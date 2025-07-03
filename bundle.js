@@ -212,13 +212,14 @@ module.exports = styleTagTransform;
 /* harmony export */   Kt: () => (/* binding */ randFrom),
 /* harmony export */   MX: () => (/* binding */ half),
 /* harmony export */   Nb: () => (/* binding */ bombUnless),
+/* harmony export */   Uk: () => (/* binding */ eachMap),
 /* harmony export */   __: () => (/* binding */ each),
 /* harmony export */   av: () => (/* binding */ bombIf),
 /* harmony export */   fv: () => (/* binding */ bomb),
 /* harmony export */   iT: () => (/* binding */ onMousemove),
 /* harmony export */   jw: () => (/* binding */ centeredStart)
 /* harmony export */ });
-/* unused harmony exports setTestMode, setMoveContext, mapi, eachMap, mapToGridDigits, randTo, onMouseover */
+/* unused harmony exports setTestMode, setMoveContext, mapi, mapToGridDigits, randTo, onMouseover, throttle */
 let isInTestMode = false;
 let moveDebug = '';
 const setTestMode = (value) => { isInTestMode = value; };
@@ -283,6 +284,16 @@ const $1 = (id) => bombUnless(document.getElementById(id), () => `No ${id} eleme
 const onClick = (e, f) => e.addEventListener('click', f);
 const onMouseover = (e, f) => e.addEventListener('mouseover', f);
 const onMousemove = (e, f) => e.addEventListener('mousemove', f);
+const throttle = (ms, fn) => {
+    let lastCall = 0;
+    return () => {
+        const now = Date.now();
+        if (now - lastCall < ms)
+            return;
+        lastCall = now;
+        fn();
+    };
+};
 function the(list, label) {
     bombIf(list.length !== 1, `Expected exactly one ${label ?? 'item'}, but got ${list.length}`);
     return list[0];
@@ -623,6 +634,7 @@ module.exports = insertStyleElement;
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Jy: () => (/* binding */ Colors),
 /* harmony export */   XE: () => (/* binding */ BORDER),
 /* harmony export */   ZK: () => (/* binding */ FIRE),
 /* harmony export */   h4: () => (/* binding */ BACKGROUND),
@@ -631,7 +643,6 @@ module.exports = insertStyleElement;
 /* harmony export */   u6: () => (/* binding */ FOREGROUND),
 /* harmony export */   wB: () => (/* binding */ WOOD)
 /* harmony export */ });
-/* unused harmony export Colors */
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
 
 const FOREGROUND = "#0a0";
@@ -645,6 +656,17 @@ class Colors {
     }
     random() {
         return _utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo ? this.colors[0] : (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randFrom */ .Kt)(this.colors);
+    }
+    static rotate(colorsOrColor) {
+        const colors = colorsOrColor instanceof Colors
+            ? colorsOrColor.colors
+            : [colorsOrColor];
+        let current = 0;
+        return () => {
+            const color = colors[current];
+            current = (current + 1) % colors.length;
+            return color;
+        };
     }
 }
 const FIRE = new Colors(['#ff6600', '#ff9900', '#ffcc00', '#ff3300']);
@@ -6337,36 +6359,29 @@ const Text = (/* unused pure expression or super */ null && (text));
 // EXTERNAL MODULE: ./src/game/colors.ts
 var colors = __webpack_require__(583);
 ;// ./src/game/config.ts
+var _a;
 
 
 class Config {
-    static createDisplay(width, height) {
+    static display(width, height, bg) {
         return new Display({
             width,
             height,
-            fontSize: Config.FONT_SIZE,
-            fontFamily: Config.FONT_FAMILY,
+            fontSize: _a.FONT_SIZE,
+            fontFamily: _a.FONT_FAMILY,
             forceSquareRatio: true,
             fg: colors/* FOREGROUND */.u6,
-            bg: colors/* BACKGROUND */.h4
-        });
-    }
-    static createTransparentDisplay(width, height) {
-        return new Display({
-            width,
-            height,
-            fontSize: Config.FONT_SIZE,
-            fontFamily: Config.FONT_FAMILY,
-            forceSquareRatio: true,
-            fg: colors/* FOREGROUND */.u6,
-            bg: 'transparent'
+            bg
         });
     }
 }
+_a = Config;
 Config.WIDTH = 90;
 Config.HEIGHT = 50;
 Config.FONT_SIZE = 16;
 Config.FONT_FAMILY = "Courier, monospace";
+Config.createDisplay = (width, height) => _a.display(width, height, colors/* BACKGROUND */.h4);
+Config.createTransparentDisplay = (width, height) => _a.display(width, height, 'transparent');
 
 
 /***/ })
@@ -6543,8 +6558,6 @@ class CellLayers {
         });
     }
     transparency() {
-        if (this.data.ui)
-            return this.data.ui.transparency;
         const transparencies = CellLayers.layerNames
             .map(name => this.data[name]?.transparency)
             .filter(t => t !== undefined);
@@ -6557,7 +6570,7 @@ class CellLayers {
         });
     }
 }
-CellLayers.layerNames = ['ui', 'pawn', 'smoke', 'fire', 'walls', 'items', 'floor'];
+CellLayers.layerNames = ['pawn', 'smoke', 'fire', 'walls', 'items', 'floor'];
 
 // EXTERNAL MODULE: ./src/game/xyl.ts
 var xyl = __webpack_require__(830);
@@ -6575,8 +6588,8 @@ class Cell {
         this.smoke = () => this.layers.data.smoke;
         this.floor = () => this.layers.data.floor;
         this.items = () => this.layers.data.items;
-        this.ui = () => this.layers.data.ui;
-        this.neighbors = () => this.xy.cardinals().map(xy => this.map.get(xy));
+        this.cardinals = () => this.xy.cardinals().map(xy => this.map.get(xy));
+        this.neighbors = () => this.xy.neighbors().map(xy => this.map.get(xy));
         this.u = (y = 1) => this.map.get(this.xy.u(y));
         this.d = (y = 1) => this.map.get(this.xy.d(y));
         this.l = (x = 1) => this.map.get(this.xy.l(x));
@@ -6645,8 +6658,6 @@ class Cell {
     }
 }
 
-// EXTERNAL MODULE: ./src/game/config.ts + 47 modules
-var config = __webpack_require__(843);
 ;// ./src/shapes.ts
 
 const eachLine = (start, end, onXYAndReturnContinue) => {
@@ -6787,7 +6798,6 @@ class Movers {
         const dx = Math.abs(from.x - to.x);
         const dy = Math.abs(from.y - to.y);
         (0,utils/* bombUnless */.Nb)(Math.max(dx, dy) === 1, 'move must be adjacent');
-        (0,utils/* bombUnless */.Nb)(this.map.get(to.xy).passable(), 'destination is not passable');
         this.moves.push(new Move(drawable, from, to));
     }
     clear() { this.moves = []; }
@@ -6814,6 +6824,8 @@ class Movers {
                 return;
             const move = (0,utils/* the */.C8)(entrants);
             const cell = this.map.get(dest.xy);
+            if (!cell.passable())
+                return;
             if (!cell.occupied(move.drawable.layer))
                 pending.push(move);
         });
@@ -6911,12 +6923,114 @@ const assertNoLeaks = (map) => {
     });
     const leaks = [...Drawable.alive].filter(d => !alive.has(d));
     if (leaks.length) {
-        (0,utils/* each */.__)(leaks, l => Drawable.alive.delete(l)); // manual GC to avoid complaining repeatedly about the same leaks
+        (0,utils/* each */.__)(leaks, l => Drawable.alive.delete(l));
         (0,utils/* bomb */.fv)(`drawable leaked ${leaks.map(l => `${l.constructor.name}:${!!l.cell}`).join(', ')}`);
     }
 };
 
+// EXTERNAL MODULE: ./src/game/config.ts + 47 modules
+var config = __webpack_require__(843);
+;// ./src/ui/display.ts
+
+
+
+class Display {
+    constructor(width, height, transparent = false) {
+        this.coordsFromEvent = (e) => {
+            const canvas = this.canvas();
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / config/* Config */.T.FONT_SIZE);
+            const y = Math.floor((e.clientY - rect.top) / config/* Config */.T.FONT_SIZE);
+            return game_xy.XY.at(x, y);
+        };
+        this.display = transparent
+            ? config/* Config */.T.createTransparentDisplay(width, height)
+            : config/* Config */.T.createDisplay(width, height);
+        this.clear();
+    }
+    draw(x, y, char, fg, bg) {
+        this.display.draw(x, y, char, fg, bg);
+    }
+    clear() {
+        this.display.clear();
+    }
+    canvas() {
+        return (0,utils/* bombUnless */.Nb)(this.display.getContainer(), () => 'Failed to get canvas');
+    }
+    attachTo(container, styles) {
+        const canvas = this.canvas();
+        Object.assign(canvas.style, styles);
+        container.appendChild(canvas);
+    }
+    onClick(callback) {
+        const canvas = this.canvas();
+        const h = (e) => {
+            const xy = this.coordsFromEvent(e);
+            if (game_xy.XY.oob(xy.x, xy.y))
+                return;
+            callback(xy);
+        };
+        (0,utils/* onClick */.Af)(canvas, h);
+        canvas.addEventListener('contextmenu', e => { e.preventDefault(); h(e); });
+    }
+    onMousemove(callback) {
+        const canvas = this.canvas();
+        (0,utils/* onMousemove */.iT)(canvas, e => {
+            const xy = this.coordsFromEvent(e);
+            if (game_xy.XY.oob(xy.x, xy.y))
+                return;
+            callback(xy);
+        });
+    }
+}
+
+;// ./src/ui/ui-renderer.ts
+
+
+class UIRenderer {
+    constructor(map) {
+        this.map = map;
+        this.strokes = new Map();
+        this.display = new Display(map.w, map.h, true);
+        this.intervalId = setInterval(() => this.render(), 100);
+        map.runOnStep('ui-renderer', () => this.render());
+    }
+    replace(id, stroke) {
+        this.remove(id);
+        this.strokes.set(id, stroke);
+    }
+    remove(id) {
+        this.strokes.delete(id);
+    }
+    draw(x, y, char, fg) {
+        this.display.draw(x, y, char, fg, 'transparent');
+    }
+    clear() {
+        this.display.clear();
+    }
+    canvas() {
+        return this.display.canvas();
+    }
+    attachTo(container, styles) {
+        this.display.attachTo(container, styles);
+    }
+    render() {
+        (0,utils/* eachMap */.Uk)(this.strokes, (id, stroke) => {
+            if (!stroke.isValid()) {
+                this.strokes.delete(id);
+            }
+        });
+        this.clear();
+        const sortedStrokes = [...this.strokes.values()].sort((a, b) => a.zIndex - b.zIndex);
+        sortedStrokes.forEach(stroke => {
+            const color = stroke.colorFn();
+            stroke.cells.forEach(({ cell, char }) => this.draw(cell.xy.x, cell.xy.y, char, color));
+        });
+    }
+}
+
 ;// ./src/game/map.ts
+
 
 
 
@@ -6935,18 +7049,11 @@ class map_Map {
             (0,utils/* bombUnless */.Nb)(result, () => 'No cell at ' + xy);
             return result;
         };
-        this.coordsFromEvent = (e, element) => {
-            const rect = element.getBoundingClientRect();
-            const x = Math.floor((e.clientX - rect.left) / config/* Config */.T.FONT_SIZE);
-            const y = Math.floor((e.clientY - rect.top) / config/* Config */.T.FONT_SIZE);
-            return game_xy.XY.at(x, y);
-        };
         this.eachLocation = (fn) => this.eachCell(cell => CellLayers.layerNames.forEach(n => fn(cell.xy.on(n))));
         this.eachCell = (fn) => (0,utils/* times */.Hn)(this.h, y => (0,utils/* times */.Hn)(this.w, x => fn(this.grid[y][x])));
         map_Map.active.add(this);
-        this.display = config/* Config */.T.createDisplay(width, height);
-        this.smokeDisplay = config/* Config */.T.createTransparentDisplay(width, height);
-        this.uiDisplay = config/* Config */.T.createTransparentDisplay(width, height);
+        this.display = new Display(width, height);
+        this.smokeDisplay = new Display(width, height, true);
         this.w = width;
         this.h = height;
         this.grid = [];
@@ -6959,6 +7066,7 @@ class map_Map {
         game_xy.XY.setSize(width, height);
         this.lighting = new Lighting(this);
         this.movers = new Movers(this);
+        this.uiRenderer = new UIRenderer(this);
     }
     drawAt(x, y, char, fg, bg) {
         this.display.draw(x, y, char, fg, bg);
@@ -6966,14 +7074,9 @@ class map_Map {
     drawAtSmoke(x, y, char, fg, bg) {
         this.smokeDisplay.draw(x, y, char, fg, bg);
     }
-    drawAtUi(x, y, char, fg, bg) {
-        this.uiDisplay.draw(x, y, char, fg, bg);
-    }
-    clearUi() { this.uiDisplay.clear(); }
     draw(showLighting, visibleLayers, showNothing, debug) {
         this.display.clear();
         this.smokeDisplay.clear();
-        this.uiDisplay.clear();
         (0,utils/* times */.Hn)(this.h, y => {
             (0,utils/* times */.Hn)(this.w, x => {
                 this.grid[y][x].draw(showLighting, visibleLayers, showNothing, debug);
@@ -7017,41 +7120,21 @@ class map_Map {
     eachRay(start, end, fOfCellIndexAndShouldContinue) {
         let index = 0;
         eachLine(start, end, (xy) => {
+            if (index === 0) {
+                index++;
+                return true;
+            }
             if (game_xy.XY.oob(xy))
                 return false;
             const cell = this.get(xy);
-            return fOfCellIndexAndShouldContinue(cell, index++);
+            return fOfCellIndexAndShouldContinue(cell, (index++) - 1);
         });
     }
-    // TODO actually want to hook into a 50ms UI flash loop which gets cleared on each step and the flash gets called with a color rotater that gets rotated each call
-    // TODO the pawn destination selection is also flashing but in a different way, it should use this too.
-    flashRayFrom(start, end, shouldContinue) {
-        this.eachRay(start.xy, end.xy, (cell, _index) => {
-            if (cell === start)
-                return true;
-            if (!shouldContinue(cell))
-                return false;
-            this.drawAtUi(cell.xy.x, cell.xy.y, '*', '#00f', 'transparent');
-            return true;
-        });
+    onClick(onClickedCell) {
+        this.display.onClick(xy => onClickedCell(this.get(xy)));
     }
-    onClick(canvas, callback) {
-        const h = (e) => {
-            const xy = this.coordsFromEvent(e, canvas);
-            if (game_xy.XY.oob(xy.x, xy.y))
-                return;
-            callback(this.get(xy));
-        };
-        (0,utils/* onClick */.Af)(canvas, h);
-        canvas.addEventListener('contextmenu', e => { e.preventDefault(); h(e); });
-    }
-    onMousemove(canvas, callback) {
-        (0,utils/* onMousemove */.iT)(canvas, e => {
-            const xy = this.coordsFromEvent(e, canvas);
-            if (game_xy.XY.oob(xy.x, xy.y))
-                return;
-            callback(this.get(xy));
-        });
+    onMousemove(onMousedCell) {
+        this.display.onMousemove(xy => onMousedCell(this.get(xy)));
     }
     renderToChars(replace = 'drawAt') {
         const chars = [];
@@ -7233,22 +7316,6 @@ class Wall extends Drawable {
     }
 }
 
-;// ./src/draw/ui.ts
-
-
-class UI extends Drawable {
-    constructor(c, textColor = colors/* FOREGROUND */.u6) {
-        super();
-        this.c = c;
-        this.textColor = textColor;
-        this.layer = 'ui';
-        this.light = () => 9;
-        this.char = () => this.c;
-        this.color = () => this.textColor;
-        this.step = () => this.cell.died(this);
-    }
-}
-
 ;// ./src/game/rect.ts
 
 class Rect {
@@ -7316,7 +7383,79 @@ class Torch extends Drawable {
     }
 }
 
+;// ./src/ui/stroke.ts
+class Stroke {
+    constructor(cells, colorFn, isValid, zIndex) {
+        this.cells = cells;
+        this.colorFn = colorFn;
+        this.isValid = isValid;
+        this.zIndex = zIndex;
+    }
+    add(cell, char) {
+        this.cells.push({ cell, char });
+    }
+}
+
+;// ./src/tasks.ts
+
+
+const TASK_COLOR = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy(['#00f', '#00f', '#00f', 'transparent', 'transparent']));
+class StepTask {
+    static strokePathBetween(from, to, id, colorFn, condition, zIndex) {
+        const path = [];
+        from.map.eachRay(from.xy, to.xy, (c, _index) => {
+            path.push({ cell: c, char: '*' });
+            return true;
+        });
+        from.map.uiRenderer.replace(id, new Stroke(path, colorFn, condition, zIndex));
+    }
+    constructor(pawn, destination) {
+        this.pawn = pawn;
+        this.destination = destination;
+        this.done = false;
+        this.isDone = () => this.done;
+        this.strokeId = `step-task-${Date.now()}-${Math.random()}`;
+    }
+    step() {
+        if (this.done)
+            return;
+        let moved = false;
+        this.pawn.cell.map.eachRay(this.pawn.cell.xy, this.destination.xy, (cell, index) => {
+            if (!cell.passable()) {
+                this.done = true;
+                return false;
+            }
+            this.pawn.cell.queueMove(this.pawn, cell.xy);
+            moved = true;
+            if (cell === this.destination)
+                this.done = true;
+            return false;
+        });
+        if (!moved || this.pawn.cell === this.destination) {
+            this.done = true;
+        }
+    }
+    cleanup() {
+        this.pawn.cell.map.uiRenderer.remove(this.strokeId);
+    }
+    desc() { return `go to ${this.destination.xy.toString()}`; }
+    strokeAndNext(start) {
+        StepTask.strokePathBetween(start, this.destination, this.strokeId, TASK_COLOR, () => !this.done, 1);
+        return this.destination;
+    }
+}
+class WaitTask {
+    constructor(pawn) {
+        this.pawn = pawn;
+    }
+    isDone() { return false; }
+    step() { }
+    desc() { return 'wait'; }
+    strokeAndNext(start) { return start; }
+}
+
 ;// ./src/draw/pawn.ts
+
 
 
 class Pawn extends Drawable {
@@ -7324,61 +7463,67 @@ class Pawn extends Drawable {
         super();
         this.name = name;
         this.selected = false;
-        this.destination = null;
+        this.passable = false;
         this.layer = 'pawn';
         this.transparency = 0;
         this.light = () => 3;
         this.char = () => '@';
         this.color = () => colors/* FOREGROUND */.u6;
-        this.onMapClicked = (c) => {
-            this.destination = c;
-            this.flashDestination();
-        };
-        this.clearDestination = () => {
-            this.destination = null;
-        };
-        this.task = () => this.destination ? `destination: ${this.destination.xy.toString()}` : 'idle';
+        this.tasks = [];
     }
     desc() {
         return this.name ? `${this.name}(${this.id})` : super.desc();
     }
+    recalcPaths() {
+        this.tasks.forEach(t => t.cleanup?.());
+        let start = this.cell;
+        this.tasks.forEach(t => start = t.strokeAndNext(start));
+        this.endCell = start;
+        return start;
+    }
+    get tipCell() { return this.tasks.length > 0 ? this.endCell : this.cell; }
+    addTask(task) {
+        this.tasks.push(task);
+        this.recalcPaths();
+    }
+    removeTask(task) {
+        task.cleanup?.();
+        this.tasks = this.tasks.filter(t => t !== task);
+        this.recalcPaths();
+    }
+    step() {
+        if (this.tasks.length > 0) {
+            const task = this.tasks[0];
+            task.step();
+            if (task.isDone()) {
+                if (task.cleanup)
+                    task.cleanup();
+                this.removeTask(task);
+            }
+            else {
+                this.recalcPaths();
+            }
+        }
+    }
+    hoverStrokePath(target) {
+        const start = this.tasks.length > 0 ? this.endCell : this.cell;
+        StepTask.strokePathBetween(start, target, Pawn.HOVER_PATH_STROKE, Pawn.HOVER_PATH_COLOR, () => true, 2);
+    }
     draw(debug, _illumination) {
-        this.flashDestination();
         if (this.selected) {
             this.cell.map.drawAt(this.cell.xy.x, this.cell.xy.y, this.char(), colors/* BACKGROUND */.h4, colors/* FOREGROUND */.u6);
             return true;
         }
         return super.draw(debug, 9);
     }
-    arrived() {
-        this.clearDestination();
-        return false;
-    }
-    step() {
-        if (this.destination)
-            this.stepToward();
-    }
     movedInto(cell) {
         super.movedInto(cell);
-        if (this.cell === this.destination)
-            this.arrived();
-    }
-    flashDestination() {
-        if (!this.destination)
-            return;
-        this.cell.map.flashRayFrom(this.cell, this.destination, cell => cell.passable());
-    }
-    stepToward() {
-        this.cell.map.eachRay(this.cell.xy, this.destination.xy, (cell, _index) => {
-            if (cell === this.cell)
-                return true; // TODO the first cell is always the start cell, which is awkward and duplicated - ponder this. dont' change without talking to the user though.
-            if (!cell.passable())
-                return this.arrived();
-            this.cell.queueMove(this, cell.xy);
-            return false;
-        });
+        if (this.tasks.length > 0)
+            this.recalcPaths();
     }
 }
+Pawn.HOVER_PATH_STROKE = 'hover-path';
+Pawn.HOVER_PATH_COLOR = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy(['#0ff', '#088']));
 
 ;// ./src/game/initializer.ts
 
@@ -7430,17 +7575,25 @@ class Initializer {
         });
     }
     addWelcomeText() {
-        this.addCenteredText("Welcome to Fire House RL", -13);
-        this.addCenteredText("press space to unpause", 13);
+        let firstStep = true;
+        this.map.runOnStep('welcome.clear', () => firstStep = false);
+        this.addCenteredText("Welcome to Fire House RL", -13, 'welcome', () => firstStep);
+        this.addCenteredText("press space to unpause", 13, 'instructions', () => firstStep);
     }
-    addCenteredText(text, yOffset) {
+    addCenteredText(text, yOffset, id, isValid = () => true) {
         const centerY = (0,utils/* half */.MX)(this.map.h);
         const y = centerY + yOffset;
         const startX = (0,utils/* centeredStart */.jw)(this.map.w, text);
-        this.addUIText(text, game_xy.XY.at(startX, y));
+        const stroke = new Stroke([], () => '#fff', isValid, 10);
+        (0,utils/* each */.__)(text, (c, i) => {
+            const cell = this.map.get(game_xy.XY.at(startX + i, y));
+            stroke.add(cell, c);
+        });
+        this.map.uiRenderer.replace(id, stroke);
     }
     addPawn() {
         this.map.createAt(game_xy.XY.at(55, 24), new Pawn('firefighter 1'));
+        this.map.createAt(game_xy.XY.at(39, 24), new Pawn('firefighter 2'));
     }
     addRoom(rect) {
         //rect.eachCell(xy => this.map.set(xy, new Floor()))
@@ -7461,21 +7614,36 @@ class Initializer {
         entrance.l().d().create(new Torch());
     }
     addUserSuggestion() {
+        let suggestionVisible = true;
         const suggest = (frameNumber) => {
+            // Stop showing once a pawn has been selected
+            if (Initializer.pawnSelected) {
+                this.map.uiRenderer.remove('suggestion');
+                return;
+            }
             if (frameNumber % 5 !== 0)
                 return;
-            const y = this.map.h - 1;
-            const text = 'click the @ symbol';
-            const startX = (0,utils/* centeredStart */.jw)(this.map.w, text);
-            this.addUIText(text, game_xy.XY.at(startX, y));
+            suggestionVisible = !suggestionVisible;
+            if (suggestionVisible) {
+                const y = this.map.h - 1;
+                const text = 'click the @ symbol';
+                const startX = (0,utils/* centeredStart */.jw)(this.map.w, text);
+                const stroke = new Stroke([], () => '#ff0', () => !Initializer.pawnSelected, 10);
+                (0,utils/* each */.__)(text, (c, i) => {
+                    const cell = this.map.get(game_xy.XY.at(startX + i, y));
+                    stroke.add(cell, c);
+                });
+                this.map.uiRenderer.replace('suggestion', stroke);
+            }
+            else {
+                this.map.uiRenderer.remove('suggestion');
+            }
         };
         suggest(0);
         this.map.runOnStep('user.suggest', suggest);
     }
-    addUIText(text, xy) {
-        (0,utils/* each */.__)(text, (c, i) => this.map.createAt(xy.add(i, 0), new UI(c)));
-    }
 }
+Initializer.pawnSelected = false;
 
 ;// ./src/ui/terminal.ts
 
@@ -7486,6 +7654,7 @@ class Terminal {
         this.selectedPawn = null;
         this.setCurrent = (cell) => this.currentCell = cell;
         this.setSelected = (pawn) => this.selectedPawn = pawn;
+        this.getSelectedPawn = () => this.selectedPawn;
         this.clear = () => { this.element.innerHTML = ''; this.selectedElement.innerHTML = ''; };
         this.element = (0,utils.$1)('terminal-content');
         this.selectedElement = (0,utils.$1)('selected-info');
@@ -7520,19 +7689,19 @@ class Terminal {
         }
         this.element.innerHTML = html;
         if (this.selectedPawn) {
-            const task = this.selectedPawn.task();
-            const hasDestination = task !== 'idle';
-            const clearButton = hasDestination ? ` <span class="clear-dest" style="cursor: pointer; color: #f44; font-weight: bold;">[x]</span>` : '';
-            this.selectedElement.innerHTML = `<div class="layer-info">${this.selectedPawn.desc()}</div><div class="layer-info">${task}${clearButton}</div>`;
-            if (hasDestination) {
-                const clearSpan = this.selectedElement.querySelector('.clear-dest');
-                if (clearSpan) {
-                    clearSpan.addEventListener('click', () => {
-                        this.selectedPawn.clearDestination();
-                        this.draw();
-                    });
-                }
-            }
+            let selHtml = `<div class="layer-info">${this.selectedPawn.desc()}</div>`;
+            this.selectedPawn.tasks.forEach((t, i) => {
+                selHtml += `<div class="layer-info">${t.desc()} <span class="clear-task" data-index="${i}" style="cursor: pointer; color: #f44; font-weight: bold;">[x]</span></div>`;
+            });
+            this.selectedElement.innerHTML = selHtml;
+            this.selectedElement.querySelectorAll('.clear-task').forEach(span => {
+                span.addEventListener('click', () => {
+                    const idx = Number(span.dataset.index);
+                    this.selectedPawn.removeTask(this.selectedPawn.tasks[idx]);
+                    this.draw();
+                    window.dispatchEvent(new Event('taskRemoved'));
+                });
+            });
         }
         else {
             this.selectedElement.innerHTML = '';
@@ -7540,7 +7709,191 @@ class Terminal {
     }
 }
 
+;// ./src/ui/ui.ts
+
+
+
+
+class SelectState {
+    constructor(ui) {
+        this.ui = ui;
+    }
+    onClick(cell) {
+        const pawn = cell.pawn();
+        if (pawn)
+            this.ui.setState('menu', pawn);
+    }
+    onMouseMove(cell) {
+        this.ui.terminal.setCurrent(cell);
+    }
+}
+class DestinationState {
+    constructor(ui) {
+        this.ui = ui;
+    }
+    onClick(cell) {
+        if (cell.pawn() !== this.selected)
+            this.selected.addTask(new StepTask(this.selected, cell));
+        this.ui.setState('menu', this.selected);
+    }
+    onMouseMove(cell) {
+        this.ui.terminal.setCurrent(cell); // TODO why is this needed? it should done in mouse move on the map, i.e., every time the mouse moves
+        this.selected.hoverStrokePath(cell);
+    }
+    enter(pawn) {
+        this.selected = pawn;
+        this.selected.selected = true;
+        this.ui.terminal.setSelected(pawn);
+        Initializer.pawnSelected = true;
+    }
+    exit() {
+        this.ui.map.uiRenderer.remove(Pawn.HOVER_PATH_STROKE);
+        this.selected.selected = false;
+        this.ui.terminal.setSelected(null);
+    }
+}
+class MenuState {
+    constructor(ui) {
+        this.ui = ui;
+        this.menuOptions = [
+            { key: 'g', action: 'go', cell: null },
+            { key: 'w', action: 'wait', cell: null },
+            { key: 'd', action: 'debug', cell: null },
+            { key: 'x', action: 'delete', cell: null },
+            { key: '!', action: 'deselect', cell: null }
+        ];
+    }
+    onClick(cell) {
+        const option = this.menuOptions.find(opt => opt.cell === cell);
+        if (option) {
+            if (option.key === 'g') {
+                this.ui.setState('destination', this.selected);
+            }
+            else if (option.key === 'w') {
+                this.selected.addTask(new WaitTask(this.selected));
+                this.ui.setState('menu', this.selected);
+            }
+            else if (option.key === 'd') {
+                window.pawn = this.selected;
+                console.log('Pawn assigned to window.pawn:', this.selected);
+                this.ui.setState('menu', this.selected);
+            }
+            else if (option.key === 'x') {
+                const t = this.selected.tasks[this.selected.tasks.length - 1];
+                if (t)
+                    this.selected.removeTask(t);
+                this.ui.setState('menu', this.selected);
+            }
+            else if (option.key === '!') {
+                this.ui.setState('select');
+            }
+        }
+        else {
+            this.ui.setState('select');
+        }
+    }
+    onMouseMove(cell) {
+        this.ui.terminal.setCurrent(cell);
+    }
+    enter(pawn) {
+        this.selected = pawn;
+        this.selected.selected = true;
+        this.ui.terminal.setSelected(pawn);
+        Initializer.pawnSelected = true;
+        this.showMenu();
+    }
+    exit() {
+        // Deselect pawn when exiting menu
+        this.selected.selected = false;
+        this.ui.terminal.setSelected(null);
+        this.hideMenu();
+    }
+    showMenu() {
+        const neighbors = this.selected.tipCell.neighbors();
+        neighbors.slice(0, this.menuOptions.length).forEach((cell, i) => {
+            if (i < this.menuOptions.length) {
+                const option = this.menuOptions[i];
+                option.cell = cell;
+                this.ui.map.uiRenderer.replace(`menu-${option.key}`, this.createMenuStroke(cell, option.key));
+            }
+        });
+    }
+    hideMenu() {
+        this.menuOptions.forEach(option => {
+            this.ui.map.uiRenderer.remove(`menu-${option.key}`);
+            option.cell = null;
+        });
+    }
+    createMenuStroke(cell, char) {
+        const stroke = new Stroke([], () => '#ff0', () => true, 5);
+        stroke.add(cell, char);
+        return stroke;
+    }
+}
+class ObservePawnState {
+    constructor(ui) {
+        this.ui = ui;
+    }
+    onClick(cell) {
+        const pawn = cell.pawn();
+        if (pawn)
+            this.ui.setState('menu', pawn);
+        else
+            this.ui.setState('select');
+    }
+    onMouseMove(cell) {
+        this.ui.terminal.setCurrent(cell);
+    }
+    enter(pawn) {
+        this.selected = pawn;
+        this.selected.selected = true;
+        this.ui.terminal.setSelected(pawn);
+        Initializer.pawnSelected = true;
+    }
+    exit() {
+        this.selected.selected = false;
+        this.ui.terminal.setSelected(null);
+    }
+}
+class UI {
+    constructor(terminal, map, drawMap) {
+        this.terminal = terminal;
+        this.map = map;
+        this.drawMap = drawMap;
+        this.state = 'select';
+        this.onClick = (cell) => {
+            this.states[this.state].onClick(cell);
+            this.drawMap();
+            this.terminal.draw();
+        };
+        this.onMouseMove = (cell) => {
+            this.states[this.state].onMouseMove(cell);
+            this.terminal.draw();
+        };
+        this.states = {
+            select: new SelectState(this),
+            destination: new DestinationState(this),
+            menu: new MenuState(this),
+            observe: new ObservePawnState(this)
+        };
+        window.addEventListener('taskRemoved', () => {
+            if (this.state === 'menu') {
+                const menuState = this.states.menu;
+                this.setState('menu', menuState.selected);
+                this.drawMap();
+                this.terminal.draw();
+            }
+        });
+    }
+    setState(newState, data) {
+        this.states[this.state].exit?.();
+        this.state = newState;
+        this.states[this.state].enter?.(data);
+    }
+}
+
 ;// ./src/game/game.ts
+
 
 
 
@@ -7554,16 +7907,14 @@ class Game {
         this.showLighting = false;
         this.mutedLayers = new Set();
         this.soloLayer = null;
-        this.selectedPawn = null;
         this.stepN = 0;
         this.stepMs = 0;
-        this.lastLine = 0;
-        this.flash = false;
         this.updateStepInfo = () => {
             (0,utils.$1)('step-info').textContent = `${this.stepN} ${this.stepMs}ms`;
         };
         this.map = new map_Map(config/* Config */.T.WIDTH, config/* Config */.T.HEIGHT);
         this.terminal = new Terminal();
+        this.ui = new UI(this.terminal, this.map, () => this.drawMap());
         this.attachToDOM();
         this.setupControls();
         this.setupDebugControls();
@@ -7581,55 +7932,14 @@ class Game {
             this.togglePlayPause();
         });
     }
-    selectPawn(pawn) {
-        this.unselectPawn();
-        pawn.selected = true;
-        this.selectedPawn = pawn;
-        this.terminal.setSelected(pawn);
-    }
-    unselectPawn() {
-        if (!this.selectedPawn)
-            return;
-        this.selectedPawn.selected = false;
-        this.selectedPawn = null;
-        this.terminal.setSelected(null);
-        this.map.clearUi();
-    }
     attachToDOM() {
-        const container = (0,utils/* bombUnless */.Nb)(document.getElementById('game-container'), () => 'No game-container element');
-        const canvas = (0,utils/* bombUnless */.Nb)(this.map.display.getContainer(), () => 'Failed to get canvas');
-        const smokeCanvas = (0,utils/* bombUnless */.Nb)(this.map.smokeDisplay.getContainer(), () => 'Failed to get smoke canvas');
-        const uiCanvas = (0,utils/* bombUnless */.Nb)(this.map.uiDisplay.getContainer(), () => 'Failed to get ui canvas');
+        const container = (0,utils.$1)('game-container');
         container.style.position = 'relative';
-        canvas.style.display = 'block';
-        canvas.style.zIndex = '1';
-        smokeCanvas.style.position = 'absolute';
-        smokeCanvas.style.top = '0';
-        smokeCanvas.style.left = '0';
-        smokeCanvas.style.zIndex = '2';
-        smokeCanvas.style.pointerEvents = 'none';
-        uiCanvas.style.position = 'absolute';
-        uiCanvas.style.top = '0';
-        uiCanvas.style.left = '0';
-        uiCanvas.style.zIndex = '3';
-        uiCanvas.style.pointerEvents = 'none';
-        container.appendChild(canvas);
-        container.appendChild(smokeCanvas);
-        container.appendChild(uiCanvas);
-        this.map.onMousemove(canvas, cell => this.onMouseMove(cell));
-        this.map.onClick(canvas, cell => {
-            const pawn = cell.pawn();
-            if (this.selectedPawn) {
-                if (pawn === this.selectedPawn)
-                    this.unselectPawn();
-                else
-                    this.selectedPawn.onMapClicked(cell);
-            }
-            else if (pawn)
-                this.selectPawn(pawn);
-            this.drawMap();
-            this.terminal.draw();
-        });
+        this.map.display.attachTo(container, { display: 'block', zIndex: '1' });
+        this.map.smokeDisplay.attachTo(container, { position: 'absolute', top: '0', left: '0', zIndex: '2', pointerEvents: 'none' });
+        this.map.uiRenderer.attachTo(container, { position: 'absolute', top: '0', left: '0', zIndex: '3', pointerEvents: 'none' });
+        this.map.onMousemove(this.ui.onMouseMove);
+        this.map.onClick(this.ui.onClick);
     }
     setupControls() {
         (0,utils/* onClick */.Af)((0,utils.$1)('playpause-button'), () => this.togglePlayPause());
@@ -7672,6 +7982,11 @@ class Game {
         this.updatePlayPauseButton();
     }
     step() {
+        const selectedPawn = this.terminal.getSelectedPawn();
+        if (selectedPawn)
+            this.ui.setState('observe', selectedPawn);
+        else
+            this.ui.setState('select');
         const start = Date.now();
         this.map.step();
         this.map.lighting.redraw();
@@ -7742,44 +8057,11 @@ class Game {
         });
         this.drawMap();
     }
-    onMouseMove(cell) {
-        this.terminal.setCurrent(cell);
-        const now = Date.now();
-        if (!this.selectedPawn) {
-            this.map.clearUi();
-            this.terminal.draw();
-            return;
-        }
-        if (this.selectedPawn.task() !== 'idle') {
-            this.map.clearUi();
-            this.terminal.draw();
-            return;
-        }
-        if (now - this.lastLine < 50) {
-            this.terminal.draw();
-            return;
-        }
-        this.lastLine = now; // TODO debounce/throttle using lodash or something else
-        this.map.clearUi();
-        const start = this.selectedPawn.cell.xy;
-        const end = cell.xy;
-        const color = this.flash ? '#0ff' : '#088';
-        this.map.eachRay(start, end, (cell, index) => {
-            if (cell === this.selectedPawn.cell)
-                return true;
-            if (!cell.passable())
-                return false;
-            this.map.drawAtUi(cell.xy.x, cell.xy.y, '*', color, 'transparent');
-            return true;
-        });
-        this.flash = !this.flash;
-        this.terminal.draw();
-    }
     createLayerButtons() {
         const layerGroup = (0,utils.$1)('layer-group');
         const layerAbbrevs = Object.fromEntries(CellLayers.layerNames.map(name => [
             name,
-            name === 'ui' ? 'ui ' : name.slice(0, 3)
+            name.slice(0, 3)
         ]));
         CellLayers.layerNames.forEach(layerName => {
             const button = document.createElement('button');
