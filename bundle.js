@@ -208,16 +208,19 @@ module.exports = styleTagTransform;
 /* harmony export */   C8: () => (/* binding */ the),
 /* harmony export */   H3: () => (/* binding */ pushMap),
 /* harmony export */   Hn: () => (/* binding */ times),
+/* harmony export */   Im: () => (/* binding */ isEmpty),
 /* harmony export */   Jo: () => (/* binding */ isInTestMode),
 /* harmony export */   Kt: () => (/* binding */ randFrom),
 /* harmony export */   MX: () => (/* binding */ half),
 /* harmony export */   Nb: () => (/* binding */ bombUnless),
-/* harmony export */   Uk: () => (/* binding */ eachMap),
 /* harmony export */   __: () => (/* binding */ each),
 /* harmony export */   av: () => (/* binding */ bombIf),
+/* harmony export */   cd: () => (/* binding */ eachPair),
 /* harmony export */   fv: () => (/* binding */ bomb),
 /* harmony export */   iT: () => (/* binding */ onMousemove),
-/* harmony export */   jw: () => (/* binding */ centeredStart)
+/* harmony export */   iw: () => (/* binding */ onLastMaybe),
+/* harmony export */   jw: () => (/* binding */ centeredStart),
+/* harmony export */   ov: () => (/* binding */ hasContent)
 /* harmony export */ });
 /* unused harmony exports setTestMode, setMoveContext, mapi, mapToGridDigits, randTo, onMouseover, throttle */
 let isInTestMode = false;
@@ -256,7 +259,15 @@ function each(xs, fOfTandI) {
     for (let i = 0; i < xs.length; i++)
         fOfTandI(xs[i], i);
 }
-const eachMap = (m, f) => m.forEach((v, k) => f(k, v));
+const hasContent = (xs) => xs instanceof Map ? xs.size > 0 : xs.length > 0;
+const isEmpty = (xs) => xs instanceof Map ? xs.size === 0 : xs.length === 0;
+const onLastMaybe = (xs, f) => hasContent(xs) && f(xs[xs.length - 1]);
+const eachPair = (m, f) => {
+    if (m instanceof Map)
+        m.forEach((v, k) => f(k, v));
+    else
+        m.forEach(([k, v]) => f(k, v));
+};
 function mapToGridDigits(size, mapFn) {
     const { XY } = __webpack_require__(88);
     let result = '\n';
@@ -641,7 +652,8 @@ module.exports = insertStyleElement;
 /* harmony export */   jA: () => (/* binding */ SMOLDERING),
 /* harmony export */   oE: () => (/* binding */ SMOKE),
 /* harmony export */   u6: () => (/* binding */ FOREGROUND),
-/* harmony export */   wB: () => (/* binding */ WOOD)
+/* harmony export */   wB: () => (/* binding */ WOOD),
+/* harmony export */   zu: () => (/* binding */ LAMP)
 /* harmony export */ });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
 
@@ -671,6 +683,7 @@ class Colors {
 }
 const FIRE = new Colors(['#ff6600', '#ff9900', '#ffcc00', '#ff3300']);
 const SMOKE = new Colors(['rgba(51,51,51,0.6)', 'rgba(85,85,85,0.6)', 'rgba(102,102,102,0.6)', 'rgba(119,119,119,0.6)', 'rgba(136,136,136,0.6)', 'rgba(153,153,153,0.6)', 'rgba(170,170,170,0.6)', 'rgba(187,187,187,0.6)', 'rgba(204,204,204,0.6)']);
+const LAMP = new Colors(['#ccffff', '#99ddff', '#66ccff']);
 
 
 /***/ }),
@@ -6744,18 +6757,20 @@ class Lighting {
                     eachLine(cell.xy, game_xy.XY.at(tx, ty), (xy) => {
                         const dir = xy.subXY(cell.xy);
                         const base = Lighting.quadraticFallOff(radius, dir.x, dir.y);
-                        const bright = Math.round(base * vis);
+                        const normalized = radius > 0 ? (base / radius) * 9 : 0;
+                        const bright = Math.round(normalized * vis);
                         if (bright > this.atXY(xy))
                             this.set(xy, bright);
                         if (xy.x === cell.xy.x && xy.y === cell.xy.y)
-                            return true; // skip torch tile
+                            return true; // skip lamp tile
                         vis *= this.transparencyOf(xy.x, xy.y);
                         return vis > 0;
                     });
                     if (vis <= 0)
                         continue; // ray blocked
                     const base = Lighting.quadraticFallOff(radius, dx, dy);
-                    const bright = Math.round(base * vis);
+                    const normalized = radius > 0 ? (base / radius) * 9 : 0;
+                    const bright = Math.round(normalized * vis);
                     if (bright > this._illumination[ty][tx])
                         this._illumination[ty][tx] = bright;
                 }
@@ -6853,7 +6868,7 @@ class Drawable {
         Drawable.alive.add(this);
     }
     step() { }
-    desc() { return `${this.constructor.name}(${this.id})`; }
+    desc() { return this.constructor.name; }
     draw(_debug, illumination) {
         const fg = this.applyIllumination(this.color(), illumination);
         this.cell.map.drawAt(this.cell.xy.x, this.cell.xy.y, this.char(), fg, colors/* BACKGROUND */.h4);
@@ -6991,9 +7006,11 @@ class UIRenderer {
     constructor(map) {
         this.map = map;
         this.strokes = new Map();
+        this.renderFrame = 0;
         this.display = new Display(map.w, map.h, true);
         this.intervalId = setInterval(() => this.render(), 100);
         map.runOnStep('ui-renderer', () => this.render());
+        window.addEventListener('strokesChanged', () => this.render());
     }
     replace(id, stroke) {
         this.remove(id);
@@ -7015,7 +7032,7 @@ class UIRenderer {
         this.display.attachTo(container, styles);
     }
     render() {
-        (0,utils/* eachMap */.Uk)(this.strokes, (id, stroke) => {
+        (0,utils/* eachPair */.cd)(this.strokes, (id, stroke) => {
             if (!stroke.isValid()) {
                 this.strokes.delete(id);
             }
@@ -7026,6 +7043,9 @@ class UIRenderer {
             const color = stroke.colorFn();
             stroke.cells.forEach(({ cell, char }) => this.draw(cell.xy.x, cell.xy.y, char, color));
         });
+        if (this.renderFrame % 4 === 0)
+            window.dispatchEvent(new Event('redraw-map'));
+        this.renderFrame++;
     }
 }
 
@@ -7117,17 +7137,17 @@ class map_Map {
     moving(drawable, from, to) {
         this.movers.queue(drawable, from, to);
     }
-    eachRay(start, end, fOfCellIndexAndShouldContinue) {
-        let index = 0;
+    eachRay(start, end, fOfCellAndShouldContinue) {
+        let first = true;
         eachLine(start, end, (xy) => {
-            if (index === 0) {
-                index++;
+            if (first) {
+                first = false;
                 return true;
             }
             if (game_xy.XY.oob(xy))
                 return false;
             const cell = this.get(xy);
-            return fOfCellIndexAndShouldContinue(cell, (index++) - 1);
+            return fOfCellAndShouldContinue(cell);
         });
     }
     onClick(onClickedCell) {
@@ -7289,7 +7309,7 @@ class Wall extends Drawable {
         this.char = () => this.isDoor ? '+' : '#';
         this.color = () => this.isBurning() ? colors/* SMOLDERING */.jA : this.isDoor ? colors/* WOOD */.wB : colors/* BORDER */.XE;
         this.light = () => this.isBurning() ? 1 : 0;
-        this.desc = () => `${this.isDoor ? 'Door' : 'Wall'}(${this.id})`;
+        this.desc = () => this.isDoor ? 'Door' : 'Wall';
         this.makeDoor = () => {
             this.isDoor = true;
             this.passable = true;
@@ -7359,19 +7379,19 @@ class Floor extends Drawable {
     }
 }
 
-;// ./src/draw/torch.ts
+;// ./src/draw/lamp.ts
 
 
 
 
-class Torch extends Drawable {
+class Lamp extends Drawable {
     constructor() {
         super(...arguments);
         this.layer = 'items';
         this.transparency = 1;
         this.light = () => 5;
         this.char = () => '*';
-        this.color = () => colors/* FIRE */.ZK.random();
+        this.color = () => colors/* LAMP */.zu.random();
     }
     smoking() {
         return utils/* isInTestMode */.Jo ? true : (0,utils/* oneIn */.A7)(3);
@@ -7396,62 +7416,26 @@ class Stroke {
     }
 }
 
-;// ./src/tasks.ts
+;// ./src/game/tasks/task.ts
 
 
 const TASK_COLOR = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy(['#00f', '#00f', '#00f', 'transparent', 'transparent']));
-class StepTask {
+class Task {
     static strokePathBetween(from, to, id, colorFn, condition, zIndex) {
         const path = [];
-        from.map.eachRay(from.xy, to.xy, (c, _index) => {
+        from.map.eachRay(from.xy, to.xy, (c) => {
             path.push({ cell: c, char: '*' });
             return true;
         });
         from.map.uiRenderer.replace(id, new Stroke(path, colorFn, condition, zIndex));
     }
-    constructor(pawn, destination) {
-        this.pawn = pawn;
-        this.destination = destination;
-        this.done = false;
-        this.isDone = () => this.done;
-        this.strokeId = `step-task-${Date.now()}-${Math.random()}`;
-    }
-    step() {
-        if (this.done)
-            return;
-        let moved = false;
-        this.pawn.cell.map.eachRay(this.pawn.cell.xy, this.destination.xy, (cell, index) => {
-            if (!cell.passable()) {
-                this.done = true;
-                return false;
-            }
-            this.pawn.cell.queueMove(this.pawn, cell.xy);
-            moved = true;
-            if (cell === this.destination)
-                this.done = true;
-            return false;
-        });
-        if (!moved || this.pawn.cell === this.destination) {
-            this.done = true;
-        }
-    }
-    cleanup() {
-        this.pawn.cell.map.uiRenderer.remove(this.strokeId);
-    }
-    desc() { return `go to ${this.destination.xy.toString()}`; }
-    strokeAndNext(start) {
-        StepTask.strokePathBetween(start, this.destination, this.strokeId, TASK_COLOR, () => !this.done, 1);
-        return this.destination;
-    }
-}
-class WaitTask {
     constructor(pawn) {
         this.pawn = pawn;
     }
-    isDone() { return false; }
-    step() { }
-    desc() { return 'wait'; }
-    strokeAndNext(start) { return start; }
+    cleanup() { }
+    remove() {
+        this.pawn.removeTask(this);
+    }
 }
 
 ;// ./src/draw/pawn.ts
@@ -7472,13 +7456,14 @@ class Pawn extends Drawable {
         this.tasks = [];
     }
     desc() {
-        return this.name ? `${this.name}(${this.id})` : super.desc();
+        return this.name ? this.name : super.desc();
     }
     recalcPaths() {
         this.tasks.forEach(t => t.cleanup?.());
         let start = this.cell;
         this.tasks.forEach(t => start = t.strokeAndNext(start));
         this.endCell = start;
+        window.dispatchEvent(new Event('strokesChanged'));
         return start;
     }
     get tipCell() { return this.tasks.length > 0 ? this.endCell : this.cell; }
@@ -7490,6 +7475,7 @@ class Pawn extends Drawable {
         task.cleanup?.();
         this.tasks = this.tasks.filter(t => t !== task);
         this.recalcPaths();
+        window.dispatchEvent(new Event('taskRemoved'));
     }
     step() {
         if (this.tasks.length > 0) {
@@ -7507,7 +7493,8 @@ class Pawn extends Drawable {
     }
     hoverStrokePath(target) {
         const start = this.tasks.length > 0 ? this.endCell : this.cell;
-        StepTask.strokePathBetween(start, target, Pawn.HOVER_PATH_STROKE, Pawn.HOVER_PATH_COLOR, () => true, 2);
+        Task.strokePathBetween(start, target, Pawn.HOVER_PATH_STROKE, Pawn.HOVER_PATH_COLOR, () => true, 2);
+        window.dispatchEvent(new Event('strokesChanged'));
     }
     draw(debug, _illumination) {
         if (this.selected) {
@@ -7601,7 +7588,7 @@ class Initializer {
             this.map.createAt(xy, new Wall());
         });
         [rect.ul.add(1, 1), rect.ur.add(-1, 1), rect.bl.add(1, -1), rect.br.add(-1, -1)].forEach(xy => {
-            this.map.createAt(xy, new Torch());
+            this.map.createAt(xy, new Lamp());
         });
     }
     addBarracks() {
@@ -7610,8 +7597,8 @@ class Initializer {
         const entrance = this.map.get(rect.cl);
         const wall = entrance.wall();
         wall.makeDoor();
-        entrance.l().u().create(new Torch());
-        entrance.l().d().create(new Torch());
+        entrance.l().u().create(new Lamp());
+        entrance.l().d().create(new Lamp());
     }
     addUserSuggestion() {
         let suggestionVisible = true;
@@ -7709,11 +7696,7 @@ class Terminal {
     }
 }
 
-;// ./src/ui/ui.ts
-
-
-
-
+;// ./src/ui/states/select-state.ts
 class SelectState {
     constructor(ui) {
         this.ui = ui;
@@ -7727,17 +7710,62 @@ class SelectState {
         this.ui.terminal.setCurrent(cell);
     }
 }
+
+;// ./src/game/tasks/destination-task.ts
+
+
+class DestinationTask extends Task {
+    constructor(pawn, destination) {
+        super(pawn);
+        this.destination = destination;
+        this.done = false;
+        this.isDone = () => this.done;
+        this.strokeId = `destination-task-${Date.now()}-${Math.random()}`;
+    }
+    step() {
+        if (this.done)
+            return;
+        let moved = false;
+        this.pawn.cell.map.eachRay(this.pawn.cell.xy, this.destination.xy, (cell) => {
+            if (!cell.passable()) {
+                this.done = true;
+                return false;
+            }
+            this.pawn.cell.queueMove(this.pawn, cell.xy);
+            moved = true;
+            if (cell === this.destination)
+                this.done = true;
+            return false;
+        });
+        if (!moved || this.pawn.cell === this.destination) {
+            this.done = true;
+        }
+    }
+    cleanup() {
+        this.pawn.cell.map.uiRenderer.remove(this.strokeId);
+    }
+    desc() { return `go to ${this.destination.xy.toString()}`; }
+    strokeAndNext(start) {
+        Task.strokePathBetween(start, this.destination, this.strokeId, TASK_COLOR, () => !this.done, 1);
+        return this.destination;
+    }
+}
+
+;// ./src/ui/states/destination-state.ts
+
+
+
 class DestinationState {
     constructor(ui) {
         this.ui = ui;
     }
     onClick(cell) {
         if (cell.pawn() !== this.selected)
-            this.selected.addTask(new StepTask(this.selected, cell));
+            this.selected.addTask(new DestinationTask(this.selected, cell));
         this.ui.setState('menu', this.selected);
     }
     onMouseMove(cell) {
-        this.ui.terminal.setCurrent(cell); // TODO why is this needed? it should done in mouse move on the map, i.e., every time the mouse moves
+        this.ui.terminal.setCurrent(cell);
         this.selected.hoverStrokePath(cell);
     }
     enter(pawn) {
@@ -7749,80 +7777,111 @@ class DestinationState {
     exit() {
         this.ui.map.uiRenderer.remove(Pawn.HOVER_PATH_STROKE);
         this.selected.selected = false;
+        window.dispatchEvent(new Event('strokesChanged'));
         this.ui.terminal.setSelected(null);
+    }
+}
+
+;// ./src/game/tasks/wait-task.ts
+
+class WaitTask extends Task {
+    isDone() { return false; }
+    step() { }
+    desc() { return 'wait'; }
+    strokeAndNext(start) { return start; }
+}
+
+;// ./src/ui/states/menu-state.ts
+
+
+
+
+
+class MenuItem {
+    constructor(letter, command) {
+        this.letter = letter;
+        this.command = command;
     }
 }
 class MenuState {
     constructor(ui) {
         this.ui = ui;
-        this.menuOptions = [
-            { key: 'g', action: 'go', cell: null },
-            { key: 'w', action: 'wait', cell: null },
-            { key: 'd', action: 'debug', cell: null },
-            { key: 'x', action: 'delete', cell: null },
-            { key: '!', action: 'deselect', cell: null }
-        ];
+        this.itemsByXY = new Map();
     }
     onClick(cell) {
-        const option = this.menuOptions.find(opt => opt.cell === cell);
-        if (option) {
-            if (option.key === 'g') {
-                this.ui.setState('destination', this.selected);
-            }
-            else if (option.key === 'w') {
-                this.selected.addTask(new WaitTask(this.selected));
-                this.ui.setState('menu', this.selected);
-            }
-            else if (option.key === 'd') {
-                window.pawn = this.selected;
-                console.log('Pawn assigned to window.pawn:', this.selected);
-                this.ui.setState('menu', this.selected);
-            }
-            else if (option.key === 'x') {
-                const t = this.selected.tasks[this.selected.tasks.length - 1];
-                if (t)
-                    this.selected.removeTask(t);
-                this.ui.setState('menu', this.selected);
-            }
-            else if (option.key === '!') {
-                this.ui.setState('select');
-            }
-        }
-        else {
-            this.ui.setState('select');
-        }
+        const menuItem = this.itemsByXY.get(cell.xy.toString());
+        if (!menuItem)
+            return this.ui.setState('select');
+        menuItem.command();
     }
     onMouseMove(cell) {
         this.ui.terminal.setCurrent(cell);
     }
     enter(pawn) {
-        this.selected = pawn;
-        this.selected.selected = true;
+        this.pawn = pawn;
+        this.pawn.selected = true;
         this.ui.terminal.setSelected(pawn);
         Initializer.pawnSelected = true;
         this.showMenu();
     }
     exit() {
-        // Deselect pawn when exiting menu
-        this.selected.selected = false;
+        this.pawn.selected = false;
         this.ui.terminal.setSelected(null);
         this.hideMenu();
     }
+    definitions() {
+        return [
+            ['x', () => this.ui.setState('select')],
+            ['g', () => this.ui.setState('destination', this.pawn)],
+            ['w', () => {
+                    this.pawn.addTask(new WaitTask(this.pawn));
+                    this.ui.setState('menu', this.pawn);
+                }],
+            ['d', () => {
+                    window.pawn = this.pawn;
+                    console.log('Pawn assigned to window.pawn:', this.pawn);
+                    this.ui.setState('menu', this.pawn);
+                }],
+            ['r', () => {
+                    (0,utils/* onLastMaybe */.iw)(this.pawn.tasks, task => {
+                        task.remove();
+                    });
+                    this.ui.setState('menu', this.pawn);
+                }]
+        ];
+    }
     showMenu() {
-        const neighbors = this.selected.tipCell.neighbors();
-        neighbors.slice(0, this.menuOptions.length).forEach((cell, i) => {
-            if (i < this.menuOptions.length) {
-                const option = this.menuOptions[i];
-                option.cell = cell;
-                this.ui.map.uiRenderer.replace(`menu-${option.key}`, this.createMenuStroke(cell, option.key));
-            }
+        const commands = [...this.definitions()];
+        this.placeCommands(commands);
+    }
+    addUnusedMenuCells() {
+        if ((0,utils/* isEmpty */.Im)(this.itemsByXY))
+            return this.pawn.tipCell.neighbors();
+        const result = [];
+        this.itemsByXY.forEach((_item, key) => {
+            const [x, y] = key.split(', ').map(n => parseInt(n));
+            const cell = this.ui.map.get(game_xy.XY.at(x, y));
+            result.push(...cell.neighbors().filter(neighbor => !this.itemsByXY.has(neighbor.xy.toString())));
         });
+        return result;
+    }
+    placeCommands(commands) {
+        const cells = this.addUnusedMenuCells();
+        const placeable = commands.slice(0, cells.length);
+        const remaining = commands.slice(cells.length);
+        (0,utils/* eachPair */.cd)(placeable, (letter, command) => {
+            const cell = cells.shift();
+            this.itemsByXY.set(cell.xy.toString(), new MenuItem(letter, command));
+            this.ui.map.uiRenderer.replace(`menu-${letter}`, this.createMenuStroke(cell, letter));
+        });
+        if ((0,utils/* hasContent */.ov)(remaining))
+            this.placeCommands(remaining);
     }
     hideMenu() {
-        this.menuOptions.forEach(option => {
-            this.ui.map.uiRenderer.remove(`menu-${option.key}`);
-            option.cell = null;
+        this.itemsByXY.forEach(item => {
+            this.ui.map.uiRenderer.remove(`menu-${item.letter}`);
         });
+        this.itemsByXY.clear();
     }
     createMenuStroke(cell, char) {
         const stroke = new Stroke([], () => '#ff0', () => true, 5);
@@ -7830,6 +7889,9 @@ class MenuState {
         return stroke;
     }
 }
+
+;// ./src/ui/states/observe-state.ts
+
 class ObservePawnState {
     constructor(ui) {
         this.ui = ui;
@@ -7855,15 +7917,20 @@ class ObservePawnState {
         this.ui.terminal.setSelected(null);
     }
 }
+
+;// ./src/ui/ui.ts
+
+
+
+
 class UI {
-    constructor(terminal, map, drawMap) {
+    constructor(terminal, map) {
         this.terminal = terminal;
         this.map = map;
-        this.drawMap = drawMap;
         this.state = 'select';
         this.onClick = (cell) => {
             this.states[this.state].onClick(cell);
-            this.drawMap();
+            window.dispatchEvent(new Event('strokesChanged'));
             this.terminal.draw();
         };
         this.onMouseMove = (cell) => {
@@ -7879,8 +7946,8 @@ class UI {
         window.addEventListener('taskRemoved', () => {
             if (this.state === 'menu') {
                 const menuState = this.states.menu;
-                this.setState('menu', menuState.selected);
-                this.drawMap();
+                this.setState('menu', menuState.pawn);
+                window.dispatchEvent(new Event('strokesChanged'));
                 this.terminal.draw();
             }
         });
@@ -7914,7 +7981,7 @@ class Game {
         };
         this.map = new map_Map(config/* Config */.T.WIDTH, config/* Config */.T.HEIGHT);
         this.terminal = new Terminal();
-        this.ui = new UI(this.terminal, this.map, () => this.drawMap());
+        this.ui = new UI(this.terminal, this.map);
         this.attachToDOM();
         this.setupControls();
         this.setupDebugControls();
@@ -7931,6 +7998,7 @@ class Game {
             e.preventDefault();
             this.togglePlayPause();
         });
+        window.addEventListener('redraw-map', () => this.drawMap());
     }
     attachToDOM() {
         const container = (0,utils.$1)('game-container');
@@ -7982,11 +8050,6 @@ class Game {
         this.updatePlayPauseButton();
     }
     step() {
-        const selectedPawn = this.terminal.getSelectedPawn();
-        if (selectedPawn)
-            this.ui.setState('observe', selectedPawn);
-        else
-            this.ui.setState('select');
         const start = Date.now();
         this.map.step();
         this.map.lighting.redraw();
