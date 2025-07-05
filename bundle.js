@@ -649,12 +649,12 @@ module.exports = insertStyleElement;
 /* harmony export */   XE: () => (/* binding */ BORDER),
 /* harmony export */   ZK: () => (/* binding */ FIRE),
 /* harmony export */   h4: () => (/* binding */ BACKGROUND),
-/* harmony export */   jA: () => (/* binding */ SMOLDERING),
 /* harmony export */   oE: () => (/* binding */ SMOKE),
 /* harmony export */   u6: () => (/* binding */ FOREGROUND),
 /* harmony export */   wB: () => (/* binding */ WOOD),
 /* harmony export */   zu: () => (/* binding */ LAMP)
 /* harmony export */ });
+/* unused harmony export SMOLDERING */
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
 
 const FOREGROUND = "#0a0";
@@ -6584,6 +6584,7 @@ class CellLayers {
     }
 }
 CellLayers.layerNames = ['pawn', 'smoke', 'fire', 'walls', 'items', 'floor'];
+CellLayers.materialLayers = ['walls', 'items', 'pawn'];
 
 // EXTERNAL MODULE: ./src/game/xyl.ts
 var xyl = __webpack_require__(830);
@@ -7212,7 +7213,9 @@ class Smoke extends Drawable {
         this.char = () => '+';
         this.color = () => colors/* SMOKE */.oE.random();
     }
-    draw(_debug, _illumination) {
+    draw(_debug, illumination) {
+        if (illumination <= 0)
+            return false;
         const fg = this.color();
         this.cell.map.drawAtSmoke(this.cell.xy.x, this.cell.xy.y, this.char(), fg, 'transparent');
         return false;
@@ -7259,6 +7262,7 @@ class Smoke extends Drawable {
 
 
 
+
 class Fire extends Drawable {
     constructor() {
         super(...arguments);
@@ -7273,9 +7277,11 @@ class Fire extends Drawable {
             return;
         }
         this.cell.reborn(new Smoke());
-        if (this.cell.layers.data.walls) {
-            this.cell.layers.data.walls.ignite();
-        }
+        CellLayers.materialLayers.forEach(l => {
+            const d = this.cell.layers.data[l];
+            if (d?.material)
+                d.material.ignite();
+        });
         if ((0,utils/* oneIn */.A7)(4)) {
             (0,utils/* randFrom */.Kt)(this.cell.neighbors()).reborn(new Fire());
         }
@@ -7292,9 +7298,39 @@ class Fire extends Drawable {
     }
 }
 
+;// ./src/draw/material.ts
+
+
+
+
+class Material {
+    constructor(owner) {
+        this.owner = owner;
+        this.burn = null;
+        this.ignite = () => { if (this.burn === null)
+            this.burn = 20; };
+        this.isBurning = () => this.burn !== null;
+        this.light = (base) => this.isBurning() ? base + 1 : base;
+        this.color = (base) => this.isBurning() && (0,utils/* oneIn */.A7)(3) ? colors/* FIRE */.ZK.random() : base;
+        this.remaining = () => this.burn ?? 0;
+    }
+    step() {
+        if (this.burn === null)
+            return;
+        const cell = this.owner.cell;
+        if ((0,utils/* oneIn */.A7)(2))
+            cell.reborn(new Smoke());
+        if (this.burn <= 0) {
+            cell.died(this.owner);
+            return;
+        }
+        this.burn--;
+        if ((0,utils/* oneIn */.A7)(2))
+            cell.reborn(new Fire());
+    }
+}
+
 ;// ./src/draw/wall.ts
-
-
 
 
 
@@ -7305,34 +7341,19 @@ class Wall extends Drawable {
         this.passable = false;
         this.transparency = 0;
         this.isDoor = false;
-        this.burningFor = null;
+        this.material = new Material(this);
         this.char = () => this.isDoor ? '+' : '#';
-        this.color = () => this.isBurning() ? colors/* SMOLDERING */.jA : this.isDoor ? colors/* WOOD */.wB : colors/* BORDER */.XE;
-        this.light = () => this.isBurning() ? 1 : 0;
+        this.color = () => this.material.color(this.isDoor ? colors/* WOOD */.wB : colors/* BORDER */.XE);
+        this.light = () => this.material.light(0);
         this.desc = () => this.isDoor ? 'Door' : 'Wall';
         this.makeDoor = () => {
             this.isDoor = true;
             this.passable = true;
         };
-        this.isBurning = () => this.burningFor !== null;
+        this.ignite = () => this.material.ignite();
     }
     step() {
-        if (!this.isBurning())
-            return;
-        if ((0,utils/* oneIn */.A7)(2))
-            this.cell.reborn(new Smoke());
-        if (this.burningFor <= 0) {
-            this.cell.died(this);
-            return;
-        }
-        this.burningFor--;
-        if ((0,utils/* oneIn */.A7)(2))
-            this.cell.reborn(new Fire());
-    }
-    ignite() {
-        if (this.isBurning())
-            return;
-        this.burningFor = 20;
+        this.material.step();
     }
 }
 
@@ -7384,22 +7405,24 @@ class Floor extends Drawable {
 
 
 
+
 class Lamp extends Drawable {
     constructor() {
         super(...arguments);
         this.layer = 'items';
         this.transparency = 1;
-        this.light = () => 5;
+        this.material = new Material(this);
+        this.light = () => this.material.light(5);
         this.char = () => '*';
-        this.color = () => colors/* LAMP */.zu.random();
+        this.color = () => this.material.color(colors/* LAMP */.zu.random());
     }
     smoking() {
         return utils/* isInTestMode */.Jo ? true : (0,utils/* oneIn */.A7)(3);
     }
     step() {
-        if (this.smoking()) {
+        if (this.smoking())
             this.cell.reborn(new Smoke());
-        }
+        this.material.step();
     }
 }
 
@@ -7442,21 +7465,24 @@ class Task {
 
 
 
+
 class Pawn extends Drawable {
     constructor(name) {
         super();
         this.name = name;
         this.selected = false;
         this.passable = false;
+        this.material = new Material(this);
         this.layer = 'pawn';
         this.transparency = 0;
-        this.light = () => 3;
+        this.light = () => this.material.light(3);
         this.char = () => '@';
-        this.color = () => colors/* FOREGROUND */.u6;
+        this.color = () => this.material.color(colors/* FOREGROUND */.u6);
         this.tasks = [];
     }
     desc() {
-        return this.name ? this.name : super.desc();
+        const d = this.name ? this.name : super.desc();
+        return this.material.isBurning() ? `${d} (fire: ${this.material.remaining()})` : d;
     }
     recalcPaths() {
         this.tasks.forEach(t => t.cleanup?.());
@@ -7478,6 +7504,7 @@ class Pawn extends Drawable {
         window.dispatchEvent(new Event('taskRemoved'));
     }
     step() {
+        this.material.step();
         if (this.tasks.length > 0) {
             const task = this.tasks[0];
             task.step();
