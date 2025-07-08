@@ -431,6 +431,10 @@ ___CSS_LOADER_EXPORT___.push([module.id, `body {
     cursor: not-allowed;
 }
 
+
+
+
+
 #game-container {
     flex-shrink: 0;
 }
@@ -7008,6 +7012,7 @@ class UIRenderer {
         this.map = map;
         this.strokes = new Map();
         this.renderFrame = 0;
+        this.frozen = () => !this.intervalId;
         this.display = new Display(map.w, map.h, true);
         this.intervalId = setInterval(() => this.render(), 100);
         map.runOnStep('ui-renderer', () => this.render());
@@ -7031,6 +7036,17 @@ class UIRenderer {
     }
     attachTo(container, styles) {
         this.display.attachTo(container, styles);
+    }
+    freeze() {
+        if (this.frozen())
+            return;
+        clearInterval(this.intervalId);
+        this.intervalId = null;
+    }
+    unfreeze() {
+        if (!this.frozen())
+            return;
+        this.intervalId = setInterval(() => this.render(), 100);
     }
     render() {
         (0,utils/* eachPair */.cd)(this.strokes, (id, stroke) => {
@@ -8018,6 +8034,7 @@ class Game {
         this.drawMap();
         this.map.runOnStep('game.stepInfo', n => this.stepN = n);
         this.updatePlayPauseButton();
+        this.updateFreezeButton();
         this.updateStepInfo();
         document.addEventListener('keydown', (e) => {
             if (e.key !== ' ')
@@ -8039,6 +8056,7 @@ class Game {
     setupControls() {
         (0,utils/* onClick */.Af)((0,utils.$1)('playpause-button'), () => this.togglePlayPause());
         (0,utils/* onClick */.Af)((0,utils.$1)('next-button'), () => this.step());
+        (0,utils/* onClick */.Af)((0,utils.$1)('freeze-button'), () => this.toggleFreeze());
     }
     setupDebugControls() {
         (0,utils/* onClick */.Af)((0,utils.$1)('lighting-toggle'), () => this.toggleLighting());
@@ -8051,13 +8069,31 @@ class Game {
     }
     updatePlayPauseButton() {
         const button = (0,utils.$1)('playpause-button');
-        button.textContent = this.running ? '⏸' : '▶';
+        button.textContent = this.running ? '⏸️' : '▶️';
+    }
+    updateFreezeButton() {
+        const button = (0,utils.$1)('freeze-button');
+        button.textContent = this.map.uiRenderer.frozen() ? '🧊' : '❄️';
     }
     togglePlayPause() {
+        if (this.map.uiRenderer.frozen()) {
+            this.toggleFreeze();
+        }
         if (this.running)
             this.pause();
         else
             this.play();
+    }
+    toggleFreeze() {
+        if (this.map.uiRenderer.frozen()) {
+            this.map.uiRenderer.unfreeze();
+        }
+        else {
+            if (this.running)
+                this.pause();
+            this.map.uiRenderer.freeze();
+        }
+        this.updateFreezeButton();
     }
     pause() {
         if (!this.running)
