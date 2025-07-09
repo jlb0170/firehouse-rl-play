@@ -531,6 +531,35 @@ ___CSS_LOADER_EXPORT___.push([module.id, `body {
 .error-close:hover {
     background: rgba(255, 255, 255, 0.2);
     border-radius: 3px;
+}
+
+.help-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #000;
+    color: #0f0;
+    font-family: monospace;
+    font-size: 16px;
+    border: 2px solid #0f0;
+    padding: 30px;
+    border-radius: 5px;
+    z-index: 10000;
+    max-width: 80vw;
+    max-height: 80vh;
+    overflow: auto;
+    box-shadow: 0 0 20px #0f0;
+}
+
+.help-popup.hidden {
+    display: none;
+}
+
+.help-text {
+    color: #0f0;
+    font-family: monospace;
+    line-height: 1.4;
 } `, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
@@ -7014,9 +7043,17 @@ class UIRenderer {
         this.renderFrame = 0;
         this.frozen = () => !this.intervalId;
         this.display = new Display(map.w, map.h, true);
-        this.intervalId = setInterval(() => this.render(), 100);
+        this.intervalId = this.start();
         map.runOnStep('ui-renderer', () => this.render());
-        window.addEventListener('strokesChanged', () => this.render());
+        window.addEventListener('repaint', () => this.render());
+    }
+    unfreeze() {
+        if (!this.frozen())
+            return;
+        this.intervalId = this.start();
+    }
+    start() {
+        return setInterval(() => { window.dispatchEvent(new Event('repaint')); }, 100);
     }
     replace(id, stroke) {
         this.remove(id);
@@ -7042,11 +7079,6 @@ class UIRenderer {
             return;
         clearInterval(this.intervalId);
         this.intervalId = null;
-    }
-    unfreeze() {
-        if (!this.frozen())
-            return;
-        this.intervalId = setInterval(() => this.render(), 100);
     }
     render() {
         (0,utils/* eachPair */.cd)(this.strokes, (id, stroke) => {
@@ -7283,7 +7315,7 @@ class Fire extends Drawable {
     constructor() {
         super(...arguments);
         this.layer = 'fire';
-        this.light = () => 5;
+        this.light = () => 3;
         this.char = () => "▲"; // "🔥"
         this.color = () => colors/* FIRE */.ZK.random();
     }
@@ -7329,6 +7361,7 @@ class Material {
         this.light = (base) => this.isBurning() ? base + 1 : base;
         this.color = (base) => this.isBurning() && (0,utils/* oneIn */.A7)(3) ? colors/* FIRE */.ZK.random() : base;
         this.remaining = () => this.burn ?? 0;
+        this.desc = (base) => this.isBurning() ? `${base} ▲` : base;
     }
     step() {
         if (this.burn === null)
@@ -7361,7 +7394,9 @@ class Wall extends Drawable {
         this.char = () => this.isDoor ? '+' : '#';
         this.color = () => this.material.color(this.isDoor ? colors/* WOOD */.wB : colors/* BORDER */.XE);
         this.light = () => this.material.light(0);
-        this.desc = () => this.isDoor ? 'Door' : 'Wall';
+        this.desc = () => {
+            return this.material.desc(this.isDoor ? 'Door' : 'Wall');
+        };
         this.makeDoor = () => {
             this.isDoor = true;
             this.passable = true;
@@ -7431,6 +7466,7 @@ class Lamp extends Drawable {
         this.light = () => this.material.light(5);
         this.char = () => '*';
         this.color = () => this.material.color(colors/* LAMP */.zu.random());
+        this.desc = () => this.material.desc('Lamp');
     }
     smoking() {
         return utils/* isInTestMode */.Jo ? true : (0,utils/* oneIn */.A7)(3);
@@ -7498,14 +7534,14 @@ class Pawn extends Drawable {
     }
     desc() {
         const d = this.name ? this.name : super.desc();
-        return this.material.isBurning() ? `${d} (fire: ${this.material.remaining()})` : d;
+        return this.material.desc(d) + (this.material.remaining() ?? '');
     }
     recalcPaths() {
         this.tasks.forEach(t => t.cleanup?.());
         let start = this.cell;
         this.tasks.forEach(t => start = t.strokeAndNext(start));
         this.endCell = start;
-        window.dispatchEvent(new Event('strokesChanged'));
+        window.dispatchEvent(new Event('repaint'));
         return start;
     }
     get tipCell() { return this.tasks.length > 0 ? this.endCell : this.cell; }
@@ -7537,7 +7573,7 @@ class Pawn extends Drawable {
     hoverStrokePath(target) {
         const start = this.tasks.length > 0 ? this.endCell : this.cell;
         Task.strokePathBetween(start, target, Pawn.HOVER_PATH_STROKE, Pawn.HOVER_PATH_COLOR, () => true, 2);
-        window.dispatchEvent(new Event('strokesChanged'));
+        window.dispatchEvent(new Event('repaint'));
     }
     draw(debug, _illumination) {
         if (this.selected) {
@@ -7688,6 +7724,7 @@ class Terminal {
         this.clear = () => { this.element.innerHTML = ''; this.selectedElement.innerHTML = ''; };
         this.element = (0,utils.$1)('terminal-content');
         this.selectedElement = (0,utils.$1)('selected-info');
+        window.addEventListener('repaint', () => this.draw());
     }
     draw() {
         if (!this.currentCell) {
@@ -7713,8 +7750,8 @@ class Terminal {
         else {
             presentLayers.forEach(([name, drawable]) => {
                 const color = drawable.color(this.currentCell);
-                const lightInfo = drawable.light() > 0 ? ` (light: ${drawable.light()})` : '';
-                html += `<div class="layer-info">${name}: <span style="color: ${color}">${drawable.desc()}${lightInfo}</span></div>`;
+                const desc = drawable.desc();
+                html += `<div class="layer-info">${name}: <span style="color: ${color}">${desc}</span></div>`;
             });
         }
         this.element.innerHTML = html;
@@ -7728,7 +7765,6 @@ class Terminal {
                 span.addEventListener('click', () => {
                     const idx = Number(span.dataset.index);
                     this.selectedPawn.removeTask(this.selectedPawn.tasks[idx]);
-                    this.draw();
                     window.dispatchEvent(new Event('taskRemoved'));
                 });
             });
@@ -7820,7 +7856,7 @@ class DestinationState {
     exit() {
         this.ui.map.uiRenderer.remove(Pawn.HOVER_PATH_STROKE);
         this.selected.selected = false;
-        window.dispatchEvent(new Event('strokesChanged'));
+        window.dispatchEvent(new Event('repaint'));
         this.ui.terminal.setSelected(null);
     }
 }
@@ -7973,8 +8009,7 @@ class UI {
         this.state = 'select';
         this.onClick = (cell) => {
             this.states[this.state].onClick(cell);
-            window.dispatchEvent(new Event('strokesChanged'));
-            this.terminal.draw();
+            window.dispatchEvent(new Event('repaint'));
         };
         this.onMouseMove = (cell) => {
             this.states[this.state].onMouseMove(cell);
@@ -7990,8 +8025,7 @@ class UI {
             if (this.state === 'menu') {
                 const menuState = this.states.menu;
                 this.setState('menu', menuState.pawn);
-                window.dispatchEvent(new Event('strokesChanged'));
-                this.terminal.draw();
+                window.dispatchEvent(new Event('repaint'));
             }
         });
     }
@@ -8002,7 +8036,172 @@ class UI {
     }
 }
 
+;// ./src/ui/help.ts
+
+class HelpSystem {
+    constructor() {
+        this.pages = [];
+        this.currentPage = 0;
+        this.generatePages();
+    }
+    getCurrentPage() {
+        return this.pages[this.currentPage] || this.pages[0];
+    }
+    getPageInfo() {
+        return `<div style="text-align: center; margin-bottom: 10px; color: #888;">Page ${this.currentPage + 1} of ${this.pages.length} • Use ← → keys to navigate</div>`;
+    }
+    nextPage() {
+        if (this.currentPage < this.pages.length - 1) {
+            this.currentPage++;
+            return true;
+        }
+        return false;
+    }
+    previousPage() {
+        if (this.currentPage > 0) {
+            this.currentPage--;
+            return true;
+        }
+        return false;
+    }
+    resetToFirstPage() {
+        this.currentPage = 0;
+    }
+    generatePages() {
+        const menuItems = [
+            ['x', 'Exit menu and return to selection'],
+            ['g', 'Go to destination - click to move firefighter'],
+            ['w', 'Wait - firefighter will pause and wait'],
+            ['d', 'Debug - assign pawn to window.pawn for console'],
+            ['r', 'Remove last task from firefighter\'s queue']
+        ];
+        const layerInfo = {
+            'floor': { char: '.', desc: 'Floor tiles and terrain', color: '#666' },
+            'walls': { char: '#', desc: 'Walls and doors (+)', color: '#666' },
+            'items': { char: '*', desc: 'Items like lamps and equipment', color: '#ff0' },
+            'fire': { char: '▲', desc: 'Active fires that spread and create smoke', color: '#f44' },
+            'smoke': { char: '+', desc: 'Smoke that drifts and blocks vision', color: '#999' },
+            'pawn': { char: '@', desc: 'Firefighters under your command', color: '#0f0' }
+        };
+        const layerSections = CellLayers.layerNames.map(layerName => {
+            const info = layerInfo[layerName];
+            if (info) {
+                return `• <strong>${layerName}</strong> (<strong style="color: ${info.color}">${info.char}</strong>) - ${info.desc}`;
+            }
+            return `• <strong>${layerName}</strong> - Layer type`;
+        }).join('<br/>');
+        const menuSection = menuItems.map(([key, desc]) => `• <strong>${key}</strong> - ${desc}`).join('<br/>');
+        const layerButtons = CellLayers.layerNames.map(name => name.slice(0, 3)).join(', ');
+        this.pages = [
+            // Page 1: Overview and Controls
+            `<div class="help-text">
+<strong>🔥 FIRE HOUSE RL 🔥</strong><br/>
+<br/>
+<strong>GAME OVERVIEW:</strong><br/>
+Control a squad of firefighters (@) in a tactical roguelike. Give orders, then watch them execute in real-time or step-by-step.<br/>
+<br/>
+<strong>MAIN CONTROLS:</strong><br/>
+• <strong>▶️ Play/Pause</strong> - Start/stop game simulation<br/>
+• <strong>⏭️ Step</strong> - Advance one game step<br/>
+• <strong>❄️ Freeze</strong> - Pause rendering (game continues)<br/>
+• <strong>❓ Help</strong> - Open this help system<br/>
+• <strong>SPACE</strong> - Play/Pause game<br/>
+• <strong>ESC</strong> - Close help or menus<br/>
+<br/>
+<strong>MOUSE CONTROLS:</strong><br/>
+• <strong>Click @</strong> - Select firefighter<br/>
+• <strong>Hover</strong> - Inspect cells in terminal<br/>
+• <strong>Right-click</strong> - Context menu<br/>
+<br/>
+<strong>GETTING STARTED:</strong><br/>
+1. Click the <strong>@</strong> symbol to select a firefighter<br/>
+2. Choose an action from the menu that appears<br/>
+3. Press <strong>SPACE</strong> to start the simulation<br/>
+4. Watch your firefighters carry out their orders!<br/>
+</div>`,
+            // Page 2: Firefighter Menu
+            `<div class="help-text">
+<strong>🚒 FIREFIGHTER COMMANDS 🚒</strong><br/>
+<br/>
+<strong>FIREFIGHTER MENU:</strong><br/>
+When you click a firefighter (@), a menu appears around them with these options:<br/>
+<br/>
+${menuSection}<br/>
+<br/>
+<strong>TASK SYSTEM:</strong><br/>
+• Firefighters can queue multiple tasks<br/>
+• Tasks are shown as colored paths on the map<br/>
+• Blue lines show planned movement routes<br/>
+• Tasks execute in order from first to last<br/>
+<br/>
+<strong>TERMINAL PANEL:</strong><br/>
+The right panel shows detailed info about:<br/>
+• Current cell under mouse cursor<br/>
+• Selected firefighter's active tasks<br/>
+• Layer contents and properties<br/>
+• Click <strong>[x]</strong> next to tasks to remove them<br/>
+<br/>
+<strong>SELECTION TIPS:</strong><br/>
+• Selected firefighters have inverted colors<br/>
+• Hover over destinations to see path preview<br/>
+• Right-click to cancel current selection<br/>
+</div>`,
+            // Page 3: Layers and Terrain
+            `<div class="help-text">
+<strong>🗺️ LAYERS & TERRAIN 🗺️</strong><br/>
+<br/>
+<strong>LAYER SYSTEM:</strong><br/>
+The game world is built in layers (${CellLayers.layerNames.length} total). From bottom to top:<br/>
+<br/>
+${layerSections}<br/>
+<br/>
+<strong>TERRAIN INTERACTIONS:</strong><br/>
+• <strong>Walls</strong> block movement and vision<br/>
+• <strong>Doors</strong> (+) can be opened and closed<br/>
+• <strong>Items</strong> provide light and can be carried<br/>
+• <strong>Fires</strong> spread to adjacent flammable materials<br/>
+• <strong>Smoke</strong> reduces visibility and can harm firefighters<br/>
+<br/>
+<strong>LIGHTING SYSTEM:</strong><br/>
+• Fires and lamps provide illumination<br/>
+• Darkness affects visibility and movement<br/>
+• Smoke blocks light transmission<br/>
+• Materials cast shadows and block vision<br/>
+</div>`,
+            // Page 4: Fire Mechanics and Debug
+            `<div class="help-text">
+<strong>🔥 FIRE MECHANICS & DEBUG 🔥</strong><br/>
+<br/>
+<strong>FIRE BEHAVIOR:</strong><br/>
+• Fires spread to adjacent cells over time<br/>
+• Fires create smoke that drifts randomly<br/>
+• Materials can ignite and burn<br/>
+• Lighting affects visibility and tactics<br/>
+• Older fires burn out eventually<br/>
+<br/>
+<strong>SMOKE MECHANICS:</strong><br/>
+• Smoke reduces transparency and vision<br/>
+• Smoke drifts to adjacent cells<br/>
+• Smoke dissipates over time<br/>
+• Can harm firefighters with prolonged exposure<br/>
+<br/>
+<strong>DEBUG CONTROLS:</strong><br/>
+• <strong>LT</strong> - Toggle lighting display<br/>
+• <strong>Layer buttons</strong> - Show/hide specific layers (${layerButtons})<br/>
+• <strong>on/off</strong> - Turn all layers on/off<br/>
+<br/>
+<strong>LAYER DEBUGGING:</strong><br/>
+• Click layer buttons to toggle visibility<br/>
+• Muted layers appear grayed out<br/>
+• Solo mode shows only one layer<br/>
+• Useful for debugging complex scenarios<br/>
+</div>`
+        ];
+    }
+}
+
 ;// ./src/game/game.ts
+
 
 
 
@@ -8019,8 +8218,16 @@ class Game {
         this.soloLayer = null;
         this.stepN = 0;
         this.stepMs = 0;
+        this.helpSystem = new HelpSystem();
         this.updateStepInfo = () => {
             (0,utils.$1)('step-info').textContent = `${this.stepN} ${this.stepMs}ms`;
+        };
+        this.closeHelpOnOutsideClick = (e) => {
+            const popup = (0,utils.$1)('help-popup');
+            const target = e.target;
+            if (!popup.contains(target)) {
+                this.closeHelp();
+            }
         };
         this.map = new map_Map(config/* Config */.T.WIDTH, config/* Config */.T.HEIGHT);
         this.terminal = new Terminal();
@@ -8037,10 +8244,19 @@ class Game {
         this.updateFreezeButton();
         this.updateStepInfo();
         document.addEventListener('keydown', (e) => {
-            if (e.key !== ' ')
-                return;
-            e.preventDefault();
-            this.togglePlayPause();
+            if (e.key === ' ') {
+                e.preventDefault();
+                this.togglePlayPause();
+            }
+            else if (e.key === 'Escape') {
+                this.closeHelp();
+            }
+            else if (e.key === 'ArrowLeft') {
+                this.previousHelpPage();
+            }
+            else if (e.key === 'ArrowRight') {
+                this.nextHelpPage();
+            }
         });
         window.addEventListener('redraw-map', () => this.drawMap());
     }
@@ -8057,6 +8273,10 @@ class Game {
         (0,utils/* onClick */.Af)((0,utils.$1)('playpause-button'), () => this.togglePlayPause());
         (0,utils/* onClick */.Af)((0,utils.$1)('next-button'), () => this.step());
         (0,utils/* onClick */.Af)((0,utils.$1)('freeze-button'), () => this.toggleFreeze());
+        (0,utils/* onClick */.Af)((0,utils.$1)('help-button'), (e) => {
+            e.stopPropagation();
+            this.toggleHelp();
+        });
     }
     setupDebugControls() {
         (0,utils/* onClick */.Af)((0,utils.$1)('lighting-toggle'), () => this.toggleLighting());
@@ -8095,6 +8315,49 @@ class Game {
         }
         this.updateFreezeButton();
     }
+    toggleHelp() {
+        const popup = (0,utils.$1)('help-popup');
+        if (popup.classList.contains('hidden')) {
+            if (this.running)
+                this.pause();
+            this.loadHelp();
+            popup.classList.remove('hidden');
+            setTimeout(() => {
+                document.addEventListener('click', this.closeHelpOnOutsideClick);
+            }, 10);
+        }
+        else {
+            this.closeHelp();
+        }
+    }
+    closeHelp() {
+        const popup = (0,utils.$1)('help-popup');
+        popup.classList.add('hidden');
+        document.removeEventListener('click', this.closeHelpOnOutsideClick);
+    }
+    loadHelp() {
+        this.helpSystem.resetToFirstPage();
+        this.updateHelpDisplay();
+    }
+    updateHelpDisplay() {
+        const content = this.helpSystem.getCurrentPage();
+        const pageInfo = this.helpSystem.getPageInfo();
+        (0,utils.$1)('help-content').innerHTML = pageInfo + content;
+    }
+    nextHelpPage() {
+        if (!(0,utils.$1)('help-popup').classList.contains('hidden')) {
+            if (this.helpSystem.nextPage()) {
+                this.updateHelpDisplay();
+            }
+        }
+    }
+    previousHelpPage() {
+        if (!(0,utils.$1)('help-popup').classList.contains('hidden')) {
+            if (this.helpSystem.previousPage()) {
+                this.updateHelpDisplay();
+            }
+        }
+    }
     pause() {
         if (!this.running)
             return;
@@ -8117,7 +8380,7 @@ class Game {
         this.map.step();
         this.map.lighting.redraw();
         this.drawMap();
-        this.terminal.draw();
+        window.dispatchEvent(new Event('repaint'));
         this.stepMs = Date.now() - start;
         this.updateStepInfo();
     }
