@@ -6650,8 +6650,8 @@ class Cell {
         this.xy = xy;
         this.map = map;
     }
-    draw(showLighting, visibleLayers, showNothing, debug) {
-        const illumination = this.map.lighting.at(this);
+    draw(showLighting, visibleLayers, showNothing, debug, showDarkness = true) {
+        const illumination = showDarkness ? this.map.lighting.at(this) : 9;
         if (showLighting) {
             const char = Math.floor(illumination).toString();
             if (char !== '0') {
@@ -7153,12 +7153,12 @@ class map_Map {
     drawAtSmoke(x, y, char, fg, bg) {
         this.smokeDisplay.draw(x, y, char, fg, bg);
     }
-    draw(showLighting, visibleLayers, showNothing, debug) {
+    draw(showLighting, visibleLayers, showNothing, debug, showDarkness = true) {
         this.display.clear();
         this.smokeDisplay.clear();
         (0,utils/* times */.Hn)(this.h, y => {
             (0,utils/* times */.Hn)(this.w, x => {
-                this.grid[y][x].draw(showLighting, visibleLayers, showNothing, debug);
+                this.grid[y][x].draw(showLighting, visibleLayers, showNothing, debug, showDarkness);
             });
         });
     }
@@ -7233,7 +7233,7 @@ class map_Map {
                 chars[y][x] = char;
             }
         };
-        this.draw(false, new Set(), false, false);
+        this.draw(false, new Set(), false, false, true);
         this[replace] = originalDrawAt;
         let result = '\n';
         (0,utils/* times */.Hn)(this.h, y => {
@@ -7537,6 +7537,7 @@ class Corpse extends Drawable {
         this.pawn = pawn;
         this.cause = cause;
         this.layer = 'items';
+        this.passable = false;
         this.desc = () => `${this.pawn.desc()}, died by ${this.cause}`;
         this.light = () => 0;
         this.char = () => '%';
@@ -8296,6 +8297,7 @@ class Game {
         this.intervalId = null;
         this.running = false;
         this.showLighting = false;
+        this.showDarkness = true;
         this.mutedLayers = new Set();
         this.soloLayer = null;
         this.stepN = 0;
@@ -8363,6 +8365,7 @@ class Game {
     }
     setupDebugControls() {
         (0,utils/* onClick */.Af)((0,utils.$1)('lighting-toggle'), () => this.toggleLighting());
+        (0,utils/* onClick */.Af)((0,utils.$1)('darkness-toggle'), () => this.toggleDarkness());
         (0,utils/* onClick */.Af)((0,utils.$1)('layer-on'), () => this.turnOnAllLayers());
         (0,utils/* onClick */.Af)((0,utils.$1)('layer-off'), () => this.turnOffAllLayers());
         this.createLayerButtons();
@@ -8471,7 +8474,7 @@ class Game {
         const visibleLayers = this.getVisibleLayers();
         const showNothing = this.mutedLayers.size === CellLayers.layerNames.length;
         const debug = this.mutedLayers.size > 0 || this.soloLayer !== null;
-        this.map.draw(this.showLighting, visibleLayers, showNothing, debug);
+        this.map.draw(this.showLighting, visibleLayers, showNothing, debug, this.showDarkness);
     }
     getVisibleLayers() {
         if (this.soloLayer) {
@@ -8486,6 +8489,12 @@ class Game {
         this.showLighting = !this.showLighting;
         const button = (0,utils.$1)('lighting-toggle');
         button.textContent = this.showLighting ? 'LT*' : 'LT';
+        this.drawMap();
+    }
+    toggleDarkness() {
+        this.showDarkness = !this.showDarkness;
+        const button = (0,utils.$1)('darkness-toggle');
+        button.textContent = this.showDarkness ? 'DK*' : 'DK';
         this.drawMap();
     }
     toggleLayerVisibility(layerName) {
