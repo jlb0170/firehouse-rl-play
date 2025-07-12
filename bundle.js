@@ -115,7 +115,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   XY: () => (/* binding */ XY)
 /* harmony export */ });
-/* harmony import */ var _colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(583);
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(919);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(185);
 /* harmony import */ var _xyl__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(830);
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(843);
@@ -149,7 +149,7 @@ class XY {
         this.dl = (n = 1) => this.add(-n, n);
         this.l = (n = 1) => this.add(-n, 0);
         this.ul = (n = 1) => this.add(-n, -n);
-        this.draw = (display, char, fg, bg = _colors__WEBPACK_IMPORTED_MODULE_0__/* .BACKGROUND */ .h4) => display.draw(this.x, this.y, char, fg, bg);
+        this.draw = (display, char, fg, bg = _ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .BACKGROUND */ .h4) => display.draw(this.x, this.y, char, fg, bg);
         this.cell = (grid) => grid[this.y][this.x];
         this.cardinals = () => [this.u(1), this.d(1), this.l(1), this.r(1)].filter(xy => !XY.oob(xy.x, xy.y));
         this.neighbors = () => [this.u(1), this.ur(1), this.r(1), this.dr(1), this.d(1), this.dl(1), this.l(1), this.ul(1)].filter(xy => !XY.oob(xy.x, xy.y));
@@ -671,53 +671,6 @@ function insertStyleElement(options) {
   return element;
 }
 module.exports = insertStyleElement;
-
-/***/ }),
-
-/***/ 583:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Jy: () => (/* binding */ Colors),
-/* harmony export */   XE: () => (/* binding */ BORDER),
-/* harmony export */   ZK: () => (/* binding */ FIRE),
-/* harmony export */   h4: () => (/* binding */ BACKGROUND),
-/* harmony export */   oE: () => (/* binding */ SMOKE),
-/* harmony export */   u6: () => (/* binding */ FOREGROUND),
-/* harmony export */   wB: () => (/* binding */ WOOD),
-/* harmony export */   zu: () => (/* binding */ LAMP)
-/* harmony export */ });
-/* unused harmony export SMOLDERING */
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
-
-const FOREGROUND = "#0a0";
-const BACKGROUND = "#000";
-const BORDER = "#444";
-const WOOD = "#8B4513";
-const SMOLDERING = '#6c200e';
-class Colors {
-    constructor(colors) {
-        this.colors = colors;
-    }
-    random() {
-        return _utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo ? this.colors[0] : (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randFrom */ .Kt)(this.colors);
-    }
-    static rotate(colorsOrColor) {
-        const colors = colorsOrColor instanceof Colors
-            ? colorsOrColor.colors
-            : [colorsOrColor];
-        let current = 0;
-        return () => {
-            const color = colors[current];
-            current = (current + 1) % colors.length;
-            return color;
-        };
-    }
-}
-const FIRE = new Colors(['#ff6600', '#ff9900', '#ffcc00', '#ff3300']);
-const SMOKE = new Colors(['rgba(51,51,51,0.6)', 'rgba(85,85,85,0.6)', 'rgba(102,102,102,0.6)', 'rgba(119,119,119,0.6)', 'rgba(136,136,136,0.6)', 'rgba(153,153,153,0.6)', 'rgba(170,170,170,0.6)', 'rgba(187,187,187,0.6)', 'rgba(204,204,204,0.6)']);
-const LAMP = new Colors(['#ccffff', '#99ddff', '#66ccff']);
-
 
 /***/ }),
 
@@ -6402,8 +6355,8 @@ const lib_Color = (/* unused pure expression or super */ null && (color));
 
 const Text = (/* unused pure expression or super */ null && (text));
 
-// EXTERNAL MODULE: ./src/game/colors.ts
-var colors = __webpack_require__(583);
+// EXTERNAL MODULE: ./src/ui/colors.ts
+var colors = __webpack_require__(919);
 ;// ./src/game/config.ts
 var _a;
 
@@ -6428,6 +6381,55 @@ Config.FONT_SIZE = 16;
 Config.FONT_FAMILY = "Courier, monospace";
 Config.createDisplay = (width, height) => _a.display(width, height, colors/* BACKGROUND */.h4);
 Config.createTransparentDisplay = (width, height) => _a.display(width, height, 'transparent');
+
+
+/***/ }),
+
+/***/ 919:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Jy: () => (/* binding */ Colors),
+/* harmony export */   LS: () => (/* binding */ BONE),
+/* harmony export */   XE: () => (/* binding */ BORDER),
+/* harmony export */   ZK: () => (/* binding */ FIRE),
+/* harmony export */   h4: () => (/* binding */ BACKGROUND),
+/* harmony export */   oE: () => (/* binding */ SMOKE),
+/* harmony export */   u6: () => (/* binding */ FOREGROUND),
+/* harmony export */   wB: () => (/* binding */ WOOD),
+/* harmony export */   zu: () => (/* binding */ LAMP)
+/* harmony export */ });
+/* unused harmony export SMOLDERING */
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
+
+const FOREGROUND = "#0a0";
+const BACKGROUND = "#000";
+const BORDER = "#444";
+const WOOD = "#8B4513";
+const SMOLDERING = '#6c200e';
+const BONE = "#fff";
+class Colors {
+    constructor(colors) {
+        this.colors = colors;
+    }
+    random() {
+        return _utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo ? this.colors[0] : (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randFrom */ .Kt)(this.colors);
+    }
+    static rotate(colorsOrColor) {
+        const colors = colorsOrColor instanceof Colors
+            ? colorsOrColor.colors
+            : [colorsOrColor];
+        let current = 0;
+        return () => {
+            const color = colors[current];
+            current = (current + 1) % colors.length;
+            return color;
+        };
+    }
+}
+const FIRE = new Colors(['#ff6600', '#ff9900', '#ffcc00', '#ff3300']);
+const SMOKE = new Colors(['rgba(51,51,51,0.6)', 'rgba(85,85,85,0.6)', 'rgba(102,102,102,0.6)', 'rgba(119,119,119,0.6)', 'rgba(136,136,136,0.6)', 'rgba(153,153,153,0.6)', 'rgba(170,170,170,0.6)', 'rgba(187,187,187,0.6)', 'rgba(204,204,204,0.6)']);
+const LAMP = new Colors(['#ccffff', '#99ddff', '#66ccff']);
 
 
 /***/ })
@@ -6685,6 +6687,7 @@ class Cell {
         this.map.lighting.update(this);
     }
     died(drawable) {
+        drawable.dying();
         this.remove(drawable);
         drawable.diedAndAlreadyRemovedFromCell();
     }
@@ -6886,8 +6889,8 @@ class Movers {
     }
 }
 
-// EXTERNAL MODULE: ./src/game/colors.ts
-var colors = __webpack_require__(583);
+// EXTERNAL MODULE: ./src/ui/colors.ts
+var colors = __webpack_require__(919);
 ;// ./src/draw/drawable.ts
 
 
@@ -6902,7 +6905,7 @@ class Drawable {
         Drawable.alive.add(this);
     }
     step() { }
-    desc() { return this.constructor.name; }
+    desc() { return `${this.constructor.name}(${this.id})`; }
     draw(_debug, illumination) {
         const fg = this.applyIllumination(this.color(), illumination);
         this.cell.map.drawAt(this.cell.xy.x, this.cell.xy.y, this.char(), fg, colors/* BACKGROUND */.h4);
@@ -6956,6 +6959,9 @@ class Drawable {
         throw new Error('merge not implemented');
     }
     diedAndAlreadyRemovedFromCell() { Drawable.alive.delete(this); }
+    dying() {
+        this.cell.map.lighting.update(this.cell);
+    }
 }
 Drawable.alive = new Set();
 Drawable.nextId = 0;
@@ -7090,11 +7096,15 @@ class UIRenderer {
         const sortedStrokes = [...this.strokes.values()].sort((a, b) => a.zIndex - b.zIndex);
         sortedStrokes.forEach(stroke => {
             const color = stroke.colorFn();
-            stroke.cells.forEach(({ cell, char }) => this.draw(cell.xy.x, cell.xy.y, char, color));
+            stroke.cells.forEach(({ cell, char }) => {
+                this.draw(cell.xy.x, cell.xy.y, char, color);
+            });
         });
         if (this.renderFrame % 4 === 0)
             window.dispatchEvent(new Event('redraw-map'));
         this.renderFrame++;
+        // Update step info to show current render frame
+        window.dispatchEvent(new Event('update-step-info'));
     }
 }
 
@@ -7363,9 +7373,9 @@ class Material {
         this.remaining = () => this.burn ?? 0;
         this.desc = (base) => this.isBurning() ? `${base} ▲` : base;
     }
-    step() {
+    step(stillAlive) {
         if (this.burn === null)
-            return;
+            return stillAlive();
         const cell = this.owner.cell;
         if ((0,utils/* oneIn */.A7)(2))
             cell.reborn(new Smoke());
@@ -7376,6 +7386,7 @@ class Material {
         this.burn--;
         if ((0,utils/* oneIn */.A7)(2))
             cell.reborn(new Fire());
+        stillAlive();
     }
 }
 
@@ -7404,7 +7415,7 @@ class Wall extends Drawable {
         this.ignite = () => this.material.ignite();
     }
     step() {
-        this.material.step();
+        this.material.step(() => { });
     }
 }
 
@@ -7474,7 +7485,7 @@ class Lamp extends Drawable {
     step() {
         if (this.smoking())
             this.cell.reborn(new Smoke());
-        this.material.step();
+        this.material.step(() => { });
     }
 }
 
@@ -7483,11 +7494,15 @@ class Stroke {
     constructor(cells, colorFn, isValid, zIndex) {
         this.cells = cells;
         this.colorFn = colorFn;
-        this.isValid = isValid;
         this.zIndex = zIndex;
+        this.isValid = typeof isValid === 'number' ? Stroke.timeout(isValid) : isValid;
     }
     add(cell, char) {
         this.cells.push({ cell, char });
+    }
+    static timeout(ms) {
+        const start = Date.now();
+        return () => Date.now() - start < ms;
     }
 }
 
@@ -7513,7 +7528,27 @@ class Task {
     }
 }
 
+;// ./src/draw/corpse.ts
+
+
+class Corpse extends Drawable {
+    constructor(pawn, cause) {
+        super();
+        this.pawn = pawn;
+        this.cause = cause;
+        this.layer = 'items';
+        this.desc = () => `${this.pawn.desc()}, died by ${this.cause}`;
+        this.light = () => 0;
+        this.char = () => '%';
+        this.color = () => colors/* BONE */.LS;
+    }
+}
+
 ;// ./src/draw/pawn.ts
+
+
+
+
 
 
 
@@ -7537,7 +7572,7 @@ class Pawn extends Drawable {
         return this.material.desc(d) + (this.material.remaining() ?? '');
     }
     recalcPaths() {
-        this.tasks.forEach(t => t.cleanup?.());
+        this.tasks.forEach(t => t.cleanup());
         let start = this.cell;
         this.tasks.forEach(t => start = t.strokeAndNext(start));
         this.endCell = start;
@@ -7550,24 +7585,65 @@ class Pawn extends Drawable {
         this.recalcPaths();
     }
     removeTask(task) {
-        task.cleanup?.();
+        task.cleanup();
         this.tasks = this.tasks.filter(t => t !== task);
         this.recalcPaths();
         window.dispatchEvent(new Event('taskRemoved'));
     }
     step() {
-        this.material.step();
-        if (this.tasks.length > 0) {
-            const task = this.tasks[0];
-            task.step();
-            if (task.isDone()) {
-                if (task.cleanup)
+        this.material.step(() => {
+            if (this.material.isBurning()) {
+                this.squawk("ouch", colors/* FIRE */.ZK);
+            }
+            if (this.tasks.length > 0) {
+                const task = this.tasks[0];
+                task.step();
+                if (task.isDone()) {
                     task.cleanup();
-                this.removeTask(task);
+                    this.removeTask(task);
+                }
+                else {
+                    this.recalcPaths();
+                }
             }
-            else {
-                this.recalcPaths();
-            }
+        });
+    }
+    dying() {
+        super.dying();
+        this.cell.create(new Corpse(this, 'burning'));
+        (0,utils/* each */.__)(this.tasks, t => t.cleanup());
+    }
+    squawk(text, colors) {
+        const directions = [
+            { dx: 0, dy: -1 }, // up
+            { dx: 1, dy: -1 }, // up-right
+            { dx: 1, dy: 0 }, // right
+            { dx: 1, dy: 1 }, // down-right
+            { dx: 0, dy: 1 }, // down
+            { dx: -1, dy: 1 }, // down-left
+            { dx: -1, dy: 0 }, // left
+            { dx: -1, dy: -1 } // up-left
+        ];
+        const fullText = " " + text;
+        const dir = (0,utils/* randFrom */.Kt)(directions);
+        const startX = this.cell.xy.x + dir.dx;
+        const startY = this.cell.xy.y + dir.dy;
+        const canPlace = !Array.from({ length: fullText.length }, (_, j) => ({
+            x: startX + j * dir.dx,
+            y: startY + j * dir.dy
+        })).some(pos => game_xy.XY.oob(pos.x, pos.y));
+        if (canPlace) {
+            const strokeId = `squawk-${Date.now()}`;
+            const stroke = new Stroke([], () => colors.random(), 300, 15);
+            Array.from({ length: fullText.length }, (_, j) => ({
+                x: startX + j * dir.dx,
+                y: startY + j * dir.dy,
+                char: fullText[j]
+            })).forEach(pos => {
+                const cell = this.cell.map.get(game_xy.XY.at(pos.x, pos.y));
+                stroke.add(cell, pos.char);
+            });
+            this.cell.map.uiRenderer.replace(strokeId, stroke);
         }
     }
     hoverStrokePath(target) {
@@ -7876,6 +7952,7 @@ class WaitTask extends Task {
 
 
 
+
 class MenuItem {
     constructor(letter, command) {
         this.letter = letter;
@@ -7914,6 +7991,10 @@ class MenuState {
             ['g', () => this.ui.setState('destination', this.pawn)],
             ['w', () => {
                     this.pawn.addTask(new WaitTask(this.pawn));
+                    this.ui.setState('menu', this.pawn);
+                }],
+            ['s', () => {
+                    this.pawn.squawk("ouch", colors/* FIRE */.ZK);
                     this.ui.setState('menu', this.pawn);
                 }],
             ['d', () => {
@@ -8072,6 +8153,7 @@ class HelpSystem {
             ['x', 'Exit menu and return to selection'],
             ['g', 'Go to destination - click to move firefighter'],
             ['w', 'Wait - firefighter will pause and wait'],
+            ['s', 'Squawk - firefighter will shout "ouch" (debug)'],
             ['d', 'Debug - assign pawn to window.pawn for console'],
             ['r', 'Remove last task from firefighter\'s queue']
         ];
@@ -8220,7 +8302,7 @@ class Game {
         this.stepMs = 0;
         this.helpSystem = new HelpSystem();
         this.updateStepInfo = () => {
-            (0,utils.$1)('step-info').textContent = `${this.stepN} ${this.stepMs}ms`;
+            (0,utils.$1)('step-info').textContent = `${this.stepN} ${this.stepMs}ms r${this.map.uiRenderer.renderFrame}`;
         };
         this.closeHelpOnOutsideClick = (e) => {
             const popup = (0,utils.$1)('help-popup');
@@ -8259,6 +8341,7 @@ class Game {
             }
         });
         window.addEventListener('redraw-map', () => this.drawMap());
+        window.addEventListener('update-step-info', () => this.updateStepInfo());
     }
     attachToDOM() {
         const container = (0,utils.$1)('game-container');
