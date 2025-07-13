@@ -209,6 +209,7 @@ module.exports = styleTagTransform;
 /* harmony export */   H3: () => (/* binding */ pushMap),
 /* harmony export */   Hn: () => (/* binding */ times),
 /* harmony export */   Im: () => (/* binding */ isEmpty),
+/* harmony export */   JD: () => (/* binding */ dispatch),
 /* harmony export */   Jo: () => (/* binding */ isInTestMode),
 /* harmony export */   Kt: () => (/* binding */ randFrom),
 /* harmony export */   MX: () => (/* binding */ half),
@@ -220,7 +221,8 @@ module.exports = styleTagTransform;
 /* harmony export */   iT: () => (/* binding */ onMousemove),
 /* harmony export */   iw: () => (/* binding */ onLastMaybe),
 /* harmony export */   jw: () => (/* binding */ centeredStart),
-/* harmony export */   ov: () => (/* binding */ hasContent)
+/* harmony export */   ov: () => (/* binding */ hasContent),
+/* harmony export */   rK: () => (/* binding */ onDispatched)
 /* harmony export */ });
 /* unused harmony exports setTestMode, setMoveContext, mapi, mapToGridDigits, randTo, onMouseover, throttle */
 let isInTestMode = false;
@@ -295,6 +297,8 @@ const $1 = (id) => bombUnless(document.getElementById(id), () => `No ${id} eleme
 const onClick = (e, f) => e.addEventListener('click', f);
 const onMouseover = (e, f) => e.addEventListener('mouseover', f);
 const onMousemove = (e, f) => e.addEventListener('mousemove', f);
+const dispatch = (eventName, item) => window.dispatchEvent(new CustomEvent(eventName, { detail: item }));
+const onDispatched = (eventName, callback) => window.addEventListener(eventName, (e) => callback(e.detail));
 const throttle = (ms, fn) => {
     let lastCall = 0;
     return () => {
@@ -7190,6 +7194,9 @@ class map_Map {
         (0,utils/* bombIf */.av)(name in this.stepCallbacks, () => `Step callback '${name}' already exists`);
         this.stepCallbacks[name] = onStepOfFrameNumber;
     }
+    removePriorRunOnStep(name) {
+        delete this.stepCallbacks[name];
+    }
     set(xy, drawable) {
         const cell = xy.cell(this.grid);
         (0,utils/* bombUnless */.Nb)(cell, () => 'No cell at ' + xy);
@@ -7434,6 +7441,8 @@ class Wall extends Drawable {
 
 ;// ./src/game/rect.ts
 
+
+
 class Rect {
     constructor(xy, w, h) {
         this.xy = xy;
@@ -7449,6 +7458,28 @@ class Rect {
     get cl() { return this.xy.add(0, (0,utils/* half */.MX)(this.h)); }
     get cr() { return this.xy.add(this.w - 1, (0,utils/* half */.MX)(this.h)); }
     get uc() { return this.xy.add((0,utils/* half */.MX)(this.w), 0); }
+    contains(target, y) {
+        let checkXY;
+        if (typeof target === 'number') {
+            checkXY = game_xy.XY.at(target, y);
+        }
+        else if (target instanceof game_xy.XY) {
+            checkXY = target;
+        }
+        else if (target instanceof Cell) {
+            checkXY = target.xy;
+        }
+        else if ('cell' in target && target.cell) {
+            checkXY = target.cell.xy;
+        }
+        else {
+            return false;
+        }
+        return checkXY.x >= this.xy.x &&
+            checkXY.x < this.xy.x + this.w &&
+            checkXY.y >= this.xy.y &&
+            checkXY.y < this.xy.y + this.h;
+    }
     eachBorder(onXY) {
         (0,utils/* times */.Hn)(this.w, x => {
             onXY(this.xy.add(x, 0)); // top edge
@@ -7624,6 +7655,7 @@ class Pawn extends Drawable {
     }
     dying() {
         super.dying();
+        (0,utils/* dispatch */.JD)('pawnDeath', this);
         this.cell.create(new Corpse(this, 'burning'));
         (0,utils/* each */.__)(this.tasks, t => t.cleanup());
     }
@@ -7681,6 +7713,32 @@ class Pawn extends Drawable {
 Pawn.HOVER_PATH_STROKE = 'hover-path';
 Pawn.HOVER_PATH_COLOR = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy(['#0ff', '#088']));
 
+;// ./src/ui/text-stroke.ts
+
+
+
+class TextStroke {
+    static create(map, text, xy, colorFn = () => '#fff', isValid = () => true, zIndex = 10) {
+        const stroke = new Stroke([], colorFn, isValid, zIndex);
+        (0,utils/* each */.__)(text, (c, i) => {
+            const cell = map.get(xy.add(i, 0));
+            stroke.add(cell, c);
+        });
+        return stroke;
+    }
+    static render(map, text, xy, id, colorFn = () => '#fff', isValid = () => true, zIndex = 10) {
+        const stroke = TextStroke.create(map, text, xy, colorFn, isValid, zIndex);
+        map.uiRenderer.replace(id, stroke);
+    }
+    static centered(map, text, y, id, colorFn = () => '#fff', isValid = () => true, zIndex = 10) {
+        const xy = game_xy.XY.at((0,utils/* centeredStart */.jw)(map.w, text), y);
+        TextStroke.render(map, text, xy, id, colorFn, isValid, zIndex);
+    }
+    static centeredPlusY(map, text, yOffset, id, colorFn = () => '#fff', isValid = () => true, zIndex = 10) {
+        TextStroke.centered(map, text, (0,utils/* half */.MX)(map.h) + yOffset, id, colorFn, isValid, zIndex);
+    }
+}
+
 ;// ./src/game/initializer.ts
 
 
@@ -7702,13 +7760,14 @@ const TITLE = [
 class Initializer {
     constructor(map) {
         this.map = map;
+        this.pawns = [];
     }
     initialize() {
         this.addField();
         this.addTitle();
         this.addWelcomeText();
-        this.addPawn();
-        this.addBarracks();
+        this.addPawns();
+        this.addBarracksWin();
         this.addUserSuggestion();
     }
     addField() {
@@ -7733,26 +7792,14 @@ class Initializer {
     addWelcomeText() {
         let firstStep = true;
         this.map.runOnStep('welcome.clear', () => firstStep = false);
-        this.addCenteredText("Welcome to Fire House RL", -13, 'welcome', () => firstStep);
-        this.addCenteredText("press space to unpause", 13, 'instructions', () => firstStep);
+        TextStroke.centeredPlusY(this.map, "Welcome to Fire House RL", -13, 'welcome', () => '#fff', () => firstStep, 10);
+        TextStroke.centeredPlusY(this.map, "press space to unpause", 13, 'instructions', () => '#fff', () => firstStep, 10);
     }
-    addCenteredText(text, yOffset, id, isValid = () => true) {
-        const centerY = (0,utils/* half */.MX)(this.map.h);
-        const y = centerY + yOffset;
-        const startX = (0,utils/* centeredStart */.jw)(this.map.w, text);
-        const stroke = new Stroke([], () => '#fff', isValid, 10);
-        (0,utils/* each */.__)(text, (c, i) => {
-            const cell = this.map.get(game_xy.XY.at(startX + i, y));
-            stroke.add(cell, c);
-        });
-        this.map.uiRenderer.replace(id, stroke);
-    }
-    addPawn() {
-        this.map.createAt(game_xy.XY.at(55, 24), new Pawn('firefighter 1'));
-        this.map.createAt(game_xy.XY.at(39, 24), new Pawn('firefighter 2'));
+    addPawns() {
+        this.pawns.push(this.map.createAt(game_xy.XY.at(55, 24), new Pawn('firefighter 1')));
+        this.pawns.push(this.map.createAt(game_xy.XY.at(39, 24), new Pawn('firefighter 2')));
     }
     addRoom(rect) {
-        //rect.eachCell(xy => this.map.set(xy, new Floor()))
         rect.eachBorder(xy => {
             this.map.createAt(xy, new Wall());
         });
@@ -7760,8 +7807,23 @@ class Initializer {
             this.map.createAt(xy, new Lamp());
         });
     }
-    addBarracks() {
+    addBarracksWin() {
         const rect = Rect.xyWH(game_xy.XY.at(60, 8), 9, 9);
+        const labelAt = game_xy.XY.at(rect.ur.x + 3, rect.cr.y);
+        TextStroke.render(this.map, '<-- GO HERE', labelAt, 'barracks-label');
+        this.map.runOnStep('barracks.check-win', () => {
+            const unrescued = this.pawns.filter(pawn => !rect.contains(pawn));
+            if ((0,utils/* hasContent */.ov)(unrescued))
+                return;
+            this.map.uiRenderer.remove('barracks-label');
+            TextStroke.render(this.map, 'YOU WIN', labelAt, 'win-text');
+            this.map.removePriorRunOnStep('barracks.check-win');
+        });
+        (0,utils/* onDispatched */.rK)('pawnDeath', _dead => {
+            this.map.uiRenderer.remove('barracks-label');
+            TextStroke.render(this.map, 'YOU LOSE', labelAt, 'lose-text');
+            this.map.removePriorRunOnStep('barracks.check-win');
+        });
         this.addRoom(rect);
         const entrance = this.map.get(rect.cl);
         const wall = entrance.wall();
@@ -7781,15 +7843,8 @@ class Initializer {
                 return;
             suggestionVisible = !suggestionVisible;
             if (suggestionVisible) {
-                const y = this.map.h - 1;
                 const text = 'click the @ symbol';
-                const startX = (0,utils/* centeredStart */.jw)(this.map.w, text);
-                const stroke = new Stroke([], () => '#ff0', () => !Initializer.pawnSelected, 10);
-                (0,utils/* each */.__)(text, (c, i) => {
-                    const cell = this.map.get(game_xy.XY.at(startX + i, y));
-                    stroke.add(cell, c);
-                });
-                this.map.uiRenderer.replace('suggestion', stroke);
+                TextStroke.centered(this.map, text, this.map.h - 1, 'suggestion', () => '#ff0', () => !Initializer.pawnSelected, 10);
             }
             else {
                 this.map.uiRenderer.remove('suggestion');
