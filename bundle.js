@@ -209,7 +209,6 @@ module.exports = styleTagTransform;
 /* harmony export */   H3: () => (/* binding */ pushMap),
 /* harmony export */   Hn: () => (/* binding */ times),
 /* harmony export */   Im: () => (/* binding */ isEmpty),
-/* harmony export */   JD: () => (/* binding */ dispatch),
 /* harmony export */   Jo: () => (/* binding */ isInTestMode),
 /* harmony export */   Kt: () => (/* binding */ randFrom),
 /* harmony export */   MX: () => (/* binding */ half),
@@ -221,10 +220,9 @@ module.exports = styleTagTransform;
 /* harmony export */   iT: () => (/* binding */ onMousemove),
 /* harmony export */   iw: () => (/* binding */ onLastMaybe),
 /* harmony export */   jw: () => (/* binding */ centeredStart),
-/* harmony export */   ov: () => (/* binding */ hasContent),
-/* harmony export */   rK: () => (/* binding */ onDispatched)
+/* harmony export */   ov: () => (/* binding */ hasContent)
 /* harmony export */ });
-/* unused harmony exports setTestMode, setMoveContext, mapi, mapToGridDigits, randTo, onMouseover, throttle */
+/* unused harmony exports setTestMode, setMoveContext, mapi, mapToGridDigits, randTo, onMouseover, dispatch, onDispatched, throttle */
 let isInTestMode = false;
 let moveDebug = '';
 const setTestMode = (value) => { isInTestMode = value; };
@@ -6395,6 +6393,7 @@ Config.createTransparentDisplay = (width, height) => _a.display(width, height, '
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Jy: () => (/* binding */ Colors),
 /* harmony export */   LS: () => (/* binding */ BONE),
+/* harmony export */   UE: () => (/* binding */ WHITE),
 /* harmony export */   XE: () => (/* binding */ BORDER),
 /* harmony export */   ZK: () => (/* binding */ FIRE),
 /* harmony export */   h4: () => (/* binding */ BACKGROUND),
@@ -6412,6 +6411,7 @@ const BORDER = "#444";
 const WOOD = "#8B4513";
 const SMOLDERING = '#6c200e';
 const BONE = "#fff";
+const WHITE = "#fff";
 class Colors {
     constructor(colors) {
         this.colors = colors;
@@ -6627,7 +6627,10 @@ CellLayers.materialLayers = ['walls', 'items', 'pawn'];
 
 // EXTERNAL MODULE: ./src/game/xyl.ts
 var xyl = __webpack_require__(830);
+// EXTERNAL MODULE: ./src/ui/colors.ts
+var colors = __webpack_require__(919);
 ;// ./src/game/cell.ts
+
 
 
 
@@ -6659,7 +6662,7 @@ class Cell {
         if (showLighting) {
             const char = Math.floor(illumination).toString();
             if (char !== '0') {
-                this.map.drawAt(this.xy.x, this.xy.y, char, '#fff', '#000');
+                this.map.drawAt(this.xy.x, this.xy.y, char, colors/* WHITE */.UE, '#000');
                 return;
             }
         }
@@ -6753,6 +6756,8 @@ const eachLine = (start, end, onXYAndReturnContinue) => {
 ;// ./src/game/lighting.ts
 
 
+
+const COLOR_INTENSITY = 0.3;
 class Lighting {
     constructor(map) {
         this.map = map;
@@ -6765,10 +6770,17 @@ class Lighting {
         };
         this.at = (cell) => this.atXY(cell.xy);
         this._illumination = Array.from({ length: map.h }, () => new Array(map.w));
+        this._colors = Array.from({ length: map.h }, () => Array.from({ length: map.w }, () => ({ r: 0, g: 0, b: 0, w: 0 })));
         this.clear();
     }
     clear() {
         this._illumination.forEach(row => row.fill(0));
+        this._colors.forEach(row => row.forEach(c => {
+            c.r = 0;
+            c.g = 0;
+            c.b = 0;
+            c.w = 0;
+        }));
     }
     add(cell) {
         this._sources.add(cell);
@@ -6796,6 +6808,7 @@ class Lighting {
                 .reduce((sum, drawable) => sum + (drawable?.light() ?? 0), 0), 9);
             if (radius <= 0)
                 continue;
+            const color = this.colorOf(cell);
             /* tiles in a square; cheap for r ≤ 9 */
             for (let dy = -radius; dy <= radius; dy++) {
                 for (let dx = -radius; dx <= radius; dx++) {
@@ -6815,6 +6828,7 @@ class Lighting {
                         const bright = Math.round(normalized * vis);
                         if (bright > this.atXY(xy))
                             this.set(xy, bright);
+                        this.addColor(xy.x, xy.y, bright, color);
                         if (xy.x === cell.xy.x && xy.y === cell.xy.y)
                             return true; // skip lamp tile
                         vis *= this.transparencyOf(xy.x, xy.y);
@@ -6827,12 +6841,19 @@ class Lighting {
                     const bright = Math.round(normalized * vis);
                     if (bright > this._illumination[ty][tx])
                         this._illumination[ty][tx] = bright;
+                    this.addColor(tx, ty, bright, color);
                 }
             }
         }
     }
     set(xy, intensity) {
         this._illumination[xy.y][xy.x] = intensity;
+    }
+    colorAt(cell) {
+        const c = this._colors[cell.xy.y][cell.xy.x];
+        if (c.w === 0)
+            return [0, 0, 0];
+        return [c.r / c.w, c.g / c.w, c.b / c.w];
     }
     sources() {
         return this._sources;
@@ -6845,6 +6866,52 @@ class Lighting {
         if (d2 > radius * radius)
             return 0;
         return radius - ((d2 + (radius >> 1)) / radius | 0);
+    }
+    addColor(x, y, bright, color) {
+        if (bright <= 0)
+            return;
+        const c = this._colors[y][x];
+        const w = bright / 9;
+        c.r += color[0] * w;
+        c.g += color[1] * w;
+        c.b += color[2] * w;
+        c.w += w;
+    }
+    colorOf(cell) {
+        let r = 0, g = 0, b = 0, w = 0;
+        for (const l of CellLayers.layerNames) {
+            const d = cell.layers.data[l];
+            if (d && d.light() > 0) {
+                const rgb = Lighting.hex(d.color());
+                if (!rgb)
+                    continue;
+                const weight = d.light();
+                r += rgb[0] * weight;
+                g += rgb[1] * weight;
+                b += rgb[2] * weight;
+                w += weight;
+            }
+        }
+        if (w === 0)
+            return [0, 0, 0];
+        return [r / w, g / w, b / w];
+    }
+    static hex(color) {
+        if (!color.startsWith('#'))
+            return null;
+        if (color.length === 4)
+            return [
+                parseInt(color[1] + color[1], 16),
+                parseInt(color[2] + color[2], 16),
+                parseInt(color[3] + color[3], 16)
+            ];
+        if (color.length === 7)
+            return [
+                parseInt(color.slice(1, 3), 16),
+                parseInt(color.slice(3, 5), 16),
+                parseInt(color.slice(5, 7), 16)
+            ];
+        return null;
     }
 }
 
@@ -6906,9 +6973,8 @@ class Movers {
     }
 }
 
-// EXTERNAL MODULE: ./src/ui/colors.ts
-var colors = __webpack_require__(919);
 ;// ./src/draw/drawable.ts
+
 
 
 class Drawable {
@@ -6956,7 +7022,14 @@ class Drawable {
         const darkR = Math.floor(r * factor);
         const darkG = Math.floor(g * factor);
         const darkB = Math.floor(b * factor);
-        return `#${darkR.toString(16).padStart(2, '0')}${darkG.toString(16).padStart(2, '0')}${darkB.toString(16).padStart(2, '0')}`;
+        const [lr, lg, lb] = this.cell.map.lighting.colorAt(this.cell);
+        const tintR = Math.floor(lr * COLOR_INTENSITY);
+        const tintG = Math.floor(lg * COLOR_INTENSITY);
+        const tintB = Math.floor(lb * COLOR_INTENSITY);
+        const finalR = Math.min(255, darkR + tintR);
+        const finalG = Math.min(255, darkG + tintG);
+        const finalB = Math.min(255, darkB + tintB);
+        return `#${finalR.toString(16).padStart(2, '0')}${finalG.toString(16).padStart(2, '0')}${finalB.toString(16).padStart(2, '0')}`;
     }
     r() { return this.cell.r(); }
     l() { return this.cell.l(); }
@@ -7059,6 +7132,7 @@ class Display {
 ;// ./src/ui/ui-renderer.ts
 
 
+
 class UIRenderer {
     constructor(map) {
         this.map = map;
@@ -7067,7 +7141,7 @@ class UIRenderer {
         this.frozen = () => !this.intervalId;
         this.display = new Display(map.w, map.h, true);
         this.intervalId = this.start();
-        map.runOnStep('ui-renderer', () => this.render());
+        GameStepped.on(() => this.render());
         window.addEventListener('repaint', () => this.render());
     }
     unfreeze() {
@@ -7138,8 +7212,6 @@ class UIRenderer {
 
 class map_Map {
     constructor(width, height) {
-        this.stepCallbacks = {};
-        this.frameNumber = 0;
         this.get = (xy) => {
             const result = xy.cell(this.grid);
             (0,utils/* bombUnless */.Nb)(result, () => 'No cell at ' + xy);
@@ -7185,17 +7257,8 @@ class map_Map {
                 this.grid[y][x].step();
             });
         });
-        this.frameNumber++;
-        Object.values(this.stepCallbacks).forEach(onStep => onStep(this.frameNumber));
         this.movers.move();
         assertNoLeaks(this);
-    }
-    runOnStep(name, onStepOfFrameNumber) {
-        (0,utils/* bombIf */.av)(name in this.stepCallbacks, () => `Step callback '${name}' already exists`);
-        this.stepCallbacks[name] = onStepOfFrameNumber;
-    }
-    removePriorRunOnStep(name) {
-        delete this.stepCallbacks[name];
     }
     set(xy, drawable) {
         const cell = xy.cell(this.grid);
@@ -7276,6 +7339,60 @@ class map_Map {
     }
 }
 map_Map.active = new Set();
+
+;// ./src/game/rect.ts
+
+
+
+class Rect {
+    constructor(xy, w, h) {
+        this.xy = xy;
+        this.w = w;
+        this.h = h;
+        this.eachCell = (onXY) => (0,utils/* times */.Hn)(this.w, x => (0,utils/* times */.Hn)(this.h, y => onXY(this.xy.add(x, y))));
+    }
+    get ul() { return this.xy; }
+    get ur() { return this.xy.add(this.w - 1, 0); }
+    get bl() { return this.xy.add(0, this.h - 1); }
+    get br() { return this.xy.add(this.w - 1, this.h - 1); }
+    get cb() { return this.xy.add((0,utils/* half */.MX)(this.w), this.h - 1); }
+    get cl() { return this.xy.add(0, (0,utils/* half */.MX)(this.h)); }
+    get cr() { return this.xy.add(this.w - 1, (0,utils/* half */.MX)(this.h)); }
+    get uc() { return this.xy.add((0,utils/* half */.MX)(this.w), 0); }
+    contains(target, y) {
+        let checkXY;
+        if (typeof target === 'number') {
+            checkXY = game_xy.XY.at(target, y);
+        }
+        else if (target instanceof game_xy.XY) {
+            checkXY = target;
+        }
+        else if (target instanceof Cell) {
+            checkXY = target.xy;
+        }
+        else if ('cell' in target && target.cell) {
+            checkXY = target.cell.xy;
+        }
+        else {
+            return false;
+        }
+        return checkXY.x >= this.xy.x &&
+            checkXY.x < this.xy.x + this.w &&
+            checkXY.y >= this.xy.y &&
+            checkXY.y < this.xy.y + this.h;
+    }
+    eachBorder(onXY) {
+        (0,utils/* times */.Hn)(this.w, x => {
+            onXY(this.xy.add(x, 0)); // top edge
+            onXY(this.xy.add(x, this.h - 1)); // bottom edge
+        });
+        (0,utils/* times */.Hn)(this.h - 2, y => {
+            onXY(this.xy.add(0, y + 1));
+            onXY(this.xy.add(this.w - 1, y + 1));
+        });
+    }
+}
+Rect.xyWH = (topLeft, width, height) => new Rect(topLeft, width, height);
 
 ;// ./src/draw/smoke.ts
 
@@ -7420,18 +7537,11 @@ class Wall extends Drawable {
         this.layer = 'walls';
         this.passable = false;
         this.transparency = 0;
-        this.isDoor = false;
         this.material = new Material(this);
-        this.char = () => this.isDoor ? '+' : '#';
-        this.color = () => this.material.color(this.isDoor ? colors/* WOOD */.wB : colors/* BORDER */.XE);
+        this.char = () => '#';
+        this.color = () => this.material.color(colors/* BORDER */.XE);
         this.light = () => this.material.light(0);
-        this.desc = () => {
-            return this.material.desc(this.isDoor ? 'Door' : 'Wall');
-        };
-        this.makeDoor = () => {
-            this.isDoor = true;
-            this.passable = true;
-        };
+        this.desc = () => this.material.desc('Wall');
         this.ignite = () => this.material.ignite();
     }
     step() {
@@ -7439,59 +7549,30 @@ class Wall extends Drawable {
     }
 }
 
-;// ./src/game/rect.ts
+;// ./src/draw/door.ts
 
 
 
-class Rect {
-    constructor(xy, w, h) {
-        this.xy = xy;
-        this.w = w;
-        this.h = h;
-        this.eachCell = (onXY) => (0,utils/* times */.Hn)(this.w, x => (0,utils/* times */.Hn)(this.h, y => onXY(this.xy.add(x, y))));
+class Door extends Drawable {
+    constructor() {
+        super(...arguments);
+        this.layer = 'walls';
+        this.open = false;
+        this.passable = false;
+        this.transparency = 0;
+        this.material = new Material(this);
+        this.light = () => this.material.light(0);
+        this.char = () => this.open ? '/' : '+';
+        this.color = () => this.material.color(colors/* WOOD */.wB);
+        this.desc = () => this.material.desc(this.open ? 'Open Door' : 'Door');
     }
-    get ul() { return this.xy; }
-    get ur() { return this.xy.add(this.w - 1, 0); }
-    get bl() { return this.xy.add(0, this.h - 1); }
-    get br() { return this.xy.add(this.w - 1, this.h - 1); }
-    get cb() { return this.xy.add((0,utils/* half */.MX)(this.w), this.h - 1); }
-    get cl() { return this.xy.add(0, (0,utils/* half */.MX)(this.h)); }
-    get cr() { return this.xy.add(this.w - 1, (0,utils/* half */.MX)(this.h)); }
-    get uc() { return this.xy.add((0,utils/* half */.MX)(this.w), 0); }
-    contains(target, y) {
-        let checkXY;
-        if (typeof target === 'number') {
-            checkXY = game_xy.XY.at(target, y);
-        }
-        else if (target instanceof game_xy.XY) {
-            checkXY = target;
-        }
-        else if (target instanceof Cell) {
-            checkXY = target.xy;
-        }
-        else if ('cell' in target && target.cell) {
-            checkXY = target.cell.xy;
-        }
-        else {
-            return false;
-        }
-        return checkXY.x >= this.xy.x &&
-            checkXY.x < this.xy.x + this.w &&
-            checkXY.y >= this.xy.y &&
-            checkXY.y < this.xy.y + this.h;
+    toggle() {
+        this.open = !this.open;
+        this.passable = this.open;
+        this.transparency = this.open ? 1 : 0;
     }
-    eachBorder(onXY) {
-        (0,utils/* times */.Hn)(this.w, x => {
-            onXY(this.xy.add(x, 0)); // top edge
-            onXY(this.xy.add(x, this.h - 1)); // bottom edge
-        });
-        (0,utils/* times */.Hn)(this.h - 2, y => {
-            onXY(this.xy.add(0, y + 1));
-            onXY(this.xy.add(this.w - 1, y + 1));
-        });
-    }
+    step() { this.material.step(() => { }); }
 }
-Rect.xyWH = (topLeft, width, height) => new Rect(topLeft, width, height);
 
 ;// ./src/draw/floor.ts
 
@@ -7503,33 +7584,6 @@ class Floor extends Drawable {
         this.light = () => 0;
         this.char = () => '.';
         this.color = () => colors/* BORDER */.XE;
-    }
-}
-
-;// ./src/draw/lamp.ts
-
-
-
-
-
-class Lamp extends Drawable {
-    constructor() {
-        super(...arguments);
-        this.layer = 'items';
-        this.transparency = 1;
-        this.material = new Material(this);
-        this.light = () => this.material.light(5);
-        this.char = () => '*';
-        this.color = () => this.material.color(colors/* LAMP */.zu.random());
-        this.desc = () => this.material.desc('Lamp');
-    }
-    smoking() {
-        return utils/* isInTestMode */.Jo ? true : (0,utils/* oneIn */.A7)(3);
-    }
-    step() {
-        if (this.smoking())
-            this.cell.reborn(new Smoke());
-        this.material.step(() => { });
     }
 }
 
@@ -7589,6 +7643,35 @@ class Corpse extends Drawable {
     }
 }
 
+;// ./src/signal.ts
+class Signal {
+    constructor() {
+        this.listeners = new Set();
+    }
+    emit(t) {
+        for (const onT of this.listeners)
+            onT(t);
+    }
+    on(onT) {
+        this.listeners.add(onT);
+        return () => this.listeners.delete(onT);
+    }
+}
+class SignalWithCurrent extends Signal {
+    constructor() {
+        super(...arguments);
+        this.current = null;
+    }
+    emit(t) {
+        this.current = t;
+        super.emit(t);
+    }
+    when(onT) {
+        if (this.current)
+            onT(this.current);
+    }
+}
+
 ;// ./src/draw/pawn.ts
 
 
@@ -7598,6 +7681,12 @@ class Corpse extends Drawable {
 
 
 
+
+const PawnSelected = new SignalWithCurrent();
+const PawnMoved = new Signal();
+const PawnBorn = new Signal();
+const PawnBurned = new Signal();
+const PawnDied = new Signal();
 class Pawn extends Drawable {
     constructor(name) {
         super();
@@ -7609,7 +7698,7 @@ class Pawn extends Drawable {
         this.transparency = 0;
         this.light = () => this.material.light(3);
         this.char = () => '@';
-        this.color = () => this.material.color(colors/* FOREGROUND */.u6);
+        this.color = () => this.material.color(colors/* WHITE */.UE);
         this.tasks = [];
     }
     desc() {
@@ -7639,6 +7728,7 @@ class Pawn extends Drawable {
         this.material.step(() => {
             if (this.material.isBurning()) {
                 this.squawk("ouch", colors/* FIRE */.ZK);
+                PawnBurned.emit(this);
             }
             if (this.tasks.length > 0) {
                 const task = this.tasks[0];
@@ -7655,7 +7745,7 @@ class Pawn extends Drawable {
     }
     dying() {
         super.dying();
-        (0,utils/* dispatch */.JD)('pawnDeath', this);
+        PawnDied.emit(this);
         this.cell.create(new Corpse(this, 'burning'));
         (0,utils/* each */.__)(this.tasks, t => t.cleanup());
     }
@@ -7705,20 +7795,54 @@ class Pawn extends Drawable {
         return super.draw(debug, 9);
     }
     movedInto(cell) {
+        const from = this.cell;
         super.movedInto(cell);
         if (this.tasks.length > 0)
             this.recalcPaths();
+        if (from)
+            PawnMoved.emit({ pawn: this, from, to: cell });
+        else
+            PawnBorn.emit({ pawn: this, into: cell });
     }
 }
 Pawn.HOVER_PATH_STROKE = 'hover-path';
 Pawn.HOVER_PATH_COLOR = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy(['#0ff', '#088']));
 
+;// ./src/draw/lamp.ts
+
+
+
+
+
+class Lamp extends Drawable {
+    constructor() {
+        super(...arguments);
+        this.layer = 'items';
+        this.transparency = 1;
+        this.material = new Material(this);
+        this.passable = false;
+        this.light = () => this.material.light(5);
+        this.char = () => '*';
+        this.color = () => this.material.color(colors/* LAMP */.zu.random());
+        this.desc = () => this.material.desc('Lamp');
+    }
+    smoking() {
+        return utils/* isInTestMode */.Jo ? true : (0,utils/* oneIn */.A7)(3);
+    }
+    step() {
+        if (this.smoking())
+            this.cell.reborn(new Smoke());
+        this.material.step(() => { });
+    }
+}
+
 ;// ./src/ui/text-stroke.ts
 
 
 
+
 class TextStroke {
-    static create(map, text, xy, colorFn = () => '#fff', isValid = () => true, zIndex = 10) {
+    static create(map, text, xy, colorFn = () => colors/* WHITE */.UE, isValid = () => true, zIndex = 10) {
         const stroke = new Stroke([], colorFn, isValid, zIndex);
         (0,utils/* each */.__)(text, (c, i) => {
             const cell = map.get(xy.add(i, 0));
@@ -7726,20 +7850,22 @@ class TextStroke {
         });
         return stroke;
     }
-    static render(map, text, xy, id, colorFn = () => '#fff', isValid = () => true, zIndex = 10) {
+    static render(map, text, xy, id, colorFn = () => colors/* WHITE */.UE, isValid = () => true, zIndex = 10) {
         const stroke = TextStroke.create(map, text, xy, colorFn, isValid, zIndex);
         map.uiRenderer.replace(id, stroke);
     }
-    static centered(map, text, y, id, colorFn = () => '#fff', isValid = () => true, zIndex = 10) {
+    static centered(map, text, y, id, colorFn = () => colors/* WHITE */.UE, isValid = () => true, zIndex = 10) {
         const xy = game_xy.XY.at((0,utils/* centeredStart */.jw)(map.w, text), y);
         TextStroke.render(map, text, xy, id, colorFn, isValid, zIndex);
     }
-    static centeredPlusY(map, text, yOffset, id, colorFn = () => '#fff', isValid = () => true, zIndex = 10) {
+    static centeredPlusY(map, text, yOffset, id, colorFn = () => colors/* WHITE */.UE, isValid = () => true, zIndex = 10) {
         TextStroke.centered(map, text, (0,utils/* half */.MX)(map.h) + yOffset, id, colorFn, isValid, zIndex);
     }
 }
 
 ;// ./src/game/initializer.ts
+
+
 
 
 
@@ -7790,10 +7916,15 @@ class Initializer {
         });
     }
     addWelcomeText() {
-        let firstStep = true;
-        this.map.runOnStep('welcome.clear', () => firstStep = false);
-        TextStroke.centeredPlusY(this.map, "Welcome to Fire House RL", -13, 'welcome', () => '#fff', () => firstStep, 10);
-        TextStroke.centeredPlusY(this.map, "press space to unpause", 13, 'instructions', () => '#fff', () => firstStep, 10);
+        TextStroke.centeredPlusY(this.map, "Welcome to Fire House RL", -13, 'welcome');
+        TextStroke.centeredPlusY(this.map, "press space to unpause", 13, 'instructions');
+        const endWelcome = GameStepped.on(step => {
+            if (step.frame <= 0)
+                return;
+            this.map.uiRenderer.remove('welcome');
+            this.map.uiRenderer.remove('instructions');
+            endWelcome();
+        });
     }
     addPawns() {
         this.pawns.push(this.map.createAt(game_xy.XY.at(55, 24), new Pawn('firefighter 1')));
@@ -7811,50 +7942,50 @@ class Initializer {
         const rect = Rect.xyWH(game_xy.XY.at(60, 8), 9, 9);
         const labelAt = game_xy.XY.at(rect.ur.x + 3, rect.cr.y);
         TextStroke.render(this.map, '<-- GO HERE', labelAt, 'barracks-label');
-        this.map.runOnStep('barracks.check-win', () => {
-            const unrescued = this.pawns.filter(pawn => !rect.contains(pawn));
-            if ((0,utils/* hasContent */.ov)(unrescued))
-                return;
-            this.map.uiRenderer.remove('barracks-label');
-            TextStroke.render(this.map, 'YOU WIN', labelAt, 'win-text');
-            this.map.removePriorRunOnStep('barracks.check-win');
-        });
-        (0,utils/* onDispatched */.rK)('pawnDeath', _dead => {
-            this.map.uiRenderer.remove('barracks-label');
-            TextStroke.render(this.map, 'YOU LOSE', labelAt, 'lose-text');
-            this.map.removePriorRunOnStep('barracks.check-win');
-        });
+        const ends = [
+            GameStepped.on(() => {
+                const unrescued = this.pawns.filter(pawn => !rect.contains(pawn));
+                if ((0,utils/* hasContent */.ov)(unrescued))
+                    return;
+                this.map.uiRenderer.remove('barracks-label');
+                TextStroke.render(this.map, 'YOU WIN', labelAt, 'win-text');
+                (0,utils/* each */.__)(ends, check => check());
+            }),
+            PawnDied.on(_dead => {
+                this.map.uiRenderer.remove('barracks-label');
+                TextStroke.render(this.map, 'YOU LOSE', labelAt, 'lose-text');
+                (0,utils/* each */.__)(ends, check => check());
+            })
+        ];
         this.addRoom(rect);
         const entrance = this.map.get(rect.cl);
-        const wall = entrance.wall();
-        wall.makeDoor();
+        entrance.reborn(new Door());
         entrance.l().u().create(new Lamp());
         entrance.l().d().create(new Lamp());
     }
     addUserSuggestion() {
         let suggestionVisible = true;
-        const suggest = (frameNumber) => {
-            // Stop showing once a pawn has been selected
-            if (Initializer.pawnSelected) {
-                this.map.uiRenderer.remove('suggestion');
-                return;
-            }
-            if (frameNumber % 5 !== 0)
+        const suggest = () => {
+            const step = GameStepped.current;
+            if (!step || step.frame % 5 !== 0)
                 return;
             suggestionVisible = !suggestionVisible;
             if (suggestionVisible) {
                 const text = 'click the @ symbol';
-                TextStroke.centered(this.map, text, this.map.h - 1, 'suggestion', () => '#ff0', () => !Initializer.pawnSelected, 10);
+                TextStroke.centered(this.map, text, this.map.h - 1, 'suggestion', () => '#ff0', () => true, 10);
             }
             else {
                 this.map.uiRenderer.remove('suggestion');
             }
         };
-        suggest(0);
-        this.map.runOnStep('user.suggest', suggest);
+        suggest();
+        const stopSuggesting = GameStepped.on(suggest);
+        PawnSelected.on(_pawn => {
+            this.map.uiRenderer.remove('suggestion');
+            stopSuggesting();
+        });
     }
 }
-Initializer.pawnSelected = false;
 
 ;// ./node_modules/d3-selection/src/selector.js
 function none() {}
@@ -12106,20 +12237,21 @@ const d1 = (selector) => {
 ;// ./src/ui/terminal.ts
 
 
+
 class Terminal {
     constructor() {
         this.currentCell = null;
-        this.selectedPawn = null;
         this.setCurrent = (cell) => this.currentCell = cell;
-        this.setSelected = (pawn) => this.selectedPawn = pawn;
-        this.getSelectedPawn = () => this.selectedPawn;
         this.div = d1('#terminal');
         this.div.appendFileHtml(terminal);
+        this.repaintSelectedPawn();
         window.addEventListener('repaint', () => this.draw());
+        PawnSelected.on(pawn => this.repaintSelectedPawn());
+        PawnMoved.on(({ pawn }) => this.repaintSelectedPawn());
+        PawnBurned.on(pawn => this.repaintSelectedPawn());
     }
     draw() {
         this.updateCell();
-        this.updateSelectedPawn();
     }
     updateCell() {
         const content = this.div.d1('#terminal-content');
@@ -12134,9 +12266,10 @@ class Terminal {
             content.dList('.layer').updateFrom([], () => { });
         });
     }
-    updateSelectedPawn() {
+    repaintSelectedPawn() {
+        const pawn = PawnSelected.current;
         const selectedInfo = this.div.d1('#selected-info');
-        selectedInfo.updateFrom(this.selectedPawn, (pawn) => {
+        selectedInfo.updateFrom(pawn, (pawn) => {
             const container = selectedInfo.d1('.selected-container');
             container.d1('.pawn-desc').text(pawn.desc());
             container.dList('.task-info').updateFrom(pawn.tasks, (taskDiv, task) => {
@@ -12169,6 +12302,7 @@ class SelectState {
 ;// ./src/game/tasks/destination-task.ts
 
 
+
 class DestinationTask extends Task {
     constructor(pawn, destination) {
         super(pawn);
@@ -12180,21 +12314,27 @@ class DestinationTask extends Task {
     step() {
         if (this.done)
             return;
-        let moved = false;
-        this.pawn.cell.map.eachRay(this.pawn.cell.xy, this.destination.xy, (cell) => {
-            if (!cell.passable()) {
-                this.done = true;
-                return false;
-            }
-            this.pawn.cell.queueMove(this.pawn, cell.xy);
-            moved = true;
-            if (cell === this.destination)
-                this.done = true;
+        let next;
+        this.pawn.cell.map.eachRay(this.pawn.cell.xy, this.destination.xy, c => {
+            next = c;
             return false;
         });
-        if (!moved || this.pawn.cell === this.destination) {
+        if (!next) {
             this.done = true;
+            return;
         }
+        const wall = next.wall();
+        if (wall instanceof Door && !wall.passable) {
+            wall.toggle();
+            return;
+        }
+        if (!next.passable()) {
+            this.done = true;
+            return;
+        }
+        this.pawn.cell.queueMove(this.pawn, next.xy);
+        if (next === this.destination)
+            this.done = true;
     }
     cleanup() {
         this.pawn.cell.map.uiRenderer.remove(this.strokeId);
@@ -12207,7 +12347,6 @@ class DestinationTask extends Task {
 }
 
 ;// ./src/ui/states/destination-state.ts
-
 
 
 class DestinationState {
@@ -12226,14 +12365,13 @@ class DestinationState {
     enter(pawn) {
         this.selected = pawn;
         this.selected.selected = true;
-        this.ui.terminal.setSelected(pawn);
-        Initializer.pawnSelected = true;
+        PawnSelected.emit(pawn);
     }
     exit() {
         this.ui.map.uiRenderer.remove(Pawn.HOVER_PATH_STROKE);
         this.selected.selected = false;
         window.dispatchEvent(new Event('repaint'));
-        this.ui.terminal.setSelected(null);
+        PawnSelected.emit(null);
     }
 }
 
@@ -12276,13 +12414,12 @@ class MenuState {
     enter(pawn) {
         this.pawn = pawn;
         this.pawn.selected = true;
-        this.ui.terminal.setSelected(pawn);
-        Initializer.pawnSelected = true;
+        PawnSelected.emit(pawn);
         this.showMenu();
     }
     exit() {
         this.pawn.selected = false;
-        this.ui.terminal.setSelected(null);
+        PawnSelected.emit(null);
         this.hideMenu();
     }
     definitions() {
@@ -12369,12 +12506,11 @@ class ObservePawnState {
     enter(pawn) {
         this.selected = pawn;
         this.selected.selected = true;
-        this.ui.terminal.setSelected(pawn);
-        Initializer.pawnSelected = true;
+        PawnSelected.emit(pawn);
     }
     exit() {
         this.selected.selected = false;
-        this.ui.terminal.setSelected(null);
+        PawnSelected.emit(null);
     }
 }
 
@@ -12591,6 +12727,8 @@ ${layerSections}<br/>
 
 
 
+
+const GameStepped = new SignalWithCurrent();
 class Game {
     constructor() {
         this.intervalId = null;
@@ -12599,11 +12737,12 @@ class Game {
         this.showDarkness = true;
         this.mutedLayers = new Set();
         this.soloLayer = null;
-        this.stepN = 0;
-        this.stepMs = 0;
         this.helpSystem = new HelpSystem();
         this.updateStepInfo = () => {
-            (0,utils.$1)('step-info').textContent = `${this.stepN} ${this.stepMs}ms r${this.map.uiRenderer.renderFrame}`;
+            if (!GameStepped.current)
+                return;
+            const { frame, stepMs } = GameStepped.current;
+            (0,utils.$1)('step-info').textContent = `${frame} ${stepMs}ms r${this.map.uiRenderer.renderFrame}`;
         };
         this.closeHelpOnOutsideClick = (e) => {
             const popup = (0,utils.$1)('help-popup');
@@ -12622,7 +12761,6 @@ class Game {
         initializer.initialize();
         this.map.lighting.redraw();
         this.drawMap();
-        this.map.runOnStep('game.stepInfo', n => this.stepN = n);
         this.updatePlayPauseButton();
         this.updateFreezeButton();
         this.updateStepInfo();
@@ -12643,6 +12781,7 @@ class Game {
         });
         window.addEventListener('redraw-map', () => this.drawMap());
         window.addEventListener('update-step-info', () => this.updateStepInfo());
+        GameStepped.emit({ frame: 0, stepMs: 0 });
     }
     attachToDOM() {
         const container = (0,utils.$1)('game-container');
@@ -12766,10 +12905,13 @@ class Game {
         this.map.lighting.redraw();
         this.drawMap();
         window.dispatchEvent(new Event('repaint'));
-        this.stepMs = Date.now() - start;
+        const stepMs = Date.now() - start;
+        const frame = (GameStepped.current?.frame || 0) + 1;
+        GameStepped.emit({ frame, stepMs });
         this.updateStepInfo();
     }
     drawMap() {
+        this.map.lighting.redraw(); // Update colors more frequently for flickering effect
         const visibleLayers = this.getVisibleLayers();
         const showNothing = this.mutedLayers.size === CellLayers.layerNames.length;
         const debug = this.mutedLayers.size > 0 || this.soloLayer !== null;
