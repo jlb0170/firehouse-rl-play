@@ -6562,6 +6562,30 @@ var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
 
 // EXTERNAL MODULE: ./src/utils.ts
 var utils = __webpack_require__(185);
+;// ./src/compress.ts
+const encode = (u8) => btoa(String.fromCharCode(...u8));
+const decode = (b) => Uint8Array.from(atob(b), c => c.charCodeAt(0));
+const pump = async (s) => new Uint8Array(await new Response(s).arrayBuffer());
+const gzip = async (s) => {
+    if (typeof CompressionStream === 'undefined')
+        return btoa(s);
+    const cs = new CompressionStream('gzip');
+    const w = cs.writable.getWriter();
+    w.write(new TextEncoder().encode(s));
+    w.close();
+    return encode(await pump(cs.readable));
+};
+const gunzip = async (b) => {
+    if (typeof DecompressionStream === 'undefined')
+        return atob(b);
+    const ds = new DecompressionStream('gzip');
+    const w = ds.writable.getWriter();
+    w.write(decode(b));
+    w.close();
+    return new TextDecoder().decode(await pump(ds.readable));
+};
+const longUrl = (u) => u.length > 2000;
+
 // EXTERNAL MODULE: ./src/game/xy.ts
 var game_xy = __webpack_require__(88);
 ;// ./src/game/layers.ts
@@ -7142,20 +7166,52 @@ class Display {
     }
 }
 
+;// ./src/signal.ts
+class Signal {
+    constructor() {
+        this.listeners = new Set();
+    }
+    emit(t) {
+        for (const onT of this.listeners)
+            onT(t);
+    }
+    on(onT) {
+        this.listeners.add(onT);
+        return () => this.listeners.delete(onT);
+    }
+}
+class SignalWithCurrent extends Signal {
+    constructor() {
+        super(...arguments);
+        this.current = null;
+    }
+    emit(t) {
+        this.current = t;
+        super.emit(t);
+    }
+    when(onT) {
+        if (this.current)
+            onT(this.current);
+    }
+}
+
 ;// ./src/ui/ui-renderer.ts
 
 
 
+
+const Repaint = new Signal();
+const RedrawMap = new Signal();
+const FrameRendered = new SignalWithCurrent();
 class UIRenderer {
     constructor(map) {
         this.map = map;
         this.strokes = new Map();
-        this.renderFrame = 0;
         this.frozen = () => !this.intervalId;
         this.display = new Display(map.w, map.h, true);
         this.intervalId = this.start();
         GameStepped.on(() => this.render());
-        window.addEventListener('repaint', () => this.render());
+        Repaint.on(() => this.render());
     }
     unfreeze() {
         if (!this.frozen())
@@ -7163,7 +7219,7 @@ class UIRenderer {
         this.intervalId = this.start();
     }
     start() {
-        return setInterval(() => { window.dispatchEvent(new Event('repaint')); }, 100);
+        return setInterval(() => { Repaint.emit(); }, 100);
     }
     replace(id, stroke) {
         this.remove(id);
@@ -7208,11 +7264,10 @@ class UIRenderer {
                 this.draw(cell.xy.x, cell.xy.y, char, color);
             });
         });
-        if (this.renderFrame % 4 === 0)
-            window.dispatchEvent(new Event('redraw-map'));
-        this.renderFrame++;
-        // Update step info to show current render frame
-        window.dispatchEvent(new Event('update-step-info'));
+        const frame = (FrameRendered.current || 0) + 1;
+        if (frame % 4 === 0)
+            RedrawMap.emit();
+        FrameRendered.emit(frame);
     }
 }
 
@@ -7688,36 +7743,8 @@ class Corpse extends Drawable {
     }
 }
 
-;// ./src/signal.ts
-class Signal {
-    constructor() {
-        this.listeners = new Set();
-    }
-    emit(t) {
-        for (const onT of this.listeners)
-            onT(t);
-    }
-    on(onT) {
-        this.listeners.add(onT);
-        return () => this.listeners.delete(onT);
-    }
-}
-class SignalWithCurrent extends Signal {
-    constructor() {
-        super(...arguments);
-        this.current = null;
-    }
-    emit(t) {
-        this.current = t;
-        super.emit(t);
-    }
-    when(onT) {
-        if (this.current)
-            onT(this.current);
-    }
-}
-
 ;// ./src/draw/pawn.ts
+
 
 
 
@@ -7732,6 +7759,7 @@ const PawnMoved = new Signal();
 const PawnBorn = new Signal();
 const PawnBurned = new Signal();
 const PawnDied = new Signal();
+const TaskRemoved = new Signal();
 class Pawn extends Drawable {
     constructor(name) {
         super();
@@ -7755,7 +7783,7 @@ class Pawn extends Drawable {
         let start = this.cell;
         this.tasks.forEach(t => start = t.strokeAndNext(start));
         this.endCell = start;
-        window.dispatchEvent(new Event('repaint'));
+        Repaint.emit();
         return start;
     }
     get tipCell() { return this.tasks.length > 0 ? this.endCell : this.cell; }
@@ -7767,7 +7795,13 @@ class Pawn extends Drawable {
         task.cleanup();
         this.tasks = this.tasks.filter(t => t !== task);
         this.recalcPaths();
-        window.dispatchEvent(new Event('taskRemoved'));
+        TaskRemoved.emit(this);
+    }
+    clearTasks() {
+        (0,utils/* each */.__)(this.tasks, t => t.cleanup());
+        this.tasks = [];
+        this.recalcPaths();
+        TaskRemoved.emit(this);
     }
     step() {
         this.material.step(() => {
@@ -7830,7 +7864,7 @@ class Pawn extends Drawable {
     hoverStrokePath(target) {
         const start = this.tasks.length > 0 ? this.endCell : this.cell;
         Task.strokePathBetween(start, target, Pawn.HOVER_PATH_STROKE, Pawn.HOVER_PATH_COLOR, () => true, 2);
-        window.dispatchEvent(new Event('repaint'));
+        Repaint.emit();
     }
     draw(debug, _illumination) {
         if (this.selected) {
@@ -12354,8 +12388,9 @@ const d1 = (selector) => {
 };
 
 ;// ./src/html/terminal.html
-/* harmony default export */ const terminal = ("<div id=\"terminal\">\n    <div id=\"terminal-content\">\n        <div class=\"cell-container\">\n            <div class=\"cell-coord\"></div>\n            <div class=\"layers\">\n                <div class=\"layer template\">\n                    <span class=\"name\">floor</span>: <span style=\"color: #444\" class=\"description\">Floor(4477)</span>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div id=\"selected-info\">\n        <div class=\"selected-container\">\n            <div class=\"pawn-desc\">firefighter 10</div>\n            <div class=\"tasks\">\n                <div class=\"task-info template\">\n                    <span class=\"task-desc\">go to 73, 26</span>\n                    <span class=\"clear-task\" data-index=\"0\" style=\"cursor: pointer; color: #f44; font-weight: bold;\">[x]</span>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>");
+/* harmony default export */ const terminal = ("<div id=\"terminal\">\n    <div id=\"terminal-content\">\n        <div class=\"cell-container\">\n            <div class=\"cell-coord\"></div>\n            <div class=\"layers\">\n                <div class=\"layer template\">\n                    <span class=\"name\">floor</span>: <span style=\"color: #444\" class=\"description\">Floor(4477)</span>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div id=\"selected-info\">\n        <div class=\"selected-container\">\n            <div class=\"pawn-desc\">firefighter 10</div>\n            <div class=\"tasks\">\n                <div class=\"task-info template\">\n                    <span class=\"task-desc\">go to 73, 26</span>\n                    <span class=\"clear-task\" data-index=\"0\" style=\"cursor: pointer; color: #f44; font-weight: bold;\">[x]</span>\n                </div>\n            </div>\n            <div id=\"clear-all\" style=\"cursor: pointer; color: #f44; font-weight: bold;\" title=\"clear all\">[xx]</div>\n        </div>\n    </div>\n</div>\n");
 ;// ./src/ui/terminal.ts
+
 
 
 
@@ -12366,7 +12401,7 @@ class Terminal {
         this.div = d1('#terminal');
         this.div.appendFileHtml(terminal);
         this.repaintSelectedPawn();
-        window.addEventListener('repaint', () => this.draw());
+        Repaint.on(() => this.draw());
         PawnSelected.on(pawn => this.repaintSelectedPawn());
         PawnMoved.on(({ pawn }) => this.repaintSelectedPawn());
         PawnBurned.on(pawn => this.repaintSelectedPawn());
@@ -12393,14 +12428,16 @@ class Terminal {
         selectedInfo.updateFrom(pawn, (pawn) => {
             const container = selectedInfo.d1('.selected-container');
             container.d1('.pawn-desc').text(pawn.desc());
-            container.dList('.task-info').updateFrom(pawn.tasks, (taskDiv, task) => {
+            container.d1('.tasks').dList('.task-info').updateFrom(pawn.tasks, (taskDiv, task) => {
                 taskDiv.d1('.task-desc').text(task.desc());
                 taskDiv.d1('.clear-task').on('click', () => task.remove());
             });
+            container.d1('#clear-all').style('display', 'block').on('click', () => pawn.clearTasks());
         }, () => {
             const container = selectedInfo.d1('.selected-container');
             container.d1('.pawn-desc').text('no pawn selected');
-            container.dList('.task-info').updateFrom([], () => { });
+            container.d1('.tasks').dList('.task-info').updateFrom([], () => { });
+            container.d1('#clear-all').style('display', 'none').on('click', null);
         });
     }
 }
@@ -12472,6 +12509,7 @@ class DestinationTask extends Task {
 ;// ./src/ui/states/destination-state.ts
 
 
+
 class DestinationState {
     constructor(ui) {
         this.ui = ui;
@@ -12486,6 +12524,10 @@ class DestinationState {
                 this.ui.setState('menu', this.selected);
             }
         };
+        this.pawnDied = (pawn) => {
+            if (pawn === this.selected)
+                this.ui.setState('select');
+        };
     }
     onClick(cell, c) {
         if (c.button === 'RIGHT' || !cell)
@@ -12499,7 +12541,8 @@ class DestinationState {
     }
     onMouseMove(cell) {
         this.ui.terminal.setCurrent(cell);
-        this.selected.hoverStrokePath(cell);
+        if (this.selected.cell)
+            this.selected.hoverStrokePath(cell);
     }
     enter(pawn) {
         this.selected = pawn;
@@ -12508,14 +12551,16 @@ class DestinationState {
         document.addEventListener('keydown', this.key);
         document.addEventListener('click', this.outside);
         document.addEventListener('contextmenu', this.outside);
+        this.unsubDied = PawnDied.on(this.pawnDied);
     }
     exit() {
         document.removeEventListener('keydown', this.key);
         document.removeEventListener('click', this.outside);
         document.removeEventListener('contextmenu', this.outside);
+        this.unsubDied();
         this.ui.map.uiRenderer.remove(Pawn.HOVER_PATH_STROKE);
         this.selected.selected = false;
-        window.dispatchEvent(new Event('repaint'));
+        Repaint.emit();
         PawnSelected.emit(null);
     }
 }
@@ -12671,6 +12716,8 @@ class ObservePawnState {
 
 
 
+
+
 class UI {
     constructor(terminal, map) {
         this.terminal = terminal;
@@ -12678,7 +12725,7 @@ class UI {
         this.state = 'select';
         this.onClick = (cell, c) => {
             this.states[this.state].onClick(cell, c);
-            window.dispatchEvent(new Event('repaint'));
+            Repaint.emit();
         };
         this.onMouseMove = (cell) => {
             this.states[this.state].onMouseMove(cell);
@@ -12690,11 +12737,11 @@ class UI {
             menu: new MenuState(this),
             observe: new ObservePawnState(this)
         };
-        window.addEventListener('taskRemoved', () => {
+        TaskRemoved.on(() => {
             if (this.state === 'menu') {
                 const menuState = this.states.menu;
                 this.setState('menu', menuState.pawn);
-                window.dispatchEvent(new Event('repaint'));
+                Repaint.emit();
             }
         });
     }
@@ -12882,6 +12929,8 @@ ${layerSections}<br/>
 
 
 
+
+
 const GameStepped = new SignalWithCurrent();
 class Game {
     constructor() {
@@ -12896,7 +12945,8 @@ class Game {
             if (!GameStepped.current)
                 return;
             const { frame, stepMs } = GameStepped.current;
-            (0,utils.$1)('step-info').textContent = `${frame} ${stepMs}ms r${this.map.uiRenderer.renderFrame}`;
+            const r = FrameRendered.current ?? 0;
+            (0,utils.$1)('step-info').textContent = `${frame} ${stepMs}ms r${r}`;
         };
         this.closeHelpOnOutsideClick = (e) => {
             const popup = (0,utils.$1)('help-popup');
@@ -12904,6 +12954,20 @@ class Game {
             if (!popup.contains(target)) {
                 this.closeHelp();
             }
+        };
+        this.switchEnv = async () => {
+            let url = this.envDest();
+            if (confirm('Save and push save across?')) {
+                this.state.save();
+                const s = localStorage.getItem('gameState');
+                if (s) {
+                    const g = await gzip(s);
+                    url += '?import=' + encodeURIComponent(g);
+                    if (longUrl(url))
+                        alert('Save may exceed url length and be truncated');
+                }
+            }
+            location.href = url;
         };
         this.enterFirehouse = (pawns) => {
             this.pause();
@@ -12922,6 +12986,7 @@ class Game {
         this.attachToDOM();
         this.setupControls();
         this.setupDebugControls();
+        this.updateEnvButton();
         const initializer = new Initializer(this.map);
         initializer.initialize();
         this.map.lighting.redraw();
@@ -12944,8 +13009,8 @@ class Game {
                 this.nextHelpPage();
             }
         });
-        window.addEventListener('redraw-map', () => this.drawMap());
-        window.addEventListener('update-step-info', () => this.updateStepInfo());
+        RedrawMap.on(() => this.drawMap());
+        FrameRendered.on(() => this.updateStepInfo());
         this.state = new GameState(this.map);
         FirehouseMode.on(this.enterFirehouse);
         this.state.load();
@@ -12977,6 +13042,7 @@ class Game {
         (0,utils/* onClick */.Af)((0,utils.$1)('clear-game'), () => this.state.clear());
         (0,utils/* onClick */.Af)((0,utils.$1)('load-game'), () => this.state.load());
         (0,utils/* onClick */.Af)((0,utils.$1)('save-game'), () => this.state.save());
+        (0,utils/* onClick */.Af)((0,utils.$1)('switch-env'), this.switchEnv);
         this.createLayerButtons();
         CellLayers.layerNames.forEach(layerName => {
             (0,utils/* onClick */.Af)((0,utils.$1)(`layer-${layerName}`), () => this.toggleLayerVisibility(layerName));
@@ -13075,7 +13141,7 @@ class Game {
         this.map.step();
         this.map.lighting.redraw();
         this.drawMap();
-        window.dispatchEvent(new Event('repaint'));
+        Repaint.emit();
         const stepMs = Date.now() - start;
         const frame = (GameStepped.current?.frame || 0) + 1;
         GameStepped.emit({ frame, stepMs });
@@ -13164,9 +13230,16 @@ class Game {
             layerGroup.appendChild(button);
         });
     }
+    envDest() {
+        return location.host.includes('github.io') ? 'http://localhost:8080' : 'https://jlb0170.github.io/firehouse-rl-play/';
+    }
+    updateEnvButton() {
+        (0,utils.$1)('switch-env').textContent = location.host.includes('github.io') ? 'LCL' : 'PROD';
+    }
 }
 
 ;// ./src/index.ts
+
 
 
 function showError(message, stack) {
@@ -13186,14 +13259,20 @@ window.addEventListener('error', (event) => {
     console.error('Stack trace:', event.error?.stack);
     showError(event.error?.message || 'Unknown error', event.error?.stack);
 });
-function src_init() {
+async function src_init() {
     try {
+        const q = new URLSearchParams(location.search);
+        const imp = q.get('import');
+        if (imp) {
+            localStorage.setItem('gameState', await gunzip(imp));
+            history.replaceState(null, '', location.pathname);
+        }
         new Game();
     }
     catch (error) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        const stack = error instanceof Error ? error.stack : undefined;
-        showError(`Game initialization failed: ${message}`, stack);
+        const m = error instanceof Error ? error.message : 'Unknown error';
+        const s = error instanceof Error ? error.stack : undefined;
+        showError(`Game initialization failed: ${m}`, s);
     }
 }
 window.addEventListener('DOMContentLoaded', src_init);
