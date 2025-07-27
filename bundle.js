@@ -558,6 +558,167 @@ ___CSS_LOADER_EXPORT___.push([module.id, `body {
     display: none;
 }
 
+/* Feedback Modal */
+#feedback {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#feedback-content {
+    background: #222;
+    border: 1px solid #666;
+    border-radius: 8px;
+    padding: 20px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.feedback-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 10px;
+}
+
+.feedback-header h3 {
+    margin: 0;
+    color: #0a0;
+    font-size: 18px;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    color: #f44;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-button:hover {
+    background: #333;
+    border-radius: 3px;
+}
+
+.feedback-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.input-group label {
+    color: #0a0;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+#feedback-title {
+    padding: 8px;
+    background: #111;
+    border: 1px solid #444;
+    color: #0a0;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+#feedback-body {
+    padding: 8px;
+    background: #111;
+    border: 1px solid #444;
+    color: #0a0;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 120px;
+}
+
+#feedback-title:focus, #feedback-body:focus {
+    outline: none;
+    border-color: #0a0;
+    box-shadow: 0 0 5px rgba(0, 170, 0, 0.3);
+}
+
+.feedback-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.submit-button, .cancel-button {
+    padding: 8px 16px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+.submit-button {
+    background: #0a0;
+    color: #000;
+    border-color: #0a0;
+}
+
+.submit-button:hover:not(:disabled) {
+    background: #0c0;
+}
+
+.submit-button:disabled {
+    background: #444;
+    color: #666;
+    border-color: #444;
+    cursor: not-allowed;
+}
+
+.cancel-button {
+    background: #333;
+    color: #0a0;
+}
+
+.cancel-button:hover {
+    background: #444;
+}
+
+.feedback-status {
+    padding: 10px;
+    border-radius: 4px;
+    background: #111;
+    border: 1px solid #444;
+    font-family: monospace;
+    font-size: 14px;
+    text-align: center;
+}
+
+.feedback-status.hidden {
+    display: none;
+}
+
 .help-text {
     color: #0f0;
     font-family: monospace;
@@ -7232,8 +7393,8 @@ class UIRenderer {
         this.strokes.clear();
         this.clear();
     }
-    draw(x, y, char, fg) {
-        this.display.draw(x, y, char, fg, 'transparent');
+    draw(x, y, char, fg, bg = 'transparent') {
+        this.display.draw(x, y, char, fg, bg);
     }
     clear() {
         this.display.clear();
@@ -7260,8 +7421,8 @@ class UIRenderer {
         const sortedStrokes = [...this.strokes.values()].sort((a, b) => a.zIndex - b.zIndex);
         sortedStrokes.forEach(stroke => {
             const color = stroke.colorFn();
-            stroke.cells.forEach(({ cell, char }) => {
-                this.draw(cell.xy.x, cell.xy.y, char, color);
+            stroke.cells.forEach(({ cell, char, bg }) => {
+                this.draw(cell.xy.x, cell.xy.y, char, color, bg);
             });
         });
         const frame = (FrameRendered.current || 0) + 1;
@@ -7695,8 +7856,8 @@ class Stroke {
         this.zIndex = zIndex;
         this.isValid = typeof isValid === 'number' ? Stroke.timeout(isValid) : isValid;
     }
-    add(cell, char) {
-        this.cells.push({ cell, char });
+    add(cell, char, bg) {
+        this.cells.push({ cell, char, bg });
     }
     static timeout(ms) {
         const start = Date.now();
@@ -7893,24 +8054,24 @@ Pawn.HOVER_PATH_COLOR = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy([
 
 
 class TextStroke {
-    static create(map, text, xy, colorFn = () => colors/* WHITE */.UE, isValid = () => true, zIndex = 10) {
+    static create(map, text, xy, colorFn = () => colors/* WHITE */.UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
         const stroke = new Stroke([], colorFn, isValid, zIndex);
         (0,utils/* each */.__)(text, (c, i) => {
             const cell = map.get(xy.add(i, 0));
-            stroke.add(cell, c);
+            stroke.add(cell, c, bg);
         });
         return stroke;
     }
-    static render(map, text, xy, id, colorFn = () => colors/* WHITE */.UE, isValid = () => true, zIndex = 10) {
-        const stroke = TextStroke.create(map, text, xy, colorFn, isValid, zIndex);
+    static render(map, text, xy, id, colorFn = () => colors/* WHITE */.UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
+        const stroke = TextStroke.create(map, text, xy, colorFn, isValid, zIndex, bg);
         map.uiRenderer.replace(id, stroke);
     }
-    static centered(map, text, y, id, colorFn = () => colors/* WHITE */.UE, isValid = () => true, zIndex = 10) {
+    static centered(map, text, y, id, colorFn = () => colors/* WHITE */.UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
         const xy = game_xy.XY.at((0,utils/* centeredStart */.jw)(map.w, text), y);
-        TextStroke.render(map, text, xy, id, colorFn, isValid, zIndex);
+        TextStroke.render(map, text, xy, id, colorFn, isValid, zIndex, bg);
     }
-    static centeredPlusY(map, text, yOffset, id, colorFn = () => colors/* WHITE */.UE, isValid = () => true, zIndex = 10) {
-        TextStroke.centered(map, text, (0,utils/* half */.MX)(map.h) + yOffset, id, colorFn, isValid, zIndex);
+    static centeredPlusY(map, text, yOffset, id, colorFn = () => colors/* WHITE */.UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
+        TextStroke.centered(map, text, (0,utils/* half */.MX)(map.h) + yOffset, id, colorFn, isValid, zIndex, bg);
     }
 }
 
@@ -12327,6 +12488,46 @@ function addMethodsToTypedSel(typedSel) {
         (0,utils/* bombUnless */.Nb)(childSel.node(), `Child element not found: ${selector}`);
         return addMethodsToTypedSel(childSel);
     };
+    enhanced.focus = function () {
+        const node = this.node();
+        (0,utils/* bombUnless */.Nb)(node && typeof node.focus === 'function', 'Node or focus not found');
+        node.focus();
+    };
+    enhanced.show = function () {
+        this.style('display', 'block');
+        return this;
+    };
+    enhanced.hide = function () {
+        this.style('display', 'none');
+        return this;
+    };
+    enhanced.showing = function () {
+        const node = this.node();
+        return node ? node.style.display !== 'none' : false;
+    };
+    enhanced.getVal = function () {
+        const node = this.node();
+        return node?.value || '';
+    };
+    enhanced.setVal = function (value) {
+        const node = this.node();
+        if (node)
+            node.value = value;
+    };
+    enhanced.disable = function (disabled) {
+        const node = this.node();
+        if (node && 'disabled' in node)
+            node.disabled = disabled;
+        return this;
+    };
+    enhanced.onClick = function (handler) {
+        this.on('click', handler);
+        return this;
+    };
+    enhanced.onInput = function (handler) {
+        this.on('input', handler);
+        return this;
+    };
     enhanced.dList = function (selector) {
         const parent = this;
         const parentNode = parent.node();
@@ -12383,6 +12584,41 @@ const d1 = (selector) => {
         const childSel = this.select(selector);
         (0,utils/* bombUnless */.Nb)(childSel.node(), `Child element not found: ${selector}`);
         return addMethodsToTypedSel(childSel);
+    };
+    enhanced.show = function () {
+        this.style('display', 'block');
+        return this;
+    };
+    enhanced.hide = function () {
+        this.style('display', 'none');
+        return this;
+    };
+    enhanced.showing = function () {
+        const node = this.node();
+        return node ? node.style.display !== 'none' : false;
+    };
+    enhanced.getVal = function () {
+        const node = this.node();
+        return node?.value || '';
+    };
+    enhanced.setVal = function (value) {
+        const node = this.node();
+        if (node)
+            node.value = value;
+    };
+    enhanced.disable = function (disabled) {
+        const node = this.node();
+        if (node && 'disabled' in node)
+            node.disabled = disabled;
+        return this;
+    };
+    enhanced.onClick = function (handler) {
+        this.on('click', handler);
+        return this;
+    };
+    enhanced.onInput = function (handler) {
+        this.on('input', handler);
+        return this;
     };
     return enhanced;
 };
@@ -12574,186 +12810,23 @@ class WaitTask extends Task {
     strokeAndNext(start) { return start; }
 }
 
-;// ./src/ui/states/menu-state.ts
+;// ./src/ui/menu.ts
 
 
 
-
-
-
-class MenuItem {
-    constructor(letter, command) {
-        this.letter = letter;
-        this.command = command;
-    }
-}
-class MenuState {
-    constructor(ui) {
-        this.ui = ui;
-        this.itemsByXY = new Map();
-    }
-    onClick(cell, _c) {
-        if (!cell)
-            return this.ui.setState('select');
-        const pawn = cell.pawn();
-        if (pawn && pawn !== this.pawn)
-            return this.ui.setState('menu', pawn);
-        const menuItem = this.itemsByXY.get(cell.xy.toString());
-        if (!menuItem)
-            return this.ui.setState('select');
-        menuItem.command();
-    }
-    onMouseMove(cell) {
-        this.ui.terminal.setCurrent(cell);
-    }
-    enter(pawn) {
-        this.pawn = pawn;
-        this.pawn.selected = true;
-        PawnSelected.emit(pawn);
-        this.showMenu();
-    }
-    exit() {
-        this.pawn.selected = false;
-        PawnSelected.emit(null);
-        this.hideMenu();
-    }
-    definitions() {
-        return [
-            ['x', () => this.ui.setState('select')],
-            ['g', () => this.ui.setState('destination', this.pawn)],
-            ['w', () => {
-                    this.pawn.addTask(new WaitTask(this.pawn));
-                    this.ui.setState('menu', this.pawn);
-                }],
-            ['s', () => {
-                    this.pawn.squawk("ouch", colors/* FIRE */.ZK);
-                    this.ui.setState('menu', this.pawn);
-                }],
-            ['d', () => {
-                    window.pawn = this.pawn;
-                    console.log('Pawn assigned to window.pawn:', this.pawn);
-                    this.ui.setState('menu', this.pawn);
-                }],
-            ['r', () => {
-                    (0,utils/* onLastMaybe */.iw)(this.pawn.tasks, task => {
-                        task.remove();
-                    });
-                    this.ui.setState('menu', this.pawn);
-                }]
-        ];
-    }
-    showMenu() {
-        const commands = [...this.definitions()];
-        this.placeCommands(commands);
-    }
-    addUnusedMenuCells() {
-        if ((0,utils/* isEmpty */.Im)(this.itemsByXY))
-            return this.pawn.tipCell.neighbors();
-        const result = [];
-        this.itemsByXY.forEach((_item, key) => {
-            const [x, y] = key.split(', ').map(n => parseInt(n));
-            const cell = this.ui.map.get(game_xy.XY.at(x, y));
-            result.push(...cell.neighbors().filter(neighbor => !this.itemsByXY.has(neighbor.xy.toString())));
-        });
-        return result;
-    }
-    placeCommands(commands) {
-        const cells = this.addUnusedMenuCells();
-        const placeable = commands.slice(0, cells.length);
-        const remaining = commands.slice(cells.length);
-        (0,utils/* eachPair */.cd)(placeable, (letter, command) => {
-            const cell = cells.shift();
-            this.itemsByXY.set(cell.xy.toString(), new MenuItem(letter, command));
-            this.ui.map.uiRenderer.replace(`menu-${letter}`, this.createMenuStroke(cell, letter));
-        });
-        if ((0,utils/* hasContent */.ov)(remaining))
-            this.placeCommands(remaining);
-    }
-    hideMenu() {
-        this.itemsByXY.forEach(item => {
-            this.ui.map.uiRenderer.remove(`menu-${item.letter}`);
-        });
-        this.itemsByXY.clear();
-    }
-    createMenuStroke(cell, char) {
-        const stroke = new Stroke([], () => '#ff0', () => true, 5);
-        stroke.add(cell, char);
-        return stroke;
-    }
-}
-
-;// ./src/ui/states/observe-state.ts
-
-class ObservePawnState {
-    constructor(ui) {
-        this.ui = ui;
-    }
-    onClick(cell, _c) {
-        if (!cell)
-            return this.ui.setState('select');
-        const pawn = cell.pawn();
-        if (pawn)
-            this.ui.setState('menu', pawn);
-        else
-            this.ui.setState('select');
-    }
-    onMouseMove(cell) {
-        this.ui.terminal.setCurrent(cell);
-    }
-    enter(pawn) {
-        this.selected = pawn;
-        this.selected.selected = true;
-        PawnSelected.emit(pawn);
-    }
-    exit() {
-        this.selected.selected = false;
-        PawnSelected.emit(null);
-    }
-}
-
-;// ./src/ui/ui.ts
-
-
-
-
-
-
-class UI {
-    constructor(terminal, map) {
-        this.terminal = terminal;
-        this.map = map;
-        this.state = 'select';
-        this.onClick = (cell, c) => {
-            this.states[this.state].onClick(cell, c);
-            Repaint.emit();
-        };
-        this.onMouseMove = (cell) => {
-            this.states[this.state].onMouseMove(cell);
-            this.terminal.draw();
-        };
-        this.states = {
-            select: new SelectState(this),
-            destination: new DestinationState(this),
-            menu: new MenuState(this),
-            observe: new ObservePawnState(this)
-        };
-        TaskRemoved.on(() => {
-            if (this.state === 'menu') {
-                const menuState = this.states.menu;
-                this.setState('menu', menuState.pawn);
-                Repaint.emit();
-            }
-        });
-    }
-    setState(newState, data) {
-        this.states[this.state].exit?.();
-        this.state = newState;
-        this.states[this.state].enter?.(data);
-    }
-}
+const MENU_ITEMS = [
+    { key: 'x', desc: 'Exit menu and return to selection', action: ui => ui.setState('select') },
+    { key: 'g', desc: 'Go to destination - click to move firefighter', action: (ui, p) => ui.setState('destination', p) },
+    { key: 'w', desc: 'Wait - firefighter will pause and wait', action: (ui, p) => { p.addTask(new WaitTask(p)); ui.setState('menu', p); } },
+    { key: 's', desc: 'Squawk - firefighter will shout "ouch" (debug)', action: (ui, p) => { p.squawk('ouch', colors/* FIRE */.ZK); ui.setState('menu', p); } },
+    { key: 'd', desc: 'Debug - assign pawn to window.pawn for console', action: (ui, p) => { window.pawn = p; console.log('Pawn assigned to window.pawn:', p); ui.setState('menu', p); } },
+    { key: 'r', desc: "Remove last task from firefighter's queue", action: (ui, p) => { (0,utils/* onLastMaybe */.iw)(p.tasks, t => t.remove()); ui.setState('menu', p); } }
+];
 
 ;// ./src/ui/help.ts
 
+
+const MENU_HELP = Object.fromEntries(MENU_ITEMS.map(i => [i.key, i.desc]));
 class HelpSystem {
     constructor() {
         this.pages = [];
@@ -12784,14 +12857,7 @@ class HelpSystem {
         this.currentPage = 0;
     }
     generatePages() {
-        const menuItems = [
-            ['x', 'Exit menu and return to selection'],
-            ['g', 'Go to destination - click to move firefighter'],
-            ['w', 'Wait - firefighter will pause and wait'],
-            ['s', 'Squawk - firefighter will shout "ouch" (debug)'],
-            ['d', 'Debug - assign pawn to window.pawn for console'],
-            ['r', 'Remove last task from firefighter\'s queue']
-        ];
+        const menuItems = MENU_ITEMS;
         const layerInfo = {
             'floor': { char: '.', desc: 'Floor tiles and terrain', color: '#666' },
             'walls': { char: '#', desc: 'Walls and doors (+)', color: '#666' },
@@ -12807,7 +12873,7 @@ class HelpSystem {
             }
             return `• <strong>${layerName}</strong> - Layer type`;
         }).join('<br/>');
-        const menuSection = menuItems.map(([key, desc]) => `• <strong>${key}</strong> - ${desc}`).join('<br/>');
+        const menuSection = menuItems.map(m => `• <strong>${m.key}</strong> - ${m.desc}`).join('<br/>');
         const layerButtons = CellLayers.layerNames.map(name => name.slice(0, 3)).join(', ');
         this.pages = [
             // Page 1: Overview and Controls
@@ -12917,7 +12983,453 @@ ${layerSections}<br/>
     }
 }
 
+;// ./src/timer.ts
+class timer_Timer {
+    restartInMillis(ms, f) {
+        this.stop();
+        this.id = setTimeout(() => { this.id = undefined; f(); }, ms);
+    }
+    stop() {
+        if (this.id)
+            clearTimeout(this.id);
+        this.id = undefined;
+    }
+}
+const timer_timer = (_name) => new timer_Timer();
+
+;// ./src/ui/states/menu-state.ts
+
+
+
+
+
+
+
+
+
+class Spot {
+    constructor(letter, command) {
+        this.letter = letter;
+        this.command = command;
+    }
+}
+class MenuState {
+    constructor(ui) {
+        this.ui = ui;
+        this.itemsByXY = new Map();
+        this.showTimer = timer_timer('show');
+        this.hideTimer = timer_timer('hide');
+        this.helpId = 'menu-help';
+    }
+    onClick(cell, _c) {
+        if (!cell)
+            return this.ui.setState('select');
+        const pawn = cell.pawn();
+        if (pawn && pawn !== this.pawn)
+            return this.ui.setState('menu', pawn);
+        const menuItem = this.itemsByXY.get(cell.xy.toString());
+        if (!menuItem)
+            return this.ui.setState('select');
+        this.hideHelp();
+        menuItem.command();
+    }
+    onMouseMove(cell) {
+        this.ui.terminal.setCurrent(cell);
+        const item = this.itemsByXY.get(cell.xy.toString());
+        if (item) {
+            this.hideTimer.stop();
+            if (this.hovered !== item) {
+                this.hovered = item;
+                this.showTimer.restartInMillis(700, () => this.showHelp(cell, item));
+            }
+        }
+        else {
+            this.hovered = undefined;
+            this.hideTimer.restartInMillis(300, () => this.hideHelp());
+        }
+    }
+    enter(pawn) {
+        this.pawn = pawn;
+        this.pawn.selected = true;
+        PawnSelected.emit(pawn);
+        this.showMenu();
+    }
+    exit() {
+        this.pawn.selected = false;
+        PawnSelected.emit(null);
+        this.hideMenu();
+        this.hideHelp();
+    }
+    showMenu() {
+        this.placeCommands(MENU_ITEMS);
+    }
+    addUnusedMenuCells() {
+        if ((0,utils/* isEmpty */.Im)(this.itemsByXY))
+            return this.pawn.tipCell.neighbors();
+        const result = [];
+        this.itemsByXY.forEach((_item, key) => {
+            const [x, y] = key.split(', ').map(n => parseInt(n));
+            const cell = this.ui.map.get(game_xy.XY.at(x, y));
+            result.push(...cell.neighbors().filter(neighbor => !this.itemsByXY.has(neighbor.xy.toString())));
+        });
+        return result;
+    }
+    placeCommands(commands) {
+        const cells = this.addUnusedMenuCells();
+        const placeable = commands.slice(0, cells.length);
+        const remaining = commands.slice(cells.length);
+        placeable.forEach(item => {
+            const cell = cells.shift();
+            this.itemsByXY.set(cell.xy.toString(), new Spot(item.key, () => item.action(this.ui, this.pawn)));
+            this.ui.map.uiRenderer.replace(`menu-${item.key}`, this.createMenuStroke(cell, item.key));
+        });
+        if ((0,utils/* hasContent */.ov)(remaining))
+            this.placeCommands(remaining);
+    }
+    hideMenu() {
+        this.itemsByXY.forEach(item => {
+            this.ui.map.uiRenderer.remove(`menu-${item.letter}`);
+        });
+        this.itemsByXY.clear();
+    }
+    findUnobstructedMenuLocation(itemCell, text) {
+        const base = this.pawn.tipCell.xy;
+        const textWidth = text.length;
+        const map = this.ui.map;
+        const fitsOnMap = (xy) => {
+            if (game_xy.XY.oob(xy))
+                return false;
+            const endX = xy.x + textWidth - 1;
+            return endX < map.w;
+        };
+        const doesNotBlockMenu = (xy) => {
+            for (let i = 0; i < textWidth; i++) {
+                const checkXY = xy.add(i, 0);
+                if (this.itemsByXY.has(checkXY.toString()) ||
+                    (checkXY.x === base.x && checkXY.y === base.y)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        const tryPosition = (startXY) => {
+            let bestX = startXY.x;
+            const isRightOfPawn = startXY.x > base.x;
+            const isOnCenterLine = startXY.x === base.x;
+            const trySlideLeft = (x) => {
+                for (let i = x; i >= 0; i--) {
+                    const xy = game_xy.XY.at(i, startXY.y);
+                    if (fitsOnMap(xy) && doesNotBlockMenu(xy))
+                        return i;
+                }
+                return x;
+            };
+            const trySlideRight = (x) => {
+                for (let i = x; i + textWidth <= map.w; i++) {
+                    const xy = game_xy.XY.at(i, startXY.y);
+                    if (fitsOnMap(xy) && doesNotBlockMenu(xy))
+                        return i;
+                }
+                return x;
+            };
+            if (isRightOfPawn || isOnCenterLine) {
+                bestX = trySlideRight(startXY.x);
+                if (bestX === startXY.x)
+                    bestX = trySlideLeft(bestX);
+            }
+            else {
+                bestX = trySlideLeft(startXY.x);
+                if (bestX === startXY.x)
+                    bestX = trySlideRight(bestX);
+            }
+            const finalXY = game_xy.XY.at(bestX, startXY.y);
+            if (fitsOnMap(finalXY) && doesNotBlockMenu(finalXY)) {
+                return finalXY;
+            }
+            return null;
+        };
+        // For center line items, prefer offset Y positions first
+        const menuItemDirection = itemCell.xy.x - base.x;
+        const yPreferences = menuItemDirection === 0
+            ? [1, -1, 0, 2, -2, 3, -3, 4, -4] // center: try offset first
+            : [0, 1, -1, 2, -2, 3, -3, 4, -4]; // sides: try same row first
+        for (const yOffset of yPreferences) {
+            const y = itemCell.xy.y + yOffset;
+            if (y < 0 || y >= map.h)
+                continue;
+            const result = tryPosition(game_xy.XY.at(itemCell.xy.x, y));
+            if (result)
+                return map.get(result);
+        }
+        // Ultimate fallback
+        return itemCell;
+    }
+    showHelp(cell, item) {
+        const text = MENU_HELP[item.letter];
+        if (!text)
+            return;
+        const target = this.findUnobstructedMenuLocation(cell, text);
+        TextStroke.render(this.ui.map, text, target.xy, this.helpId, () => colors/* WHITE */.UE, () => true, 6, colors/* BACKGROUND */.h4);
+    }
+    hideHelp() {
+        this.showTimer.stop();
+        this.hideTimer.stop();
+        this.ui.map.uiRenderer.remove(this.helpId);
+        this.hovered = undefined;
+    }
+    createMenuStroke(cell, char) {
+        const stroke = new Stroke([], () => '#ff0', () => true, 5);
+        stroke.add(cell, char);
+        return stroke;
+    }
+}
+
+;// ./src/ui/states/observe-state.ts
+
+class ObservePawnState {
+    constructor(ui) {
+        this.ui = ui;
+    }
+    onClick(cell, _c) {
+        if (!cell)
+            return this.ui.setState('select');
+        const pawn = cell.pawn();
+        if (pawn)
+            this.ui.setState('menu', pawn);
+        else
+            this.ui.setState('select');
+    }
+    onMouseMove(cell) {
+        this.ui.terminal.setCurrent(cell);
+    }
+    enter(pawn) {
+        this.selected = pawn;
+        this.selected.selected = true;
+        PawnSelected.emit(pawn);
+    }
+    exit() {
+        this.selected.selected = false;
+        PawnSelected.emit(null);
+    }
+}
+
+;// ./src/ui/ui.ts
+
+
+
+
+
+
+class UI {
+    constructor(terminal, map) {
+        this.terminal = terminal;
+        this.map = map;
+        this.state = 'select';
+        this.onClick = (cell, c) => {
+            this.states[this.state].onClick(cell, c);
+            Repaint.emit();
+        };
+        this.onMouseMove = (cell) => {
+            this.states[this.state].onMouseMove(cell);
+            this.terminal.draw();
+        };
+        this.states = {
+            select: new SelectState(this),
+            destination: new DestinationState(this),
+            menu: new MenuState(this),
+            observe: new ObservePawnState(this)
+        };
+        TaskRemoved.on(() => {
+            if (this.state === 'menu') {
+                const menuState = this.states.menu;
+                this.setState('menu', menuState.pawn);
+                Repaint.emit();
+            }
+        });
+    }
+    setState(newState, data) {
+        this.states[this.state].exit?.();
+        this.state = newState;
+        this.states[this.state].enter?.(data);
+    }
+}
+
+;// ./src/html/feedback.html
+/* harmony default export */ const feedback = ("<div id=\"feedback\">\n    <div id=\"feedback-content\">\n        <div class=\"feedback-header\">\n            <h3>Submit Feedback</h3>\n            <button id=\"feedback-close\" class=\"close-button\">×</button>\n        </div>\n        <div class=\"feedback-form\">\n            <div class=\"input-group\">\n                <label for=\"feedback-title\">Title:</label>\n                <input id=\"feedback-title\" type=\"text\" placeholder=\"\">\n            </div>\n            <div class=\"input-group\">\n                <label for=\"feedback-body\">Details:</label>\n                <textarea id=\"feedback-body\" rows=\"6\" placeholder=\"Start typing...\"></textarea>\n            </div>\n            <div class=\"feedback-actions\">\n                <div id=\"feedback-normal-buttons\">\n                    <button id=\"feedback-submit\" class=\"submit-button\">Submit Feedback</button>\n                    <button id=\"feedback-cancel\" class=\"cancel-button\">Cancel</button>\n                </div>\n                <div id=\"feedback-success-buttons\" class=\"hidden\">\n                    <button id=\"feedback-ok\" class=\"submit-button\">OK</button>\n                </div>\n            </div>\n            <div id=\"feedback-status\" class=\"feedback-status hidden\"></div>\n        </div>\n    </div>\n</div> ");
+;// ./src/ui/feedback.ts
+
+
+class Feedback {
+    constructor() {
+        this.titleTouched = false;
+        this.isSubmitting = false;
+        this.handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
+                this.hide();
+            }
+            else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.submit();
+            }
+            else if (e.key === ' ') {
+                // Allow space bar in text inputs but prevent game from capturing it
+                e.stopPropagation();
+            }
+        };
+        this.handleKeyUp = (e) => {
+            if (e.key === ' ') {
+                // Prevent game from capturing space bar releases
+                e.stopPropagation();
+            }
+        };
+        this.div = d1('#feedback');
+        this.div.appendFileHtml(feedback);
+        this.setupEventListeners();
+    }
+    show() {
+        this.div.show();
+        this.reset();
+        this.captureKeyboardEvents();
+        this.div.d1('#feedback-body').focus();
+    }
+    hide() {
+        this.div.hide();
+        this.releaseKeyboardEvents();
+        this.reset();
+    }
+    isVisible() { return this.div.showing(); }
+    reset() {
+        this.titleTouched = false;
+        this.isSubmitting = false;
+        this.div.d1('#feedback-title').setVal('');
+        this.div.d1('#feedback-body').setVal('');
+        this.div.d1('#feedback-status').text('').hide();
+        this.resetButtons();
+        this.updateSubmitButton();
+    }
+    setupEventListeners() {
+        this.div.d1('#feedback-close').onClick(() => this.hide());
+        this.div.d1('#feedback-cancel').onClick(() => this.hide());
+        this.div.d1('#feedback-submit').onClick(() => this.submit());
+        this.div.d1('#feedback-ok').onClick(() => this.hide());
+        this.div.d1('#feedback-title').onInput(() => {
+            this.titleTouched = true;
+            this.updateSubmitButton();
+        });
+        this.div.d1('#feedback-body').onInput(() => {
+            this.updateTitleFromBody();
+            this.updateSubmitButton();
+        });
+    }
+    captureKeyboardEvents() {
+        document.addEventListener('keydown', this.handleKeyDown, true);
+        document.addEventListener('keyup', this.handleKeyUp, true);
+    }
+    releaseKeyboardEvents() {
+        document.removeEventListener('keydown', this.handleKeyDown, true);
+        document.removeEventListener('keyup', this.handleKeyUp, true);
+    }
+    updateTitleFromBody() {
+        if (this.titleTouched)
+            return;
+        const bodyTextarea = this.div.d1('#feedback-body');
+        const titleInput = this.div.d1('#feedback-title');
+        const bodyText = bodyTextarea.getVal();
+        if (!bodyText) {
+            titleInput.setVal('');
+            return;
+        }
+        // Split on punctuation or newlines, but preserve the punctuation
+        const match = bodyText.match(/^([^.!?\n]+[.!?]?|\n)/i);
+        if (match) {
+            let firstSentence = match[1].trim();
+            // If it's just a newline, take everything up to the newline
+            if (!firstSentence) {
+                const lineBreakIndex = bodyText.indexOf('\n');
+                if (lineBreakIndex > 0) {
+                    firstSentence = bodyText.substring(0, lineBreakIndex).trim();
+                }
+            }
+            if (firstSentence) {
+                if (firstSentence.length > 50) {
+                    titleInput.setVal(firstSentence.substring(0, 47) + '...');
+                }
+                else {
+                    titleInput.setVal(firstSentence);
+                }
+            }
+        }
+    }
+    generateTitleFromBody(bodyText) {
+        if (!bodyText.trim())
+            return 'Feedback';
+        // Get first line, up to 120 characters
+        const firstLine = bodyText.split('\n')[0].trim();
+        return firstLine.length > 120 ? firstLine.substring(0, 117) + '...' : firstLine;
+    }
+    updateSubmitButton() {
+        const bodyTextarea = this.div.d1('#feedback-body');
+        const submitButton = this.div.d1('#feedback-submit');
+        const hasBody = bodyTextarea.getVal().trim().length > 0;
+        submitButton.disable(this.isSubmitting || !hasBody);
+    }
+    async submit() {
+        if (this.isSubmitting)
+            return;
+        const titleInput = this.div.d1('#feedback-title');
+        const bodyTextarea = this.div.d1('#feedback-body');
+        const statusDiv = this.div.d1('#feedback-status');
+        let title = titleInput.getVal().trim();
+        const body = bodyTextarea.getVal().trim();
+        if (!title) {
+            title = this.generateTitleFromBody(body);
+        }
+        this.isSubmitting = true;
+        this.updateSubmitButton();
+        statusDiv.show().style('color', '#0a0').text('Submitting feedback...');
+        try {
+            const response = await fetch('https://k69b0whqzl.execute-api.us-west-1.amazonaws.com/firehouse-rl-feedback-lambda', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, body })
+            });
+            if (response.ok) {
+                const result = await response.json();
+                const issueNumber = result.issueUrl?.split('/').pop() || 'unknown';
+                statusDiv.show().style('color', '#0a0')
+                    .text(`Issue #${issueNumber} has been submitted, thank you for your feedback!`);
+                this.showSuccessState();
+            }
+            else {
+                statusDiv.show().style('color', '#f44')
+                    .text('Failed to send feedback. Please try again.');
+            }
+        }
+        catch (error) {
+            statusDiv.show().style('color', '#f44')
+                .text('Network error. Please check your connection and try again.');
+        }
+        finally {
+            this.isSubmitting = false;
+            this.updateSubmitButton();
+        }
+    }
+    showSuccessState() {
+        this.div.d1('#feedback-normal-buttons').hide();
+        this.div.d1('#feedback-success-buttons').show();
+    }
+    resetButtons() {
+        this.div.d1('#feedback-normal-buttons').show();
+        this.div.d1('#feedback-success-buttons').hide();
+    }
+}
+
 ;// ./src/game/game.ts
+
+
 
 
 
@@ -12934,13 +13446,15 @@ ${layerSections}<br/>
 const GameStepped = new SignalWithCurrent();
 class Game {
     constructor() {
-        this.intervalId = null;
         this.running = false;
+        this.holding = false;
+        this.stepTimer = timer_timer('step');
         this.showLighting = false;
         this.showDarkness = true;
         this.mutedLayers = new Set();
         this.soloLayer = null;
         this.helpSystem = new HelpSystem();
+        this.feedback = new Feedback();
         this.updateStepInfo = () => {
             if (!GameStepped.current)
                 return;
@@ -12948,12 +13462,49 @@ class Game {
             const r = FrameRendered.current ?? 0;
             (0,utils.$1)('step-info').textContent = `${frame} ${stepMs}ms r${r}`;
         };
+        this.keyDown = (e) => {
+            if (e.key === ' ') {
+                e.preventDefault();
+                if (this.holding)
+                    return;
+                this.holding = true;
+                if (this.map.uiRenderer.frozen())
+                    this.toggleFreeze();
+                if (!this.running)
+                    this.play();
+            }
+            else if (e.key === 'Escape') {
+                if (this.feedback.isVisible()) {
+                    this.feedback.hide();
+                }
+                else {
+                    this.closeHelp();
+                }
+            }
+            else if (e.key === 'ArrowLeft')
+                this.previousHelpPage();
+            else if (e.key === 'ArrowRight')
+                this.nextHelpPage();
+        };
+        this.keyUp = (e) => {
+            if (e.key === ' ' && this.holding) {
+                this.holding = false;
+                if (this.running)
+                    this.pause();
+            }
+        };
         this.closeHelpOnOutsideClick = (e) => {
             const popup = (0,utils.$1)('help-popup');
             const target = e.target;
             if (!popup.contains(target)) {
                 this.closeHelp();
             }
+        };
+        this.tick = () => {
+            if (!this.running)
+                return;
+            this.step();
+            this.stepTimer.restartInMillis(350, this.tick);
         };
         this.switchEnv = async () => {
             let url = this.envDest();
@@ -12994,21 +13545,8 @@ class Game {
         this.updatePlayPauseButton();
         this.updateFreezeButton();
         this.updateStepInfo();
-        document.addEventListener('keydown', (e) => {
-            if (e.key === ' ') {
-                e.preventDefault();
-                this.togglePlayPause();
-            }
-            else if (e.key === 'Escape') {
-                this.closeHelp();
-            }
-            else if (e.key === 'ArrowLeft') {
-                this.previousHelpPage();
-            }
-            else if (e.key === 'ArrowRight') {
-                this.nextHelpPage();
-            }
-        });
+        document.addEventListener('keydown', this.keyDown);
+        document.addEventListener('keyup', this.keyUp);
         RedrawMap.on(() => this.drawMap());
         FrameRendered.on(() => this.updateStepInfo());
         this.state = new GameState(this.map);
@@ -13032,6 +13570,10 @@ class Game {
         (0,utils/* onClick */.Af)((0,utils.$1)('help-button'), (e) => {
             e.stopPropagation();
             this.toggleHelp();
+        });
+        (0,utils/* onClick */.Af)((0,utils.$1)('feedback-button'), (e) => {
+            e.stopPropagation();
+            this.showFeedback();
         });
     }
     setupDebugControls() {
@@ -13100,6 +13642,18 @@ class Game {
         this.helpSystem.resetToFirstPage();
         this.updateHelpDisplay();
     }
+    showFeedback() {
+        if (this.running)
+            this.pause();
+        this.feedback.show();
+    }
+    pauseForModal() {
+        if (this.running)
+            this.pause();
+    }
+    resumeFromModal() {
+        // Game stays paused - user can resume manually if they want
+    }
     updateHelpDisplay() {
         const content = this.helpSystem.getCurrentPage();
         const pageInfo = this.helpSystem.getPageInfo();
@@ -13123,17 +13677,14 @@ class Game {
         if (!this.running)
             return;
         this.running = false;
-        if (this.intervalId) {
-            clearInterval(this.intervalId);
-            this.intervalId = null;
-        }
+        this.stepTimer.stop();
         this.updatePlayPauseButton();
     }
     play() {
         if (this.running)
             return;
         this.running = true;
-        this.intervalId = setInterval(() => this.step(), 350);
+        this.tick();
         this.updatePlayPauseButton();
     }
     step() {
