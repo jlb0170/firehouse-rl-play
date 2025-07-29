@@ -108,6 +108,40 @@ module.exports = function (list, options) {
 
 /***/ }),
 
+/***/ 74:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   ZI: () => (/* binding */ gzip),
+/* harmony export */   kd: () => (/* binding */ gunzip),
+/* harmony export */   wz: () => (/* binding */ longUrl)
+/* harmony export */ });
+const encode = (u8) => btoa(String.fromCharCode(...u8));
+const decode = (b) => Uint8Array.from(atob(b), c => c.charCodeAt(0));
+const pump = async (s) => new Uint8Array(await new Response(s).arrayBuffer());
+const gzip = async (s) => {
+    if (typeof CompressionStream === 'undefined')
+        return btoa(s);
+    const cs = new CompressionStream('gzip');
+    const w = cs.writable.getWriter();
+    w.write(new TextEncoder().encode(s));
+    w.close();
+    return encode(await pump(cs.readable));
+};
+const gunzip = async (b) => {
+    if (typeof DecompressionStream === 'undefined')
+        return atob(b);
+    const ds = new DecompressionStream('gzip');
+    const w = ds.writable.getWriter();
+    w.write(decode(b));
+    w.close();
+    return new TextDecoder().decode(await pump(ds.readable));
+};
+const longUrl = (u) => u.length > 2000;
+
+
+/***/ }),
+
 /***/ 88:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -723,9 +757,278 @@ ___CSS_LOADER_EXPORT___.push([module.id, `body {
     color: #0f0;
     font-family: monospace;
     line-height: 1.4;
+}
+
+/* Save Slots Popup */
+#save-slots-popup {
+    background: #222;
+    border: 1px solid #666;
+    border-radius: 8px;
+    color: #0a0;
+    font-family: monospace;
+}
+
+.popup-title {
+    margin: 0 0 20px 0;
+    color: #0a0;
+    font-size: 18px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 10px;
+}
+
+.save-slot {
+    margin: 10px 0;
+    padding: 12px;
+    background: #111;
+    border: 1px solid #444;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.save-slot:hover {
+    background: #333;
+}
+
+.save-slot.slot-exists {
+    border-color: #0a0;
+}
+
+.save-slot.slot-exists:hover {
+    border-color: #0c0;
+}
+
+.save-slot.slot-empty {
+    border-color: #080;
+}
+
+.save-slot.slot-empty:hover {
+    border-color: #0a0;
+}
+
+.slot-number {
+    font-weight: bold;
+    color: #0a0;
+    font-size: 16px;
+}
+
+.slot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.slot-delete {
+    font-size: 16px;
+    width: 20px;
+    height: 20px;
+}
+
+.slot-status {
+    color: #0a0;
+    font-weight: bold;
+}
+
+.slot-details {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.popup-help-text {
+    margin-top: 20px;
+    text-align: center;
+    color: #666;
+    font-size: 12px;
+    border-top: 1px solid #444;
+    padding-top: 10px;
+}
+
+.imported-save-section {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #444;
+}
+
+.imported-save-section .slot-number {
+    color: #fa0;
+    font-size: 14px;
+}
+
+.save-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+    gap: 10px;
 } `, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ 231:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   f: () => (/* binding */ Cell)
+/* harmony export */ });
+/* harmony import */ var _layers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(633);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(185);
+/* harmony import */ var _xyl__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(830);
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(919);
+
+
+
+
+class Cell {
+    constructor(xy, map) {
+        this.layers = new _layers__WEBPACK_IMPORTED_MODULE_0__/* .CellLayers */ .v();
+        this.passable = () => this.layers.passable();
+        this.wall = () => this.layers.data.walls;
+        this.pawn = () => this.layers.data.pawn;
+        this.fire = () => this.layers.data.fire;
+        this.smoke = () => this.layers.data.smoke;
+        this.floor = () => this.layers.data.floor;
+        this.items = () => this.layers.data.items;
+        this.cardinals = () => this.xy.cardinals().map(xy => this.map.get(xy));
+        this.neighbors = () => this.xy.neighbors().map(xy => this.map.get(xy));
+        this.u = (y = 1) => this.map.get(this.xy.u(y));
+        this.d = (y = 1) => this.map.get(this.xy.d(y));
+        this.l = (x = 1) => this.map.get(this.xy.l(x));
+        this.r = (x = 1) => this.map.get(this.xy.r(x));
+        this.ul = (n = 1) => this.map.get(this.xy.ul(n));
+        this.ur = (n = 1) => this.map.get(this.xy.ur(n));
+        this.dl = (n = 1) => this.map.get(this.xy.dl(n));
+        this.dr = (n = 1) => this.map.get(this.xy.dr(n));
+        this.xy = xy;
+        this.map = map;
+    }
+    draw(showLighting, visibleLayers, showNothing, debug, showDarkness = true) {
+        const illumination = showDarkness ? this.map.lighting.at(this) : 9;
+        if (showLighting) {
+            const char = Math.floor(illumination).toString();
+            if (char !== '0') {
+                this.map.drawAt(this.xy.x, this.xy.y, char, _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .WHITE */ .UE, '#000');
+                return;
+            }
+        }
+        if (showNothing) {
+            // Don't draw anything - clear board
+        }
+        else {
+            this.layers.draw(visibleLayers, debug, illumination);
+        }
+    }
+    step() {
+        this.layers.step();
+    }
+    reborn(drawable) {
+        this.layers.onExisting(drawable, e => this.died(e));
+        this.create(drawable);
+    }
+    set(drawable) {
+        (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(drawable.born, () => `tried to set raw constructed drawable ${drawable.desc()} - should be created with create()`);
+        this.layers.onExisting(drawable, (existing) => {
+            (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bomb */ .fv)(`tried to replace ${existing.desc()} with ${drawable.desc()}`);
+        });
+        this.layers.set(drawable);
+        drawable.movedInto(this);
+        this.map.lighting.update(this);
+    }
+    remove(drawable) {
+        this.layers.remove(drawable);
+        this.map.lighting.update(this);
+    }
+    died(drawable) {
+        drawable.dying();
+        this.remove(drawable);
+        drawable.diedAndAlreadyRemovedFromCell();
+    }
+    occupied(layer) {
+        return !!this.layers.data[layer];
+    }
+    occupantIs(drawable) {
+        return this.layers.data[drawable.layer] === drawable;
+    }
+    queueMove(drawable, xy) {
+        this.map.moving(drawable, _xyl__WEBPACK_IMPORTED_MODULE_2__/* .XYL */ .Y.at(this.xy, drawable.layer), _xyl__WEBPACK_IMPORTED_MODULE_2__/* .XYL */ .Y.at(xy, drawable.layer));
+    }
+    presentLayers() {
+        return _layers__WEBPACK_IMPORTED_MODULE_0__/* .CellLayers */ .v.layerNames
+            .filter((name) => this.layers.data[name])
+            .map((name) => {
+            const drawable = this.layers.data[name];
+            return {
+                name,
+                drawable,
+                desc: drawable.desc(),
+                color: drawable.color()
+            };
+        });
+    }
+    create(drawable) {
+        return this.map.create(this, drawable);
+    }
+    bombOccupied(layer, msgOfOccupant) {
+        (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombIf */ .av)(this.occupied(layer), () => `Cell is occupied: ${msgOfOccupant(this.layers.data[layer])}`);
+    }
+}
+
+
+/***/ }),
+
+/***/ 267:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   v: () => (/* binding */ Fire)
+/* harmony export */ });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(919);
+/* harmony import */ var _drawable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(721);
+/* harmony import */ var _smoke__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(502);
+/* harmony import */ var _game_layers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(633);
+
+
+
+
+
+class Fire extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
+    constructor() {
+        super(...arguments);
+        this.layer = 'fire';
+        this.light = () => 3;
+        this.char = () => "▲"; // "🔥"
+        this.color = () => _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .FIRE */ .ZK.random();
+    }
+    step() {
+        if (!(0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(this.age)) {
+            this.cell.died(this);
+            return;
+        }
+        this.cell.reborn(new _smoke__WEBPACK_IMPORTED_MODULE_3__/* .Smoke */ ._());
+        _game_layers__WEBPACK_IMPORTED_MODULE_4__/* .CellLayers */ .v.materialLayers.forEach(l => {
+            const d = this.cell.layers.data[l];
+            if (d?.material)
+                d.material.ignite();
+        });
+        if ((0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(4)) {
+            (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randFrom */ .Kt)(this.cell.neighbors()).reborn(new Fire());
+        }
+        if ((0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(4)) {
+            const neighbor = (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randFrom */ .Kt)(this.cell.neighbors());
+            if (!neighbor.passable())
+                return;
+            this.cell.queueMove(this, neighbor.xy);
+        }
+    }
+    merge(other) {
+        (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .bombUnless */ .Nb)(other instanceof Fire, 'merge mismatch');
+        return other.olderThan(this) ? 'replace' : 'kill';
+    }
+}
 
 
 /***/ }),
@@ -821,6 +1124,691 @@ module.exports = function (cssWithMappingToString) {
 
 /***/ }),
 
+/***/ 328:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  n: () => (/* binding */ Display)
+});
+
+// EXTERNAL MODULE: ./src/game/config.ts + 47 modules
+var config = __webpack_require__(843);
+// EXTERNAL MODULE: ./src/utils.ts
+var utils = __webpack_require__(185);
+// EXTERNAL MODULE: ./src/game/xy.ts
+var game_xy = __webpack_require__(88);
+;// ./src/ui/click.ts
+const toClick = (e) => ({
+    button: e.button === 2 ? 'RIGHT' : 'LEFT',
+    shift: e.shiftKey,
+    ctrl: e.ctrlKey,
+    alt: e.altKey,
+    meta: e.metaKey
+});
+
+;// ./src/ui/display.ts
+
+
+
+
+class Display {
+    constructor(width, height, transparent = false) {
+        this.coordsFromEvent = (e) => {
+            const canvas = this.canvas();
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / config/* Config */.T.FONT_SIZE);
+            const y = Math.floor((e.clientY - rect.top) / config/* Config */.T.FONT_SIZE);
+            return game_xy.XY.at(x, y);
+        };
+        this.display = transparent
+            ? config/* Config */.T.createTransparentDisplay(width, height)
+            : config/* Config */.T.createDisplay(width, height);
+        this.clear();
+    }
+    draw(x, y, char, fg, bg) {
+        this.display.draw(x, y, char, fg, bg);
+    }
+    clear() {
+        this.display.clear();
+    }
+    canvas() {
+        return (0,utils/* bombUnless */.Nb)(this.display.getContainer(), () => 'Failed to get canvas');
+    }
+    attachTo(container, styles) {
+        const canvas = this.canvas();
+        Object.assign(canvas.style, styles);
+        container.appendChild(canvas);
+    }
+    onClick(callback) {
+        const canvas = this.canvas();
+        const h = (e) => {
+            const xy = this.coordsFromEvent(e);
+            const c = toClick(e);
+            if (game_xy.XY.oob(xy.x, xy.y)) {
+                callback(undefined, c);
+                return;
+            }
+            callback(xy, c);
+        };
+        (0,utils/* onClick */.Af)(canvas, h);
+        canvas.addEventListener('contextmenu', e => { e.preventDefault(); h(e); });
+    }
+    onMousemove(callback) {
+        const canvas = this.canvas();
+        (0,utils/* onMousemove */.iT)(canvas, e => {
+            const xy = this.coordsFromEvent(e);
+            if (game_xy.XY.oob(xy.x, xy.y))
+                return;
+            callback(xy);
+        });
+    }
+}
+
+
+/***/ }),
+
+/***/ 334:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   H: () => (/* binding */ Signal),
+/* harmony export */   Y: () => (/* binding */ SignalWithCurrent)
+/* harmony export */ });
+class Signal {
+    constructor() {
+        this.listeners = new Set();
+    }
+    emit(t) {
+        for (const onT of this.listeners)
+            onT(t);
+    }
+    on(onT) {
+        this.listeners.add(onT);
+        return () => this.listeners.delete(onT);
+    }
+}
+class SignalWithCurrent extends Signal {
+    constructor() {
+        super(...arguments);
+        this.current = null;
+    }
+    emit(t) {
+        this.current = t;
+        super.emit(t);
+    }
+    when(onT) {
+        if (this.current)
+            onT(this.current);
+    }
+}
+
+
+/***/ }),
+
+/***/ 482:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  Initializer: () => (/* binding */ Initializer)
+});
+
+// EXTERNAL MODULE: ./src/game/xy.ts
+var xy = __webpack_require__(88);
+// EXTERNAL MODULE: ./src/utils.ts
+var utils = __webpack_require__(185);
+// EXTERNAL MODULE: ./src/game/cell.ts
+var cell = __webpack_require__(231);
+;// ./src/game/rect.ts
+
+
+
+class Rect {
+    constructor(xy, w, h) {
+        this.xy = xy;
+        this.w = w;
+        this.h = h;
+        this.eachCell = (onXY) => (0,utils/* times */.Hn)(this.w, x => (0,utils/* times */.Hn)(this.h, y => onXY(this.xy.add(x, y))));
+    }
+    get ul() { return this.xy; }
+    get ur() { return this.xy.add(this.w - 1, 0); }
+    get bl() { return this.xy.add(0, this.h - 1); }
+    get br() { return this.xy.add(this.w - 1, this.h - 1); }
+    get cb() { return this.xy.add((0,utils/* half */.MX)(this.w), this.h - 1); }
+    get cl() { return this.xy.add(0, (0,utils/* half */.MX)(this.h)); }
+    get cr() { return this.xy.add(this.w - 1, (0,utils/* half */.MX)(this.h)); }
+    get uc() { return this.xy.add((0,utils/* half */.MX)(this.w), 0); }
+    contains(target, y) {
+        let checkXY;
+        if (typeof target === 'number') {
+            checkXY = xy.XY.at(target, y);
+        }
+        else if (target instanceof xy.XY) {
+            checkXY = target;
+        }
+        else if (target instanceof cell/* Cell */.f) {
+            checkXY = target.xy;
+        }
+        else if ('cell' in target && target.cell) {
+            checkXY = target.cell.xy;
+        }
+        else {
+            return false;
+        }
+        return checkXY.x >= this.xy.x &&
+            checkXY.x < this.xy.x + this.w &&
+            checkXY.y >= this.xy.y &&
+            checkXY.y < this.xy.y + this.h;
+    }
+    eachBorder(onXY) {
+        (0,utils/* times */.Hn)(this.w, x => {
+            onXY(this.xy.add(x, 0)); // top edge
+            onXY(this.xy.add(x, this.h - 1)); // bottom edge
+        });
+        (0,utils/* times */.Hn)(this.h - 2, y => {
+            onXY(this.xy.add(0, y + 1));
+            onXY(this.xy.add(this.w - 1, y + 1));
+        });
+    }
+}
+Rect.xyWH = (topLeft, width, height) => new Rect(topLeft, width, height);
+
+// EXTERNAL MODULE: ./src/ui/colors.ts
+var colors = __webpack_require__(919);
+// EXTERNAL MODULE: ./src/draw/drawable.ts
+var drawable = __webpack_require__(721);
+// EXTERNAL MODULE: ./src/draw/material.ts
+var material = __webpack_require__(994);
+;// ./src/draw/wall.ts
+
+
+
+class Wall extends drawable/* Drawable */.h {
+    constructor() {
+        super(...arguments);
+        this.layer = 'walls';
+        this.passable = false;
+        this.transparency = 0;
+        this.material = new material/* Material */.i(this);
+        this.char = () => '#';
+        this.color = () => this.material.color(colors/* BORDER */.XE);
+        this.light = () => this.material.light(0);
+        this.desc = () => this.material.desc('Wall');
+        this.ignite = () => this.material.ignite();
+    }
+    step() {
+        this.material.step(() => { });
+    }
+}
+
+;// ./src/draw/floor.ts
+
+
+class Floor extends drawable/* Drawable */.h {
+    constructor() {
+        super(...arguments);
+        this.layer = 'floor';
+        this.light = () => 0;
+        this.char = () => '.';
+        this.color = () => colors/* BORDER */.XE;
+    }
+}
+
+// EXTERNAL MODULE: ./src/draw/smoke.ts
+var smoke = __webpack_require__(502);
+;// ./src/draw/lamp.ts
+
+
+
+
+
+class Lamp extends drawable/* Drawable */.h {
+    constructor() {
+        super(...arguments);
+        this.layer = 'items';
+        this.transparency = 1;
+        this.material = new material/* Material */.i(this);
+        this.passable = false;
+        this.light = () => this.material.light(5);
+        this.char = () => '*';
+        this.color = () => this.material.color(colors/* LAMP */.zu.random());
+        this.desc = () => this.material.desc('Lamp');
+    }
+    smoking() {
+        return utils/* isInTestMode */.Jo ? true : (0,utils/* oneIn */.A7)(3);
+    }
+    step() {
+        if (this.smoking())
+            this.cell.reborn(new smoke/* Smoke */._());
+        this.material.step(() => { });
+    }
+}
+
+// EXTERNAL MODULE: ./src/draw/door.ts
+var door = __webpack_require__(483);
+// EXTERNAL MODULE: ./src/draw/pawn.ts + 1 modules
+var pawn = __webpack_require__(705);
+// EXTERNAL MODULE: ./src/draw/fire.ts
+var fire = __webpack_require__(267);
+// EXTERNAL MODULE: ./src/ui/text-stroke.ts
+var text_stroke = __webpack_require__(485);
+// EXTERNAL MODULE: ./src/game/game.ts + 117 modules
+var game = __webpack_require__(903);
+// EXTERNAL MODULE: ./src/game/state.ts
+var state = __webpack_require__(522);
+;// ./src/game/names.ts
+const firsts = "Mary,Anna,Emma,Elizabeth,Minnie,Margaret,Ida,Alice,Bertha,Sarah,Annie,Clara,Ella,Florence,Cora,Martha,Laura,Nellie,Grace,Carrie,Maude,Mabel,Bessie,Jennie,Gertrude,Julia,Hattie,Edith,Mattie,Rose,Catherine,Lillian,Ada,Lillie,Helen,Jessie,Louise,Ethel,Lula,Myrtle,Eva,Frances,Lena,Lucy,Edna,Maggie,Pearl,Daisy,Fannie,Josephine,Dora,Rosa,Katherine,Agnes,Marie,Nora,May,Mamie,Blanche,Stella,Ellen,Nancy,Effie,Sallie,Nettie,Della,Lizzie,Flora,Susie,Maud,Mae,Etta,Harriet,Sadie,Caroline,Katie,Lydia,Elsie,Kate,Susan,Mollie,Alma,Addie,Georgia,Eliza,Lulu,Nannie,Lottie,Amanda,Belle,Charlotte,Rebecca,Ruth,Viola,Olive,Amelia,Hannah,Jane,Virginia,Emily,Matilda,Irene,Kathryn,Esther,Willie,Henrietta,Ollie,Amy,Rachel,Sara,Estella,Theresa,Augusta,Ora,Pauline,Josie,Lola,Sophia,Leona,Anne,Mildred,Ann,Beulah,Callie,Lou,Delia,Eleanor,Barbara,Iva,Louisa,Maria,Mayme,Evelyn,Estelle,Nina,Betty,Marion,Bettie,Dorothy,Luella,Inez,Lela,Rosie,Allie,Millie,Janie,Cornelia,Victoria,Ruby,Winifred,Alta,Celia,Christine,Beatrice,Birdie,Harriett,Mable,Myra,Sophie,Tillie,Isabel,Sylvia,Carolyn,Isabelle,Leila,Sally,Ina,Essie,Bertie,Nell,Alberta,Katharine,Lora,Rena,Mina,Rhoda,Mathilda,Abbie,Eula,Dollie,Hettie,Eunice,Fanny,Ola,Lenora,Adelaide,Christina,Lelia,Nelle,Sue,Johanna,Lilly,Lucinda,Minerva,Lettie,Roxie,Cynthia,Helena,Hilda,Hulda,Bernice,Genevieve,Jean,Cordelia,Marian,Francis,Jeanette,Adeline,Gussie,Leah,Lois,Lura,Mittie,Hallie,Isabella,Olga,Phoebe,Teresa,Hester,Lida,Lina,Winnie,Claudia,Marguerite,Vera,Cecelia,Bess,Emilie,John,Rosetta,Verna,Myrtie,Cecilia,Elva,Olivia,Ophelia,Georgie,Elnora,Violet,Adele,Lily,Linnie,Loretta,Madge,Polly,Virgie,Eugenia,Lucile,Lucille,Mabelle,Rosalie,Kittie,Meta,Angie,Dessie,Georgiana,Lila,Regina,Selma,Wilhelmina,Bridget,Lilla,Malinda,Vina,Freda,Gertie,Jeannette,Louella,Mandy,Roberta,Cassie,Corinne,Ivy,Melissa,Lyda,Naomi,Norma,Bell,Margie,Nona,Zella,Dovie,Elvira,Erma,Irma,Leota,William,Artie,Blanch,Charity,Lorena,Lucretia,Orpha,Alvina,Annette,Catharine,Elma,Geneva,Janet,Lee,Leora,Lona,Miriam,Zora,Linda,Octavia,Sudie,Zula,Adella,Alpha,Frieda,George,Joanna,Leonora,Priscilla,Tennie,Angeline,Docia,Ettie,Flossie,Hanna,Letha,Minta,Retta,Rosella,Adah,Berta,Elisabeth,Elise,Goldie,Leola,Margret,Adaline,Floy,Idella,Juanita,Lenna,Lucie,Missouri,Nola,Zoe,Eda,Isabell,James,Julie,Letitia,Madeline,Malissa,Mariah,Pattie,Vivian,Almeda,Aurelia,Claire,Dolly,Hazel,Jannie,Kathleen,Kathrine,Lavinia,Marietta,Melvina,Ona,Pinkie,Samantha,Susanna,Chloe,Donnie,Elsa,Gladys,Matie,Pearle,Vesta,Vinnie,Antoinette,Clementine,Edythe,Harriette,Libbie,Lilian,Lue,Lutie,Magdalena,Meda,Rita,Tena,Zelma,Adelia,Annetta,Antonia,Dona,Elizebeth,Georgianna,Gracie,Iona,Lessie,Leta,Liza,Mertie,Molly,Neva,Oma,Alida,Alva,Cecile,Cleo,Donna,Ellie,Ernestine,Evie,Frankie,Helene,Minna,Myrta,Prudence,Queen,Rilla,Savannah,Tessie,Tina,Agatha,America,Anita,Arminta,Dorothea,Ira,Luvenia,Marjorie,Maybelle,Mellie,Nan,Pearlie,Sidney,Velma,Clare,Constance,Dixie,Ila,Iola,Jimmie,Louvenia,Lucia,Ludie,Luna,Metta,Patsy,Phebe,Sophronia,Adda,Avis,Betsy,Bonnie,Cecil,Cordie,Emmaline,Ethelyn,Hortense,June,Louie,Lovie,Marcella,Melinda,Mona,Odessa,Veronica,Aimee,Annabel,Ava,Bella,Carolina,Cathrine,Christena,Clyde,Dena,Dolores,Eleanore,Elmira,Fay,Frank,Jenny,Kizzie,Lonnie,Loula,Magdalene,Mettie,Mintie,Peggy,Reba,Serena,Vida,Zada,Abigail,Celestine,Celina,Claudie,Clemmie,Connie,Daisie,Deborah,Dessa,Easter,Eddie,Emelia,Emmie,Imogene,India,Jeanne,Joan,Lenore,Liddie,Lotta,Mame,Nevada,Rachael,Robert,Sina,Willa,Aline,Beryl,Charles,Daisey,Dorcas,Edmonia,Effa,Eldora,Eloise,Emmer,Era,Gena,Henry,Iris,Izora,Lennie,Lissie,Mallie,Malvina,Mathilde,Mazie,Queenie,Rosina,Salome,Theodora,Therese,Vena,Wanda,Wilda,Altha,Anastasia,Besse,Bird,Birtie,Clarissa,Claude,Delilah,Diana,Emelie,Erna,Fern,Florida,Frona,Hilma,Joseph,Juliet,Leonie,Lugenia,Mammie,Manda,Manerva,Manie,Nella,Paulina,Philomena,Rae,Selina,Sena,Theodosia,Tommie,Una,Vernie,Adela,Althea,Amalia,Amber,Angelina,Annabelle,Anner,Arie,Clarice,Corda,Corrie,Dell,Dellar,Donie,Doris,Elda,Elinor,Emeline,Emilia,Esta,Estell,Etha,Fred,Hope,Indiana,Ione,Jettie,Johnnie,Josiephine,Kitty,Lavina,Leda,Letta,Mahala,Marcia,Margarette,Maudie,Maye,Norah,Oda,Patty,Paula,Permelia,Rosalia,Roxanna,Sula,Vada,Winnifred,Adline,Almira,Alvena,Arizona,Becky,Bennie,Bernadette,Camille,Cordia,Corine,Dicie,Dove,Drusilla,Elena,Elenora,Elmina,Ethyl,Evalyn,Evelina,Faye,Huldah,Idell,Inga,Irena,Jewell,Kattie,Lavenia,Leslie,Lovina,Lulie,Magnolia,Margeret,Margery,Media,Millicent,Nena,Ocie,Orilla,Osie,Pansy,Ray,Rosia,Rowena,Shirley,Tabitha,Thomas,Verdie,Walter,Zetta,Zoa,Zona,Albertina,Albina,Alyce,Amie,Angela,Annis,Carol,Carra,Clarence,Clarinda,Delphia,Dillie,Doshie,Drucilla,Etna,Eugenie,Eulalia,Eve,Felicia,Florance,Fronie,Geraldine,Gina,Glenna,Grayce,Hedwig,Jessica,Jossie,Katheryn,Katy,Lea,Leanna,Leitha,Leone,Lidie,Loma,Lular,Magdalen,Maymie,Minervia,Muriel,Neppie,Olie,Onie,Osa,Otelia,Paralee,Patience,Rella,Rillie,Rosanna,Theo,Tilda,Tishie,Tressa,Viva,Yetta,Zena,Zola,Abby,Aileen,Alba,Alda,Alla,Alverta,Ara,Ardelia,Ardella,Arrie,Arvilla,Augustine,Aurora,Bama,Bena,Byrd,Calla,Camilla,Carey,Carlotta,Celestia,Cherry,Cinda,Classie,Claudine,Clemie,Clifford,Clyda,Creola,Debbie,Dee,Dinah,Doshia,Ednah,Edyth,Eleanora,Electa,Eola,Erie,Eudora,Euphemia,Evalena,Evaline,Faith,Fidelia,Freddie,Golda,Harry,Helma,Hermine,Hessie,Ivah,Janette,Jennette,Joella,Kathryne,Lacy,Lanie,Lauretta,Leana,Leatha,Leo,Liller,Lillis,Louetta,Madie,Mai,Martina,Maryann,Melva,Mena,Mercedes,Merle,Mima,Minda,Monica,Nealie,Netta,Nolia,Nonie,Odelia,Ottilie,Phyllis,Robbie,Sabina,Sada,Sammie,Suzanne,Sybilla,Thea,Tressie,Vallie,Venie,Viney,Wilhelmine,Winona,Zelda,Zilpha,Adelle,Adina,Adrienne,Albertine,Alys,Ana,Araminta,Arthur,Birtha,Bulah,Caddie,Celie,Charlotta,Clair,Concepcion,Cordella,Corrine,Delila,Delphine,Dosha,Edgar,Elaine,Elisa,Ellar,Elmire,Elvina,Ena,Estie,Etter,Fronnie,Genie,Georgina,Glenn,Gracia,Guadalupe,Gwendolyn,Hassie,Honora,Icy,Isa,Isadora,Jesse,Jewel,Joe,Johannah,Juana,Judith,Judy,Junie,Lavonia,Lella,Lemma,Letty,Linna,Littie,Lollie,Lorene,Louis,Love,Lovisa,Lucina,Lynn,Madora,Mahalia,Manervia,Manuela,Margarett,Margaretta,Margarita,Marilla,Mignon,Mozella,Natalie,Nelia,Nolie,Omie,Opal,Ossie,Ottie,Ottilia,Parthenia,Penelope,Pinkey,Pollie,Rennie,Reta,Roena,Rosalee,Roseanna,Ruthie,Sabra,Sannie,Selena,Sibyl,Tella,Tempie,Tennessee,Teressa,Texas,Theda,Thelma,Thursa,Ula,Vannie,Verona,Vertie,Wilma,John,William,James,Charles,George,Frank,Joseph,Thomas,Henry,Robert,Edward,Harry,Walter,Arthur,Fred,Albert,Samuel,David,Louis,Joe,Charlie,Clarence,Richard,Andrew,Daniel,Ernest,Will,Jesse,Oscar,Lewis,Peter,Benjamin,Frederick,Willie,Alfred,Sam,Roy,Herbert,Jacob,Tom,Elmer,Carl,Lee,Howard,Martin,Michael,Bert,Herman,Jim,Francis,Harvey,Earl,Eugene,Ralph,Ed,Claude,Edwin,Ben,Charley,Paul,Edgar,Isaac,Otto,Luther,Lawrence,Ira,Patrick,Guy,Oliver,Theodore,Hugh,Clyde,Alexander,August,Floyd,Homer,Jack,Leonard,Horace,Marion,Philip,Allen,Archie,Stephen,Chester,Willis,Raymond,Rufus,Warren,Jessie,Milton,Alex,Leo,Julius,Ray,Sidney,Bernard,Dan,Jerry,Calvin,Perry,Dave,Anthony,Eddie,Amos,Dennis,Clifford,Leroy,Wesley,Alonzo,Garfield,Franklin,Emil,Leon,Nathan,Harold,Matthew,Levi,Moses,Everett,Lester,Winfield,Adam,Lloyd,Mack,Fredrick,Jay,Jess,Melvin,Noah,Aaron,Alvin,Norman,Gilbert,Elijah,Victor,Gus,Nelson,Jasper,Silas,Jake,Christopher,Mike,Percy,Adolph,Maurice,Cornelius,Felix,Reuben,Wallace,Claud,Roscoe,Sylvester,Earnest,Hiram,Otis,Simon,Willard,Irvin,Mark,Jose,Wilbur,Abraham,Virgil,Clinton,Elbert,Leslie,Marshall,Owen,Wiley,Anton,Morris,Manuel,Phillip,Augustus,Emmett,Eli,Nicholas,Wilson,Alva,Harley,Newton,Timothy,Marvin,Ross,Curtis,Edmund,Jeff,Elias,Harrison,Stanley,Columbus,Lon,Ora,Ollie,Pearl,Russell,Solomon,Arch,Asa,Clayton,Enoch,Irving,Mathew,Nathaniel,Scott,Hubert,Lemuel,Andy,Ellis,Emanuel,Joshua,Millard,Vernon,Wade,Cyrus,Miles,Rudolph,Sherman,Austin,Bill,Chas,Lonnie,Monroe,Byron,Edd,Emery,Grant,Jerome,Max,Mose,Steve,Gordon,Abe,Pete,Chris,Clark,Gustave,Orville,Lorenzo,Bruce,Marcus,Preston,Bob,Dock,Donald,Jackson,Cecil,Barney,Delbert,Edmond,Anderson,Christian,Glenn,Jefferson,Luke,Neal,Burt,Ike,Myron,Tony,Conrad,Joel,Matt,Riley,Vincent,Emory,Isaiah,Nick,Ezra,Green,Juan,Clifton,Lucius,Porter,Arnold,Bud,Jeremiah,Taylor,Forrest,Roland,Spencer,Burton,Don,Emmet,Gustav,Louie,Morgan,Ned,Van,Ambrose,Chauncey,Elisha,Ferdinand,General,Julian,Kenneth,Mitchell,Allie,Josh,Judson,Lyman,Napoleon,Pedro,Berry,Dewitt,Ervin,Forest,Lynn,Pink,Ruben,Sanford,Ward,Douglas,Ole,Omer,Ulysses,Walker,Wilbert,Adelbert,Benjiman,Ivan,Jonas,Major,Abner,Archibald,Caleb,Clint,Dudley,Granville,King,Mary,Merton,Antonio,Bennie,Carroll,Freeman,Josiah,Milo,Royal,Dick,Earle,Elza,Emerson,Fletcher,Judge,Laurence,Roger,Seth,Glen,Hugo,Jimmie,Johnnie,Neil,Washington,Elwood,Gust,Harmon,Jordan,Simeon,Wayne,Wilber,Clem,Evan,Frederic,Irwin,Junius,Lafayette,Loren,Madison,Mason,Orval,Abram,Aubrey,Elliott,Hans,Karl,Minor,Wash,Wilfred,Allan,Alphonse,Dallas,Dee,Isiah,Jason,Johnny,Lawson,Lew,Micheal,Orin,Addison,Cal,Erastus,Francisco,Hardy,Lucien,Randolph,Stewart,Vern,Wilmer,Zack,Adrian,Alvah,Bertram,Clay,Ephraim,Fritz,Giles,Grover,Harris,Isom,Jesus,Johnie,Jonathan,Lucian,Malcolm,Merritt,Otho,Perley,Rolla,Sandy,Tomas,Wilford,Adolphus,Angus,Arther,Carlos,Cary,Cassius,Davis,Hamilton,Harve,Israel,Leander,Melville,Merle,Murray,Pleasant,Sterling,Steven,Axel,Boyd,Bryant,Clement,Erwin,Ezekiel,Foster,Frances,Geo,Houston,Issac,Jules,Larkin,Mat,Morton,Orlando,Pierce,Prince,Rollie,Rollin,Sim,Stuart,Wilburn,Bennett,Casper,Christ,Dell,Egbert,Elmo,Fay,Gabriel,Hector,Horatio,Lige,Saul,Smith,Squire,Tobe,Tommie,Wyatt,Alford,Alma,Alton,Andres,Burl,Cicero,Dean,Dorsey,Enos,Howell,Lou,Loyd,Mahlon,Nat,Omar,Oran,Parker,Raleigh,Reginald,Rubin,Seymour,Wm,Young,Benjamine,Carey,Carlton,Eldridge,Elzie,Garrett,Isham,Johnson,Larry,Logan,Merrill,Mont,Oren,Pierre,Rex,Rodney,Ted,Webster,West,Wheeler,Willam,Al,Aloysius,Alvie,Anna,Art,Augustine,Bailey,Benjaman,Beverly,Bishop,Clair,Cloyd,Coleman,Dana,Duncan,Dwight,Emile,Evert,Henderson,Hunter,Jean,Lem,Luis,Mathias,Maynard,Miguel,Mortimer,Nels,Norris,Pat,Phil,Rush,Santiago,Sol,Sydney,Thaddeus,Thornton,Tim,Travis,Truman,Watson,Webb,Wellington,Winfred,Wylie,Alec,Basil,Baxter,Bertrand,Buford,Burr,Cleveland,Colonel,Dempsey,Early,Ellsworth,Fate,Finley,Gabe,Garland,Gerald,Herschel,Hezekiah,Justus,Lindsey,Marcellus,Olaf,Olin,Pablo,Rolland,Turner,Verne,Volney,Williams,Almon,Alois,Alonza,Anson,Authur,Benton,Billie,Cornelious,Darius,Denis,Dillard,Doctor,Elvin,Emma,Eric,Evans,Gideon,Haywood,Hilliard,Hosea,Lincoln,Lonzo,Lucious,Lum,Malachi,Newt,Noel,Orie,Palmer,Pinkney,Shirley,Sumner,Terry,Urban,Uriah,Valentine,Waldo,Warner,Wong,Zeb,Abel,Alden,Archer,Avery,Carson,Cullen,Doc,Eben,Elige,Elizabeth,Elmore,Ernst,Finis,Freddie,Godfrey,Guss,Hamp,Hermann,Isadore,Isreal,Jones,June,Lacy,Lafe,Leland,Llewellyn,Ludwig,Manford,Maxwell,Minnie,Obie,Octave,Orrin,Ossie,Oswald,Park,Parley,Ramon,Rice,Stonewall,Theo,Tillman,Addie,Aron,Ashley,Bernhard,Bertie,Berton,Buster,Butler,Carleton,Carrie,Clara,Clarance,Clare,Crawford,Danial,Dayton,Dolphus,Elder,Ephriam,Fayette,Felipe,Fernando,Flem,Florence,Ford,Harlan,Hayes,Henery,Hoy,Huston,Ida,Ivory,Jonah,Justin,Lenard,Leopold,Lionel,Manley,Marquis,Marshal,Mart,Odie,Olen,Oral,Orley,Otha,Press,Price,Quincy,Randall,Rich,Richmond,Romeo,Russel,Rutherford,Shade,Shelby,Solon,Thurman,Tilden,Troy,Woodson,Worth,Aden,Alcide,Alf,Algie,Arlie,Bart,Bedford,Benito,Billy,Bird,Birt,Bruno,Burley,Chancy,Claus,Cliff,Clovis,Connie,Creed,Delos,Duke,Eber,Eligah,Elliot,Elton,Emmitt,Gene,Golden,Hal,Hardin,Harman,Hervey,Hollis,Ivey,Jennie,Len,Lindsay,Lonie,Lyle,Mac,Mal,Math,Miller,Orson,Osborne,Percival,Pleas,Ples,Rafael,Raoul,Roderick,Rose,Shelton,Sid,Theron,Tobias,Toney,Tyler,Vance,Vivian,Walton,Watt,Weaver,Wilton,Adolf,Albin,Albion,Allison,Alpha,Alpheus,Anastacio,Andre,Annie,Arlington,Armand,Asberry,Asbury,Asher,Augustin,Auther,Author,Ballard,Blas,Caesar,Candido,Cato,Clarke,Clemente,Colin,Commodore,Cora,Coy,Cruz,Curt,Damon,Davie,Delmar,Dexter,Dora,Doss,Drew,Edson,Elam,Elihu,Eliza,Elsie,Erie,Ernie,Ethel,Ferd,Friend,Garry,Gary,Grace,Gustaf,Hallie,Hampton,Harrie,Hattie,Hence,Hillard,Hollie,Holmes,Hope,Hyman,Ishmael,Jarrett,Jessee,Joeseph,Junious,Kirk,Levy,Mervin,Michel,Milford,Mitchel,Nellie,Noble,Obed,Oda,Orren,Ottis,Rafe,Redden,Reese,Rube,Ruby,Rupert,Salomon,Sammie,Sanders,Soloman,Stacy,Stanford,Stanton,Thad,Titus,Tracy,Vernie,Wendell,Wilhelm,Willian,Yee,Zeke,Ab,Abbott,Agustus,Albertus,Almer,Alphonso,Alvia,Artie,Arvid,Ashby,Augusta,Aurthur,Babe,Baldwin,Barnett,Bartholomew,Barton,Bernie,Blaine,Boston,Brad,Bradford,Bradley,Brooks,Buck,Budd,Ceylon,Chalmers,Chesley,Chin,Cleo,Crockett,Cyril,Daisy,Denver,Dow,Duff,Edie,Edith,Elick,Elie,Eliga,Eliseo,Elroy,Ely,Ennis,Enrique,Erasmus,Esau,Everette,Firman,Fleming,Flora,Gardner,Gee,Gorge,Gottlieb,Gregorio,Gregory,Gustavus,Halsey,Handy,Hardie,Harl,Hayden,Hays,Hermon,Hershel,Holly,Hosteen,Hoyt,Hudson,Huey,Humphrey,Hunt,Hyrum,Irven,Isam,Ivy,Jabez,Jewel,Jodie,Judd,Julious,Justice,Katherine,Kelly,Kit,Knute,Lavern,Lawyer,Layton,Leonidas,Lewie,Lillie,Linwood,Loran,Lorin,Mace,Malcom,Manly,Manson,Matthias,Mattie,Merida,Miner,Montgomery,Moroni,Murdock,Myrtle,Nate,Nathanial,Nimrod,Nora,Norval,Nova,Orion,Orla,Orrie,Payton,Philo,Phineas,Presley,Ransom,Reece,Rene,Roswell,Rowland,Sampson,Samual,Santos,Schuyler,Sheppard,Spurgeon,Starling,Sylvanus,Theadore,Theophile,Tilmon,Tommy,Unknown,Vann,Wes,Winston,Wood,Woodie,Worthy,Wright,York,Zachariah".split(',');
+const lasts = "Abbott,Abel,Adams,Addison,Adkins,Agent,Aldrich,Aldridge,Alexander,Alford,Allen,Appleton,Armstrong,Arrington,Arwood,Atkins,Austin,Avery,Bailey,Baine,Baird,Baldwin,Bankston,Barker,Barnes,Barnett,Barry,Barton,Baughan,Beard,Beasley,Beck,Bell,Bennefield,Bennett,Berry,Bishop,Black,Blackwell,Blake,Blaxton,Blaylock,Blevins,Bonds,Boone,Boston,Botiler,Boyd,Bradford,Brannon,Brazeall,Brewer,Bridgeman,Brimer,Brooks,Brown,Bryant,Burdick,Burnet,Burns,Burrell,Byars,Bynum,Cagle,Cagner,Cain,Calvert,Campbell,Canada,Cantrell,Carroll,Carter,Cary,Casey,Cates,Chambers,Chappell,Chillcoat,Clark,Cline,Cole,Collman,Commens,Compton	Conly,Cooper,Cotton,Cowart,Cox,Cummings,Curtis,Davidson,Davis,Deason,Dempsey,Derrick,Dickenson,Dodd,Donough,Dougherty,Dorris,Doss,Dover,Downy,Dunahoo,Duncan,Dunlap,Dupre,Eaton,Eatton,Ellenbury,Elliott,Ellis,England,Estes,Evans,Ezell,Fair,Farley,Farris,Faught,Forester,Fowler,Freeman,Frost,Gamble,Ganes,Gardener,Garrison,Garson,Gentle,George,Gibson,Gice,Gilbert,Glenn,Godsey,Goodwin,Gosset,Grantham,Grastey,Green,Griffin,Guest,Gunter,Guthrie,Hadder,Haines,Haley,Hamilton,Hampton,Hand,Harbin,Harmon,Harper,Harris,Hatchett,Haw,Haynes,Hays,Hebster,Hefner,Henderson,Hendon,Henson,Hewitt,Hicks,Hightower	Hill,Hiller,Hilton,Hinesley,Hix,Hogg,Holden,Holloway,Holt,Hood,Hoover,Hopson,Horton,Howard,Howells,Hudson,Hughes,Hyde,Ingle,Inmon,Isabell,Ivy,Jack,Jackson,James,Jamison,Jeffries,Jenkins,Johnson,Kely),Kemp,Key,Kidd,Kiker,Kile,Kilpatrick,Kimbrell,King,Knight,Knox,Lambert,Lane,Laneford,Laramore,Lauderdale,Lawson,Lay,League,Lewis,Little,Litton,Livingston,Logan,Long,Looney,Love,Lovelady,Lovell,Lovett,Lynn,Manasco,Mann,Martin,Mathews,McClane,McClung,McClure,McColum,McCoy,McCue,McCullan,McCullar,McDaniel,McDuff,McKay,McNames,McNeil,McNutt,Mellican,Merritt,Metcalf,Miles,Miller,Mitchell,Mize,Mobley,Montgomery,Moody,Mooney,Morgan,Morris,Morrison,Motes,Mullins,Musgrove,Nelson,Nesmith,Newman,Nolen,Noles,Nortwich,Oden,Odom,O'Henry,O'Mary,O'Rear,O'Steen,Overton,Owsley,Pace,Painter,Parsons,Partain,Patek,Patterson,Payne,Peak,Pearson,Pencard,Penn,Penyl,Perkins,Perry,Peters,Pittman,Plott,Poe,Pool,Portridge,Posey,Pouder,Powell,Preston,Pugh,Pulliam,Purdy,Radford,Ramey,Ramie,Ray,Raynes,Reeves,Richardson,Riddle,Rivers,Roberts,Robinson,Roden,Rollins,Romines,Ronow,Rowe,Rush,Russell,Rutledge,Sam,Samples,Sanford,Sarun,Scogin,Segars,Setton,Sexton,Seymore,Shadix,Shain,Shank,Shelly,Shelton,Shipman,Siddens,Simmons,Simpson,Sims,Slater,Slaughter,Smathers,Smith,Sneed,South,Southern,Spain,Spane,Sparks,Staten,Steel,Stephenson,Stevens,Stewart,Stokes,Stone,Strange,Sunmers,Surin,Sutherland,Suttles,Swindle,Taberson,Tarbutton,Taylor,Teague,Tedford,Thomanson,Thomas,Thompson,Thornton,Threadgill,Tidwell,Tittle,Tubs,Tucker,Turner,Tyler,Underwood,Ussery,Wadsworth,Waid,Wakefield,Walker,Walston,Ward,Ware,Warren,Watson,Watts,Weaver,Webb,Welborn,Welsh,West,Whisenhunt,White,Whitfield,Whitman,Whitney,Whitten,Wiley,Willborn,Williams,Willis,Willson,Wilson,Wise,Woodley,Woods,Wooley,Wright,Yarborough,York,Young".split(',');
+
+const initials = (n) => n[0] + n.split(' ')[1][0];
+const firstInitial = (n) => n[0];
+const group = (ns) => ns.reduce((m, n) => {
+    var _a;
+    (m[_a = n[0]] || (m[_a] = [])).push(n);
+    return m;
+}, {});
+class Names {
+    static randomName(used) {
+        const usedPairs = new Set(used.map(initials));
+        const usedFirsts = new Set(used.map(firstInitial));
+        // prefer unused first initials, then any unused pairs
+        for (const preferNewFirst of [true, false]) {
+            const availableFirsts = preferNewFirst
+                ? Names.fiAll.filter(f => !usedFirsts.has(f))
+                : Names.fiAll;
+            for (const fi of availableFirsts) {
+                const availableLasts = Names.liAll.filter(li => !usedPairs.has(fi + li));
+                if (availableLasts.length > 0) {
+                    const li = (0,utils/* randFrom */.Kt)(availableLasts);
+                    return `${(0,utils/* randFrom */.Kt)(Names.firstBy[fi])} ${(0,utils/* randFrom */.Kt)(Names.lastBy[li])}`;
+                }
+            }
+        }
+        // fallback to any random combination
+        const fi = (0,utils/* randFrom */.Kt)(Names.fiAll);
+        const li = (0,utils/* randFrom */.Kt)(Names.liAll);
+        return `${(0,utils/* randFrom */.Kt)(Names.firstBy[fi])} ${(0,utils/* randFrom */.Kt)(Names.lastBy[li])}`;
+    }
+}
+Names.firstBy = group(firsts);
+Names.lastBy = group(lasts);
+Names.fiAll = Object.keys(Names.firstBy);
+Names.liAll = Object.keys(Names.lastBy);
+const randomName = Names.randomName;
+
+;// ./src/game/levels/intro.ts
+
+
+
+
+
+
+
+
+
+
+
+const TITLE = [
+    "#   #  ###  ####  #     ####       ###  #   #      ##### ##### ####  #####",
+    "#   # #   # #   # #     #   #     #   # ##  #      #       #   #   # #    ",
+    "# # # #   # ####  #     #   #     #   # # # #      ####    #   ####  #### ",
+    "# # # #   # #   # #     #   #     #   # #  ##      #       #   #   # #    ",
+    "## ## #   # #   # #     #   #     #   # #   #      #       #   #   # #    ",
+    "#   #  ###  #   # ##### ####       ###  #   #      #     ##### #   # #####"
+];
+class Intro {
+    constructor(initializer, map) {
+        this.initializer = initializer;
+        this.map = map;
+        this.pawns = [];
+    }
+    setup() {
+        this.addWorldOnFireRoom();
+        this.addPawns();
+        this.addBarracksWin();
+        this.addWelcomeText();
+        this.addUserSuggestion();
+    }
+    addWorldOnFireRoom() {
+        const w = TITLE[0].length;
+        const h = TITLE.length;
+        const startX = (0,utils/* centeredStart */.jw)(this.map.w, TITLE[0]);
+        const startY = Math.floor((this.map.h - h) / 2);
+        const start = xy.XY.at(startX, startY);
+        this.initializer.addRoom(Rect.xyWH(start.add(-1, -1), w + 2, h + 2));
+        (0,utils/* each */.__)(TITLE, (line, y) => {
+            (0,utils/* each */.__)(line, (c, x) => {
+                if (c === '#')
+                    this.map.createAt(start.add(x, y), new fire/* Fire */.v());
+            });
+        });
+    }
+    addWelcomeText() {
+        text_stroke/* TextStroke */.m.centeredPlusY(this.map, "Welcome to Fire House RL", -13, 'welcome');
+        text_stroke/* TextStroke */.m.centeredPlusY(this.map, "press space to unpause", 13, 'instructions');
+        const endWelcome = game/* GameStepped */.K.on(step => {
+            if (step.frame <= 0)
+                return;
+            this.map.uiRenderer.remove('welcome');
+            this.map.uiRenderer.remove('instructions');
+            endWelcome();
+        });
+    }
+    addPawns() {
+        const a = randomName([]);
+        this.pawns.push(this.map.createAt(xy.XY.at(55, 24), new pawn/* Pawn */.vc(a)));
+        const b = randomName([a]);
+        this.pawns.push(this.map.createAt(xy.XY.at(39, 24), new pawn/* Pawn */.vc(b)));
+    }
+    addBarracksWin() {
+        const rect = Rect.xyWH(xy.XY.at(60, 8), 9, 9);
+        const labelAt = xy.XY.at(rect.ur.x + 3, rect.cr.y);
+        text_stroke/* TextStroke */.m.render(this.map, '<-- GO HERE', labelAt, 'barracks-label');
+        const ends = [
+            game/* GameStepped */.K.on(() => {
+                const unrescued = this.pawns.filter(pawn => !rect.contains(pawn));
+                if ((0,utils/* hasContent */.ov)(unrescued))
+                    return;
+                this.map.uiRenderer.remove('barracks-label');
+                state.FirehouseMode.emit(this.pawns.map(p => p.name || ''));
+                (0,utils/* each */.__)(ends, check => check());
+            }),
+            pawn/* PawnDied */.hq.on(_dead => {
+                this.map.uiRenderer.remove('barracks-label');
+                text_stroke/* TextStroke */.m.render(this.map, 'YOU LOSE', labelAt, 'lose-text');
+                (0,utils/* each */.__)(ends, check => check());
+            })
+        ];
+        this.initializer.addRoom(rect);
+        const entrance = this.map.get(rect.cl);
+        entrance.reborn(new door/* Door */.$());
+        entrance.l().u().create(new Lamp());
+        entrance.l().d().create(new Lamp());
+    }
+    addUserSuggestion() {
+        let suggestionVisible = true;
+        const suggest = () => {
+            const step = game/* GameStepped */.K.current;
+            if (!step || step.frame % 5 !== 0)
+                return;
+            suggestionVisible = !suggestionVisible;
+            if (suggestionVisible) {
+                const text = 'click the @ symbol';
+                text_stroke/* TextStroke */.m.centered(this.map, text, this.map.h - 1, 'suggestion', () => '#ff0', () => true, 10);
+            }
+            else {
+                this.map.uiRenderer.remove('suggestion');
+            }
+        };
+        suggest();
+        const stopSuggesting = game/* GameStepped */.K.on(suggest);
+        pawn/* PawnSelected */.Ei.on(_pawn => {
+            this.map.uiRenderer.remove('suggestion');
+            stopSuggesting();
+        });
+    }
+}
+
+;// ./src/game/initializer.ts
+
+
+
+
+
+
+class Initializer {
+    constructor(map) {
+        this.map = map;
+    }
+    initialize() {
+        this.addField();
+        const intro = new Intro(this, this.map);
+        intro.setup();
+    }
+    addField() {
+        Rect.xyWH(xy.XY.at(0, 0), this.map.w, this.map.h).eachCell(xy => {
+            this.map.createAt(xy, new Floor());
+        });
+    }
+    addRoom(rect) {
+        rect.eachBorder(xy => {
+            this.map.createAt(xy, new Wall());
+        });
+        [rect.ul.add(1, 1), rect.ur.add(-1, 1), rect.bl.add(1, -1), rect.br.add(-1, -1)].forEach(xy => {
+            this.map.createAt(xy, new Lamp());
+        });
+    }
+}
+
+
+/***/ }),
+
+/***/ 483:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   $: () => (/* binding */ Door)
+/* harmony export */ });
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(919);
+/* harmony import */ var _drawable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(721);
+/* harmony import */ var _material__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(994);
+
+
+
+class Door extends _drawable__WEBPACK_IMPORTED_MODULE_1__/* .Drawable */ .h {
+    constructor() {
+        super(...arguments);
+        this.layer = 'walls';
+        this.open = false;
+        this.passable = false;
+        this.transparency = 0;
+        this.material = new _material__WEBPACK_IMPORTED_MODULE_2__/* .Material */ .i(this);
+        this.light = () => this.material.light(0);
+        this.char = () => this.open ? '/' : '+';
+        this.color = () => this.material.color(_ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .WOOD */ .wB);
+        this.desc = () => this.material.desc(this.open ? 'Open Door' : 'Door');
+    }
+    toggle() {
+        this.open = !this.open;
+        this.passable = this.open;
+        this.transparency = this.open ? 1 : 0;
+    }
+    step() { this.material.step(() => { }); }
+}
+
+
+/***/ }),
+
+/***/ 485:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   m: () => (/* binding */ TextStroke)
+/* harmony export */ });
+/* harmony import */ var _game_xy__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(88);
+/* harmony import */ var _stroke__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(891);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(185);
+/* harmony import */ var _colors__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(919);
+
+
+
+
+class TextStroke {
+    static create(map, text, xy, colorFn = () => _colors__WEBPACK_IMPORTED_MODULE_2__/* .WHITE */ .UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
+        const stroke = new _stroke__WEBPACK_IMPORTED_MODULE_3__/* .Stroke */ .t([], colorFn, isValid, zIndex);
+        (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .each */ .__)(text, (c, i) => {
+            const cell = map.get(xy.add(i, 0));
+            stroke.add(cell, c, bg);
+        });
+        return stroke;
+    }
+    static render(map, text, xy, id, colorFn = () => _colors__WEBPACK_IMPORTED_MODULE_2__/* .WHITE */ .UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
+        const stroke = TextStroke.create(map, text, xy, colorFn, isValid, zIndex, bg);
+        map.uiRenderer.replace(id, stroke);
+    }
+    static centered(map, text, y, id, colorFn = () => _colors__WEBPACK_IMPORTED_MODULE_2__/* .WHITE */ .UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
+        const xy = _game_xy__WEBPACK_IMPORTED_MODULE_0__.XY.at((0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .centeredStart */ .jw)(map.w, text), y);
+        TextStroke.render(map, text, xy, id, colorFn, isValid, zIndex, bg);
+    }
+    static centeredPlusY(map, text, yOffset, id, colorFn = () => _colors__WEBPACK_IMPORTED_MODULE_2__/* .WHITE */ .UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
+        TextStroke.centered(map, text, (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .half */ .MX)(map.h) + yOffset, id, colorFn, isValid, zIndex, bg);
+    }
+}
+
+
+/***/ }),
+
+/***/ 502:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   _: () => (/* binding */ Smoke)
+/* harmony export */ });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(919);
+/* harmony import */ var _drawable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(721);
+/* harmony import */ var _game_xy__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(88);
+
+
+
+
+class Smoke extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
+    constructor() {
+        super(...arguments);
+        this.layer = 'smoke';
+        this.transparency = 0.1;
+        this.light = () => 0;
+        this.char = () => '+';
+        this.color = () => _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .SMOKE */ .oE.random();
+    }
+    draw(_debug, illumination) {
+        if (illumination <= 0)
+            return false;
+        const fg = this.color();
+        this.cell.map.drawAtSmoke(this.cell.xy.x, this.cell.xy.y, this.char(), fg, 'transparent');
+        return false;
+    }
+    agedOut() {
+        if (_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo) {
+            return this.age > 3;
+        }
+        return !(0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(this.age / 3);
+    }
+    shouldDrift() {
+        if (_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo) {
+            return this.age % 4 === 0;
+        }
+        return (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(4);
+    }
+    driftTo() {
+        if (_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo) {
+            const r = this.r();
+            if (_game_xy__WEBPACK_IMPORTED_MODULE_3__.XY.oob(r.xy.x, r.xy.y))
+                return this.l();
+            return r;
+        }
+        return this.cell.map.get(this.cell.xy.random());
+    }
+    drift() {
+        const target = this.driftTo();
+        if (!target.passable())
+            return;
+        this.cell.queueMove(this, target.xy);
+    }
+    step() {
+        if (this.agedOut()) {
+            this.cell.died(this);
+            return;
+        }
+        if (this.shouldDrift())
+            this.drift();
+    }
+}
+
+
+/***/ }),
+
+/***/ 522:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   FirehouseMode: () => (/* binding */ FirehouseMode),
+/* harmony export */   GameState: () => (/* binding */ GameState)
+/* harmony export */ });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
+/* harmony import */ var _ui_text_stroke__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(485);
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(919);
+/* harmony import */ var _signal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(334);
+
+
+
+
+class GameState {
+    constructor(map) {
+        this.map = map;
+        this.introSucceeded = false;
+        this.pawns = [];
+        this.firehouseNum = 0;
+        FirehouseMode.on(names => {
+            this.introSucceeded = true;
+            this.pawns = names;
+            if (!this.firehouseNum)
+                this.firehouseNum = (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randTo */ .JD)(97) + 3;
+            this.save();
+        });
+    }
+    save() {
+        const data = { introSucceeded: this.introSucceeded, pawns: this.pawns, firehouseNum: this.firehouseNum };
+        localStorage.setItem('gameState', JSON.stringify(data));
+        _ui_text_stroke__WEBPACK_IMPORTED_MODULE_1__/* .TextStroke */ .m.centered(this.map, 'GAME SAVED', this.map.h - 2, 'saved', _ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .Colors */ .Jy.rotate(new _ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .Colors */ .Jy([_ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .WHITE */ .UE, _ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .FOREGROUND */ .u6])), 500);
+    }
+    load() {
+        const s = localStorage.getItem('gameState');
+        if (!s)
+            return;
+        const d = JSON.parse(s);
+        this.introSucceeded = d.introSucceeded;
+        this.pawns = d.pawns || [];
+        this.firehouseNum = d.firehouseNum || 0;
+        if (this.introSucceeded)
+            FirehouseMode.emit(this.pawns);
+    }
+    clear() {
+        localStorage.removeItem('gameState');
+        for (let i = 1; i <= 3; i++) {
+            localStorage.removeItem(`gameState_${i}`);
+        }
+        this.introSucceeded = false;
+        this.pawns = [];
+        this.firehouseNum = 0;
+    }
+    restartIntro() {
+        this.introSucceeded = false;
+        this.pawns = [];
+        this.firehouseNum = 0;
+        // Clear everything first (like enterFirehouse does)
+        this.map.killAll();
+        this.map.display.clear();
+        this.map.smokeDisplay.clear();
+        this.map.uiRenderer.clearStrokes();
+        // Then reinitialize the intro level
+        const { Initializer } = __webpack_require__(482);
+        const initializer = new Initializer(this.map);
+        initializer.initialize();
+        this.map.lighting.redraw();
+    }
+}
+const FirehouseMode = new _signal__WEBPACK_IMPORTED_MODULE_3__/* .Signal */ .H();
+
+
+/***/ }),
+
 /***/ 540:
 /***/ ((module) => {
 
@@ -845,6 +1833,249 @@ module.exports = insertStyleElement;
 module.exports = function (i) {
   return i[1];
 };
+
+/***/ }),
+
+/***/ 615:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   R: () => (/* binding */ Lighting),
+/* harmony export */   c: () => (/* binding */ COLOR_INTENSITY)
+/* harmony export */ });
+/* harmony import */ var _xy__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(88);
+/* harmony import */ var _shapes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(720);
+/* harmony import */ var _layers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(633);
+
+
+
+const COLOR_INTENSITY = 0.3;
+class Lighting {
+    constructor(map) {
+        this.map = map;
+        this._sources = new Set();
+        this.atXY = (xy) => {
+            if (xy.x < 0 || xy.x >= this.map.w || xy.y < 0 || xy.y >= this.map.h) {
+                return 0;
+            }
+            return this._illumination[xy.y][xy.x] ?? 0;
+        };
+        this.at = (cell) => this.atXY(cell.xy);
+        this._illumination = Array.from({ length: map.h }, () => new Array(map.w));
+        this._colors = Array.from({ length: map.h }, () => Array.from({ length: map.w }, () => ({ r: 0, g: 0, b: 0, w: 0 })));
+        this.clear();
+    }
+    clear() {
+        this._illumination.forEach(row => row.fill(0));
+        this._colors.forEach(row => row.forEach(c => {
+            c.r = 0;
+            c.g = 0;
+            c.b = 0;
+            c.w = 0;
+        }));
+    }
+    add(cell) {
+        this._sources.add(cell);
+    }
+    remove(cell) {
+        this._sources.delete(cell);
+    }
+    update(cell) {
+        if (cell.layers.lit())
+            this.add(cell);
+        else
+            this.remove(cell);
+    }
+    transparencyOf(x, y) {
+        if (_xy__WEBPACK_IMPORTED_MODULE_0__.XY.oob(x, y))
+            return 1;
+        const cell = this.map.get(_xy__WEBPACK_IMPORTED_MODULE_0__.XY.at(x, y));
+        const transparency = cell.layers.transparency();
+        return transparency;
+    }
+    redraw() {
+        this.clear();
+        for (const cell of this._sources) {
+            const radius = Math.min(Object.values(cell.layers.data)
+                .reduce((sum, drawable) => sum + (drawable?.light() ?? 0), 0), 9);
+            if (radius <= 0)
+                continue;
+            const color = this.colorOf(cell);
+            /* tiles in a square; cheap for r ≤ 9 */
+            for (let dy = -radius; dy <= radius; dy++) {
+                for (let dx = -radius; dx <= radius; dx++) {
+                    const tx = cell.xy.x + dx;
+                    const ty = cell.xy.y + dy;
+                    if (_xy__WEBPACK_IMPORTED_MODULE_0__.XY.oob(tx, ty))
+                        continue;
+                    /* quick circle check */
+                    if (dx * dx + dy * dy > radius * radius)
+                        continue;
+                    /* trace ray, accumulate translucency */
+                    let vis = 1;
+                    (0,_shapes__WEBPACK_IMPORTED_MODULE_1__/* .eachLine */ .I)(cell.xy, _xy__WEBPACK_IMPORTED_MODULE_0__.XY.at(tx, ty), (xy) => {
+                        const dir = xy.subXY(cell.xy);
+                        const base = Lighting.quadraticFallOff(radius, dir.x, dir.y);
+                        const normalized = radius > 0 ? (base / radius) * 9 : 0;
+                        const bright = Math.round(normalized * vis);
+                        if (bright > this.atXY(xy))
+                            this.set(xy, bright);
+                        this.addColor(xy.x, xy.y, bright, color);
+                        if (xy.x === cell.xy.x && xy.y === cell.xy.y)
+                            return true; // skip lamp tile
+                        vis *= this.transparencyOf(xy.x, xy.y);
+                        return vis > 0;
+                    });
+                    if (vis <= 0)
+                        continue; // ray blocked
+                    const base = Lighting.quadraticFallOff(radius, dx, dy);
+                    const normalized = radius > 0 ? (base / radius) * 9 : 0;
+                    const bright = Math.round(normalized * vis);
+                    if (bright > this._illumination[ty][tx])
+                        this._illumination[ty][tx] = bright;
+                    this.addColor(tx, ty, bright, color);
+                }
+            }
+        }
+    }
+    set(xy, intensity) {
+        this._illumination[xy.y][xy.x] = intensity;
+    }
+    colorAt(cell) {
+        const c = this._colors[cell.xy.y][cell.xy.x];
+        if (c.w === 0)
+            return [0, 0, 0];
+        return [c.r / c.w, c.g / c.w, c.b / c.w];
+    }
+    sources() {
+        return this._sources;
+    }
+    lit(cell) {
+        return this._sources.has(cell);
+    }
+    static quadraticFallOff(radius, dx, dy) {
+        const d2 = dx * dx + dy * dy;
+        if (d2 > radius * radius)
+            return 0;
+        return radius - ((d2 + (radius >> 1)) / radius | 0);
+    }
+    addColor(x, y, bright, color) {
+        if (bright <= 0)
+            return;
+        const c = this._colors[y][x];
+        const w = bright / 9;
+        c.r += color[0] * w;
+        c.g += color[1] * w;
+        c.b += color[2] * w;
+        c.w += w;
+    }
+    colorOf(cell) {
+        let r = 0, g = 0, b = 0, w = 0;
+        for (const l of _layers__WEBPACK_IMPORTED_MODULE_2__/* .CellLayers */ .v.layerNames) {
+            const d = cell.layers.data[l];
+            if (d && d.light() > 0) {
+                const rgb = Lighting.hex(d.color());
+                if (!rgb)
+                    continue;
+                const weight = d.light();
+                r += rgb[0] * weight;
+                g += rgb[1] * weight;
+                b += rgb[2] * weight;
+                w += weight;
+            }
+        }
+        if (w === 0)
+            return [0, 0, 0];
+        return [r / w, g / w, b / w];
+    }
+    static hex(color) {
+        if (!color.startsWith('#'))
+            return null;
+        if (color.length === 4)
+            return [
+                parseInt(color[1] + color[1], 16),
+                parseInt(color[2] + color[2], 16),
+                parseInt(color[3] + color[3], 16)
+            ];
+        if (color.length === 7)
+            return [
+                parseInt(color.slice(1, 3), 16),
+                parseInt(color.slice(3, 5), 16),
+                parseInt(color.slice(5, 7), 16)
+            ];
+        return null;
+    }
+}
+
+
+/***/ }),
+
+/***/ 633:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   v: () => (/* binding */ CellLayers)
+/* harmony export */ });
+class CellLayers {
+    constructor() {
+        this.data = {};
+    }
+    draw(visibleLayers, debug, illumination) {
+        CellLayers.layerNames.some(name => {
+            if (visibleLayers.size > 0 && !visibleLayers.has(name))
+                return false;
+            const drawable = this.data[name];
+            if (drawable?.draw) {
+                return drawable.draw(debug, illumination);
+            }
+            return false;
+        });
+    }
+    step() {
+        CellLayers.layerNames.forEach(name => {
+            const drawable = this.data[name];
+            if (!drawable)
+                return;
+            drawable.step();
+            drawable.age++;
+        });
+    }
+    set(drawable) {
+        this.data[drawable.layer] = drawable;
+    }
+    onExisting(layerOrDrawable, fOfExisting) {
+        const layer = typeof layerOrDrawable === 'string' ? layerOrDrawable : layerOrDrawable.layer;
+        const existing = this.data[layer];
+        if (!existing)
+            return;
+        fOfExisting(existing);
+    }
+    remove(drawable) {
+        delete this.data[drawable.layer];
+        drawable.cell = null;
+    }
+    passable() {
+        return CellLayers.layerNames.every(name => {
+            const drawable = this.data[name];
+            return drawable?.passable ?? true;
+        });
+    }
+    transparency() {
+        const transparencies = CellLayers.layerNames
+            .map(name => this.data[name]?.transparency)
+            .filter(t => t !== undefined);
+        return transparencies.length > 0 ? Math.min(...transparencies) : 1;
+    }
+    lit() {
+        return CellLayers.layerNames.some(name => {
+            const drawable = this.data[name];
+            return drawable && drawable.light() > 0;
+        });
+    }
+}
+CellLayers.layerNames = ['pawn', 'smoke', 'fire', 'walls', 'items', 'floor'];
+CellLayers.materialLayers = ['walls', 'items', 'pawn'];
+
 
 /***/ }),
 
@@ -885,6 +2116,332 @@ function insertBySelector(insert, style) {
   target.appendChild(style);
 }
 module.exports = insertBySelector;
+
+/***/ }),
+
+/***/ 705:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  vc: () => (/* binding */ Pawn),
+  zW: () => (/* binding */ PawnBurned),
+  hq: () => (/* binding */ PawnDied),
+  w: () => (/* binding */ PawnMoved),
+  Ei: () => (/* binding */ PawnSelected),
+  qe: () => (/* binding */ TaskRemoved)
+});
+
+// UNUSED EXPORTS: PawnBorn
+
+// EXTERNAL MODULE: ./src/ui/colors.ts
+var colors = __webpack_require__(919);
+// EXTERNAL MODULE: ./src/draw/drawable.ts
+var drawable = __webpack_require__(721);
+// EXTERNAL MODULE: ./src/draw/material.ts
+var material = __webpack_require__(994);
+// EXTERNAL MODULE: ./src/game/tasks/task.ts
+var task = __webpack_require__(877);
+// EXTERNAL MODULE: ./src/ui/stroke.ts
+var ui_stroke = __webpack_require__(891);
+// EXTERNAL MODULE: ./src/game/xy.ts
+var xy = __webpack_require__(88);
+// EXTERNAL MODULE: ./src/utils.ts
+var utils = __webpack_require__(185);
+;// ./src/draw/corpse.ts
+
+
+class Corpse extends drawable/* Drawable */.h {
+    constructor(pawn, cause) {
+        super();
+        this.pawn = pawn;
+        this.cause = cause;
+        this.layer = 'items';
+        this.passable = false;
+        this.desc = () => `${this.pawn.desc()}, died by ${this.cause}`;
+        this.light = () => 0;
+        this.char = () => '%';
+        this.color = () => colors/* BONE */.LS;
+    }
+}
+
+// EXTERNAL MODULE: ./src/signal.ts
+var signal = __webpack_require__(334);
+// EXTERNAL MODULE: ./src/ui/ui-renderer.ts
+var ui_renderer = __webpack_require__(889);
+;// ./src/draw/pawn.ts
+
+
+
+
+
+
+
+
+
+
+const PawnSelected = new signal/* SignalWithCurrent */.Y();
+const PawnMoved = new signal/* Signal */.H();
+const PawnBorn = new signal/* Signal */.H();
+const PawnBurned = new signal/* Signal */.H();
+const PawnDied = new signal/* Signal */.H();
+const TaskRemoved = new signal/* Signal */.H();
+class Pawn extends drawable/* Drawable */.h {
+    constructor(name) {
+        super();
+        this.name = name;
+        this.selected = false;
+        this.passable = false;
+        this.material = new material/* Material */.i(this);
+        this.layer = 'pawn';
+        this.transparency = 0;
+        this.light = () => this.material.light(3);
+        this.char = () => '@';
+        this.color = () => this.material.color(colors/* WHITE */.UE);
+        this.tasks = [];
+    }
+    desc() {
+        const d = this.name ? this.name : super.desc();
+        return this.material.desc(d);
+    }
+    recalcPaths() {
+        this.tasks.forEach(t => t.cleanup());
+        let start = this.cell;
+        this.tasks.forEach(t => start = t.strokeAndNext(start));
+        this.endCell = start;
+        ui_renderer/* Repaint */.G2.emit();
+        return start;
+    }
+    get tipCell() { return this.tasks.length > 0 ? this.endCell : this.cell; }
+    addTask(task) {
+        this.tasks.push(task);
+        this.recalcPaths();
+    }
+    removeTask(task) {
+        task.cleanup();
+        this.tasks = this.tasks.filter(t => t !== task);
+        this.recalcPaths();
+        TaskRemoved.emit(this);
+    }
+    clearTasks() {
+        (0,utils/* each */.__)(this.tasks, t => t.cleanup());
+        this.tasks = [];
+        this.recalcPaths();
+        TaskRemoved.emit(this);
+    }
+    step() {
+        this.material.step(() => {
+            if (this.material.isBurning()) {
+                this.squawk("ouch", colors/* FIRE */.ZK);
+                PawnBurned.emit(this);
+            }
+            if (this.tasks.length > 0) {
+                const task = this.tasks[0];
+                task.step();
+                if (task.isDone()) {
+                    task.cleanup();
+                    this.removeTask(task);
+                }
+                else {
+                    this.recalcPaths();
+                }
+            }
+        });
+    }
+    dying() {
+        super.dying();
+        PawnDied.emit(this);
+        this.cell.create(new Corpse(this, 'burning'));
+        (0,utils/* each */.__)(this.tasks, t => t.cleanup());
+    }
+    squawk(text, colors) {
+        const directions = [
+            { dx: 0, dy: -1 }, // up
+            { dx: 1, dy: -1 }, // up-right
+            { dx: 1, dy: 0 }, // right
+            { dx: 1, dy: 1 }, // down-right
+            { dx: 0, dy: 1 }, // down
+            { dx: -1, dy: 1 }, // down-left
+            { dx: -1, dy: 0 }, // left
+            { dx: -1, dy: -1 } // up-left
+        ];
+        const fullText = " " + text;
+        const dir = (0,utils/* randFrom */.Kt)(directions);
+        const startX = this.cell.xy.x + dir.dx;
+        const startY = this.cell.xy.y + dir.dy;
+        const canPlace = !Array.from({ length: fullText.length }, (_, j) => ({
+            x: startX + j * dir.dx,
+            y: startY + j * dir.dy
+        })).some(pos => xy.XY.oob(pos.x, pos.y));
+        if (canPlace) {
+            const strokeId = `squawk-${Date.now()}`;
+            const stroke = new ui_stroke/* Stroke */.t([], () => colors.random(), 300, 15);
+            Array.from({ length: fullText.length }, (_, j) => ({
+                x: startX + j * dir.dx,
+                y: startY + j * dir.dy,
+                char: fullText[j]
+            })).forEach(pos => {
+                const cell = this.cell.map.get(xy.XY.at(pos.x, pos.y));
+                stroke.add(cell, pos.char);
+            });
+            this.cell.map.uiRenderer.replace(strokeId, stroke);
+        }
+    }
+    hoverStrokePath(target) {
+        const start = this.tasks.length > 0 ? this.endCell : this.cell;
+        task/* Task */.Y.strokePathBetween(start, target, Pawn.HOVER_PATH_STROKE, Pawn.HOVER_PATH_COLOR, () => true, 2);
+        ui_renderer/* Repaint */.G2.emit();
+    }
+    draw(debug, _illumination) {
+        if (this.selected) {
+            this.cell.map.drawAt(this.cell.xy.x, this.cell.xy.y, this.char(), colors/* BACKGROUND */.h4, colors/* FOREGROUND */.u6);
+            return true;
+        }
+        return super.draw(debug, 9);
+    }
+    movedInto(cell) {
+        const from = this.cell;
+        super.movedInto(cell);
+        if (this.tasks.length > 0)
+            this.recalcPaths();
+        if (from)
+            PawnMoved.emit({ pawn: this, from, to: cell });
+        else
+            PawnBorn.emit({ pawn: this, into: cell });
+    }
+}
+Pawn.HOVER_PATH_STROKE = 'hover-path';
+Pawn.HOVER_PATH_COLOR = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy(['#0ff', '#088']));
+
+
+/***/ }),
+
+/***/ 720:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   I: () => (/* binding */ eachLine)
+/* harmony export */ });
+/* harmony import */ var _game_xy__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(88);
+
+const eachLine = (start, end, onXYAndReturnContinue) => {
+    let x0 = start.x, y0 = start.y;
+    const x1 = end.x, y1 = end.y;
+    let dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+    let dy = -Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+    let err = dx + dy;
+    while (true) {
+        if (!onXYAndReturnContinue(_game_xy__WEBPACK_IMPORTED_MODULE_0__.XY.at(x0, y0)))
+            break;
+        if (x0 === x1 && y0 === y1)
+            break;
+        const e2 = err << 1;
+        if (e2 >= dy) {
+            err += dy;
+            x0 += sx;
+        }
+        if (e2 <= dx) {
+            err += dx;
+            y0 += sy;
+        }
+    }
+};
+
+
+/***/ }),
+
+/***/ 721:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   h: () => (/* binding */ Drawable)
+/* harmony export */ });
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(919);
+/* harmony import */ var _game_xy__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(88);
+/* harmony import */ var _game_lighting__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(615);
+
+
+
+class Drawable {
+    constructor() {
+        this.id = Drawable.nextId++;
+        this.born = false;
+        this.age = 0;
+        this.passable = true;
+        this.transparency = 1;
+        this.cell = null;
+        Drawable.alive.add(this);
+    }
+    step() { }
+    desc() { return `${this.constructor.name}(${this.id})`; }
+    draw(_debug, illumination) {
+        const fg = this.applyIllumination(this.color(), illumination);
+        this.cell.map.drawAt(this.cell.xy.x, this.cell.xy.y, this.char(), fg, _ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .BACKGROUND */ .h4);
+        return true;
+    }
+    movedInto(cell) {
+        this.cell = cell;
+    }
+    applyIllumination(color, illumination) {
+        if (!color.startsWith('#'))
+            return color;
+        const clamped = Math.min(illumination, 9);
+        const normalized = clamped / 9;
+        const factor = Math.max(0, normalized);
+        let r, g, b;
+        if (color.length === 4) {
+            // 3-char hex like #0a0
+            r = parseInt(color[1] + color[1], 16);
+            g = parseInt(color[2] + color[2], 16);
+            b = parseInt(color[3] + color[3], 16);
+        }
+        else if (color.length === 7) {
+            // 6-char hex like #00aa00
+            r = parseInt(color.slice(1, 3), 16);
+            g = parseInt(color.slice(3, 5), 16);
+            b = parseInt(color.slice(5, 7), 16);
+        }
+        else {
+            return color;
+        }
+        const darkR = Math.floor(r * factor);
+        const darkG = Math.floor(g * factor);
+        const darkB = Math.floor(b * factor);
+        const [lr, lg, lb] = this.cell.map.lighting.colorAt(this.cell);
+        const tintR = Math.floor(lr * _game_lighting__WEBPACK_IMPORTED_MODULE_2__/* .COLOR_INTENSITY */ .c);
+        const tintG = Math.floor(lg * _game_lighting__WEBPACK_IMPORTED_MODULE_2__/* .COLOR_INTENSITY */ .c);
+        const tintB = Math.floor(lb * _game_lighting__WEBPACK_IMPORTED_MODULE_2__/* .COLOR_INTENSITY */ .c);
+        const finalR = Math.min(255, darkR + tintR);
+        const finalG = Math.min(255, darkG + tintG);
+        const finalB = Math.min(255, darkB + tintB);
+        return `#${finalR.toString(16).padStart(2, '0')}${finalG.toString(16).padStart(2, '0')}${finalB.toString(16).padStart(2, '0')}`;
+    }
+    r() { return this.cell.r(); }
+    l() { return this.cell.l(); }
+    u() { return this.cell.u(); }
+    d() { return this.cell.d(); }
+    ur() { return this.cell.ur(); }
+    ul() { return this.cell.ul(); }
+    dr() { return this.cell.dr(); }
+    dl() { return this.cell.dl(); }
+    queueMove(to) {
+        this.cell.queueMove(this, to instanceof _game_xy__WEBPACK_IMPORTED_MODULE_1__.XY ? to : to.cell.xy);
+    }
+    olderThan(other) {
+        return this.age > other.age;
+    }
+    merge(_other, _from) {
+        throw new Error('merge not implemented');
+    }
+    diedAndAlreadyRemovedFromCell() { Drawable.alive.delete(this); }
+    dying() {
+        this.cell.map.lighting.update(this.cell);
+    }
+}
+Drawable.alive = new Set();
+Drawable.nextId = 0;
+
 
 /***/ }),
 
@@ -6548,558 +8105,177 @@ Config.createTransparentDisplay = (width, height) => _a.display(width, height, '
 
 /***/ }),
 
-/***/ 919:
+/***/ 877:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Jy: () => (/* binding */ Colors),
-/* harmony export */   LS: () => (/* binding */ BONE),
-/* harmony export */   UE: () => (/* binding */ WHITE),
-/* harmony export */   XE: () => (/* binding */ BORDER),
-/* harmony export */   ZK: () => (/* binding */ FIRE),
-/* harmony export */   h4: () => (/* binding */ BACKGROUND),
-/* harmony export */   oE: () => (/* binding */ SMOKE),
-/* harmony export */   u6: () => (/* binding */ FOREGROUND),
-/* harmony export */   wB: () => (/* binding */ WOOD),
-/* harmony export */   zu: () => (/* binding */ LAMP)
+/* harmony export */   Y: () => (/* binding */ Task),
+/* harmony export */   k: () => (/* binding */ TASK_COLOR)
 /* harmony export */ });
-/* unused harmony export SMOLDERING */
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(919);
+/* harmony import */ var _ui_stroke__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(891);
 
-const FOREGROUND = "#0a0";
-const BACKGROUND = "#000";
-const BORDER = "#444";
-const WOOD = "#8B4513";
-const SMOLDERING = '#6c200e';
-const BONE = "#fff";
-const WHITE = "#fff";
-class Colors {
-    constructor(colors) {
-        this.colors = colors;
+
+const TASK_COLOR = _ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .Colors */ .Jy.rotate(new _ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .Colors */ .Jy(['#00f', '#00f', '#00f', 'transparent', 'transparent']));
+class Task {
+    static strokePathBetween(from, to, id, colorFn, condition, zIndex) {
+        const path = [];
+        from.map.eachRay(from.xy, to.xy, (c) => {
+            path.push({ cell: c, char: '*' });
+            return true;
+        });
+        from.map.uiRenderer.replace(id, new _ui_stroke__WEBPACK_IMPORTED_MODULE_1__/* .Stroke */ .t(path, colorFn, condition, zIndex));
     }
-    random() {
-        return _utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo ? this.colors[0] : (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randFrom */ .Kt)(this.colors);
+    constructor(pawn) {
+        this.pawn = pawn;
     }
-    static rotate(colorsOrColor) {
-        const colors = colorsOrColor instanceof Colors
-            ? colorsOrColor.colors
-            : [colorsOrColor];
-        let current = 0;
-        return () => {
-            const color = colors[current];
-            current = (current + 1) % colors.length;
-            return color;
-        };
+    cleanup() { }
+    remove() {
+        this.pawn.removeTask(this);
     }
 }
-const FIRE = new Colors(['#ff6600', '#ff9900', '#ffcc00', '#ff3300']);
-const SMOKE = new Colors(['rgba(51,51,51,0.6)', 'rgba(85,85,85,0.6)', 'rgba(102,102,102,0.6)', 'rgba(119,119,119,0.6)', 'rgba(136,136,136,0.6)', 'rgba(153,153,153,0.6)', 'rgba(170,170,170,0.6)', 'rgba(187,187,187,0.6)', 'rgba(204,204,204,0.6)']);
-const LAMP = new Colors(['#ccffff', '#99ddff', '#66ccff']);
 
 
-/***/ })
+/***/ }),
 
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			id: moduleId,
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__webpack_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/nonce */
-/******/ 	(() => {
-/******/ 		__webpack_require__.nc = undefined;
-/******/ 	})();
-/******/ 	
-/************************************************************************/
-var __webpack_exports__ = {};
+/***/ 889:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
-var injectStylesIntoStyleTag = __webpack_require__(72);
-var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleDomAPI.js
-var styleDomAPI = __webpack_require__(825);
-var styleDomAPI_default = /*#__PURE__*/__webpack_require__.n(styleDomAPI);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertBySelector.js
-var insertBySelector = __webpack_require__(659);
-var insertBySelector_default = /*#__PURE__*/__webpack_require__.n(insertBySelector);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js
-var setAttributesWithoutAttributes = __webpack_require__(56);
-var setAttributesWithoutAttributes_default = /*#__PURE__*/__webpack_require__.n(setAttributesWithoutAttributes);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertStyleElement.js
-var insertStyleElement = __webpack_require__(540);
-var insertStyleElement_default = /*#__PURE__*/__webpack_require__.n(insertStyleElement);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleTagTransform.js
-var styleTagTransform = __webpack_require__(113);
-var styleTagTransform_default = /*#__PURE__*/__webpack_require__.n(styleTagTransform);
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./src/style.css
-var style = __webpack_require__(208);
-;// ./src/style.css
-
-      
-      
-      
-      
-      
-      
-      
-      
-      
-
-var options = {};
-
-options.styleTagTransform = (styleTagTransform_default());
-options.setAttributes = (setAttributesWithoutAttributes_default());
-options.insert = insertBySelector_default().bind(null, "head");
-options.domAPI = (styleDomAPI_default());
-options.insertStyleElement = (insertStyleElement_default());
-
-var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   G2: () => (/* binding */ Repaint),
+/* harmony export */   HO: () => (/* binding */ FrameRendered),
+/* harmony export */   Q7: () => (/* binding */ UIRenderer),
+/* harmony export */   iQ: () => (/* binding */ RedrawMap)
+/* harmony export */ });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
+/* harmony import */ var _display__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(328);
+/* harmony import */ var _game_game__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(903);
+/* harmony import */ var _signal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(334);
 
 
 
 
-       /* harmony default export */ const src_style = (style/* default */.A && style/* default */.A.locals ? style/* default */.A.locals : undefined);
+const Repaint = new _signal__WEBPACK_IMPORTED_MODULE_3__/* .Signal */ .H();
+const RedrawMap = new _signal__WEBPACK_IMPORTED_MODULE_3__/* .Signal */ .H();
+const FrameRendered = new _signal__WEBPACK_IMPORTED_MODULE_3__/* .SignalWithCurrent */ .Y();
+class UIRenderer {
+    constructor(map) {
+        this.map = map;
+        this.strokes = new Map();
+        this.frozen = () => !this.intervalId;
+        this.display = new _display__WEBPACK_IMPORTED_MODULE_1__/* .Display */ .n(map.w, map.h, true);
+        this.intervalId = this.start();
+        _game_game__WEBPACK_IMPORTED_MODULE_2__/* .GameStepped */ .K.on(() => this.render());
+        Repaint.on(() => this.render());
+    }
+    unfreeze() {
+        if (!this.frozen())
+            return;
+        this.intervalId = this.start();
+    }
+    start() {
+        return setInterval(() => { Repaint.emit(); }, 100);
+    }
+    replace(id, stroke) {
+        this.remove(id);
+        this.strokes.set(id, stroke);
+    }
+    remove(id) {
+        this.strokes.delete(id);
+    }
+    clearStrokes() {
+        this.strokes.clear();
+        this.clear();
+    }
+    draw(x, y, char, fg, bg = 'transparent') {
+        this.display.draw(x, y, char, fg, bg);
+    }
+    clear() {
+        this.display.clear();
+    }
+    canvas() {
+        return this.display.canvas();
+    }
+    attachTo(container, styles) {
+        this.display.attachTo(container, styles);
+    }
+    freeze() {
+        if (this.frozen())
+            return;
+        clearInterval(this.intervalId);
+        this.intervalId = null;
+    }
+    render() {
+        (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .eachPair */ .cd)(this.strokes, (id, stroke) => {
+            if (!stroke.isValid()) {
+                this.strokes.delete(id);
+            }
+        });
+        this.clear();
+        const sortedStrokes = [...this.strokes.values()].sort((a, b) => a.zIndex - b.zIndex);
+        sortedStrokes.forEach(stroke => {
+            const color = stroke.colorFn();
+            stroke.cells.forEach(({ cell, char, bg }) => {
+                this.draw(cell.xy.x, cell.xy.y, char, color, bg);
+            });
+        });
+        const frame = (FrameRendered.current || 0) + 1;
+        if (frame % 4 === 0)
+            RedrawMap.emit();
+        FrameRendered.emit(frame);
+    }
+}
+
+
+/***/ }),
+
+/***/ 891:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   t: () => (/* binding */ Stroke)
+/* harmony export */ });
+class Stroke {
+    constructor(cells, colorFn, isValid, zIndex) {
+        this.cells = cells;
+        this.colorFn = colorFn;
+        this.zIndex = zIndex;
+        this.isValid = typeof isValid === 'number' ? Stroke.timeout(isValid) : isValid;
+    }
+    add(cell, char, bg) {
+        this.cells.push({ cell, char, bg });
+    }
+    static timeout(ms) {
+        const start = Date.now();
+        return () => Date.now() - start < ms;
+    }
+}
+
+
+/***/ }),
+
+/***/ 903:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  Z: () => (/* binding */ Game),
+  K: () => (/* binding */ GameStepped)
+});
 
 // EXTERNAL MODULE: ./src/utils.ts
 var utils = __webpack_require__(185);
-;// ./src/compress.ts
-const encode = (u8) => btoa(String.fromCharCode(...u8));
-const decode = (b) => Uint8Array.from(atob(b), c => c.charCodeAt(0));
-const pump = async (s) => new Uint8Array(await new Response(s).arrayBuffer());
-const gzip = async (s) => {
-    if (typeof CompressionStream === 'undefined')
-        return btoa(s);
-    const cs = new CompressionStream('gzip');
-    const w = cs.writable.getWriter();
-    w.write(new TextEncoder().encode(s));
-    w.close();
-    return encode(await pump(cs.readable));
-};
-const gunzip = async (b) => {
-    if (typeof DecompressionStream === 'undefined')
-        return atob(b);
-    const ds = new DecompressionStream('gzip');
-    const w = ds.writable.getWriter();
-    w.write(decode(b));
-    w.close();
-    return new TextDecoder().decode(await pump(ds.readable));
-};
-const longUrl = (u) => u.length > 2000;
-
+// EXTERNAL MODULE: ./src/compress.ts
+var compress = __webpack_require__(74);
 // EXTERNAL MODULE: ./src/game/xy.ts
 var game_xy = __webpack_require__(88);
-;// ./src/game/layers.ts
-class CellLayers {
-    constructor() {
-        this.data = {};
-    }
-    draw(visibleLayers, debug, illumination) {
-        CellLayers.layerNames.some(name => {
-            if (visibleLayers.size > 0 && !visibleLayers.has(name))
-                return false;
-            const drawable = this.data[name];
-            if (drawable?.draw) {
-                return drawable.draw(debug, illumination);
-            }
-            return false;
-        });
-    }
-    step() {
-        CellLayers.layerNames.forEach(name => {
-            const drawable = this.data[name];
-            if (!drawable)
-                return;
-            drawable.step();
-            drawable.age++;
-        });
-    }
-    set(drawable) {
-        this.data[drawable.layer] = drawable;
-    }
-    onExisting(layerOrDrawable, fOfExisting) {
-        const layer = typeof layerOrDrawable === 'string' ? layerOrDrawable : layerOrDrawable.layer;
-        const existing = this.data[layer];
-        if (!existing)
-            return;
-        fOfExisting(existing);
-    }
-    remove(drawable) {
-        delete this.data[drawable.layer];
-        drawable.cell = null;
-    }
-    passable() {
-        return CellLayers.layerNames.every(name => {
-            const drawable = this.data[name];
-            return drawable?.passable ?? true;
-        });
-    }
-    transparency() {
-        const transparencies = CellLayers.layerNames
-            .map(name => this.data[name]?.transparency)
-            .filter(t => t !== undefined);
-        return transparencies.length > 0 ? Math.min(...transparencies) : 1;
-    }
-    lit() {
-        return CellLayers.layerNames.some(name => {
-            const drawable = this.data[name];
-            return drawable && drawable.light() > 0;
-        });
-    }
-}
-CellLayers.layerNames = ['pawn', 'smoke', 'fire', 'walls', 'items', 'floor'];
-CellLayers.materialLayers = ['walls', 'items', 'pawn'];
-
-// EXTERNAL MODULE: ./src/game/xyl.ts
-var xyl = __webpack_require__(830);
-// EXTERNAL MODULE: ./src/ui/colors.ts
-var colors = __webpack_require__(919);
-;// ./src/game/cell.ts
-
-
-
-
-class Cell {
-    constructor(xy, map) {
-        this.layers = new CellLayers();
-        this.passable = () => this.layers.passable();
-        this.wall = () => this.layers.data.walls;
-        this.pawn = () => this.layers.data.pawn;
-        this.fire = () => this.layers.data.fire;
-        this.smoke = () => this.layers.data.smoke;
-        this.floor = () => this.layers.data.floor;
-        this.items = () => this.layers.data.items;
-        this.cardinals = () => this.xy.cardinals().map(xy => this.map.get(xy));
-        this.neighbors = () => this.xy.neighbors().map(xy => this.map.get(xy));
-        this.u = (y = 1) => this.map.get(this.xy.u(y));
-        this.d = (y = 1) => this.map.get(this.xy.d(y));
-        this.l = (x = 1) => this.map.get(this.xy.l(x));
-        this.r = (x = 1) => this.map.get(this.xy.r(x));
-        this.ul = (n = 1) => this.map.get(this.xy.ul(n));
-        this.ur = (n = 1) => this.map.get(this.xy.ur(n));
-        this.dl = (n = 1) => this.map.get(this.xy.dl(n));
-        this.dr = (n = 1) => this.map.get(this.xy.dr(n));
-        this.xy = xy;
-        this.map = map;
-    }
-    draw(showLighting, visibleLayers, showNothing, debug, showDarkness = true) {
-        const illumination = showDarkness ? this.map.lighting.at(this) : 9;
-        if (showLighting) {
-            const char = Math.floor(illumination).toString();
-            if (char !== '0') {
-                this.map.drawAt(this.xy.x, this.xy.y, char, colors/* WHITE */.UE, '#000');
-                return;
-            }
-        }
-        if (showNothing) {
-            // Don't draw anything - clear board
-        }
-        else {
-            this.layers.draw(visibleLayers, debug, illumination);
-        }
-    }
-    step() {
-        this.layers.step();
-    }
-    reborn(drawable) {
-        this.layers.onExisting(drawable, e => this.died(e));
-        this.create(drawable);
-    }
-    set(drawable) {
-        (0,utils/* bombUnless */.Nb)(drawable.born, () => `tried to set raw constructed drawable ${drawable.desc()} - should be created with create()`);
-        this.layers.onExisting(drawable, (existing) => {
-            (0,utils/* bomb */.fv)(`tried to replace ${existing.desc()} with ${drawable.desc()}`);
-        });
-        this.layers.set(drawable);
-        drawable.movedInto(this);
-        this.map.lighting.update(this);
-    }
-    remove(drawable) {
-        this.layers.remove(drawable);
-        this.map.lighting.update(this);
-    }
-    died(drawable) {
-        drawable.dying();
-        this.remove(drawable);
-        drawable.diedAndAlreadyRemovedFromCell();
-    }
-    occupied(layer) {
-        return !!this.layers.data[layer];
-    }
-    occupantIs(drawable) {
-        return this.layers.data[drawable.layer] === drawable;
-    }
-    queueMove(drawable, xy) {
-        this.map.moving(drawable, xyl/* XYL */.Y.at(this.xy, drawable.layer), xyl/* XYL */.Y.at(xy, drawable.layer));
-    }
-    presentLayers() {
-        return CellLayers.layerNames
-            .filter((name) => this.layers.data[name])
-            .map((name) => {
-            const drawable = this.layers.data[name];
-            return {
-                name,
-                drawable,
-                desc: drawable.desc(),
-                color: drawable.color()
-            };
-        });
-    }
-    create(drawable) {
-        return this.map.create(this, drawable);
-    }
-    bombOccupied(layer, msgOfOccupant) {
-        (0,utils/* bombIf */.av)(this.occupied(layer), () => `Cell is occupied: ${msgOfOccupant(this.layers.data[layer])}`);
-    }
-}
-
-;// ./src/shapes.ts
-
-const eachLine = (start, end, onXYAndReturnContinue) => {
-    let x0 = start.x, y0 = start.y;
-    const x1 = end.x, y1 = end.y;
-    let dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-    let dy = -Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
-    let err = dx + dy;
-    while (true) {
-        if (!onXYAndReturnContinue(game_xy.XY.at(x0, y0)))
-            break;
-        if (x0 === x1 && y0 === y1)
-            break;
-        const e2 = err << 1;
-        if (e2 >= dy) {
-            err += dy;
-            x0 += sx;
-        }
-        if (e2 <= dx) {
-            err += dx;
-            y0 += sy;
-        }
-    }
-};
-
-;// ./src/game/lighting.ts
-
-
-
-const COLOR_INTENSITY = 0.3;
-class Lighting {
-    constructor(map) {
-        this.map = map;
-        this._sources = new Set();
-        this.atXY = (xy) => {
-            if (xy.x < 0 || xy.x >= this.map.w || xy.y < 0 || xy.y >= this.map.h) {
-                return 0;
-            }
-            return this._illumination[xy.y][xy.x] ?? 0;
-        };
-        this.at = (cell) => this.atXY(cell.xy);
-        this._illumination = Array.from({ length: map.h }, () => new Array(map.w));
-        this._colors = Array.from({ length: map.h }, () => Array.from({ length: map.w }, () => ({ r: 0, g: 0, b: 0, w: 0 })));
-        this.clear();
-    }
-    clear() {
-        this._illumination.forEach(row => row.fill(0));
-        this._colors.forEach(row => row.forEach(c => {
-            c.r = 0;
-            c.g = 0;
-            c.b = 0;
-            c.w = 0;
-        }));
-    }
-    add(cell) {
-        this._sources.add(cell);
-    }
-    remove(cell) {
-        this._sources.delete(cell);
-    }
-    update(cell) {
-        if (cell.layers.lit())
-            this.add(cell);
-        else
-            this.remove(cell);
-    }
-    transparencyOf(x, y) {
-        if (game_xy.XY.oob(x, y))
-            return 1;
-        const cell = this.map.get(game_xy.XY.at(x, y));
-        const transparency = cell.layers.transparency();
-        return transparency;
-    }
-    redraw() {
-        this.clear();
-        for (const cell of this._sources) {
-            const radius = Math.min(Object.values(cell.layers.data)
-                .reduce((sum, drawable) => sum + (drawable?.light() ?? 0), 0), 9);
-            if (radius <= 0)
-                continue;
-            const color = this.colorOf(cell);
-            /* tiles in a square; cheap for r ≤ 9 */
-            for (let dy = -radius; dy <= radius; dy++) {
-                for (let dx = -radius; dx <= radius; dx++) {
-                    const tx = cell.xy.x + dx;
-                    const ty = cell.xy.y + dy;
-                    if (game_xy.XY.oob(tx, ty))
-                        continue;
-                    /* quick circle check */
-                    if (dx * dx + dy * dy > radius * radius)
-                        continue;
-                    /* trace ray, accumulate translucency */
-                    let vis = 1;
-                    eachLine(cell.xy, game_xy.XY.at(tx, ty), (xy) => {
-                        const dir = xy.subXY(cell.xy);
-                        const base = Lighting.quadraticFallOff(radius, dir.x, dir.y);
-                        const normalized = radius > 0 ? (base / radius) * 9 : 0;
-                        const bright = Math.round(normalized * vis);
-                        if (bright > this.atXY(xy))
-                            this.set(xy, bright);
-                        this.addColor(xy.x, xy.y, bright, color);
-                        if (xy.x === cell.xy.x && xy.y === cell.xy.y)
-                            return true; // skip lamp tile
-                        vis *= this.transparencyOf(xy.x, xy.y);
-                        return vis > 0;
-                    });
-                    if (vis <= 0)
-                        continue; // ray blocked
-                    const base = Lighting.quadraticFallOff(radius, dx, dy);
-                    const normalized = radius > 0 ? (base / radius) * 9 : 0;
-                    const bright = Math.round(normalized * vis);
-                    if (bright > this._illumination[ty][tx])
-                        this._illumination[ty][tx] = bright;
-                    this.addColor(tx, ty, bright, color);
-                }
-            }
-        }
-    }
-    set(xy, intensity) {
-        this._illumination[xy.y][xy.x] = intensity;
-    }
-    colorAt(cell) {
-        const c = this._colors[cell.xy.y][cell.xy.x];
-        if (c.w === 0)
-            return [0, 0, 0];
-        return [c.r / c.w, c.g / c.w, c.b / c.w];
-    }
-    sources() {
-        return this._sources;
-    }
-    lit(cell) {
-        return this._sources.has(cell);
-    }
-    static quadraticFallOff(radius, dx, dy) {
-        const d2 = dx * dx + dy * dy;
-        if (d2 > radius * radius)
-            return 0;
-        return radius - ((d2 + (radius >> 1)) / radius | 0);
-    }
-    addColor(x, y, bright, color) {
-        if (bright <= 0)
-            return;
-        const c = this._colors[y][x];
-        const w = bright / 9;
-        c.r += color[0] * w;
-        c.g += color[1] * w;
-        c.b += color[2] * w;
-        c.w += w;
-    }
-    colorOf(cell) {
-        let r = 0, g = 0, b = 0, w = 0;
-        for (const l of CellLayers.layerNames) {
-            const d = cell.layers.data[l];
-            if (d && d.light() > 0) {
-                const rgb = Lighting.hex(d.color());
-                if (!rgb)
-                    continue;
-                const weight = d.light();
-                r += rgb[0] * weight;
-                g += rgb[1] * weight;
-                b += rgb[2] * weight;
-                w += weight;
-            }
-        }
-        if (w === 0)
-            return [0, 0, 0];
-        return [r / w, g / w, b / w];
-    }
-    static hex(color) {
-        if (!color.startsWith('#'))
-            return null;
-        if (color.length === 4)
-            return [
-                parseInt(color[1] + color[1], 16),
-                parseInt(color[2] + color[2], 16),
-                parseInt(color[3] + color[3], 16)
-            ];
-        if (color.length === 7)
-            return [
-                parseInt(color.slice(1, 3), 16),
-                parseInt(color.slice(3, 5), 16),
-                parseInt(color.slice(5, 7), 16)
-            ];
-        return null;
-    }
-}
-
+// EXTERNAL MODULE: ./src/game/cell.ts
+var cell = __webpack_require__(231);
+// EXTERNAL MODULE: ./src/game/lighting.ts
+var lighting = __webpack_require__(615);
+// EXTERNAL MODULE: ./src/game/layers.ts
+var game_layers = __webpack_require__(633);
 ;// ./src/game/movers.ts
 
 class Move {
@@ -7158,89 +8334,8 @@ class Movers {
     }
 }
 
-;// ./src/draw/drawable.ts
-
-
-
-class Drawable {
-    constructor() {
-        this.id = Drawable.nextId++;
-        this.born = false;
-        this.age = 0;
-        this.passable = true;
-        this.transparency = 1;
-        this.cell = null;
-        Drawable.alive.add(this);
-    }
-    step() { }
-    desc() { return `${this.constructor.name}(${this.id})`; }
-    draw(_debug, illumination) {
-        const fg = this.applyIllumination(this.color(), illumination);
-        this.cell.map.drawAt(this.cell.xy.x, this.cell.xy.y, this.char(), fg, colors/* BACKGROUND */.h4);
-        return true;
-    }
-    movedInto(cell) {
-        this.cell = cell;
-    }
-    applyIllumination(color, illumination) {
-        if (!color.startsWith('#'))
-            return color;
-        const clamped = Math.min(illumination, 9);
-        const normalized = clamped / 9;
-        const factor = Math.max(0, normalized);
-        let r, g, b;
-        if (color.length === 4) {
-            // 3-char hex like #0a0
-            r = parseInt(color[1] + color[1], 16);
-            g = parseInt(color[2] + color[2], 16);
-            b = parseInt(color[3] + color[3], 16);
-        }
-        else if (color.length === 7) {
-            // 6-char hex like #00aa00
-            r = parseInt(color.slice(1, 3), 16);
-            g = parseInt(color.slice(3, 5), 16);
-            b = parseInt(color.slice(5, 7), 16);
-        }
-        else {
-            return color;
-        }
-        const darkR = Math.floor(r * factor);
-        const darkG = Math.floor(g * factor);
-        const darkB = Math.floor(b * factor);
-        const [lr, lg, lb] = this.cell.map.lighting.colorAt(this.cell);
-        const tintR = Math.floor(lr * COLOR_INTENSITY);
-        const tintG = Math.floor(lg * COLOR_INTENSITY);
-        const tintB = Math.floor(lb * COLOR_INTENSITY);
-        const finalR = Math.min(255, darkR + tintR);
-        const finalG = Math.min(255, darkG + tintG);
-        const finalB = Math.min(255, darkB + tintB);
-        return `#${finalR.toString(16).padStart(2, '0')}${finalG.toString(16).padStart(2, '0')}${finalB.toString(16).padStart(2, '0')}`;
-    }
-    r() { return this.cell.r(); }
-    l() { return this.cell.l(); }
-    u() { return this.cell.u(); }
-    d() { return this.cell.d(); }
-    ur() { return this.cell.ur(); }
-    ul() { return this.cell.ul(); }
-    dr() { return this.cell.dr(); }
-    dl() { return this.cell.dl(); }
-    queueMove(to) {
-        this.cell.queueMove(this, to instanceof game_xy.XY ? to : to.cell.xy);
-    }
-    olderThan(other) {
-        return this.age > other.age;
-    }
-    merge(_other, _from) {
-        throw new Error('merge not implemented');
-    }
-    diedAndAlreadyRemovedFromCell() { Drawable.alive.delete(this); }
-    dying() {
-        this.cell.map.lighting.update(this.cell);
-    }
-}
-Drawable.alive = new Set();
-Drawable.nextId = 0;
-
+// EXTERNAL MODULE: ./src/draw/drawable.ts
+var drawable = __webpack_require__(721);
 ;// ./src/game/leaks.ts
 
 
@@ -7251,187 +8346,19 @@ const assertNoLeaks = (map) => {
         if (d)
             alive.add(d);
     });
-    const leaks = [...Drawable.alive].filter(d => !alive.has(d));
+    const leaks = [...drawable/* Drawable */.h.alive].filter(d => !alive.has(d));
     if (leaks.length) {
-        (0,utils/* each */.__)(leaks, l => Drawable.alive.delete(l));
+        (0,utils/* each */.__)(leaks, l => drawable/* Drawable */.h.alive.delete(l));
         (0,utils/* bomb */.fv)(`drawable leaked ${leaks.map(l => `${l.constructor.name}:${!!l.cell}`).join(', ')}`);
     }
 };
 
-// EXTERNAL MODULE: ./src/game/config.ts + 47 modules
-var config = __webpack_require__(843);
-;// ./src/ui/click.ts
-const toClick = (e) => ({
-    button: e.button === 2 ? 'RIGHT' : 'LEFT',
-    shift: e.shiftKey,
-    ctrl: e.ctrlKey,
-    alt: e.altKey,
-    meta: e.metaKey
-});
-
-;// ./src/ui/display.ts
-
-
-
-
-class Display {
-    constructor(width, height, transparent = false) {
-        this.coordsFromEvent = (e) => {
-            const canvas = this.canvas();
-            const rect = canvas.getBoundingClientRect();
-            const x = Math.floor((e.clientX - rect.left) / config/* Config */.T.FONT_SIZE);
-            const y = Math.floor((e.clientY - rect.top) / config/* Config */.T.FONT_SIZE);
-            return game_xy.XY.at(x, y);
-        };
-        this.display = transparent
-            ? config/* Config */.T.createTransparentDisplay(width, height)
-            : config/* Config */.T.createDisplay(width, height);
-        this.clear();
-    }
-    draw(x, y, char, fg, bg) {
-        this.display.draw(x, y, char, fg, bg);
-    }
-    clear() {
-        this.display.clear();
-    }
-    canvas() {
-        return (0,utils/* bombUnless */.Nb)(this.display.getContainer(), () => 'Failed to get canvas');
-    }
-    attachTo(container, styles) {
-        const canvas = this.canvas();
-        Object.assign(canvas.style, styles);
-        container.appendChild(canvas);
-    }
-    onClick(callback) {
-        const canvas = this.canvas();
-        const h = (e) => {
-            const xy = this.coordsFromEvent(e);
-            const c = toClick(e);
-            if (game_xy.XY.oob(xy.x, xy.y)) {
-                callback(undefined, c);
-                return;
-            }
-            callback(xy, c);
-        };
-        (0,utils/* onClick */.Af)(canvas, h);
-        canvas.addEventListener('contextmenu', e => { e.preventDefault(); h(e); });
-    }
-    onMousemove(callback) {
-        const canvas = this.canvas();
-        (0,utils/* onMousemove */.iT)(canvas, e => {
-            const xy = this.coordsFromEvent(e);
-            if (game_xy.XY.oob(xy.x, xy.y))
-                return;
-            callback(xy);
-        });
-    }
-}
-
-;// ./src/signal.ts
-class Signal {
-    constructor() {
-        this.listeners = new Set();
-    }
-    emit(t) {
-        for (const onT of this.listeners)
-            onT(t);
-    }
-    on(onT) {
-        this.listeners.add(onT);
-        return () => this.listeners.delete(onT);
-    }
-}
-class SignalWithCurrent extends Signal {
-    constructor() {
-        super(...arguments);
-        this.current = null;
-    }
-    emit(t) {
-        this.current = t;
-        super.emit(t);
-    }
-    when(onT) {
-        if (this.current)
-            onT(this.current);
-    }
-}
-
-;// ./src/ui/ui-renderer.ts
-
-
-
-
-const Repaint = new Signal();
-const RedrawMap = new Signal();
-const FrameRendered = new SignalWithCurrent();
-class UIRenderer {
-    constructor(map) {
-        this.map = map;
-        this.strokes = new Map();
-        this.frozen = () => !this.intervalId;
-        this.display = new Display(map.w, map.h, true);
-        this.intervalId = this.start();
-        GameStepped.on(() => this.render());
-        Repaint.on(() => this.render());
-    }
-    unfreeze() {
-        if (!this.frozen())
-            return;
-        this.intervalId = this.start();
-    }
-    start() {
-        return setInterval(() => { Repaint.emit(); }, 100);
-    }
-    replace(id, stroke) {
-        this.remove(id);
-        this.strokes.set(id, stroke);
-    }
-    remove(id) {
-        this.strokes.delete(id);
-    }
-    clearStrokes() {
-        this.strokes.clear();
-        this.clear();
-    }
-    draw(x, y, char, fg, bg = 'transparent') {
-        this.display.draw(x, y, char, fg, bg);
-    }
-    clear() {
-        this.display.clear();
-    }
-    canvas() {
-        return this.display.canvas();
-    }
-    attachTo(container, styles) {
-        this.display.attachTo(container, styles);
-    }
-    freeze() {
-        if (this.frozen())
-            return;
-        clearInterval(this.intervalId);
-        this.intervalId = null;
-    }
-    render() {
-        (0,utils/* eachPair */.cd)(this.strokes, (id, stroke) => {
-            if (!stroke.isValid()) {
-                this.strokes.delete(id);
-            }
-        });
-        this.clear();
-        const sortedStrokes = [...this.strokes.values()].sort((a, b) => a.zIndex - b.zIndex);
-        sortedStrokes.forEach(stroke => {
-            const color = stroke.colorFn();
-            stroke.cells.forEach(({ cell, char, bg }) => {
-                this.draw(cell.xy.x, cell.xy.y, char, color, bg);
-            });
-        });
-        const frame = (FrameRendered.current || 0) + 1;
-        if (frame % 4 === 0)
-            RedrawMap.emit();
-        FrameRendered.emit(frame);
-    }
-}
-
+// EXTERNAL MODULE: ./src/shapes.ts
+var shapes = __webpack_require__(720);
+// EXTERNAL MODULE: ./src/ui/display.ts + 1 modules
+var display = __webpack_require__(328);
+// EXTERNAL MODULE: ./src/ui/ui-renderer.ts
+var ui_renderer = __webpack_require__(889);
 ;// ./src/game/map.ts
 
 
@@ -7450,24 +8377,24 @@ class map_Map {
             (0,utils/* bombUnless */.Nb)(result, () => 'No cell at ' + xy);
             return result;
         };
-        this.eachLocation = (fn) => this.eachCell(cell => CellLayers.layerNames.forEach(n => fn(cell.xy.on(n))));
+        this.eachLocation = (fn) => this.eachCell(cell => game_layers/* CellLayers */.v.layerNames.forEach(n => fn(cell.xy.on(n))));
         this.eachCell = (fn) => (0,utils/* times */.Hn)(this.h, y => (0,utils/* times */.Hn)(this.w, x => fn(this.grid[y][x])));
         map_Map.active.add(this);
-        this.display = new Display(width, height);
-        this.smokeDisplay = new Display(width, height, true);
+        this.display = new display/* Display */.n(width, height);
+        this.smokeDisplay = new display/* Display */.n(width, height, true);
         this.w = width;
         this.h = height;
         this.grid = [];
         (0,utils/* times */.Hn)(height, y => {
             this.grid[y] = [];
             (0,utils/* times */.Hn)(width, x => {
-                this.grid[y][x] = new Cell(game_xy.XY.at(x, y), this);
+                this.grid[y][x] = new cell/* Cell */.f(game_xy.XY.at(x, y), this);
             });
         });
         game_xy.XY.setSize(width, height);
-        this.lighting = new Lighting(this);
+        this.lighting = new lighting/* Lighting */.R(this);
         this.movers = new Movers(this);
-        this.uiRenderer = new UIRenderer(this);
+        this.uiRenderer = new ui_renderer/* UIRenderer */.Q7(this);
     }
     drawAt(x, y, char, fg, bg) {
         this.display.draw(x, y, char, fg, bg);
@@ -7514,7 +8441,7 @@ class map_Map {
     }
     eachRay(start, end, fOfCellAndShouldContinue) {
         let first = true;
-        eachLine(start, end, (xy) => {
+        (0,shapes/* eachLine */.I)(start, end, (xy) => {
             if (first) {
                 first = false;
                 return true;
@@ -7564,7 +8491,7 @@ class map_Map {
         this.eachCell(cell => cell.create(drawableConstructor()));
     }
     killAll() {
-        this.eachCell(cell => CellLayers.layerNames.forEach(n => {
+        this.eachCell(cell => game_layers/* CellLayers */.v.layerNames.forEach(n => {
             const d = cell.layers.data[n];
             if (d)
                 cell.died(d);
@@ -7573,736 +8500,12 @@ class map_Map {
 }
 map_Map.active = new Set();
 
-;// ./src/game/rect.ts
-
-
-
-class Rect {
-    constructor(xy, w, h) {
-        this.xy = xy;
-        this.w = w;
-        this.h = h;
-        this.eachCell = (onXY) => (0,utils/* times */.Hn)(this.w, x => (0,utils/* times */.Hn)(this.h, y => onXY(this.xy.add(x, y))));
-    }
-    get ul() { return this.xy; }
-    get ur() { return this.xy.add(this.w - 1, 0); }
-    get bl() { return this.xy.add(0, this.h - 1); }
-    get br() { return this.xy.add(this.w - 1, this.h - 1); }
-    get cb() { return this.xy.add((0,utils/* half */.MX)(this.w), this.h - 1); }
-    get cl() { return this.xy.add(0, (0,utils/* half */.MX)(this.h)); }
-    get cr() { return this.xy.add(this.w - 1, (0,utils/* half */.MX)(this.h)); }
-    get uc() { return this.xy.add((0,utils/* half */.MX)(this.w), 0); }
-    contains(target, y) {
-        let checkXY;
-        if (typeof target === 'number') {
-            checkXY = game_xy.XY.at(target, y);
-        }
-        else if (target instanceof game_xy.XY) {
-            checkXY = target;
-        }
-        else if (target instanceof Cell) {
-            checkXY = target.xy;
-        }
-        else if ('cell' in target && target.cell) {
-            checkXY = target.cell.xy;
-        }
-        else {
-            return false;
-        }
-        return checkXY.x >= this.xy.x &&
-            checkXY.x < this.xy.x + this.w &&
-            checkXY.y >= this.xy.y &&
-            checkXY.y < this.xy.y + this.h;
-    }
-    eachBorder(onXY) {
-        (0,utils/* times */.Hn)(this.w, x => {
-            onXY(this.xy.add(x, 0)); // top edge
-            onXY(this.xy.add(x, this.h - 1)); // bottom edge
-        });
-        (0,utils/* times */.Hn)(this.h - 2, y => {
-            onXY(this.xy.add(0, y + 1));
-            onXY(this.xy.add(this.w - 1, y + 1));
-        });
-    }
-}
-Rect.xyWH = (topLeft, width, height) => new Rect(topLeft, width, height);
-
-;// ./src/draw/smoke.ts
-
-
-
-
-class Smoke extends Drawable {
-    constructor() {
-        super(...arguments);
-        this.layer = 'smoke';
-        this.transparency = 0.1;
-        this.light = () => 0;
-        this.char = () => '+';
-        this.color = () => colors/* SMOKE */.oE.random();
-    }
-    draw(_debug, illumination) {
-        if (illumination <= 0)
-            return false;
-        const fg = this.color();
-        this.cell.map.drawAtSmoke(this.cell.xy.x, this.cell.xy.y, this.char(), fg, 'transparent');
-        return false;
-    }
-    agedOut() {
-        if (utils/* isInTestMode */.Jo) {
-            return this.age > 3;
-        }
-        return !(0,utils/* oneIn */.A7)(this.age / 3);
-    }
-    shouldDrift() {
-        if (utils/* isInTestMode */.Jo) {
-            return this.age % 4 === 0;
-        }
-        return (0,utils/* oneIn */.A7)(4);
-    }
-    driftTo() {
-        if (utils/* isInTestMode */.Jo) {
-            const r = this.r();
-            if (game_xy.XY.oob(r.xy.x, r.xy.y))
-                return this.l();
-            return r;
-        }
-        return this.cell.map.get(this.cell.xy.random());
-    }
-    drift() {
-        const target = this.driftTo();
-        if (!target.passable())
-            return;
-        this.cell.queueMove(this, target.xy);
-    }
-    step() {
-        if (this.agedOut()) {
-            this.cell.died(this);
-            return;
-        }
-        if (this.shouldDrift())
-            this.drift();
-    }
-}
-
-;// ./src/draw/fire.ts
-
-
-
-
-
-class Fire extends Drawable {
-    constructor() {
-        super(...arguments);
-        this.layer = 'fire';
-        this.light = () => 3;
-        this.char = () => "▲"; // "🔥"
-        this.color = () => colors/* FIRE */.ZK.random();
-    }
-    step() {
-        if (!(0,utils/* oneIn */.A7)(this.age)) {
-            this.cell.died(this);
-            return;
-        }
-        this.cell.reborn(new Smoke());
-        CellLayers.materialLayers.forEach(l => {
-            const d = this.cell.layers.data[l];
-            if (d?.material)
-                d.material.ignite();
-        });
-        if ((0,utils/* oneIn */.A7)(4)) {
-            (0,utils/* randFrom */.Kt)(this.cell.neighbors()).reborn(new Fire());
-        }
-        if ((0,utils/* oneIn */.A7)(4)) {
-            const neighbor = (0,utils/* randFrom */.Kt)(this.cell.neighbors());
-            if (!neighbor.passable())
-                return;
-            this.cell.queueMove(this, neighbor.xy);
-        }
-    }
-    merge(other) {
-        (0,utils/* bombUnless */.Nb)(other instanceof Fire, 'merge mismatch');
-        return other.olderThan(this) ? 'replace' : 'kill';
-    }
-}
-
-;// ./src/draw/material.ts
-
-
-
-
-class Material {
-    constructor(owner) {
-        this.owner = owner;
-        this.burn = null;
-        this.ignite = () => { if (this.burn === null)
-            this.burn = 20; };
-        this.isBurning = () => this.burn !== null;
-        this.light = (base) => this.isBurning() ? base + 1 : base;
-        this.color = (base) => this.isBurning() && (0,utils/* oneIn */.A7)(3) ? colors/* FIRE */.ZK.random() : base;
-        this.remaining = () => this.burn ?? 0;
-        this.desc = (base) => this.isBurning() ? `${base} ▲` : base;
-    }
-    step(stillAlive) {
-        if (this.burn === null)
-            return stillAlive();
-        const cell = this.owner.cell;
-        if ((0,utils/* oneIn */.A7)(2))
-            cell.reborn(new Smoke());
-        if (this.burn <= 0) {
-            cell.died(this.owner);
-            return;
-        }
-        this.burn--;
-        if ((0,utils/* oneIn */.A7)(2))
-            cell.reborn(new Fire());
-        stillAlive();
-    }
-}
-
-;// ./src/draw/wall.ts
-
-
-
-class Wall extends Drawable {
-    constructor() {
-        super(...arguments);
-        this.layer = 'walls';
-        this.passable = false;
-        this.transparency = 0;
-        this.material = new Material(this);
-        this.char = () => '#';
-        this.color = () => this.material.color(colors/* BORDER */.XE);
-        this.light = () => this.material.light(0);
-        this.desc = () => this.material.desc('Wall');
-        this.ignite = () => this.material.ignite();
-    }
-    step() {
-        this.material.step(() => { });
-    }
-}
-
-;// ./src/draw/floor.ts
-
-
-class Floor extends Drawable {
-    constructor() {
-        super(...arguments);
-        this.layer = 'floor';
-        this.light = () => 0;
-        this.char = () => '.';
-        this.color = () => colors/* BORDER */.XE;
-    }
-}
-
-;// ./src/draw/lamp.ts
-
-
-
-
-
-class Lamp extends Drawable {
-    constructor() {
-        super(...arguments);
-        this.layer = 'items';
-        this.transparency = 1;
-        this.material = new Material(this);
-        this.passable = false;
-        this.light = () => this.material.light(5);
-        this.char = () => '*';
-        this.color = () => this.material.color(colors/* LAMP */.zu.random());
-        this.desc = () => this.material.desc('Lamp');
-    }
-    smoking() {
-        return utils/* isInTestMode */.Jo ? true : (0,utils/* oneIn */.A7)(3);
-    }
-    step() {
-        if (this.smoking())
-            this.cell.reborn(new Smoke());
-        this.material.step(() => { });
-    }
-}
-
-;// ./src/draw/door.ts
-
-
-
-class Door extends Drawable {
-    constructor() {
-        super(...arguments);
-        this.layer = 'walls';
-        this.open = false;
-        this.passable = false;
-        this.transparency = 0;
-        this.material = new Material(this);
-        this.light = () => this.material.light(0);
-        this.char = () => this.open ? '/' : '+';
-        this.color = () => this.material.color(colors/* WOOD */.wB);
-        this.desc = () => this.material.desc(this.open ? 'Open Door' : 'Door');
-    }
-    toggle() {
-        this.open = !this.open;
-        this.passable = this.open;
-        this.transparency = this.open ? 1 : 0;
-    }
-    step() { this.material.step(() => { }); }
-}
-
-;// ./src/ui/stroke.ts
-class Stroke {
-    constructor(cells, colorFn, isValid, zIndex) {
-        this.cells = cells;
-        this.colorFn = colorFn;
-        this.zIndex = zIndex;
-        this.isValid = typeof isValid === 'number' ? Stroke.timeout(isValid) : isValid;
-    }
-    add(cell, char, bg) {
-        this.cells.push({ cell, char, bg });
-    }
-    static timeout(ms) {
-        const start = Date.now();
-        return () => Date.now() - start < ms;
-    }
-}
-
-;// ./src/game/tasks/task.ts
-
-
-const TASK_COLOR = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy(['#00f', '#00f', '#00f', 'transparent', 'transparent']));
-class Task {
-    static strokePathBetween(from, to, id, colorFn, condition, zIndex) {
-        const path = [];
-        from.map.eachRay(from.xy, to.xy, (c) => {
-            path.push({ cell: c, char: '*' });
-            return true;
-        });
-        from.map.uiRenderer.replace(id, new Stroke(path, colorFn, condition, zIndex));
-    }
-    constructor(pawn) {
-        this.pawn = pawn;
-    }
-    cleanup() { }
-    remove() {
-        this.pawn.removeTask(this);
-    }
-}
-
-;// ./src/draw/corpse.ts
-
-
-class Corpse extends Drawable {
-    constructor(pawn, cause) {
-        super();
-        this.pawn = pawn;
-        this.cause = cause;
-        this.layer = 'items';
-        this.passable = false;
-        this.desc = () => `${this.pawn.desc()}, died by ${this.cause}`;
-        this.light = () => 0;
-        this.char = () => '%';
-        this.color = () => colors/* BONE */.LS;
-    }
-}
-
-;// ./src/draw/pawn.ts
-
-
-
-
-
-
-
-
-
-
-const PawnSelected = new SignalWithCurrent();
-const PawnMoved = new Signal();
-const PawnBorn = new Signal();
-const PawnBurned = new Signal();
-const PawnDied = new Signal();
-const TaskRemoved = new Signal();
-class Pawn extends Drawable {
-    constructor(name) {
-        super();
-        this.name = name;
-        this.selected = false;
-        this.passable = false;
-        this.material = new Material(this);
-        this.layer = 'pawn';
-        this.transparency = 0;
-        this.light = () => this.material.light(3);
-        this.char = () => '@';
-        this.color = () => this.material.color(colors/* WHITE */.UE);
-        this.tasks = [];
-    }
-    desc() {
-        const d = this.name ? this.name : super.desc();
-        return this.material.desc(d);
-    }
-    recalcPaths() {
-        this.tasks.forEach(t => t.cleanup());
-        let start = this.cell;
-        this.tasks.forEach(t => start = t.strokeAndNext(start));
-        this.endCell = start;
-        Repaint.emit();
-        return start;
-    }
-    get tipCell() { return this.tasks.length > 0 ? this.endCell : this.cell; }
-    addTask(task) {
-        this.tasks.push(task);
-        this.recalcPaths();
-    }
-    removeTask(task) {
-        task.cleanup();
-        this.tasks = this.tasks.filter(t => t !== task);
-        this.recalcPaths();
-        TaskRemoved.emit(this);
-    }
-    clearTasks() {
-        (0,utils/* each */.__)(this.tasks, t => t.cleanup());
-        this.tasks = [];
-        this.recalcPaths();
-        TaskRemoved.emit(this);
-    }
-    step() {
-        this.material.step(() => {
-            if (this.material.isBurning()) {
-                this.squawk("ouch", colors/* FIRE */.ZK);
-                PawnBurned.emit(this);
-            }
-            if (this.tasks.length > 0) {
-                const task = this.tasks[0];
-                task.step();
-                if (task.isDone()) {
-                    task.cleanup();
-                    this.removeTask(task);
-                }
-                else {
-                    this.recalcPaths();
-                }
-            }
-        });
-    }
-    dying() {
-        super.dying();
-        PawnDied.emit(this);
-        this.cell.create(new Corpse(this, 'burning'));
-        (0,utils/* each */.__)(this.tasks, t => t.cleanup());
-    }
-    squawk(text, colors) {
-        const directions = [
-            { dx: 0, dy: -1 }, // up
-            { dx: 1, dy: -1 }, // up-right
-            { dx: 1, dy: 0 }, // right
-            { dx: 1, dy: 1 }, // down-right
-            { dx: 0, dy: 1 }, // down
-            { dx: -1, dy: 1 }, // down-left
-            { dx: -1, dy: 0 }, // left
-            { dx: -1, dy: -1 } // up-left
-        ];
-        const fullText = " " + text;
-        const dir = (0,utils/* randFrom */.Kt)(directions);
-        const startX = this.cell.xy.x + dir.dx;
-        const startY = this.cell.xy.y + dir.dy;
-        const canPlace = !Array.from({ length: fullText.length }, (_, j) => ({
-            x: startX + j * dir.dx,
-            y: startY + j * dir.dy
-        })).some(pos => game_xy.XY.oob(pos.x, pos.y));
-        if (canPlace) {
-            const strokeId = `squawk-${Date.now()}`;
-            const stroke = new Stroke([], () => colors.random(), 300, 15);
-            Array.from({ length: fullText.length }, (_, j) => ({
-                x: startX + j * dir.dx,
-                y: startY + j * dir.dy,
-                char: fullText[j]
-            })).forEach(pos => {
-                const cell = this.cell.map.get(game_xy.XY.at(pos.x, pos.y));
-                stroke.add(cell, pos.char);
-            });
-            this.cell.map.uiRenderer.replace(strokeId, stroke);
-        }
-    }
-    hoverStrokePath(target) {
-        const start = this.tasks.length > 0 ? this.endCell : this.cell;
-        Task.strokePathBetween(start, target, Pawn.HOVER_PATH_STROKE, Pawn.HOVER_PATH_COLOR, () => true, 2);
-        Repaint.emit();
-    }
-    draw(debug, _illumination) {
-        if (this.selected) {
-            this.cell.map.drawAt(this.cell.xy.x, this.cell.xy.y, this.char(), colors/* BACKGROUND */.h4, colors/* FOREGROUND */.u6);
-            return true;
-        }
-        return super.draw(debug, 9);
-    }
-    movedInto(cell) {
-        const from = this.cell;
-        super.movedInto(cell);
-        if (this.tasks.length > 0)
-            this.recalcPaths();
-        if (from)
-            PawnMoved.emit({ pawn: this, from, to: cell });
-        else
-            PawnBorn.emit({ pawn: this, into: cell });
-    }
-}
-Pawn.HOVER_PATH_STROKE = 'hover-path';
-Pawn.HOVER_PATH_COLOR = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy(['#0ff', '#088']));
-
-;// ./src/ui/text-stroke.ts
-
-
-
-
-class TextStroke {
-    static create(map, text, xy, colorFn = () => colors/* WHITE */.UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
-        const stroke = new Stroke([], colorFn, isValid, zIndex);
-        (0,utils/* each */.__)(text, (c, i) => {
-            const cell = map.get(xy.add(i, 0));
-            stroke.add(cell, c, bg);
-        });
-        return stroke;
-    }
-    static render(map, text, xy, id, colorFn = () => colors/* WHITE */.UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
-        const stroke = TextStroke.create(map, text, xy, colorFn, isValid, zIndex, bg);
-        map.uiRenderer.replace(id, stroke);
-    }
-    static centered(map, text, y, id, colorFn = () => colors/* WHITE */.UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
-        const xy = game_xy.XY.at((0,utils/* centeredStart */.jw)(map.w, text), y);
-        TextStroke.render(map, text, xy, id, colorFn, isValid, zIndex, bg);
-    }
-    static centeredPlusY(map, text, yOffset, id, colorFn = () => colors/* WHITE */.UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
-        TextStroke.centered(map, text, (0,utils/* half */.MX)(map.h) + yOffset, id, colorFn, isValid, zIndex, bg);
-    }
-}
-
-;// ./src/game/state.ts
-
-
-
-
-class GameState {
-    constructor(map) {
-        this.map = map;
-        this.introSucceeded = false;
-        this.pawns = [];
-        this.firehouseNum = 0;
-        FirehouseMode.on(names => {
-            this.introSucceeded = true;
-            this.pawns = names;
-            if (!this.firehouseNum)
-                this.firehouseNum = (0,utils/* randTo */.JD)(97) + 3;
-            this.save();
-        });
-    }
-    save() {
-        const data = { introSucceeded: this.introSucceeded, pawns: this.pawns, firehouseNum: this.firehouseNum };
-        localStorage.setItem('gameState', JSON.stringify(data));
-        TextStroke.centered(this.map, 'GAME SAVED', this.map.h - 2, 'saved', colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy([colors/* WHITE */.UE, colors/* FOREGROUND */.u6])), 500);
-    }
-    load() {
-        const s = localStorage.getItem('gameState');
-        if (!s)
-            return;
-        const d = JSON.parse(s);
-        this.introSucceeded = d.introSucceeded;
-        this.pawns = d.pawns || [];
-        this.firehouseNum = d.firehouseNum || 0;
-        if (this.introSucceeded)
-            FirehouseMode.emit(this.pawns);
-    }
-    clear() {
-        localStorage.removeItem('gameState');
-        this.introSucceeded = false;
-        this.pawns = [];
-        this.firehouseNum = 0;
-    }
-}
-const FirehouseMode = new Signal();
-
-;// ./src/game/names.ts
-const firsts = "Mary,Anna,Emma,Elizabeth,Minnie,Margaret,Ida,Alice,Bertha,Sarah,Annie,Clara,Ella,Florence,Cora,Martha,Laura,Nellie,Grace,Carrie,Maude,Mabel,Bessie,Jennie,Gertrude,Julia,Hattie,Edith,Mattie,Rose,Catherine,Lillian,Ada,Lillie,Helen,Jessie,Louise,Ethel,Lula,Myrtle,Eva,Frances,Lena,Lucy,Edna,Maggie,Pearl,Daisy,Fannie,Josephine,Dora,Rosa,Katherine,Agnes,Marie,Nora,May,Mamie,Blanche,Stella,Ellen,Nancy,Effie,Sallie,Nettie,Della,Lizzie,Flora,Susie,Maud,Mae,Etta,Harriet,Sadie,Caroline,Katie,Lydia,Elsie,Kate,Susan,Mollie,Alma,Addie,Georgia,Eliza,Lulu,Nannie,Lottie,Amanda,Belle,Charlotte,Rebecca,Ruth,Viola,Olive,Amelia,Hannah,Jane,Virginia,Emily,Matilda,Irene,Kathryn,Esther,Willie,Henrietta,Ollie,Amy,Rachel,Sara,Estella,Theresa,Augusta,Ora,Pauline,Josie,Lola,Sophia,Leona,Anne,Mildred,Ann,Beulah,Callie,Lou,Delia,Eleanor,Barbara,Iva,Louisa,Maria,Mayme,Evelyn,Estelle,Nina,Betty,Marion,Bettie,Dorothy,Luella,Inez,Lela,Rosie,Allie,Millie,Janie,Cornelia,Victoria,Ruby,Winifred,Alta,Celia,Christine,Beatrice,Birdie,Harriett,Mable,Myra,Sophie,Tillie,Isabel,Sylvia,Carolyn,Isabelle,Leila,Sally,Ina,Essie,Bertie,Nell,Alberta,Katharine,Lora,Rena,Mina,Rhoda,Mathilda,Abbie,Eula,Dollie,Hettie,Eunice,Fanny,Ola,Lenora,Adelaide,Christina,Lelia,Nelle,Sue,Johanna,Lilly,Lucinda,Minerva,Lettie,Roxie,Cynthia,Helena,Hilda,Hulda,Bernice,Genevieve,Jean,Cordelia,Marian,Francis,Jeanette,Adeline,Gussie,Leah,Lois,Lura,Mittie,Hallie,Isabella,Olga,Phoebe,Teresa,Hester,Lida,Lina,Winnie,Claudia,Marguerite,Vera,Cecelia,Bess,Emilie,John,Rosetta,Verna,Myrtie,Cecilia,Elva,Olivia,Ophelia,Georgie,Elnora,Violet,Adele,Lily,Linnie,Loretta,Madge,Polly,Virgie,Eugenia,Lucile,Lucille,Mabelle,Rosalie,Kittie,Meta,Angie,Dessie,Georgiana,Lila,Regina,Selma,Wilhelmina,Bridget,Lilla,Malinda,Vina,Freda,Gertie,Jeannette,Louella,Mandy,Roberta,Cassie,Corinne,Ivy,Melissa,Lyda,Naomi,Norma,Bell,Margie,Nona,Zella,Dovie,Elvira,Erma,Irma,Leota,William,Artie,Blanch,Charity,Lorena,Lucretia,Orpha,Alvina,Annette,Catharine,Elma,Geneva,Janet,Lee,Leora,Lona,Miriam,Zora,Linda,Octavia,Sudie,Zula,Adella,Alpha,Frieda,George,Joanna,Leonora,Priscilla,Tennie,Angeline,Docia,Ettie,Flossie,Hanna,Letha,Minta,Retta,Rosella,Adah,Berta,Elisabeth,Elise,Goldie,Leola,Margret,Adaline,Floy,Idella,Juanita,Lenna,Lucie,Missouri,Nola,Zoe,Eda,Isabell,James,Julie,Letitia,Madeline,Malissa,Mariah,Pattie,Vivian,Almeda,Aurelia,Claire,Dolly,Hazel,Jannie,Kathleen,Kathrine,Lavinia,Marietta,Melvina,Ona,Pinkie,Samantha,Susanna,Chloe,Donnie,Elsa,Gladys,Matie,Pearle,Vesta,Vinnie,Antoinette,Clementine,Edythe,Harriette,Libbie,Lilian,Lue,Lutie,Magdalena,Meda,Rita,Tena,Zelma,Adelia,Annetta,Antonia,Dona,Elizebeth,Georgianna,Gracie,Iona,Lessie,Leta,Liza,Mertie,Molly,Neva,Oma,Alida,Alva,Cecile,Cleo,Donna,Ellie,Ernestine,Evie,Frankie,Helene,Minna,Myrta,Prudence,Queen,Rilla,Savannah,Tessie,Tina,Agatha,America,Anita,Arminta,Dorothea,Ira,Luvenia,Marjorie,Maybelle,Mellie,Nan,Pearlie,Sidney,Velma,Clare,Constance,Dixie,Ila,Iola,Jimmie,Louvenia,Lucia,Ludie,Luna,Metta,Patsy,Phebe,Sophronia,Adda,Avis,Betsy,Bonnie,Cecil,Cordie,Emmaline,Ethelyn,Hortense,June,Louie,Lovie,Marcella,Melinda,Mona,Odessa,Veronica,Aimee,Annabel,Ava,Bella,Carolina,Cathrine,Christena,Clyde,Dena,Dolores,Eleanore,Elmira,Fay,Frank,Jenny,Kizzie,Lonnie,Loula,Magdalene,Mettie,Mintie,Peggy,Reba,Serena,Vida,Zada,Abigail,Celestine,Celina,Claudie,Clemmie,Connie,Daisie,Deborah,Dessa,Easter,Eddie,Emelia,Emmie,Imogene,India,Jeanne,Joan,Lenore,Liddie,Lotta,Mame,Nevada,Rachael,Robert,Sina,Willa,Aline,Beryl,Charles,Daisey,Dorcas,Edmonia,Effa,Eldora,Eloise,Emmer,Era,Gena,Henry,Iris,Izora,Lennie,Lissie,Mallie,Malvina,Mathilde,Mazie,Queenie,Rosina,Salome,Theodora,Therese,Vena,Wanda,Wilda,Altha,Anastasia,Besse,Bird,Birtie,Clarissa,Claude,Delilah,Diana,Emelie,Erna,Fern,Florida,Frona,Hilma,Joseph,Juliet,Leonie,Lugenia,Mammie,Manda,Manerva,Manie,Nella,Paulina,Philomena,Rae,Selina,Sena,Theodosia,Tommie,Una,Vernie,Adela,Althea,Amalia,Amber,Angelina,Annabelle,Anner,Arie,Clarice,Corda,Corrie,Dell,Dellar,Donie,Doris,Elda,Elinor,Emeline,Emilia,Esta,Estell,Etha,Fred,Hope,Indiana,Ione,Jettie,Johnnie,Josiephine,Kitty,Lavina,Leda,Letta,Mahala,Marcia,Margarette,Maudie,Maye,Norah,Oda,Patty,Paula,Permelia,Rosalia,Roxanna,Sula,Vada,Winnifred,Adline,Almira,Alvena,Arizona,Becky,Bennie,Bernadette,Camille,Cordia,Corine,Dicie,Dove,Drusilla,Elena,Elenora,Elmina,Ethyl,Evalyn,Evelina,Faye,Huldah,Idell,Inga,Irena,Jewell,Kattie,Lavenia,Leslie,Lovina,Lulie,Magnolia,Margeret,Margery,Media,Millicent,Nena,Ocie,Orilla,Osie,Pansy,Ray,Rosia,Rowena,Shirley,Tabitha,Thomas,Verdie,Walter,Zetta,Zoa,Zona,Albertina,Albina,Alyce,Amie,Angela,Annis,Carol,Carra,Clarence,Clarinda,Delphia,Dillie,Doshie,Drucilla,Etna,Eugenie,Eulalia,Eve,Felicia,Florance,Fronie,Geraldine,Gina,Glenna,Grayce,Hedwig,Jessica,Jossie,Katheryn,Katy,Lea,Leanna,Leitha,Leone,Lidie,Loma,Lular,Magdalen,Maymie,Minervia,Muriel,Neppie,Olie,Onie,Osa,Otelia,Paralee,Patience,Rella,Rillie,Rosanna,Theo,Tilda,Tishie,Tressa,Viva,Yetta,Zena,Zola,Abby,Aileen,Alba,Alda,Alla,Alverta,Ara,Ardelia,Ardella,Arrie,Arvilla,Augustine,Aurora,Bama,Bena,Byrd,Calla,Camilla,Carey,Carlotta,Celestia,Cherry,Cinda,Classie,Claudine,Clemie,Clifford,Clyda,Creola,Debbie,Dee,Dinah,Doshia,Ednah,Edyth,Eleanora,Electa,Eola,Erie,Eudora,Euphemia,Evalena,Evaline,Faith,Fidelia,Freddie,Golda,Harry,Helma,Hermine,Hessie,Ivah,Janette,Jennette,Joella,Kathryne,Lacy,Lanie,Lauretta,Leana,Leatha,Leo,Liller,Lillis,Louetta,Madie,Mai,Martina,Maryann,Melva,Mena,Mercedes,Merle,Mima,Minda,Monica,Nealie,Netta,Nolia,Nonie,Odelia,Ottilie,Phyllis,Robbie,Sabina,Sada,Sammie,Suzanne,Sybilla,Thea,Tressie,Vallie,Venie,Viney,Wilhelmine,Winona,Zelda,Zilpha,Adelle,Adina,Adrienne,Albertine,Alys,Ana,Araminta,Arthur,Birtha,Bulah,Caddie,Celie,Charlotta,Clair,Concepcion,Cordella,Corrine,Delila,Delphine,Dosha,Edgar,Elaine,Elisa,Ellar,Elmire,Elvina,Ena,Estie,Etter,Fronnie,Genie,Georgina,Glenn,Gracia,Guadalupe,Gwendolyn,Hassie,Honora,Icy,Isa,Isadora,Jesse,Jewel,Joe,Johannah,Juana,Judith,Judy,Junie,Lavonia,Lella,Lemma,Letty,Linna,Littie,Lollie,Lorene,Louis,Love,Lovisa,Lucina,Lynn,Madora,Mahalia,Manervia,Manuela,Margarett,Margaretta,Margarita,Marilla,Mignon,Mozella,Natalie,Nelia,Nolie,Omie,Opal,Ossie,Ottie,Ottilia,Parthenia,Penelope,Pinkey,Pollie,Rennie,Reta,Roena,Rosalee,Roseanna,Ruthie,Sabra,Sannie,Selena,Sibyl,Tella,Tempie,Tennessee,Teressa,Texas,Theda,Thelma,Thursa,Ula,Vannie,Verona,Vertie,Wilma,John,William,James,Charles,George,Frank,Joseph,Thomas,Henry,Robert,Edward,Harry,Walter,Arthur,Fred,Albert,Samuel,David,Louis,Joe,Charlie,Clarence,Richard,Andrew,Daniel,Ernest,Will,Jesse,Oscar,Lewis,Peter,Benjamin,Frederick,Willie,Alfred,Sam,Roy,Herbert,Jacob,Tom,Elmer,Carl,Lee,Howard,Martin,Michael,Bert,Herman,Jim,Francis,Harvey,Earl,Eugene,Ralph,Ed,Claude,Edwin,Ben,Charley,Paul,Edgar,Isaac,Otto,Luther,Lawrence,Ira,Patrick,Guy,Oliver,Theodore,Hugh,Clyde,Alexander,August,Floyd,Homer,Jack,Leonard,Horace,Marion,Philip,Allen,Archie,Stephen,Chester,Willis,Raymond,Rufus,Warren,Jessie,Milton,Alex,Leo,Julius,Ray,Sidney,Bernard,Dan,Jerry,Calvin,Perry,Dave,Anthony,Eddie,Amos,Dennis,Clifford,Leroy,Wesley,Alonzo,Garfield,Franklin,Emil,Leon,Nathan,Harold,Matthew,Levi,Moses,Everett,Lester,Winfield,Adam,Lloyd,Mack,Fredrick,Jay,Jess,Melvin,Noah,Aaron,Alvin,Norman,Gilbert,Elijah,Victor,Gus,Nelson,Jasper,Silas,Jake,Christopher,Mike,Percy,Adolph,Maurice,Cornelius,Felix,Reuben,Wallace,Claud,Roscoe,Sylvester,Earnest,Hiram,Otis,Simon,Willard,Irvin,Mark,Jose,Wilbur,Abraham,Virgil,Clinton,Elbert,Leslie,Marshall,Owen,Wiley,Anton,Morris,Manuel,Phillip,Augustus,Emmett,Eli,Nicholas,Wilson,Alva,Harley,Newton,Timothy,Marvin,Ross,Curtis,Edmund,Jeff,Elias,Harrison,Stanley,Columbus,Lon,Ora,Ollie,Pearl,Russell,Solomon,Arch,Asa,Clayton,Enoch,Irving,Mathew,Nathaniel,Scott,Hubert,Lemuel,Andy,Ellis,Emanuel,Joshua,Millard,Vernon,Wade,Cyrus,Miles,Rudolph,Sherman,Austin,Bill,Chas,Lonnie,Monroe,Byron,Edd,Emery,Grant,Jerome,Max,Mose,Steve,Gordon,Abe,Pete,Chris,Clark,Gustave,Orville,Lorenzo,Bruce,Marcus,Preston,Bob,Dock,Donald,Jackson,Cecil,Barney,Delbert,Edmond,Anderson,Christian,Glenn,Jefferson,Luke,Neal,Burt,Ike,Myron,Tony,Conrad,Joel,Matt,Riley,Vincent,Emory,Isaiah,Nick,Ezra,Green,Juan,Clifton,Lucius,Porter,Arnold,Bud,Jeremiah,Taylor,Forrest,Roland,Spencer,Burton,Don,Emmet,Gustav,Louie,Morgan,Ned,Van,Ambrose,Chauncey,Elisha,Ferdinand,General,Julian,Kenneth,Mitchell,Allie,Josh,Judson,Lyman,Napoleon,Pedro,Berry,Dewitt,Ervin,Forest,Lynn,Pink,Ruben,Sanford,Ward,Douglas,Ole,Omer,Ulysses,Walker,Wilbert,Adelbert,Benjiman,Ivan,Jonas,Major,Abner,Archibald,Caleb,Clint,Dudley,Granville,King,Mary,Merton,Antonio,Bennie,Carroll,Freeman,Josiah,Milo,Royal,Dick,Earle,Elza,Emerson,Fletcher,Judge,Laurence,Roger,Seth,Glen,Hugo,Jimmie,Johnnie,Neil,Washington,Elwood,Gust,Harmon,Jordan,Simeon,Wayne,Wilber,Clem,Evan,Frederic,Irwin,Junius,Lafayette,Loren,Madison,Mason,Orval,Abram,Aubrey,Elliott,Hans,Karl,Minor,Wash,Wilfred,Allan,Alphonse,Dallas,Dee,Isiah,Jason,Johnny,Lawson,Lew,Micheal,Orin,Addison,Cal,Erastus,Francisco,Hardy,Lucien,Randolph,Stewart,Vern,Wilmer,Zack,Adrian,Alvah,Bertram,Clay,Ephraim,Fritz,Giles,Grover,Harris,Isom,Jesus,Johnie,Jonathan,Lucian,Malcolm,Merritt,Otho,Perley,Rolla,Sandy,Tomas,Wilford,Adolphus,Angus,Arther,Carlos,Cary,Cassius,Davis,Hamilton,Harve,Israel,Leander,Melville,Merle,Murray,Pleasant,Sterling,Steven,Axel,Boyd,Bryant,Clement,Erwin,Ezekiel,Foster,Frances,Geo,Houston,Issac,Jules,Larkin,Mat,Morton,Orlando,Pierce,Prince,Rollie,Rollin,Sim,Stuart,Wilburn,Bennett,Casper,Christ,Dell,Egbert,Elmo,Fay,Gabriel,Hector,Horatio,Lige,Saul,Smith,Squire,Tobe,Tommie,Wyatt,Alford,Alma,Alton,Andres,Burl,Cicero,Dean,Dorsey,Enos,Howell,Lou,Loyd,Mahlon,Nat,Omar,Oran,Parker,Raleigh,Reginald,Rubin,Seymour,Wm,Young,Benjamine,Carey,Carlton,Eldridge,Elzie,Garrett,Isham,Johnson,Larry,Logan,Merrill,Mont,Oren,Pierre,Rex,Rodney,Ted,Webster,West,Wheeler,Willam,Al,Aloysius,Alvie,Anna,Art,Augustine,Bailey,Benjaman,Beverly,Bishop,Clair,Cloyd,Coleman,Dana,Duncan,Dwight,Emile,Evert,Henderson,Hunter,Jean,Lem,Luis,Mathias,Maynard,Miguel,Mortimer,Nels,Norris,Pat,Phil,Rush,Santiago,Sol,Sydney,Thaddeus,Thornton,Tim,Travis,Truman,Watson,Webb,Wellington,Winfred,Wylie,Alec,Basil,Baxter,Bertrand,Buford,Burr,Cleveland,Colonel,Dempsey,Early,Ellsworth,Fate,Finley,Gabe,Garland,Gerald,Herschel,Hezekiah,Justus,Lindsey,Marcellus,Olaf,Olin,Pablo,Rolland,Turner,Verne,Volney,Williams,Almon,Alois,Alonza,Anson,Authur,Benton,Billie,Cornelious,Darius,Denis,Dillard,Doctor,Elvin,Emma,Eric,Evans,Gideon,Haywood,Hilliard,Hosea,Lincoln,Lonzo,Lucious,Lum,Malachi,Newt,Noel,Orie,Palmer,Pinkney,Shirley,Sumner,Terry,Urban,Uriah,Valentine,Waldo,Warner,Wong,Zeb,Abel,Alden,Archer,Avery,Carson,Cullen,Doc,Eben,Elige,Elizabeth,Elmore,Ernst,Finis,Freddie,Godfrey,Guss,Hamp,Hermann,Isadore,Isreal,Jones,June,Lacy,Lafe,Leland,Llewellyn,Ludwig,Manford,Maxwell,Minnie,Obie,Octave,Orrin,Ossie,Oswald,Park,Parley,Ramon,Rice,Stonewall,Theo,Tillman,Addie,Aron,Ashley,Bernhard,Bertie,Berton,Buster,Butler,Carleton,Carrie,Clara,Clarance,Clare,Crawford,Danial,Dayton,Dolphus,Elder,Ephriam,Fayette,Felipe,Fernando,Flem,Florence,Ford,Harlan,Hayes,Henery,Hoy,Huston,Ida,Ivory,Jonah,Justin,Lenard,Leopold,Lionel,Manley,Marquis,Marshal,Mart,Odie,Olen,Oral,Orley,Otha,Press,Price,Quincy,Randall,Rich,Richmond,Romeo,Russel,Rutherford,Shade,Shelby,Solon,Thurman,Tilden,Troy,Woodson,Worth,Aden,Alcide,Alf,Algie,Arlie,Bart,Bedford,Benito,Billy,Bird,Birt,Bruno,Burley,Chancy,Claus,Cliff,Clovis,Connie,Creed,Delos,Duke,Eber,Eligah,Elliot,Elton,Emmitt,Gene,Golden,Hal,Hardin,Harman,Hervey,Hollis,Ivey,Jennie,Len,Lindsay,Lonie,Lyle,Mac,Mal,Math,Miller,Orson,Osborne,Percival,Pleas,Ples,Rafael,Raoul,Roderick,Rose,Shelton,Sid,Theron,Tobias,Toney,Tyler,Vance,Vivian,Walton,Watt,Weaver,Wilton,Adolf,Albin,Albion,Allison,Alpha,Alpheus,Anastacio,Andre,Annie,Arlington,Armand,Asberry,Asbury,Asher,Augustin,Auther,Author,Ballard,Blas,Caesar,Candido,Cato,Clarke,Clemente,Colin,Commodore,Cora,Coy,Cruz,Curt,Damon,Davie,Delmar,Dexter,Dora,Doss,Drew,Edson,Elam,Elihu,Eliza,Elsie,Erie,Ernie,Ethel,Ferd,Friend,Garry,Gary,Grace,Gustaf,Hallie,Hampton,Harrie,Hattie,Hence,Hillard,Hollie,Holmes,Hope,Hyman,Ishmael,Jarrett,Jessee,Joeseph,Junious,Kirk,Levy,Mervin,Michel,Milford,Mitchel,Nellie,Noble,Obed,Oda,Orren,Ottis,Rafe,Redden,Reese,Rube,Ruby,Rupert,Salomon,Sammie,Sanders,Soloman,Stacy,Stanford,Stanton,Thad,Titus,Tracy,Vernie,Wendell,Wilhelm,Willian,Yee,Zeke,Ab,Abbott,Agustus,Albertus,Almer,Alphonso,Alvia,Artie,Arvid,Ashby,Augusta,Aurthur,Babe,Baldwin,Barnett,Bartholomew,Barton,Bernie,Blaine,Boston,Brad,Bradford,Bradley,Brooks,Buck,Budd,Ceylon,Chalmers,Chesley,Chin,Cleo,Crockett,Cyril,Daisy,Denver,Dow,Duff,Edie,Edith,Elick,Elie,Eliga,Eliseo,Elroy,Ely,Ennis,Enrique,Erasmus,Esau,Everette,Firman,Fleming,Flora,Gardner,Gee,Gorge,Gottlieb,Gregorio,Gregory,Gustavus,Halsey,Handy,Hardie,Harl,Hayden,Hays,Hermon,Hershel,Holly,Hosteen,Hoyt,Hudson,Huey,Humphrey,Hunt,Hyrum,Irven,Isam,Ivy,Jabez,Jewel,Jodie,Judd,Julious,Justice,Katherine,Kelly,Kit,Knute,Lavern,Lawyer,Layton,Leonidas,Lewie,Lillie,Linwood,Loran,Lorin,Mace,Malcom,Manly,Manson,Matthias,Mattie,Merida,Miner,Montgomery,Moroni,Murdock,Myrtle,Nate,Nathanial,Nimrod,Nora,Norval,Nova,Orion,Orla,Orrie,Payton,Philo,Phineas,Presley,Ransom,Reece,Rene,Roswell,Rowland,Sampson,Samual,Santos,Schuyler,Sheppard,Spurgeon,Starling,Sylvanus,Theadore,Theophile,Tilmon,Tommy,Unknown,Vann,Wes,Winston,Wood,Woodie,Worthy,Wright,York,Zachariah".split(',');
-const lasts = "Abbott,Abel,Adams,Addison,Adkins,Agent,Aldrich,Aldridge,Alexander,Alford,Allen,Appleton,Armstrong,Arrington,Arwood,Atkins,Austin,Avery,Bailey,Baine,Baird,Baldwin,Bankston,Barker,Barnes,Barnett,Barry,Barton,Baughan,Beard,Beasley,Beck,Bell,Bennefield,Bennett,Berry,Bishop,Black,Blackwell,Blake,Blaxton,Blaylock,Blevins,Bonds,Boone,Boston,Botiler,Boyd,Bradford,Brannon,Brazeall,Brewer,Bridgeman,Brimer,Brooks,Brown,Bryant,Burdick,Burnet,Burns,Burrell,Byars,Bynum,Cagle,Cagner,Cain,Calvert,Campbell,Canada,Cantrell,Carroll,Carter,Cary,Casey,Cates,Chambers,Chappell,Chillcoat,Clark,Cline,Cole,Collman,Commens,Compton	Conly,Cooper,Cotton,Cowart,Cox,Cummings,Curtis,Davidson,Davis,Deason,Dempsey,Derrick,Dickenson,Dodd,Donough,Dougherty,Dorris,Doss,Dover,Downy,Dunahoo,Duncan,Dunlap,Dupre,Eaton,Eatton,Ellenbury,Elliott,Ellis,England,Estes,Evans,Ezell,Fair,Farley,Farris,Faught,Forester,Fowler,Freeman,Frost,Gamble,Ganes,Gardener,Garrison,Garson,Gentle,George,Gibson,Gice,Gilbert,Glenn,Godsey,Goodwin,Gosset,Grantham,Grastey,Green,Griffin,Guest,Gunter,Guthrie,Hadder,Haines,Haley,Hamilton,Hampton,Hand,Harbin,Harmon,Harper,Harris,Hatchett,Haw,Haynes,Hays,Hebster,Hefner,Henderson,Hendon,Henson,Hewitt,Hicks,Hightower	Hill,Hiller,Hilton,Hinesley,Hix,Hogg,Holden,Holloway,Holt,Hood,Hoover,Hopson,Horton,Howard,Howells,Hudson,Hughes,Hyde,Ingle,Inmon,Isabell,Ivy,Jack,Jackson,James,Jamison,Jeffries,Jenkins,Johnson,Kely),Kemp,Key,Kidd,Kiker,Kile,Kilpatrick,Kimbrell,King,Knight,Knox,Lambert,Lane,Laneford,Laramore,Lauderdale,Lawson,Lay,League,Lewis,Little,Litton,Livingston,Logan,Long,Looney,Love,Lovelady,Lovell,Lovett,Lynn,Manasco,Mann,Martin,Mathews,McClane,McClung,McClure,McColum,McCoy,McCue,McCullan,McCullar,McDaniel,McDuff,McKay,McNames,McNeil,McNutt,Mellican,Merritt,Metcalf,Miles,Miller,Mitchell,Mize,Mobley,Montgomery,Moody,Mooney,Morgan,Morris,Morrison,Motes,Mullins,Musgrove,Nelson,Nesmith,Newman,Nolen,Noles,Nortwich,Oden,Odom,O'Henry,O'Mary,O'Rear,O'Steen,Overton,Owsley,Pace,Painter,Parsons,Partain,Patek,Patterson,Payne,Peak,Pearson,Pencard,Penn,Penyl,Perkins,Perry,Peters,Pittman,Plott,Poe,Pool,Portridge,Posey,Pouder,Powell,Preston,Pugh,Pulliam,Purdy,Radford,Ramey,Ramie,Ray,Raynes,Reeves,Richardson,Riddle,Rivers,Roberts,Robinson,Roden,Rollins,Romines,Ronow,Rowe,Rush,Russell,Rutledge,Sam,Samples,Sanford,Sarun,Scogin,Segars,Setton,Sexton,Seymore,Shadix,Shain,Shank,Shelly,Shelton,Shipman,Siddens,Simmons,Simpson,Sims,Slater,Slaughter,Smathers,Smith,Sneed,South,Southern,Spain,Spane,Sparks,Staten,Steel,Stephenson,Stevens,Stewart,Stokes,Stone,Strange,Sunmers,Surin,Sutherland,Suttles,Swindle,Taberson,Tarbutton,Taylor,Teague,Tedford,Thomanson,Thomas,Thompson,Thornton,Threadgill,Tidwell,Tittle,Tubs,Tucker,Turner,Tyler,Underwood,Ussery,Wadsworth,Waid,Wakefield,Walker,Walston,Ward,Ware,Warren,Watson,Watts,Weaver,Webb,Welborn,Welsh,West,Whisenhunt,White,Whitfield,Whitman,Whitney,Whitten,Wiley,Willborn,Williams,Willis,Willson,Wilson,Wise,Woodley,Woods,Wooley,Wright,Yarborough,York,Young".split(',');
-
-const initials = (n) => n[0] + n.split(' ')[1][0];
-const firstInitial = (n) => n[0];
-const group = (ns) => ns.reduce((m, n) => {
-    var _a;
-    (m[_a = n[0]] || (m[_a] = [])).push(n);
-    return m;
-}, {});
-class Names {
-    static randomName(used) {
-        const usedPairs = new Set(used.map(initials));
-        const usedFirsts = new Set(used.map(firstInitial));
-        // prefer unused first initials, then any unused pairs
-        for (const preferNewFirst of [true, false]) {
-            const availableFirsts = preferNewFirst
-                ? Names.fiAll.filter(f => !usedFirsts.has(f))
-                : Names.fiAll;
-            for (const fi of availableFirsts) {
-                const availableLasts = Names.liAll.filter(li => !usedPairs.has(fi + li));
-                if (availableLasts.length > 0) {
-                    const li = (0,utils/* randFrom */.Kt)(availableLasts);
-                    return `${(0,utils/* randFrom */.Kt)(Names.firstBy[fi])} ${(0,utils/* randFrom */.Kt)(Names.lastBy[li])}`;
-                }
-            }
-        }
-        // fallback to any random combination
-        const fi = (0,utils/* randFrom */.Kt)(Names.fiAll);
-        const li = (0,utils/* randFrom */.Kt)(Names.liAll);
-        return `${(0,utils/* randFrom */.Kt)(Names.firstBy[fi])} ${(0,utils/* randFrom */.Kt)(Names.lastBy[li])}`;
-    }
-}
-Names.firstBy = group(firsts);
-Names.lastBy = group(lasts);
-Names.fiAll = Object.keys(Names.firstBy);
-Names.liAll = Object.keys(Names.lastBy);
-const randomName = Names.randomName;
-
-;// ./src/game/levels/intro.ts
-
-
-
-
-
-
-
-
-
-
-
-const TITLE = [
-    "#   #  ###  ####  #     ####       ###  #   #      ##### ##### ####  #####",
-    "#   # #   # #   # #     #   #     #   # ##  #      #       #   #   # #    ",
-    "# # # #   # ####  #     #   #     #   # # # #      ####    #   ####  #### ",
-    "# # # #   # #   # #     #   #     #   # #  ##      #       #   #   # #    ",
-    "## ## #   # #   # #     #   #     #   # #   #      #       #   #   # #    ",
-    "#   #  ###  #   # ##### ####       ###  #   #      #     ##### #   # #####"
-];
-class Intro {
-    constructor(initializer, map) {
-        this.initializer = initializer;
-        this.map = map;
-        this.pawns = [];
-    }
-    setup() {
-        this.addWorldOnFireRoom();
-        this.addPawns();
-        this.addBarracksWin();
-        this.addWelcomeText();
-        this.addUserSuggestion();
-    }
-    addWorldOnFireRoom() {
-        const w = TITLE[0].length;
-        const h = TITLE.length;
-        const startX = (0,utils/* centeredStart */.jw)(this.map.w, TITLE[0]);
-        const startY = Math.floor((this.map.h - h) / 2);
-        const start = game_xy.XY.at(startX, startY);
-        this.initializer.addRoom(Rect.xyWH(start.add(-1, -1), w + 2, h + 2));
-        (0,utils/* each */.__)(TITLE, (line, y) => {
-            (0,utils/* each */.__)(line, (c, x) => {
-                if (c === '#')
-                    this.map.createAt(start.add(x, y), new Fire());
-            });
-        });
-    }
-    addWelcomeText() {
-        TextStroke.centeredPlusY(this.map, "Welcome to Fire House RL", -13, 'welcome');
-        TextStroke.centeredPlusY(this.map, "press space to unpause", 13, 'instructions');
-        const endWelcome = GameStepped.on(step => {
-            if (step.frame <= 0)
-                return;
-            this.map.uiRenderer.remove('welcome');
-            this.map.uiRenderer.remove('instructions');
-            endWelcome();
-        });
-    }
-    addPawns() {
-        const a = randomName([]);
-        this.pawns.push(this.map.createAt(game_xy.XY.at(55, 24), new Pawn(a)));
-        const b = randomName([a]);
-        this.pawns.push(this.map.createAt(game_xy.XY.at(39, 24), new Pawn(b)));
-    }
-    addBarracksWin() {
-        const rect = Rect.xyWH(game_xy.XY.at(60, 8), 9, 9);
-        const labelAt = game_xy.XY.at(rect.ur.x + 3, rect.cr.y);
-        TextStroke.render(this.map, '<-- GO HERE', labelAt, 'barracks-label');
-        const ends = [
-            GameStepped.on(() => {
-                const unrescued = this.pawns.filter(pawn => !rect.contains(pawn));
-                if ((0,utils/* hasContent */.ov)(unrescued))
-                    return;
-                this.map.uiRenderer.remove('barracks-label');
-                FirehouseMode.emit(this.pawns.map(p => p.name || ''));
-                (0,utils/* each */.__)(ends, check => check());
-            }),
-            PawnDied.on(_dead => {
-                this.map.uiRenderer.remove('barracks-label');
-                TextStroke.render(this.map, 'YOU LOSE', labelAt, 'lose-text');
-                (0,utils/* each */.__)(ends, check => check());
-            })
-        ];
-        this.initializer.addRoom(rect);
-        const entrance = this.map.get(rect.cl);
-        entrance.reborn(new Door());
-        entrance.l().u().create(new Lamp());
-        entrance.l().d().create(new Lamp());
-    }
-    addUserSuggestion() {
-        let suggestionVisible = true;
-        const suggest = () => {
-            const step = GameStepped.current;
-            if (!step || step.frame % 5 !== 0)
-                return;
-            suggestionVisible = !suggestionVisible;
-            if (suggestionVisible) {
-                const text = 'click the @ symbol';
-                TextStroke.centered(this.map, text, this.map.h - 1, 'suggestion', () => '#ff0', () => true, 10);
-            }
-            else {
-                this.map.uiRenderer.remove('suggestion');
-            }
-        };
-        suggest();
-        const stopSuggesting = GameStepped.on(suggest);
-        PawnSelected.on(_pawn => {
-            this.map.uiRenderer.remove('suggestion');
-            stopSuggesting();
-        });
-    }
-}
-
-;// ./src/game/initializer.ts
-
-
-
-
-
-
-class Initializer {
-    constructor(map) {
-        this.map = map;
-    }
-    initialize() {
-        this.addField();
-        const intro = new Intro(this, this.map);
-        intro.setup();
-    }
-    addField() {
-        Rect.xyWH(game_xy.XY.at(0, 0), this.map.w, this.map.h).eachCell(xy => {
-            this.map.createAt(xy, new Floor());
-        });
-    }
-    addRoom(rect) {
-        rect.eachBorder(xy => {
-            this.map.createAt(xy, new Wall());
-        });
-        [rect.ul.add(1, 1), rect.ur.add(-1, 1), rect.bl.add(1, -1), rect.br.add(-1, -1)].forEach(xy => {
-            this.map.createAt(xy, new Lamp());
-        });
-    }
-}
-
+// EXTERNAL MODULE: ./src/game/initializer.ts + 6 modules
+var game_initializer = __webpack_require__(482);
+// EXTERNAL MODULE: ./src/game/config.ts + 47 modules
+var config = __webpack_require__(843);
+// EXTERNAL MODULE: ./src/draw/pawn.ts + 1 modules
+var draw_pawn = __webpack_require__(705);
 ;// ./node_modules/d3-selection/src/selector.js
 function none() {}
 
@@ -8864,7 +9067,7 @@ function styleFunction(name, value, priority) {
   };
 }
 
-/* harmony default export */ function selection_style(name, value, priority) {
+/* harmony default export */ function style(name, value, priority) {
   return arguments.length > 1
       ? this.each((value == null
             ? styleRemove : typeof value === "function"
@@ -9329,7 +9532,7 @@ Selection.prototype = selection.prototype = {
   empty: selection_empty,
   each: each,
   attr: attr,
-  style: selection_style,
+  style: style,
   property: property,
   classed: classed,
   text: selection_text,
@@ -9967,7 +10170,7 @@ function extend(parent, definition) {
 ;// ./node_modules/d3-color/src/color.js
 
 
-function src_Color() {}
+function Color() {}
 
 var darker = 0.7;
 var brighter = 1 / darker;
@@ -10134,7 +10337,7 @@ var named = {
   yellowgreen: 0x9acd32
 };
 
-src_define(src_Color, src_color, {
+src_define(Color, color, {
   copy(channels) {
     return Object.assign(new this.constructor, this, channels);
   },
@@ -10165,7 +10368,7 @@ function color_formatRgb() {
   return this.rgb().formatRgb();
 }
 
-function src_color(format) {
+function color(format) {
   var m, l;
   format = (format + "").trim().toLowerCase();
   return (m = reHex.exec(format)) ? (l = m[1].length, m = parseInt(m[1], 16), l === 6 ? rgbn(m) // #ff0000
@@ -10194,7 +10397,7 @@ function rgba(r, g, b, a) {
 }
 
 function rgbConvert(o) {
-  if (!(o instanceof src_Color)) o = src_color(o);
+  if (!(o instanceof Color)) o = color(o);
   if (!o) return new Rgb;
   o = o.rgb();
   return new Rgb(o.r, o.g, o.b, o.opacity);
@@ -10211,7 +10414,7 @@ function Rgb(r, g, b, opacity) {
   this.opacity = +opacity;
 }
 
-src_define(Rgb, color_rgb, extend(src_Color, {
+src_define(Rgb, color_rgb, extend(Color, {
   brighter(k) {
     k = k == null ? brighter : Math.pow(brighter, k);
     return new Rgb(this.r * k, this.g * k, this.b * k, this.opacity);
@@ -10274,7 +10477,7 @@ function hsla(h, s, l, a) {
 
 function hslConvert(o) {
   if (o instanceof Hsl) return new Hsl(o.h, o.s, o.l, o.opacity);
-  if (!(o instanceof src_Color)) o = src_color(o);
+  if (!(o instanceof Color)) o = color(o);
   if (!o) return new Hsl;
   if (o instanceof Hsl) return o;
   o = o.rgb();
@@ -10309,7 +10512,7 @@ function Hsl(h, s, l, opacity) {
   this.opacity = +opacity;
 }
 
-src_define(Hsl, hsl, extend(src_Color, {
+src_define(Hsl, hsl, extend(Color, {
   brighter(k) {
     k = k == null ? brighter : Math.pow(brighter, k);
     return new Hsl(this.h, this.s, this.l * k, this.opacity);
@@ -10562,8 +10765,8 @@ function one(b) {
 /* harmony default export */ function transition_interpolate(a, b) {
   var c;
   return (typeof b === "number" ? number
-      : b instanceof src_color ? rgb
-      : (c = src_color(b)) ? (b = c, rgb)
+      : b instanceof color ? rgb
+      : (c = color(b)) ? (b = c, rgb)
       : string)(a, b);
 }
 
@@ -12528,6 +12731,11 @@ function addMethodsToTypedSel(typedSel) {
         this.on('input', handler);
         return this;
     };
+    enhanced.bounds = function () {
+        const node = this.node();
+        (0,utils/* bombUnless */.Nb)(node, 'Node not found for bounds()');
+        return node.getBoundingClientRect();
+    };
     enhanced.dList = function (selector) {
         const parent = this;
         const parentNode = parent.node();
@@ -12620,6 +12828,11 @@ const d1 = (selector) => {
         this.on('input', handler);
         return this;
     };
+    enhanced.bounds = function () {
+        const node = this.node();
+        (0,utils/* bombUnless */.Nb)(node, 'Node not found for bounds()');
+        return node.getBoundingClientRect();
+    };
     return enhanced;
 };
 
@@ -12637,10 +12850,10 @@ class Terminal {
         this.div = d1('#terminal');
         this.div.appendFileHtml(terminal);
         this.repaintSelectedPawn();
-        Repaint.on(() => this.draw());
-        PawnSelected.on(pawn => this.repaintSelectedPawn());
-        PawnMoved.on(({ pawn }) => this.repaintSelectedPawn());
-        PawnBurned.on(pawn => this.repaintSelectedPawn());
+        ui_renderer/* Repaint */.G2.on(() => this.draw());
+        draw_pawn/* PawnSelected */.Ei.on(pawn => this.repaintSelectedPawn());
+        draw_pawn/* PawnMoved */.w.on(({ pawn }) => this.repaintSelectedPawn());
+        draw_pawn/* PawnBurned */.zW.on(pawn => this.repaintSelectedPawn());
     }
     draw() {
         this.updateCell();
@@ -12659,7 +12872,7 @@ class Terminal {
         });
     }
     repaintSelectedPawn() {
-        const pawn = PawnSelected.current;
+        const pawn = draw_pawn/* PawnSelected */.Ei.current;
         const selectedInfo = this.div.d1('#selected-info');
         selectedInfo.updateFrom(pawn, (pawn) => {
             const container = selectedInfo.d1('.selected-container');
@@ -12695,11 +12908,15 @@ class SelectState {
     }
 }
 
+// EXTERNAL MODULE: ./src/game/tasks/task.ts
+var task = __webpack_require__(877);
+// EXTERNAL MODULE: ./src/draw/door.ts
+var door = __webpack_require__(483);
 ;// ./src/game/tasks/destination-task.ts
 
 
 
-class DestinationTask extends Task {
+class DestinationTask extends task/* Task */.Y {
     constructor(pawn, destination) {
         super(pawn);
         this.destination = destination;
@@ -12720,7 +12937,7 @@ class DestinationTask extends Task {
             return;
         }
         const wall = next.wall();
-        if (wall instanceof Door && !wall.passable) {
+        if (wall instanceof door/* Door */.$ && !wall.passable) {
             wall.toggle();
             return;
         }
@@ -12737,7 +12954,7 @@ class DestinationTask extends Task {
     }
     desc() { return `go to ${this.destination.xy.toString()}`; }
     strokeAndNext(start) {
-        Task.strokePathBetween(start, this.destination, this.strokeId, TASK_COLOR, () => !this.done, 1);
+        task/* Task */.Y.strokePathBetween(start, this.destination, this.strokeId, task/* TASK_COLOR */.k, () => !this.done, 1);
         return this.destination;
     }
 }
@@ -12783,27 +13000,33 @@ class DestinationState {
     enter(pawn) {
         this.selected = pawn;
         this.selected.selected = true;
-        PawnSelected.emit(pawn);
+        draw_pawn/* PawnSelected */.Ei.emit(pawn);
         document.addEventListener('keydown', this.key);
         document.addEventListener('click', this.outside);
         document.addEventListener('contextmenu', this.outside);
-        this.unsubDied = PawnDied.on(this.pawnDied);
+        this.unsubDied = draw_pawn/* PawnDied */.hq.on(this.pawnDied);
     }
     exit() {
         document.removeEventListener('keydown', this.key);
         document.removeEventListener('click', this.outside);
         document.removeEventListener('contextmenu', this.outside);
         this.unsubDied();
-        this.ui.map.uiRenderer.remove(Pawn.HOVER_PATH_STROKE);
+        this.ui.map.uiRenderer.remove(draw_pawn/* Pawn */.vc.HOVER_PATH_STROKE);
         this.selected.selected = false;
-        Repaint.emit();
-        PawnSelected.emit(null);
+        ui_renderer/* Repaint */.G2.emit();
+        draw_pawn/* PawnSelected */.Ei.emit(null);
     }
 }
 
+// EXTERNAL MODULE: ./src/ui/stroke.ts
+var ui_stroke = __webpack_require__(891);
+// EXTERNAL MODULE: ./src/ui/text-stroke.ts
+var text_stroke = __webpack_require__(485);
+// EXTERNAL MODULE: ./src/ui/colors.ts
+var colors = __webpack_require__(919);
 ;// ./src/game/tasks/wait-task.ts
 
-class WaitTask extends Task {
+class WaitTask extends task/* Task */.Y {
     isDone() { return false; }
     step() { }
     desc() { return 'wait'; }
@@ -12866,7 +13089,7 @@ class HelpSystem {
             'smoke': { char: '+', desc: 'Smoke that drifts and blocks vision', color: '#999' },
             'pawn': { char: '@', desc: 'Firefighters under your command', color: '#0f0' }
         };
-        const layerSections = CellLayers.layerNames.map(layerName => {
+        const layerSections = game_layers/* CellLayers */.v.layerNames.map(layerName => {
             const info = layerInfo[layerName];
             if (info) {
                 return `• <strong>${layerName}</strong> (<strong style="color: ${info.color}">${info.char}</strong>) - ${info.desc}`;
@@ -12874,7 +13097,7 @@ class HelpSystem {
             return `• <strong>${layerName}</strong> - Layer type`;
         }).join('<br/>');
         const menuSection = menuItems.map(m => `• <strong>${m.key}</strong> - ${m.desc}`).join('<br/>');
-        const layerButtons = CellLayers.layerNames.map(name => name.slice(0, 3)).join(', ');
+        const layerButtons = game_layers/* CellLayers */.v.layerNames.map(name => name.slice(0, 3)).join(', ');
         this.pages = [
             // Page 1: Overview and Controls
             `<div class="help-text">
@@ -12934,7 +13157,7 @@ The right panel shows detailed info about:<br/>
 <strong>🗺️ LAYERS & TERRAIN 🗺️</strong><br/>
 <br/>
 <strong>LAYER SYSTEM:</strong><br/>
-The game world is built in layers (${CellLayers.layerNames.length} total). From bottom to top:<br/>
+The game world is built in layers (${game_layers/* CellLayers */.v.layerNames.length} total). From bottom to top:<br/>
 <br/>
 ${layerSections}<br/>
 <br/>
@@ -13051,12 +13274,12 @@ class MenuState {
     enter(pawn) {
         this.pawn = pawn;
         this.pawn.selected = true;
-        PawnSelected.emit(pawn);
+        draw_pawn/* PawnSelected */.Ei.emit(pawn);
         this.showMenu();
     }
     exit() {
         this.pawn.selected = false;
-        PawnSelected.emit(null);
+        draw_pawn/* PawnSelected */.Ei.emit(null);
         this.hideMenu();
         this.hideHelp();
     }
@@ -13169,7 +13392,7 @@ class MenuState {
         if (!text)
             return;
         const target = this.findUnobstructedMenuLocation(cell, text);
-        TextStroke.render(this.ui.map, text, target.xy, this.helpId, () => colors/* WHITE */.UE, () => true, 6, colors/* BACKGROUND */.h4);
+        text_stroke/* TextStroke */.m.render(this.ui.map, text, target.xy, this.helpId, () => colors/* WHITE */.UE, () => true, 6, colors/* BACKGROUND */.h4);
     }
     hideHelp() {
         this.showTimer.stop();
@@ -13178,7 +13401,7 @@ class MenuState {
         this.hovered = undefined;
     }
     createMenuStroke(cell, char) {
-        const stroke = new Stroke([], () => '#ff0', () => true, 5);
+        const stroke = new ui_stroke/* Stroke */.t([], () => '#ff0', () => true, 5);
         stroke.add(cell, char);
         return stroke;
     }
@@ -13205,11 +13428,11 @@ class ObservePawnState {
     enter(pawn) {
         this.selected = pawn;
         this.selected.selected = true;
-        PawnSelected.emit(pawn);
+        draw_pawn/* PawnSelected */.Ei.emit(pawn);
     }
     exit() {
         this.selected.selected = false;
-        PawnSelected.emit(null);
+        draw_pawn/* PawnSelected */.Ei.emit(null);
     }
 }
 
@@ -13227,7 +13450,7 @@ class UI {
         this.state = 'select';
         this.onClick = (cell, c) => {
             this.states[this.state].onClick(cell, c);
-            Repaint.emit();
+            ui_renderer/* Repaint */.G2.emit();
         };
         this.onMouseMove = (cell) => {
             this.states[this.state].onMouseMove(cell);
@@ -13239,11 +13462,11 @@ class UI {
             menu: new MenuState(this),
             observe: new ObservePawnState(this)
         };
-        TaskRemoved.on(() => {
+        draw_pawn/* TaskRemoved */.qe.on(() => {
             if (this.state === 'menu') {
                 const menuState = this.states.menu;
                 this.setState('menu', menuState.pawn);
-                Repaint.emit();
+                ui_renderer/* Repaint */.G2.emit();
             }
         });
     }
@@ -13254,6 +13477,10 @@ class UI {
     }
 }
 
+// EXTERNAL MODULE: ./src/signal.ts
+var signal = __webpack_require__(334);
+// EXTERNAL MODULE: ./src/game/state.ts
+var state = __webpack_require__(522);
 ;// ./src/html/feedback.html
 /* harmony default export */ const feedback = ("<div id=\"feedback\">\n    <div id=\"feedback-content\">\n        <div class=\"feedback-header\">\n            <h3>Submit Feedback</h3>\n            <button id=\"feedback-close\" class=\"close-button\">×</button>\n        </div>\n        <div class=\"feedback-form\">\n            <div class=\"input-group\">\n                <label for=\"feedback-title\">Title:</label>\n                <input id=\"feedback-title\" type=\"text\" placeholder=\"\">\n            </div>\n            <div class=\"input-group\">\n                <label for=\"feedback-body\">Details:</label>\n                <textarea id=\"feedback-body\" rows=\"6\" placeholder=\"Start typing...\"></textarea>\n            </div>\n            <div class=\"feedback-actions\">\n                <div id=\"feedback-normal-buttons\">\n                    <button id=\"feedback-submit\" class=\"submit-button\">Submit Feedback</button>\n                    <button id=\"feedback-cancel\" class=\"cancel-button\">Cancel</button>\n                </div>\n                <div id=\"feedback-success-buttons\" class=\"hidden\">\n                    <button id=\"feedback-ok\" class=\"submit-button\">OK</button>\n                </div>\n            </div>\n            <div id=\"feedback-status\" class=\"feedback-status hidden\"></div>\n        </div>\n    </div>\n</div> ");
 ;// ./src/ui/feedback.ts
@@ -13427,6 +13654,220 @@ class Feedback {
     }
 }
 
+;// ./src/html/save-slots.html
+/* harmony default export */ const save_slots = ("<div id=\"save-slots-popup\">\n    <h3 id=\"save-title\" class=\"popup-title\">SAVE GAME - SELECT SLOT</h3>\n    <div class=\"imported-save-section\">\n        <div class=\"imported-save template save-slot\">\n            <div class=\"slot-header\">\n                <div class=\"slot-number\">Imported</div>\n                <button class=\"slot-delete close-button\">×</button>\n            </div>\n            <div class=\"slot-info\">\n                <div class=\"slot-status\">Imported Save</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"slots\">\n        <div class=\"slot template save-slot\">\n            <div class=\"slot-header\">\n                <div class=\"slot-number\">1</div>\n                <button class=\"slot-delete close-button\">×</button>\n            </div>\n            <div class=\"slot-info\">\n                <div class=\"slot-status\">Empty Slot</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"save-actions\">\n        <button id=\"save-cancel\" class=\"cancel-button\">Cancel</button>\n    </div>\n    <div class=\"popup-help-text\">\n        Click a slot to select • ESC to cancel\n    </div>\n</div>");
+;// ./src/ui/save-slots.ts
+
+
+class SaveSlotsUI {
+    constructor(gameState) {
+        this.gameState = gameState;
+        this.currentAction = 'save';
+        this.isAutoLoadAtStartup = false;
+        this.popup = d1('#save-slots-popup');
+        this.popup.appendFileHtml(save_slots);
+        this.setupKeyHandler();
+        this.popup.d1('#save-cancel').onClick(() => this.hidePopup());
+    }
+    showSaveDialog() {
+        this.currentAction = 'save';
+        this.popup.d1('#save-title').text('SAVE GAME - SELECT SLOT');
+        this.renderSlots();
+        this.showPopup();
+    }
+    showLoadDialog() {
+        this.currentAction = 'load';
+        this.isAutoLoadAtStartup = false;
+        this.popup.d1('#save-title').text('LOAD GAME - SELECT SLOT');
+        this.renderSlots();
+        this.showPopup();
+    }
+    showAutoLoadDialog() {
+        this.currentAction = 'load';
+        this.isAutoLoadAtStartup = true;
+        this.popup.d1('#save-title').text('LOAD GAME - SELECT SLOT');
+        this.renderSlots();
+        this.showPopup();
+    }
+    showPopup() {
+        const rect = d1('#game-container').bounds();
+        this.popup.style('left', `${rect.left + 50}px`)
+            .style('top', `${rect.top + 50}px`);
+        this.popup.show();
+    }
+    renderSlots() {
+        this.renderImportedSave();
+        const slots = this.getSlotData();
+        this.popup.d1('.slots').dList('.slot').updateFrom(slots, (slotDiv, slotData) => {
+            const index = slots.indexOf(slotData);
+            const slotNum = index + 1;
+            slotDiv.d1('.slot-number').text(slotNum.toString());
+            if (slotData.exists) {
+                slotDiv.d1('.slot-status').text(`Firehouse #${slotData.firehouseNum}`);
+                slotDiv.d1('.slot-details').text(`${slotData.pawns.length} firefighters`);
+                slotDiv.classed('slot-exists', true).classed('slot-empty', false);
+            }
+            else {
+                slotDiv.d1('.slot-status').text('Empty Slot');
+                slotDiv.d1('.slot-details').text('');
+                slotDiv.classed('slot-exists', false).classed('slot-empty', true);
+            }
+            slotDiv.onClick(() => this.selectSlot(slotNum));
+            slotDiv.d1('.slot-delete').on('click', (event) => {
+                event.stopPropagation();
+                this.deleteSlot(slotNum);
+                this.renderSlots(); // Refresh the display
+            });
+        });
+    }
+    renderImportedSave() {
+        const importedSection = this.popup.d1('.imported-save-section');
+        // Hide imported saves during save mode
+        if (this.currentAction === 'save') {
+            importedSection.style('display', 'none');
+            return;
+        }
+        const importedData = this.getImportedSaveData();
+        if (!importedData) {
+            importedSection.style('display', 'none');
+            return;
+        }
+        importedSection.style('display', 'block');
+        const importedDiv = importedSection.d1('.imported-save');
+        importedDiv.d1('.slot-status').text(`Firehouse #${importedData.firehouseNum || 0}`);
+        importedDiv.d1('.slot-details').text(`${(importedData.pawns || []).length} firefighters`);
+        importedDiv.classed('slot-exists', true).classed('slot-empty', false);
+        importedDiv.onClick(() => this.loadImportedSave());
+        importedDiv.d1('.slot-delete').on('click', (event) => {
+            event.stopPropagation();
+            this.deleteImportedSave();
+            this.renderSlots();
+        });
+    }
+    loadImportedSave() {
+        const data = this.getImportedSaveData();
+        if (!data)
+            return;
+        this.gameState.introSucceeded = data.introSucceeded;
+        this.gameState.pawns = data.pawns || [];
+        this.gameState.firehouseNum = data.firehouseNum || 0;
+        // Clean up the imported save after loading
+        localStorage.removeItem('importedSave');
+        if (this.gameState.introSucceeded) {
+            const { FirehouseMode } = __webpack_require__(522);
+            FirehouseMode.emit(this.gameState.pawns);
+        }
+        this.isAutoLoadAtStartup = false;
+        this.hidePopup();
+        console.log('Imported save loaded');
+    }
+    deleteImportedSave() {
+        localStorage.removeItem('importedSave');
+        console.log('Imported save deleted');
+    }
+    selectSlot(slotNum) {
+        if (this.currentAction === 'save') {
+            this.saveToSlot(slotNum);
+        }
+        else {
+            this.loadFromSlot(slotNum);
+        }
+        this.isAutoLoadAtStartup = false;
+        this.hidePopup();
+    }
+    saveToSlot(slotNum) {
+        const key = `gameState_${slotNum}`;
+        const data = {
+            introSucceeded: this.gameState.introSucceeded,
+            pawns: this.gameState.pawns,
+            firehouseNum: this.gameState.firehouseNum
+        };
+        localStorage.setItem(key, JSON.stringify(data));
+        console.log(`Game saved to slot ${slotNum}`);
+    }
+    loadFromSlot(slotNum) {
+        const key = `gameState_${slotNum}`;
+        const data = localStorage.getItem(key);
+        if (!data) {
+            // If loading and slot is empty, start fresh intro
+            console.log(`Starting fresh game (empty slot ${slotNum})`);
+            this.startFreshGame();
+            return;
+        }
+        const parsed = JSON.parse(data);
+        this.gameState.introSucceeded = parsed.introSucceeded;
+        this.gameState.pawns = parsed.pawns || [];
+        this.gameState.firehouseNum = parsed.firehouseNum || 0;
+        if (this.gameState.introSucceeded) {
+            const { FirehouseMode } = __webpack_require__(522);
+            FirehouseMode.emit(this.gameState.pawns);
+        }
+        console.log(`Game loaded from slot ${slotNum}`);
+    }
+    deleteSlot(slotNum) {
+        const key = `gameState_${slotNum}`;
+        localStorage.removeItem(key);
+        console.log(`Deleted save slot ${slotNum}`);
+    }
+    startFreshGame() {
+        this.gameState.restartIntro();
+    }
+    hasSavedGames() {
+        return [1, 2, 3].some(slotNum => {
+            const key = `gameState_${slotNum}`;
+            return localStorage.getItem(key) !== null;
+        }) || this.hasImportedSave();
+    }
+    hasImportedSave() {
+        return localStorage.getItem('importedSave') !== null;
+    }
+    getImportedSaveData() {
+        const data = localStorage.getItem('importedSave');
+        if (!data)
+            return null;
+        try {
+            return JSON.parse(data);
+        }
+        catch {
+            return null;
+        }
+    }
+    getSlotData() {
+        return [1, 2, 3].map(slotNum => {
+            const key = `gameState_${slotNum}`;
+            const data = localStorage.getItem(key);
+            if (!data)
+                return { exists: false, pawns: [], firehouseNum: 0 };
+            const parsed = JSON.parse(data);
+            return {
+                exists: true,
+                pawns: parsed.pawns || [],
+                firehouseNum: parsed.firehouseNum || 0
+            };
+        });
+    }
+    hidePopup() {
+        this.popup.hide();
+        // If canceling auto-load at startup, start fresh intro
+        if (this.isAutoLoadAtStartup) {
+            this.isAutoLoadAtStartup = false;
+            this.startFreshGame();
+        }
+    }
+    setupKeyHandler() {
+        document.addEventListener('keydown', (e) => {
+            if (!this.popup.showing())
+                return;
+            if (e.key === 'Escape') {
+                this.hidePopup();
+            }
+            else if (e.key >= '1' && e.key <= '3') {
+                this.selectSlot(parseInt(e.key));
+            }
+        });
+    }
+}
+
 ;// ./src/game/game.ts
 
 
@@ -13443,7 +13884,8 @@ class Feedback {
 
 
 
-const GameStepped = new SignalWithCurrent();
+
+const GameStepped = new signal/* SignalWithCurrent */.Y();
 class Game {
     constructor() {
         this.running = false;
@@ -13459,7 +13901,7 @@ class Game {
             if (!GameStepped.current)
                 return;
             const { frame, stepMs } = GameStepped.current;
-            const r = FrameRendered.current ?? 0;
+            const r = ui_renderer/* FrameRendered */.HO.current ?? 0;
             (0,utils.$1)('step-info').textContent = `${frame} ${stepMs}ms r${r}`;
         };
         this.keyDown = (e) => {
@@ -13512,9 +13954,9 @@ class Game {
                 this.state.save();
                 const s = localStorage.getItem('gameState');
                 if (s) {
-                    const g = await gzip(s);
+                    const g = await (0,compress/* gzip */.ZI)(s);
                     url += '?import=' + encodeURIComponent(g);
-                    if (longUrl(url))
+                    if ((0,compress/* longUrl */.wz)(url))
                         alert('Save may exceed url length and be truncated');
                 }
             }
@@ -13527,8 +13969,8 @@ class Game {
             this.map.smokeDisplay.clear();
             this.map.uiRenderer.clearStrokes();
             const y = (0,utils/* half */.MX)(this.map.h);
-            TextStroke.centered(this.map, `Firehouse ${this.state.firehouseNum}`, y, 'firehouse');
-            pawns.forEach((name, i) => TextStroke.centered(this.map, name, y + 2 + i, `firehouse-${i}`));
+            text_stroke/* TextStroke */.m.centered(this.map, `Firehouse ${this.state.firehouseNum}`, y, 'firehouse');
+            pawns.forEach((name, i) => text_stroke/* TextStroke */.m.centered(this.map, name, y + 2 + i, `firehouse-${i}`));
             this.drawMap();
         };
         this.map = new map_Map(config/* Config */.T.WIDTH, config/* Config */.T.HEIGHT);
@@ -13538,7 +13980,7 @@ class Game {
         this.setupControls();
         this.setupDebugControls();
         this.updateEnvButton();
-        const initializer = new Initializer(this.map);
+        const initializer = new game_initializer.Initializer(this.map);
         initializer.initialize();
         this.map.lighting.redraw();
         this.drawMap();
@@ -13547,11 +13989,18 @@ class Game {
         this.updateStepInfo();
         document.addEventListener('keydown', this.keyDown);
         document.addEventListener('keyup', this.keyUp);
-        RedrawMap.on(() => this.drawMap());
-        FrameRendered.on(() => this.updateStepInfo());
-        this.state = new GameState(this.map);
-        FirehouseMode.on(this.enterFirehouse);
-        this.state.load();
+        ui_renderer/* RedrawMap */.iQ.on(() => this.drawMap());
+        ui_renderer/* FrameRendered */.HO.on(() => this.updateStepInfo());
+        this.state = new state.GameState(this.map);
+        this.saveSlots = new SaveSlotsUI(this.state);
+        state.FirehouseMode.on(this.enterFirehouse);
+        // Auto-show load dialog if saves exist, otherwise start normally
+        if (this.saveSlots.hasSavedGames()) {
+            this.saveSlots.showAutoLoadDialog();
+        }
+        else {
+            this.state.load();
+        }
         GameStepped.emit({ frame: 0, stepMs: 0 });
     }
     attachToDOM() {
@@ -13582,11 +14031,11 @@ class Game {
         (0,utils/* onClick */.Af)((0,utils.$1)('layer-on'), () => this.turnOnAllLayers());
         (0,utils/* onClick */.Af)((0,utils.$1)('layer-off'), () => this.turnOffAllLayers());
         (0,utils/* onClick */.Af)((0,utils.$1)('clear-game'), () => this.state.clear());
-        (0,utils/* onClick */.Af)((0,utils.$1)('load-game'), () => this.state.load());
-        (0,utils/* onClick */.Af)((0,utils.$1)('save-game'), () => this.state.save());
+        (0,utils/* onClick */.Af)((0,utils.$1)('load-game'), () => this.saveSlots.showLoadDialog());
+        (0,utils/* onClick */.Af)((0,utils.$1)('save-game'), () => this.saveSlots.showSaveDialog());
         (0,utils/* onClick */.Af)((0,utils.$1)('switch-env'), this.switchEnv);
         this.createLayerButtons();
-        CellLayers.layerNames.forEach(layerName => {
+        game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
             (0,utils/* onClick */.Af)((0,utils.$1)(`layer-${layerName}`), () => this.toggleLayerVisibility(layerName));
         });
     }
@@ -13692,7 +14141,7 @@ class Game {
         this.map.step();
         this.map.lighting.redraw();
         this.drawMap();
-        Repaint.emit();
+        ui_renderer/* Repaint */.G2.emit();
         const stepMs = Date.now() - start;
         const frame = (GameStepped.current?.frame || 0) + 1;
         GameStepped.emit({ frame, stepMs });
@@ -13701,7 +14150,7 @@ class Game {
     drawMap() {
         this.map.lighting.redraw(); // Update colors more frequently for flickering effect
         const visibleLayers = this.getVisibleLayers();
-        const showNothing = this.mutedLayers.size === CellLayers.layerNames.length;
+        const showNothing = this.mutedLayers.size === game_layers/* CellLayers */.v.layerNames.length;
         const debug = this.mutedLayers.size > 0 || this.soloLayer !== null;
         this.map.draw(this.showLighting, visibleLayers, showNothing, debug, this.showDarkness);
     }
@@ -13712,7 +14161,7 @@ class Game {
         if (this.mutedLayers.size === 0) {
             return new Set();
         }
-        return new Set(CellLayers.layerNames.filter(layer => !this.mutedLayers.has(layer)));
+        return new Set(game_layers/* CellLayers */.v.layerNames.filter(layer => !this.mutedLayers.has(layer)));
     }
     toggleLighting() {
         this.showLighting = !this.showLighting;
@@ -13751,7 +14200,7 @@ class Game {
     turnOnAllLayers() {
         this.mutedLayers.clear();
         this.soloLayer = null;
-        CellLayers.layerNames.forEach(layerName => {
+        game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
             const button = (0,utils.$1)(`layer-${layerName}`);
             button.classList.remove('muted', 'solo');
         });
@@ -13759,8 +14208,8 @@ class Game {
     }
     turnOffAllLayers() {
         this.soloLayer = null;
-        this.mutedLayers = new Set(CellLayers.layerNames);
-        CellLayers.layerNames.forEach(layerName => {
+        this.mutedLayers = new Set(game_layers/* CellLayers */.v.layerNames);
+        game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
             const button = (0,utils.$1)(`layer-${layerName}`);
             button.classList.remove('solo');
             button.classList.add('muted');
@@ -13769,11 +14218,11 @@ class Game {
     }
     createLayerButtons() {
         const layerGroup = (0,utils.$1)('layer-group');
-        const layerAbbrevs = Object.fromEntries(CellLayers.layerNames.map(name => [
+        const layerAbbrevs = Object.fromEntries(game_layers/* CellLayers */.v.layerNames.map(name => [
             name,
             name.slice(0, 3)
         ]));
-        CellLayers.layerNames.forEach(layerName => {
+        game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
             const button = document.createElement('button');
             button.id = `layer-${layerName}`;
             button.className = 'layer-button';
@@ -13789,6 +14238,232 @@ class Game {
     }
 }
 
+
+/***/ }),
+
+/***/ 919:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Jy: () => (/* binding */ Colors),
+/* harmony export */   LS: () => (/* binding */ BONE),
+/* harmony export */   UE: () => (/* binding */ WHITE),
+/* harmony export */   XE: () => (/* binding */ BORDER),
+/* harmony export */   ZK: () => (/* binding */ FIRE),
+/* harmony export */   h4: () => (/* binding */ BACKGROUND),
+/* harmony export */   oE: () => (/* binding */ SMOKE),
+/* harmony export */   u6: () => (/* binding */ FOREGROUND),
+/* harmony export */   wB: () => (/* binding */ WOOD),
+/* harmony export */   zu: () => (/* binding */ LAMP)
+/* harmony export */ });
+/* unused harmony export SMOLDERING */
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
+
+const FOREGROUND = "#0a0";
+const BACKGROUND = "#000";
+const BORDER = "#444";
+const WOOD = "#8B4513";
+const SMOLDERING = '#6c200e';
+const BONE = "#fff";
+const WHITE = "#fff";
+class Colors {
+    constructor(colors) {
+        this.colors = colors;
+    }
+    random() {
+        return _utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo ? this.colors[0] : (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randFrom */ .Kt)(this.colors);
+    }
+    static rotate(colorsOrColor) {
+        const colors = colorsOrColor instanceof Colors
+            ? colorsOrColor.colors
+            : [colorsOrColor];
+        let current = 0;
+        return () => {
+            const color = colors[current];
+            current = (current + 1) % colors.length;
+            return color;
+        };
+    }
+}
+const FIRE = new Colors(['#ff6600', '#ff9900', '#ffcc00', '#ff3300']);
+const SMOKE = new Colors(['rgba(51,51,51,0.6)', 'rgba(85,85,85,0.6)', 'rgba(102,102,102,0.6)', 'rgba(119,119,119,0.6)', 'rgba(136,136,136,0.6)', 'rgba(153,153,153,0.6)', 'rgba(170,170,170,0.6)', 'rgba(187,187,187,0.6)', 'rgba(204,204,204,0.6)']);
+const LAMP = new Colors(['#ccffff', '#99ddff', '#66ccff']);
+
+
+/***/ }),
+
+/***/ 994:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   i: () => (/* binding */ Material)
+/* harmony export */ });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
+/* harmony import */ var _smoke__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(502);
+/* harmony import */ var _fire__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(267);
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(919);
+
+
+
+
+class Material {
+    constructor(owner) {
+        this.owner = owner;
+        this.burn = null;
+        this.ignite = () => { if (this.burn === null)
+            this.burn = 20; };
+        this.isBurning = () => this.burn !== null;
+        this.light = (base) => this.isBurning() ? base + 1 : base;
+        this.color = (base) => this.isBurning() && (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(3) ? _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .FIRE */ .ZK.random() : base;
+        this.remaining = () => this.burn ?? 0;
+        this.desc = (base) => this.isBurning() ? `${base} ▲` : base;
+    }
+    step(stillAlive) {
+        if (this.burn === null)
+            return stillAlive();
+        const cell = this.owner.cell;
+        if ((0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(2))
+            cell.reborn(new _smoke__WEBPACK_IMPORTED_MODULE_1__/* .Smoke */ ._());
+        if (this.burn <= 0) {
+            cell.died(this.owner);
+            return;
+        }
+        this.burn--;
+        if ((0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(2))
+            cell.reborn(new _fire__WEBPACK_IMPORTED_MODULE_2__/* .Fire */ .v());
+        stillAlive();
+    }
+}
+
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			id: moduleId,
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/nonce */
+/******/ 	(() => {
+/******/ 		__webpack_require__.nc = undefined;
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
+var injectStylesIntoStyleTag = __webpack_require__(72);
+var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleDomAPI.js
+var styleDomAPI = __webpack_require__(825);
+var styleDomAPI_default = /*#__PURE__*/__webpack_require__.n(styleDomAPI);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertBySelector.js
+var insertBySelector = __webpack_require__(659);
+var insertBySelector_default = /*#__PURE__*/__webpack_require__.n(insertBySelector);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js
+var setAttributesWithoutAttributes = __webpack_require__(56);
+var setAttributesWithoutAttributes_default = /*#__PURE__*/__webpack_require__.n(setAttributesWithoutAttributes);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertStyleElement.js
+var insertStyleElement = __webpack_require__(540);
+var insertStyleElement_default = /*#__PURE__*/__webpack_require__.n(insertStyleElement);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleTagTransform.js
+var styleTagTransform = __webpack_require__(113);
+var styleTagTransform_default = /*#__PURE__*/__webpack_require__.n(styleTagTransform);
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./src/style.css
+var style = __webpack_require__(208);
+;// ./src/style.css
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var options = {};
+
+options.styleTagTransform = (styleTagTransform_default());
+options.setAttributes = (setAttributesWithoutAttributes_default());
+options.insert = insertBySelector_default().bind(null, "head");
+options.domAPI = (styleDomAPI_default());
+options.insertStyleElement = (insertStyleElement_default());
+
+var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
+
+
+
+
+       /* harmony default export */ const src_style = (style/* default */.A && style/* default */.A.locals ? style/* default */.A.locals : undefined);
+
+// EXTERNAL MODULE: ./src/game/game.ts + 117 modules
+var game = __webpack_require__(903);
+// EXTERNAL MODULE: ./src/compress.ts
+var compress = __webpack_require__(74);
 ;// ./src/index.ts
 
 
@@ -13810,15 +14485,15 @@ window.addEventListener('error', (event) => {
     console.error('Stack trace:', event.error?.stack);
     showError(event.error?.message || 'Unknown error', event.error?.stack);
 });
-async function src_init() {
+async function init() {
     try {
         const q = new URLSearchParams(location.search);
         const imp = q.get('import');
         if (imp) {
-            localStorage.setItem('gameState', await gunzip(imp));
+            localStorage.setItem('importedSave', await (0,compress/* gunzip */.kd)(imp));
             history.replaceState(null, '', location.pathname);
         }
-        new Game();
+        new game/* Game */.Z();
     }
     catch (error) {
         const m = error instanceof Error ? error.message : 'Unknown error';
@@ -13826,7 +14501,7 @@ async function src_init() {
         showError(`Game initialization failed: ${m}`, s);
     }
 }
-window.addEventListener('DOMContentLoaded', src_init);
+window.addEventListener('DOMContentLoaded', init);
 
 /******/ })()
 ;
