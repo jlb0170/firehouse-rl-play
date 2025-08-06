@@ -257,6 +257,7 @@ module.exports = styleTagTransform;
 /* harmony export */   av: () => (/* binding */ bombIf),
 /* harmony export */   cd: () => (/* binding */ eachPair),
 /* harmony export */   fv: () => (/* binding */ bomb),
+/* harmony export */   gJ: () => (/* binding */ rollD6),
 /* harmony export */   iT: () => (/* binding */ onMousemove),
 /* harmony export */   iw: () => (/* binding */ onLastMaybe),
 /* harmony export */   jw: () => (/* binding */ centeredStart),
@@ -289,6 +290,13 @@ function randFrom(ts) {
     bombIf(ts.length === 0, 'need at least one element');
     return ts[randTo(ts.length)];
 }
+const rollD6 = (n) => {
+    if (isInTestMode)
+        return n * 5;
+    let s = 0;
+    times(n, _ => s += randTo(6) + 1);
+    return s;
+};
 function times(n, fOfIndex) {
     bombIf(n < 0, 'Cannot iterate negatively');
     for (let i = 0; i < n; i++)
@@ -430,6 +438,18 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Layout System */
 .gap-form { gap: 15px; }
 .gap-modal-header { gap: 20px; }
 .gap-terminal-info { gap: 4px; }
+
+/* Modal Base */
+.modal-window {
+    background: #222;
+    border: 1px solid #666;
+    border-radius: 8px;
+    color: #0a0;
+    font-family: monospace;
+    padding: 20px;
+    position: absolute;
+    z-index: 1000;
+}
 
 body {
     margin: 0;
@@ -705,6 +725,10 @@ body {
     margin-top: 10px;
 }
 
+.error-copy {
+    margin: 10px 0 0 10px;
+}
+
 .help-popup {
     position: fixed;
     top: 50%;
@@ -729,24 +753,7 @@ body {
 }
 
 /* Feedback Modal */
-#feedback {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#feedback-content {
-    background: #222;
-    border: 1px solid #666;
-    border-radius: 8px;
-    padding: 20px;
+#feedback-modal {
     width: 90%;
     max-width: 500px;
     max-height: 80vh;
@@ -754,9 +761,6 @@ body {
 }
 
 .feedback-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     margin-bottom: 20px;
     border-bottom: 1px solid #444;
     padding-bottom: 10px;
@@ -787,12 +791,6 @@ body {
     border-radius: 3px;
 }
 
-.feedback-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
 .input-group {
     display: flex;
     flex-direction: column;
@@ -805,7 +803,7 @@ body {
     font-size: 14px;
 }
 
-#feedback-title {
+#feedback-title, #feedback-screenshot {
     padding: 8px;
     background: #111;
     border: 1px solid #444;
@@ -833,12 +831,7 @@ body {
     box-shadow: 0 0 5px rgba(0, 170, 0, 0.3);
 }
 
-.feedback-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-top: 10px;
-}
+.feedback-actions { margin-top: 10px; }
 
 .submit-button, .cancel-button {
     padding: 8px 16px;
@@ -893,15 +886,6 @@ body {
     color: #0f0;
     font-family: monospace;
     line-height: 1.4;
-}
-
-/* Save Slots Popup */
-#save-slots-popup {
-    background: #222;
-    border: 1px solid #666;
-    border-radius: 8px;
-    color: #0a0;
-    font-family: monospace;
 }
 
 .popup-title {
@@ -993,33 +977,9 @@ body {
 } 
 
 /* Firehouse Modal */
-#firehouse-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-}
-
-#firehouse-content {
-    background: #222;
-    border: 1px solid #0a0;
-    border-radius: 8px;
-    padding: 20px;
-    color: #0a0;
-    font-family: monospace;
-    min-width: 300px;
-}
+#firehouse-modal { min-width: 300px; }
 
 .firehouse-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     margin-bottom: 10px;
     border-bottom: 1px solid #444;
     padding-bottom: 5px;
@@ -1034,55 +994,27 @@ body {
     margin: 10px 0;
 }
 
-.firehouse-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 10px;
-}
-
-#env-switch {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#env-switch-content {
-    background: #222;
-    border: 1px solid #666;
-    border-radius: 8px;
-    padding: 20px;
-    width: fit-content;
-    font-family: monospace;
-}
-
-.env-switch-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #444;
-    padding-bottom: 10px;
-}
-
-.env-switch-header h3 {
+.firehouse-panel {
     margin: 0;
+    border: 1px solid #444;
+    padding: 5px;
+}
+.firehouse-panel h4 {
+    margin: 0 0 5px 0;
     color: #0a0;
-    font-size: 18px;
+}
+.inspector {
+    border: 1px solid #444;
+    padding: 5px;
 }
 
-.env-switch-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
+.firehouse-actions {
     margin-top: 10px;
 }
+
+#play-wrapper { position: relative }
+#speed-buttons { position: absolute; top: 100% }
+#speed-buttons button { width: 100% }
 
 `, ""]);
 // Exports
@@ -1202,7 +1134,237 @@ class Cell {
 
 /***/ }),
 
-/***/ 243:
+/***/ 267:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   v: () => (/* binding */ Fire)
+/* harmony export */ });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(919);
+/* harmony import */ var _drawable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(721);
+/* harmony import */ var _smoke__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(502);
+/* harmony import */ var _game_layers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(633);
+
+
+
+
+
+class Fire extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
+    constructor() {
+        super(...arguments);
+        this.layer = 'fire';
+        this.light = () => 3;
+        this.char = () => "▲"; // "🔥"
+        this.color = () => _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .FIRE */ .ZK.random();
+    }
+    step() {
+        if (!(0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(this.age)) {
+            this.cell.died(this);
+            return;
+        }
+        this.cell.reborn(new _smoke__WEBPACK_IMPORTED_MODULE_3__/* .Smoke */ ._());
+        _game_layers__WEBPACK_IMPORTED_MODULE_4__/* .CellLayers */ .v.materialLayers.forEach(l => {
+            const d = this.cell.layers.data[l];
+            if (d?.material)
+                d.material.ignite();
+        });
+        if ((0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(4)) {
+            (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randFrom */ .Kt)(this.cell.neighbors()).reborn(new Fire());
+        }
+        if ((0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(4)) {
+            const neighbor = (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randFrom */ .Kt)(this.cell.neighbors());
+            if (!neighbor.passable())
+                return;
+            this.cell.queueMove(this, neighbor.xy);
+        }
+    }
+    merge(other) {
+        (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .bombUnless */ .Nb)(other instanceof Fire, 'merge mismatch');
+        return other.olderThan(this) ? 'replace' : 'kill';
+    }
+}
+
+
+/***/ }),
+
+/***/ 314:
+/***/ ((module) => {
+
+
+
+/*
+  MIT License http://www.opensource.org/licenses/mit-license.php
+  Author Tobias Koppers @sokra
+*/
+module.exports = function (cssWithMappingToString) {
+  var list = [];
+
+  // return the list of modules as css string
+  list.toString = function toString() {
+    return this.map(function (item) {
+      var content = "";
+      var needLayer = typeof item[5] !== "undefined";
+      if (item[4]) {
+        content += "@supports (".concat(item[4], ") {");
+      }
+      if (item[2]) {
+        content += "@media ".concat(item[2], " {");
+      }
+      if (needLayer) {
+        content += "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {");
+      }
+      content += cssWithMappingToString(item);
+      if (needLayer) {
+        content += "}";
+      }
+      if (item[2]) {
+        content += "}";
+      }
+      if (item[4]) {
+        content += "}";
+      }
+      return content;
+    }).join("");
+  };
+
+  // import a list of modules into the list
+  list.i = function i(modules, media, dedupe, supports, layer) {
+    if (typeof modules === "string") {
+      modules = [[null, modules, undefined]];
+    }
+    var alreadyImportedModules = {};
+    if (dedupe) {
+      for (var k = 0; k < this.length; k++) {
+        var id = this[k][0];
+        if (id != null) {
+          alreadyImportedModules[id] = true;
+        }
+      }
+    }
+    for (var _k = 0; _k < modules.length; _k++) {
+      var item = [].concat(modules[_k]);
+      if (dedupe && alreadyImportedModules[item[0]]) {
+        continue;
+      }
+      if (typeof layer !== "undefined") {
+        if (typeof item[5] === "undefined") {
+          item[5] = layer;
+        } else {
+          item[1] = "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {").concat(item[1], "}");
+          item[5] = layer;
+        }
+      }
+      if (media) {
+        if (!item[2]) {
+          item[2] = media;
+        } else {
+          item[1] = "@media ".concat(item[2], " {").concat(item[1], "}");
+          item[2] = media;
+        }
+      }
+      if (supports) {
+        if (!item[4]) {
+          item[4] = "".concat(supports);
+        } else {
+          item[1] = "@supports (".concat(item[4], ") {").concat(item[1], "}");
+          item[4] = supports;
+        }
+      }
+      list.push(item);
+    }
+  };
+  return list;
+};
+
+/***/ }),
+
+/***/ 328:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  n: () => (/* binding */ Display)
+});
+
+// EXTERNAL MODULE: ./src/game/config.ts + 47 modules
+var config = __webpack_require__(843);
+// EXTERNAL MODULE: ./src/utils.ts
+var utils = __webpack_require__(185);
+// EXTERNAL MODULE: ./src/game/xy.ts
+var game_xy = __webpack_require__(88);
+;// ./src/ui/click.ts
+const toClick = (e) => ({
+    button: e.button === 2 ? 'RIGHT' : 'LEFT',
+    shift: e.shiftKey,
+    ctrl: e.ctrlKey,
+    alt: e.altKey,
+    meta: e.metaKey
+});
+
+;// ./src/ui/display.ts
+
+
+
+
+class Display {
+    constructor(width, height, transparent = false) {
+        this.coordsFromEvent = (e) => {
+            const canvas = this.canvas();
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / config/* Config */.T.FONT_SIZE);
+            const y = Math.floor((e.clientY - rect.top) / config/* Config */.T.FONT_SIZE);
+            return game_xy.XY.at(x, y);
+        };
+        this.display = transparent
+            ? config/* Config */.T.createTransparentDisplay(width, height)
+            : config/* Config */.T.createDisplay(width, height);
+        this.clear();
+    }
+    draw(x, y, char, fg, bg) {
+        this.display.draw(x, y, char, fg, bg);
+    }
+    clear() {
+        this.display.clear();
+    }
+    canvas() {
+        return (0,utils/* bombUnless */.Nb)(this.display.getContainer(), () => 'Failed to get canvas');
+    }
+    attachTo(container, styles) {
+        const canvas = this.canvas();
+        Object.assign(canvas.style, styles);
+        container.appendChild(canvas);
+    }
+    onClick(callback) {
+        const canvas = this.canvas();
+        const h = (e) => {
+            const xy = this.coordsFromEvent(e);
+            const c = toClick(e);
+            if (game_xy.XY.oob(xy.x, xy.y)) {
+                callback(undefined, c);
+                return;
+            }
+            callback(xy, c);
+        };
+        (0,utils/* onClick */.Af)(canvas, h);
+        canvas.addEventListener('contextmenu', e => { e.preventDefault(); h(e); });
+    }
+    onMousemove(callback) {
+        const canvas = this.canvas();
+        (0,utils/* onMousemove */.iT)(canvas, e => {
+            const xy = this.coordsFromEvent(e);
+            if (game_xy.XY.oob(xy.x, xy.y))
+                return;
+            callback(xy);
+        });
+    }
+}
+
+
+/***/ }),
+
+/***/ 331:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 
@@ -1214,246 +1376,6 @@ __webpack_require__.d(__webpack_exports__, {
 
 // EXTERNAL MODULE: ./src/utils.ts
 var utils = __webpack_require__(185);
-// EXTERNAL MODULE: ./src/compress.ts
-var compress = __webpack_require__(74);
-// EXTERNAL MODULE: ./src/game/xy.ts
-var game_xy = __webpack_require__(88);
-// EXTERNAL MODULE: ./src/game/cell.ts
-var cell = __webpack_require__(231);
-// EXTERNAL MODULE: ./src/game/lighting.ts
-var lighting = __webpack_require__(615);
-// EXTERNAL MODULE: ./src/game/layers.ts
-var game_layers = __webpack_require__(633);
-;// ./src/game/movers.ts
-
-class Move {
-    constructor(drawable, from, to) {
-        this.drawable = drawable;
-        this.from = from;
-        this.to = to;
-    }
-}
-class Movers {
-    constructor(map) {
-        this.map = map;
-        this.moves = [];
-    }
-    queue(drawable, from, to) {
-        (0,utils/* bombUnless */.Nb)(from !== to, 'cant queue move to same cell');
-        const dx = Math.abs(from.x - to.x);
-        const dy = Math.abs(from.y - to.y);
-        (0,utils/* bombUnless */.Nb)(Math.max(dx, dy) === 1, 'move must be adjacent');
-        this.moves.push(new Move(drawable, from, to));
-    }
-    clear() { this.moves = []; }
-    move() {
-        const stillpossible = new Set(this.moves.filter(m => {
-            const cell = this.map.get(m.from.xy);
-            return cell.occupantIs(m.drawable);
-        }));
-        this.clear();
-        while (stillpossible.size > 0) {
-            const pending = this.movable(stillpossible);
-            if (pending.length === 0)
-                return;
-            this.execute(pending);
-            pending.forEach(m => stillpossible.delete(m));
-        }
-    }
-    movable(stillpossible) {
-        const destinations = new Map();
-        stillpossible.forEach(m => (0,utils/* pushMap */.H3)(destinations, m.to, m)); // TODO - this is group by, right?
-        const pending = [];
-        destinations.forEach((entrants, dest) => {
-            if (entrants.length !== 1)
-                return;
-            const move = (0,utils/* the */.C8)(entrants);
-            const cell = this.map.get(dest.xy);
-            if (!cell.passable())
-                return;
-            if (!cell.occupied(move.drawable.layer))
-                pending.push(move);
-        });
-        return pending;
-    }
-    execute(moves) {
-        moves.forEach(m => this.map.get(m.from.xy).remove(m.drawable));
-        moves.forEach(m => this.map.get(m.to.xy).set(m.drawable));
-    }
-}
-
-// EXTERNAL MODULE: ./src/draw/drawable.ts
-var drawable = __webpack_require__(721);
-;// ./src/game/leaks.ts
-
-
-const assertNoLeaks = (map) => {
-    const alive = new Set();
-    map.eachLocation(xyl => {
-        const d = map.get(xyl.xy).layers.data[xyl.layer];
-        if (d)
-            alive.add(d);
-    });
-    const leaks = [...drawable/* Drawable */.h.alive].filter(d => !alive.has(d));
-    if (leaks.length) {
-        (0,utils/* each */.__)(leaks, l => drawable/* Drawable */.h.alive.delete(l));
-        (0,utils/* bomb */.fv)(`drawable leaked ${leaks.map(l => `${l.constructor.name}:${!!l.cell}`).join(', ')}`);
-    }
-};
-
-// EXTERNAL MODULE: ./src/shapes.ts
-var shapes = __webpack_require__(720);
-// EXTERNAL MODULE: ./src/ui/display.ts + 1 modules
-var display = __webpack_require__(328);
-// EXTERNAL MODULE: ./src/ui/ui-renderer.ts
-var ui_renderer = __webpack_require__(889);
-;// ./src/game/map.ts
-
-
-
-
-
-
-
-
-
-
-class map_Map {
-    constructor(width, height) {
-        this.get = (xy) => {
-            const result = xy.cell(this.grid);
-            (0,utils/* bombUnless */.Nb)(result, () => 'No cell at ' + xy);
-            return result;
-        };
-        this.eachLocation = (fn) => this.eachCell(cell => game_layers/* CellLayers */.v.layerNames.forEach(n => fn(cell.xy.on(n))));
-        this.eachCell = (fn) => (0,utils/* times */.Hn)(this.h, y => (0,utils/* times */.Hn)(this.w, x => fn(this.grid[y][x])));
-        map_Map.active.add(this);
-        this.display = new display/* Display */.n(width, height);
-        this.smokeDisplay = new display/* Display */.n(width, height, true);
-        this.w = width;
-        this.h = height;
-        this.grid = [];
-        (0,utils/* times */.Hn)(height, y => {
-            this.grid[y] = [];
-            (0,utils/* times */.Hn)(width, x => {
-                this.grid[y][x] = new cell/* Cell */.f(game_xy.XY.at(x, y), this);
-            });
-        });
-        game_xy.XY.setSize(width, height);
-        this.lighting = new lighting/* Lighting */.R(this);
-        this.movers = new Movers(this);
-        this.uiRenderer = new ui_renderer/* UIRenderer */.Q7(this);
-    }
-    drawAt(x, y, char, fg, bg) {
-        this.display.draw(x, y, char, fg, bg);
-    }
-    drawAtSmoke(x, y, char, fg, bg) {
-        this.smokeDisplay.draw(x, y, char, fg, bg);
-    }
-    draw(showLighting, visibleLayers, showNothing, debug, showDarkness = true) {
-        this.display.clear();
-        this.smokeDisplay.clear();
-        (0,utils/* times */.Hn)(this.h, y => {
-            (0,utils/* times */.Hn)(this.w, x => {
-                this.grid[y][x].draw(showLighting, visibleLayers, showNothing, debug, showDarkness);
-            });
-        });
-    }
-    step() {
-        (0,utils/* times */.Hn)(this.h, y => {
-            (0,utils/* times */.Hn)(this.w, x => {
-                this.grid[y][x].step();
-            });
-        });
-        this.movers.move();
-        assertNoLeaks(this);
-    }
-    set(xy, drawable) {
-        const cell = xy.cell(this.grid);
-        (0,utils/* bombUnless */.Nb)(cell, () => 'No cell at ' + xy);
-        cell.set(drawable);
-        return cell;
-    }
-    createAt(xy, drawable) {
-        const cell = this.get(xy);
-        return cell.create(drawable);
-    }
-    create(cell, drawable) {
-        drawable.born = true;
-        cell.bombOccupied(drawable.layer, occupant => `can't create ${drawable.desc()} on top of ${occupant.desc()}`);
-        cell.set(drawable);
-        return drawable;
-    }
-    moving(drawable, from, to) {
-        this.movers.queue(drawable, from, to);
-    }
-    eachRay(start, end, fOfCellAndShouldContinue) {
-        let first = true;
-        (0,shapes/* eachLine */.I)(start, end, (xy) => {
-            if (first) {
-                first = false;
-                return true;
-            }
-            if (game_xy.XY.oob(xy))
-                return false;
-            const cell = this.get(xy);
-            return fOfCellAndShouldContinue(cell);
-        });
-    }
-    onClick(onClickedCell) {
-        this.display.onClick((xy, c) => onClickedCell(xy ? this.get(xy) : undefined, c));
-    }
-    onMousemove(onMousedCell) {
-        this.display.onMousemove(xy => onMousedCell(this.get(xy)));
-    }
-    renderToChars(replace = 'drawAt') {
-        const chars = [];
-        (0,utils/* times */.Hn)(this.h, y => {
-            chars[y] = [];
-            (0,utils/* times */.Hn)(this.w, x => {
-                chars[y][x] = '.';
-            });
-        });
-        const originalDrawAt = this[replace];
-        this[replace] = (x, y, char, _fg, _bg) => {
-            const cell = this.get(game_xy.XY.at(x, y));
-            if (replace === 'drawAt' && cell.pawn()) {
-                chars[y][x] = cell.pawn().desc()[0];
-            }
-            else {
-                chars[y][x] = char;
-            }
-        };
-        this.draw(false, new Set(), false, false, true);
-        this[replace] = originalDrawAt;
-        let result = '\n';
-        (0,utils/* times */.Hn)(this.h, y => {
-            (0,utils/* times */.Hn)(this.w, x => {
-                result += chars[y][x];
-            });
-            result += '\n';
-        });
-        return result;
-    }
-    fill(drawableConstructor) {
-        this.eachCell(cell => cell.create(drawableConstructor()));
-    }
-    killAll() {
-        this.eachCell(cell => game_layers/* CellLayers */.v.layerNames.forEach(n => {
-            const d = cell.layers.data[n];
-            if (d)
-                cell.died(d);
-        }));
-    }
-}
-map_Map.active = new Set();
-
-// EXTERNAL MODULE: ./src/game/initializer.ts + 6 modules
-var game_initializer = __webpack_require__(482);
-// EXTERNAL MODULE: ./src/game/config.ts + 47 modules
-var config = __webpack_require__(843);
-// EXTERNAL MODULE: ./src/draw/pawn.ts + 1 modules
-var draw_pawn = __webpack_require__(705);
 ;// ./node_modules/d3-selection/src/selector.js
 function none() {}
 
@@ -5687,6 +5609,10 @@ function addMethodsToTypedSel(typedSel) {
         this.attr('href', url);
         return this;
     };
+    enhanced.htmlData = function (n) {
+        const node = this.node();
+        return node ? node.getAttribute(`data-${n}`) : null;
+    };
     enhanced.bounds = function () {
         const node = this.node();
         (0,utils/* bombUnless */.Nb)(node, 'Node not found for bounds()');
@@ -5792,6 +5718,10 @@ const d1 = (selector) => {
         this.attr('href', url);
         return this;
     };
+    enhanced.htmlData = function (n) {
+        const node = this.node();
+        return node ? node.getAttribute(`data-${n}`) : null;
+    };
     enhanced.bounds = function () {
         const node = this.node();
         (0,utils/* bombUnless */.Nb)(node, 'Node not found for bounds()');
@@ -5800,8 +5730,248 @@ const d1 = (selector) => {
     return enhanced;
 };
 
+// EXTERNAL MODULE: ./src/compress.ts
+var compress = __webpack_require__(74);
+// EXTERNAL MODULE: ./src/game/xy.ts
+var game_xy = __webpack_require__(88);
+// EXTERNAL MODULE: ./src/game/cell.ts
+var cell = __webpack_require__(231);
+// EXTERNAL MODULE: ./src/game/lighting.ts
+var lighting = __webpack_require__(615);
+// EXTERNAL MODULE: ./src/game/layers.ts
+var game_layers = __webpack_require__(633);
+;// ./src/game/movers.ts
+
+class Move {
+    constructor(drawable, from, to) {
+        this.drawable = drawable;
+        this.from = from;
+        this.to = to;
+    }
+}
+class Movers {
+    constructor(map) {
+        this.map = map;
+        this.moves = [];
+    }
+    queue(drawable, from, to) {
+        (0,utils/* bombUnless */.Nb)(from !== to, 'cant queue move to same cell');
+        const dx = Math.abs(from.x - to.x);
+        const dy = Math.abs(from.y - to.y);
+        (0,utils/* bombUnless */.Nb)(Math.max(dx, dy) === 1, 'move must be adjacent');
+        this.moves.push(new Move(drawable, from, to));
+    }
+    clear() { this.moves = []; }
+    move() {
+        const stillpossible = new Set(this.moves.filter(m => {
+            const cell = this.map.get(m.from.xy);
+            return cell.occupantIs(m.drawable);
+        }));
+        this.clear();
+        while (stillpossible.size > 0) {
+            const pending = this.movable(stillpossible);
+            if (pending.length === 0)
+                return;
+            this.execute(pending);
+            pending.forEach(m => stillpossible.delete(m));
+        }
+    }
+    movable(stillpossible) {
+        const destinations = new Map();
+        stillpossible.forEach(m => (0,utils/* pushMap */.H3)(destinations, m.to, m)); // TODO - this is group by, right?
+        const pending = [];
+        destinations.forEach((entrants, dest) => {
+            if (entrants.length !== 1)
+                return;
+            const move = (0,utils/* the */.C8)(entrants);
+            const cell = this.map.get(dest.xy);
+            if (!cell.passable())
+                return;
+            if (!cell.occupied(move.drawable.layer))
+                pending.push(move);
+        });
+        return pending;
+    }
+    execute(moves) {
+        moves.forEach(m => this.map.get(m.from.xy).remove(m.drawable));
+        moves.forEach(m => this.map.get(m.to.xy).set(m.drawable));
+    }
+}
+
+// EXTERNAL MODULE: ./src/draw/drawable.ts
+var drawable = __webpack_require__(721);
+;// ./src/game/leaks.ts
+
+
+const assertNoLeaks = (map) => {
+    const alive = new Set();
+    map.eachLocation(xyl => {
+        const d = map.get(xyl.xy).layers.data[xyl.layer];
+        if (d)
+            alive.add(d);
+    });
+    const leaks = [...drawable/* Drawable */.h.alive].filter(d => !alive.has(d));
+    if (leaks.length) {
+        (0,utils/* each */.__)(leaks, l => drawable/* Drawable */.h.alive.delete(l));
+        (0,utils/* bomb */.fv)(`drawable leaked ${leaks.map(l => `${l.constructor.name}:${!!l.cell}`).join(', ')}`);
+    }
+};
+
+// EXTERNAL MODULE: ./src/shapes.ts
+var shapes = __webpack_require__(720);
+// EXTERNAL MODULE: ./src/ui/display.ts + 1 modules
+var display = __webpack_require__(328);
+// EXTERNAL MODULE: ./src/ui/ui-renderer.ts
+var ui_renderer = __webpack_require__(889);
+;// ./src/game/map.ts
+
+
+
+
+
+
+
+
+
+
+class map_Map {
+    constructor(width, height) {
+        this.get = (xy) => {
+            const result = xy.cell(this.grid);
+            (0,utils/* bombUnless */.Nb)(result, () => 'No cell at ' + xy);
+            return result;
+        };
+        this.eachLocation = (fn) => this.eachCell(cell => game_layers/* CellLayers */.v.layerNames.forEach(n => fn(cell.xy.on(n))));
+        this.eachCell = (fn) => (0,utils/* times */.Hn)(this.h, y => (0,utils/* times */.Hn)(this.w, x => fn(this.grid[y][x])));
+        map_Map.active.add(this);
+        this.display = new display/* Display */.n(width, height);
+        this.smokeDisplay = new display/* Display */.n(width, height, true);
+        this.w = width;
+        this.h = height;
+        this.grid = [];
+        (0,utils/* times */.Hn)(height, y => {
+            this.grid[y] = [];
+            (0,utils/* times */.Hn)(width, x => {
+                this.grid[y][x] = new cell/* Cell */.f(game_xy.XY.at(x, y), this);
+            });
+        });
+        game_xy.XY.setSize(width, height);
+        this.lighting = new lighting/* Lighting */.R(this);
+        this.movers = new Movers(this);
+        this.uiRenderer = new ui_renderer/* UIRenderer */.Q7(this);
+    }
+    drawAt(x, y, char, fg, bg) {
+        this.display.draw(x, y, char, fg, bg);
+    }
+    drawAtSmoke(x, y, char, fg, bg) {
+        this.smokeDisplay.draw(x, y, char, fg, bg);
+    }
+    draw(showLighting, visibleLayers, showNothing, debug, showDarkness = true) {
+        this.display.clear();
+        this.smokeDisplay.clear();
+        (0,utils/* times */.Hn)(this.h, y => {
+            (0,utils/* times */.Hn)(this.w, x => {
+                this.grid[y][x].draw(showLighting, visibleLayers, showNothing, debug, showDarkness);
+            });
+        });
+    }
+    step() {
+        (0,utils/* times */.Hn)(this.h, y => {
+            (0,utils/* times */.Hn)(this.w, x => {
+                this.grid[y][x].step();
+            });
+        });
+        this.movers.move();
+        assertNoLeaks(this);
+    }
+    set(xy, drawable) {
+        const cell = xy.cell(this.grid);
+        (0,utils/* bombUnless */.Nb)(cell, () => 'No cell at ' + xy);
+        cell.set(drawable);
+        return cell;
+    }
+    createAt(xy, drawable) {
+        const cell = this.get(xy);
+        return cell.create(drawable);
+    }
+    create(cell, drawable) {
+        drawable.born = true;
+        cell.bombOccupied(drawable.layer, occupant => `can't create ${drawable.desc()} on top of ${occupant.desc()}`);
+        cell.set(drawable);
+        return drawable;
+    }
+    moving(drawable, from, to) {
+        this.movers.queue(drawable, from, to);
+    }
+    eachRay(start, end, fOfCellAndShouldContinue) {
+        let first = true;
+        (0,shapes/* eachLine */.I)(start, end, (xy) => {
+            if (first) {
+                first = false;
+                return true;
+            }
+            if (game_xy.XY.oob(xy))
+                return false;
+            const cell = this.get(xy);
+            return fOfCellAndShouldContinue(cell);
+        });
+    }
+    onClick(onClickedCell) {
+        this.display.onClick((xy, c) => onClickedCell(xy ? this.get(xy) : undefined, c));
+    }
+    onMousemove(onMousedCell) {
+        this.display.onMousemove(xy => onMousedCell(this.get(xy)));
+    }
+    renderToChars(replace = 'drawAt') {
+        const chars = [];
+        (0,utils/* times */.Hn)(this.h, y => {
+            chars[y] = [];
+            (0,utils/* times */.Hn)(this.w, x => {
+                chars[y][x] = '.';
+            });
+        });
+        const originalDrawAt = this[replace];
+        this[replace] = (x, y, char, _fg, _bg) => {
+            const cell = this.get(game_xy.XY.at(x, y));
+            if (replace === 'drawAt' && cell.pawn()) {
+                chars[y][x] = cell.pawn().desc()[0];
+            }
+            else {
+                chars[y][x] = char;
+            }
+        };
+        this.draw(false, new Set(), false, false, true);
+        this[replace] = originalDrawAt;
+        let result = '\n';
+        (0,utils/* times */.Hn)(this.h, y => {
+            (0,utils/* times */.Hn)(this.w, x => {
+                result += chars[y][x];
+            });
+            result += '\n';
+        });
+        return result;
+    }
+    fill(drawableConstructor) {
+        this.eachCell(cell => cell.create(drawableConstructor()));
+    }
+    killAll() {
+        this.eachCell(cell => game_layers/* CellLayers */.v.layerNames.forEach(n => {
+            const d = cell.layers.data[n];
+            if (d)
+                cell.died(d);
+        }));
+    }
+}
+map_Map.active = new Set();
+
+// EXTERNAL MODULE: ./src/game/initializer.ts + 6 modules
+var game_initializer = __webpack_require__(482);
+// EXTERNAL MODULE: ./src/game/config.ts + 47 modules
+var config = __webpack_require__(843);
+// EXTERNAL MODULE: ./src/draw/pawn.ts + 1 modules
+var draw_pawn = __webpack_require__(705);
 ;// ./src/html/terminal.html
-/* harmony default export */ const terminal = ("<div id=\"terminal\">\n    <div id=\"terminal-content\">\n        <div class=\"cell-container\">\n            <div class=\"cell-coord\"></div>\n            <div class=\"layers\">\n                <div class=\"layer template\">\n                    <span class=\"name\">floor</span>: <span style=\"color: #444\" class=\"description\">Floor(4477)</span>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div id=\"selected-info\">\n        <div class=\"selected-container\">\n            <div class=\"pawn-desc\">firefighter 10</div>\n            <div class=\"tasks\">\n                <div class=\"task-info template\">\n                    <span class=\"task-desc\">go to 73, 26</span>\n                    <span class=\"clear-task\" data-index=\"0\" style=\"cursor: pointer; color: #f44; font-weight: bold;\">[x]</span>\n                </div>\n            </div>\n            <div id=\"clear-all\" style=\"cursor: pointer; color: #f44; font-weight: bold;\" title=\"clear all\">[xx]</div>\n        </div>\n    </div>\n</div>\n");
+/* harmony default export */ const terminal = ("<div id=\"terminal\">\n    <div id=\"terminal-content\">\n        <div class=\"cell-container\">\n            <div class=\"cell-coord\"></div>\n            <div class=\"layers\">\n                <div class=\"layer template\">\n                    <span class=\"name\">floor</span>: <span style=\"color: #444\" class=\"description\">Floor(4477)</span>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div id=\"selected-info\">\n        <div class=\"selected-container\">\n            <div class=\"pawn-desc\">firefighter 10</div>\n            <div class=\"capabilities\">\n                <div class=\"capability template\">strength 10</div>\n            </div>\n            <div class=\"tasks\">\n                <div class=\"task-info template\">\n                    <span class=\"task-desc\">go to 73, 26</span>\n                    <span class=\"clear-task\" data-index=\"0\" style=\"cursor: pointer; color: #f44; font-weight: bold;\">[x]</span>\n                </div>\n            </div>\n            <div id=\"clear-all\" style=\"cursor: pointer; color: #f44; font-weight: bold;\" title=\"clear all\">[xx]</div>\n        </div>\n    </div>\n</div>\n");
 ;// ./src/ui/terminal.ts
 
 
@@ -5841,6 +6011,10 @@ class Terminal {
         selectedInfo.updateFrom(pawn, (pawn) => {
             const container = selectedInfo.d1('.selected-container');
             container.d1('.pawn-desc').text(pawn.desc());
+            container.d1('.capabilities').dList('.capability').updateFrom(Object.entries(pawn.capabilities), (cDiv, [n, cap]) => {
+                const skills = Object.entries(cap).filter(([k]) => k !== 'score').map(([k, v]) => `${k} ${v}`).join(' ');
+                cDiv.text(`${n} ${cap.score} ${skills}`);
+            });
             container.d1('.tasks').dList('.task-info').updateFrom(pawn.tasks, (taskDiv, task) => {
                 taskDiv.d1('.task-desc').text(task.desc());
                 taskDiv.d1('.clear-task').on('click', () => task.remove());
@@ -5849,6 +6023,7 @@ class Terminal {
         }, () => {
             const container = selectedInfo.d1('.selected-container');
             container.d1('.pawn-desc').text('no pawn selected');
+            container.d1('.capabilities').dList('.capability').updateFrom([], () => { });
             container.d1('.tasks').dList('.task-info').updateFrom([], () => { });
             container.d1('#clear-all').style('display', 'none').on('click', null);
         });
@@ -6030,13 +6205,11 @@ class ExtinguishTask extends task/* Task */.Y {
 
 
 
-
 const MENU_ITEMS = [
     { key: 'x', desc: 'Exit menu and return to selection', action: ui => ui.setState('select') },
     { key: 'g', desc: 'Go to destination - click to move firefighter', action: (ui, p) => ui.setState('destination', p) },
     { key: 'w', desc: 'Wait - firefighter will pause and wait', action: (ui, p) => { p.addTask(new WaitTask(p)); ui.setState('menu', p); } },
     { key: 'e', desc: 'Extinguish - put out burning firefighter', action: (ui, p) => { p.addTask(new ExtinguishTask(p)); ui.setState('menu', p); } },
-    { key: 's', desc: 'Squawk - firefighter will shout "ouch" (debug)', action: (ui, p) => { p.squawk('ouch', colors/* FIRE */.ZK); ui.setState('menu', p); } },
     { key: 'd', desc: 'Debug - assign pawn to window.pawn for console', action: (ui, p) => { window.pawn = p; console.log('Pawn assigned to window.pawn:', p); ui.setState('menu', p); } },
     { key: 'r', desc: "Remove last task from firefighter's queue", action: (ui, p) => { (0,utils/* onLastMaybe */.iw)(p.tasks, t => t.remove()); ui.setState('menu', p); } }
 ];
@@ -6225,9 +6398,10 @@ const timer_timer = (_name) => new timer_Timer();
 
 
 
+
 class Spot {
-    constructor(letter, command) {
-        this.letter = letter;
+    constructor(key, command) {
+        this.key = key;
         this.command = command;
     }
 }
@@ -6235,9 +6409,23 @@ class MenuState {
     constructor(ui) {
         this.ui = ui;
         this.itemsByXY = new Map();
+        this.key = (e) => {
+            if (e.key === 'Escape')
+                this.ui.setState('select');
+            const item = MENU_ITEMS.find(i => i.key === e.key);
+            if (!item)
+                return;
+            this.hideHelp();
+            item.action(this.ui, this.pawn);
+            ui_renderer/* Repaint */.G2.emit();
+        };
         this.showTimer = timer_timer('show');
         this.hideTimer = timer_timer('hide');
         this.helpId = 'menu-help';
+        this.died = (pawn) => {
+            if (pawn === this.pawn)
+                this.ui.setState('select');
+        };
     }
     onClick(cell, _c) {
         if (!cell)
@@ -6270,6 +6458,15 @@ class MenuState {
         this.pawn = pawn;
         this.pawn.selected = true;
         draw_pawn/* PawnSelected */.Ei.emit(pawn);
+        this.unsubMove = draw_pawn/* PawnMoved */.w.on(({ pawn }) => {
+            if (pawn === this.pawn) {
+                this.hideHelp();
+                this.hideMenu();
+                this.showMenu();
+            }
+        });
+        this.unsubDied = draw_pawn/* PawnDied */.hq.on(this.died);
+        document.addEventListener('keydown', this.key);
         this.showMenu();
     }
     exit() {
@@ -6277,13 +6474,16 @@ class MenuState {
         draw_pawn/* PawnSelected */.Ei.emit(null);
         this.hideMenu();
         this.hideHelp();
+        this.unsubMove?.();
+        this.unsubDied?.();
+        document.removeEventListener('keydown', this.key);
     }
     showMenu() {
         this.placeCommands(MENU_ITEMS);
     }
     addUnusedMenuCells() {
         if ((0,utils/* isEmpty */.Im)(this.itemsByXY))
-            return this.pawn.tipCell.neighbors();
+            return this.pawn.cell.neighbors();
         const result = [];
         this.itemsByXY.forEach((_item, key) => {
             const [x, y] = key.split(', ').map(n => parseInt(n));
@@ -6306,12 +6506,12 @@ class MenuState {
     }
     hideMenu() {
         this.itemsByXY.forEach(item => {
-            this.ui.map.uiRenderer.remove(`menu-${item.letter}`);
+            this.ui.map.uiRenderer.remove(`menu-${item.key}`);
         });
         this.itemsByXY.clear();
     }
     findUnobstructedMenuLocation(itemCell, text) {
-        const base = this.pawn.tipCell.xy;
+        const base = this.pawn.cell.xy;
         const textWidth = text.length;
         const map = this.ui.map;
         const fitsOnMap = (xy) => {
@@ -6383,7 +6583,7 @@ class MenuState {
         return itemCell;
     }
     showHelp(cell, item) {
-        const text = MENU_HELP[item.letter];
+        const text = MENU_HELP[item.key];
         if (!text)
             return;
         const target = this.findUnobstructedMenuLocation(cell, text);
@@ -6475,75 +6675,101 @@ class UI {
 // EXTERNAL MODULE: ./src/signal.ts
 var signal = __webpack_require__(334);
 ;// ./src/html/firehouse.html
-/* harmony default export */ const firehouse = ("<div id=\"firehouse-modal\">\n    <div id=\"firehouse-content\">\n        <div class=\"firehouse-header\">\n            <h3 id=\"firehouse-title\"></h3>\n            <button id=\"firehouse-close\" class=\"close-button\">×</button>\n        </div>\n        <div class=\"names\">\n            <div class=\"firefighter template\">Name</div>\n        </div>\n        <div class=\"firehouse-actions\">\n            <button id=\"firehouse-ok\" class=\"submit-button\">OK</button>\n        </div>\n    </div>\n</div>\n");
+/* harmony default export */ const firehouse = ("<div id=\"firehouse-modal\" class=\"column gap-form\">\n        <div class=\"firehouse-header row items-between cross-aligned-center gap-modal-header\">\n            <h3 id=\"firehouse-title\"></h3>\n            <button id=\"firehouse-close\" class=\"close-button\">×</button>\n        </div>\n        <div class=\"row gap-form items-fill\">\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Upgrades</h4>\n                <div>a better place to live and work</div>\n            </div>\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Fire Engine</h4>\n                <div>how you get to missions</div>\n            </div>\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Resources</h4>\n                <div>use these to buy things</div>\n            </div>\n        </div>\n        <div class=\"row gap-form items-fill\">\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Personnel</h4>\n                <div class=\"names column gap-terminal-info\">\n                    <div class=\"firefighter template\">Name</div>\n                </div>\n            </div>\n            <div class=\"firehouse-panel column gap-terminal-info inspector\">\n                <h4>Inspector</h4>\n                <div class=\"details\">\n                    <div class=\"name\"></div>\n                    <div class=\"caps\">\n                        <div class=\"capability template\">strength 10</div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Equipment</h4>\n                <div>unallocated equipment</div>\n            </div>\n        </div>\n        <div class=\"firehouse-actions row aligned-end\">\n            <button id=\"firehouse-ok\" class=\"submit-button\">OK</button>\n        </div>\n    </div>\n\n");
+;// ./src/ui/modal.ts
+
+
+const ModalShowing = new signal/* Signal */.H();
+class Modal {
+    constructor(id) {
+        this.keyDown = (e) => {
+            const handled = this.modalKeyHandled(e);
+            if (!handled && e.key === 'Escape')
+                this.hide();
+            e.stopPropagation();
+        };
+        this.keyUp = (e) => e.stopPropagation();
+        this.div = d1(id);
+        Modal.list.push(this);
+    }
+    show() {
+        Modal.list.forEach(m => { if (m !== this)
+            m.hide(); });
+        const r = d1('#game-container').bounds();
+        this.div.style('left', `${r.left + 50}px`).style('top', `${r.top + 50}px`);
+        this.div.show();
+        ModalShowing.emit(true);
+        document.addEventListener('keydown', this.keyDown, true);
+        document.addEventListener('keyup', this.keyUp, true);
+    }
+    hide() {
+        this.div.hide();
+        document.removeEventListener('keydown', this.keyDown, true);
+        document.removeEventListener('keyup', this.keyUp, true);
+        if (!Modal.list.some(m => m.div.showing()))
+            ModalShowing.emit(false);
+    }
+    modalKeyHandled(e) {
+        return false;
+    }
+}
+Modal.list = [];
+
 ;// ./src/ui/firehouse.ts
 
 
-class FirehouseModal {
+
+class FirehouseModal extends Modal {
     constructor() {
-        this.div = d1('#firehouse-modal');
+        super('#firehouse-modal');
         this.div.appendFileHtml(firehouse);
         this.div.d1('#firehouse-close').onClick(() => this.hide());
         this.div.d1('#firehouse-ok').onClick(() => this.hide());
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape' && this.div.showing())
-                this.hide();
-        });
     }
-    show(num, names) {
+    open(num, pawns) {
         this.div.d1('#firehouse-title').text(`Firehouse ${num}`);
-        this.div.d1('.names').dList('.firefighter').updateFrom(names, (d, n) => d.text(n));
-        this.div.show();
+        this.div.d1('.names').dList('.firefighter').updateFrom(pawns, (d, p) => d.text(p.name).onClick(() => this.inspect(p)));
+        this.div.d1('.inspector .name').text('');
+        this.div.d1('.inspector .caps').dList('.capability').updateFrom([], () => { });
+        this.show();
     }
-    hide() { this.div.hide(); }
+    inspect(pawn) {
+        this.div.d1('.inspector .name').text(pawn.name);
+        this.div.d1('.inspector .caps').dList('.capability').updateFrom(Object.entries(pawn.capabilities), (cDiv, [n, cap]) => {
+            const skills = Object.entries(cap).filter(([k]) => k !== 'score').map(([k, v]) => `${k} ${v}`).join(' ');
+            cDiv.text(`${n} ${cap.score} ${skills}`);
+        });
+        draw_pawn/* PawnSelected */.Ei.emit(new draw_pawn/* Pawn */.vc(pawn.name, pawn.capabilities));
+    }
+    hide() {
+        super.hide();
+        draw_pawn/* PawnSelected */.Ei.emit(null);
+    }
 }
 
 // EXTERNAL MODULE: ./src/game/state.ts
 var state = __webpack_require__(522);
 ;// ./src/html/feedback.html
-/* harmony default export */ const feedback = ("<div id=\"feedback\">\n    <div id=\"feedback-content\">\n        <div class=\"feedback-header\">\n            <h3>Submit Feedback</h3>\n            <button id=\"feedback-close\" class=\"close-button\">×</button>\n        </div>\n        <div class=\"feedback-form\">\n            <div class=\"input-group\">\n                <label for=\"feedback-title\">Title:</label>\n                <input id=\"feedback-title\" type=\"text\" placeholder=\"\">\n            </div>\n            <div class=\"input-group\">\n                <label for=\"feedback-body\">Details:</label>\n                <textarea id=\"feedback-body\" rows=\"6\" placeholder=\"Start typing...\"></textarea>\n            </div>\n            <div class=\"feedback-actions\">\n                <div id=\"feedback-normal-buttons\">\n                    <button id=\"feedback-submit\" class=\"submit-button\">Submit Feedback</button>\n                    <button id=\"feedback-cancel\" class=\"cancel-button\">Cancel</button>\n                </div>\n                <div id=\"feedback-success-buttons\" style=\"display: none;\">\n                    <button id=\"feedback-ok\" class=\"submit-button\">OK</button>\n                </div>\n            </div>\n            <div id=\"feedback-status\" class=\"feedback-status hidden\"></div>\n        </div>\n    </div>\n</div> ");
+/* harmony default export */ const feedback = ("<div id=\"feedback-modal\" class=\"column gap-form\">\n        <div class=\"feedback-header row items-between cross-aligned-center gap-modal-header\">\n            <h3>Submit Feedback</h3>\n            <button id=\"feedback-close\" class=\"close-button\">×</button>\n        </div>\n        <div class=\"feedback-form column gap-form\">\n            <div class=\"input-group\">\n                <label for=\"feedback-title\">Title:</label>\n                <input id=\"feedback-title\" type=\"text\" placeholder=\"\">\n            </div>\n            <div class=\"input-group\">\n                <label for=\"feedback-body\">Details:</label>\n                <textarea id=\"feedback-body\" rows=\"6\" placeholder=\"Start typing...\"></textarea>\n            </div>\n            <div class=\"input-group\">\n                <label for=\"feedback-screenshot\">Screenshot (drop/paste or upload, 10MB max):</label>\n                <input id=\"feedback-screenshot\" type=\"file\" accept=\"image/*\">\n            </div>\n            <div class=\"feedback-actions row aligned-end gap-buttons\">\n                <div id=\"feedback-normal-buttons\" class=\"row gap-buttons\">\n                    <button id=\"feedback-submit\" class=\"submit-button\">Submit Feedback</button>\n                    <button id=\"feedback-cancel\" class=\"cancel-button\">Cancel</button>\n                </div>\n                <div id=\"feedback-success-buttons\" class=\"hidden row gap-buttons\">\n                    <button id=\"feedback-ok\" class=\"submit-button\">OK</button>\n                </div>\n            </div>\n        <div id=\"feedback-status\" class=\"feedback-status hidden\"></div>\n    </div>\n    </div>\n");
 ;// ./src/ui/feedback.ts
 
 
-class Feedback {
+class Feedback extends Modal {
     constructor() {
+        super('#feedback-modal');
         this.titleTouched = false;
         this.isSubmitting = false;
-        this.handleKeyDown = (e) => {
-            if (e.key === 'Escape') {
-                e.preventDefault();
-                e.stopPropagation();
-                this.hide();
-            }
-            else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-                e.preventDefault();
-                e.stopPropagation();
-                this.submit();
-            }
-            else if (e.key === ' ') {
-                // Allow space bar in text inputs but prevent game from capturing it
-                e.stopPropagation();
-            }
-        };
-        this.handleKeyUp = (e) => {
-            if (e.key === ' ') {
-                // Prevent game from capturing space bar releases
-                e.stopPropagation();
-            }
-        };
-        this.div = d1('#feedback');
+        this.image = null;
         this.div.appendFileHtml(feedback);
         this.setupEventListeners();
     }
     show() {
-        this.div.show();
+        super.show();
         this.reset();
-        this.captureKeyboardEvents();
         this.div.d1('#feedback-body').focus();
     }
     hide() {
-        this.div.hide();
-        this.releaseKeyboardEvents();
+        super.hide();
         this.reset();
     }
     prefill(title, body) {
@@ -6555,8 +6781,10 @@ class Feedback {
     reset() {
         this.titleTouched = false;
         this.isSubmitting = false;
+        this.image = null;
         this.div.d1('#feedback-title').setVal('');
         this.div.d1('#feedback-body').setVal('');
+        this.div.d1('#feedback-screenshot').setVal('');
         this.div.d1('#feedback-status').text('').hide();
         this.resetButtons();
         this.updateSubmitButton();
@@ -6574,14 +6802,30 @@ class Feedback {
             this.updateTitleFromBody();
             this.updateSubmitButton();
         });
+        const i = this.div.d1('#feedback-screenshot');
+        i.on('change', () => this.pick());
+        this.div.on('dragover', e => e.preventDefault());
+        this.div.on('drop', e => {
+            e.preventDefault();
+            const f = e.dataTransfer?.files?.[0];
+            if (f)
+                this.read(f);
+        });
+        this.div.on('paste', e => {
+            const f = e.clipboardData?.files?.[0];
+            if (f) {
+                e.preventDefault();
+                this.read(f);
+            }
+        });
     }
-    captureKeyboardEvents() {
-        document.addEventListener('keydown', this.handleKeyDown, true);
-        document.addEventListener('keyup', this.handleKeyUp, true);
-    }
-    releaseKeyboardEvents() {
-        document.removeEventListener('keydown', this.handleKeyDown, true);
-        document.removeEventListener('keyup', this.handleKeyUp, true);
+    modalKeyHandled(e) {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            this.submit();
+            return true;
+        }
+        return false;
     }
     updateTitleFromBody() {
         if (this.titleTouched)
@@ -6627,6 +6871,24 @@ class Feedback {
         const hasBody = bodyTextarea.getVal().trim().length > 0;
         submitButton.disable(this.isSubmitting || !hasBody);
     }
+    pick() {
+        const f = this.div.d1('#feedback-screenshot').node().files?.[0];
+        if (f)
+            this.read(f);
+    }
+    read(f) {
+        const s = this.div.d1('#feedback-status');
+        if (f.size > 10000000) {
+            s.show().style('color', '#f44').text('Screenshot too large (10MB max)');
+            this.div.d1('#feedback-screenshot').setVal('');
+            this.image = null;
+            return;
+        }
+        s.hide().text('');
+        const r = new FileReader();
+        r.onload = () => this.image = r.result;
+        r.readAsDataURL(f);
+    }
     async submit() {
         if (this.isSubmitting)
             return;
@@ -6642,10 +6904,11 @@ class Feedback {
         this.updateSubmitButton();
         statusDiv.show().style('color', '#0a0').text('Submitting feedback...');
         try {
+            const b = this.image ? body + '\\n\\n![screenshot](' + this.image + ')' : body;
             const response = await fetch('https://k69b0whqzl.execute-api.us-west-1.amazonaws.com/firehouse-rl-feedback-lambda', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, body })
+                body: JSON.stringify({ title, body: b })
             });
             if (response.ok) {
                 const result = await response.json();
@@ -6679,20 +6942,14 @@ class Feedback {
 }
 
 ;// ./src/html/switch-env.html
-/* harmony default export */ const switch_env = ("<div id=\"env-switch\">\n    <div id=\"env-switch-content\">\n        <div class=\"env-switch-header\">\n            <h3>SWITCH ENVIRONMENT</h3>\n            <button id=\"env-switch-close\" class=\"close-button\">×</button>\n        </div>\n        <div id=\"env-switch-message\"></div>\n        <div class=\"env-switch-actions\">\n            <button id=\"env-switch-cancel\" class=\"cancel-button\">Cancel</button>\n            <button id=\"env-switch-save-push\" class=\"submit-button\">Save &amp; Push</button>\n            <button id=\"env-switch-save\" class=\"submit-button\">Save Here &amp; Switch</button>\n            <button id=\"env-switch-switch\" class=\"submit-button\">Switch Only</button>\n        </div>\n    </div>\n</div>\n");
+/* harmony default export */ const switch_env = ("<div id=\"env-switch-modal\" class=\"column gap-form\">\n    <div class=\"row items-between cross-aligned-center gap-modal-header\">\n        <h3>SWITCH ENVIRONMENT</h3>\n        <button id=\"env-switch-close\" class=\"close-button\">×</button>\n    </div>\n    <div id=\"env-switch-message\"></div>\n    <div class=\"row aligned-end gap-buttons\">\n        <button id=\"env-switch-cancel\" class=\"cancel-button\">Cancel</button>\n        <button id=\"env-switch-save-push\" class=\"submit-button\">Save &amp; Push</button>\n        <button id=\"env-switch-save\" class=\"submit-button\">Save Here &amp; Switch</button>\n        <button id=\"env-switch-switch\" class=\"submit-button\">Switch Only</button>\n    </div>\n</div>\n");
 ;// ./src/ui/env-switch.ts
 
 
 
-class EnvSwitch {
+class EnvSwitch extends Modal {
     constructor() {
-        this.onKey = (e) => {
-            if (e.key === 'Escape') {
-                e.preventDefault();
-                this.choose('cancel');
-            }
-        };
-        this.div = d1('#env-switch');
+        super('#env-switch-modal');
         this.div.appendFileHtml(switch_env);
         const close = () => this.choose('cancel');
         this.div.d1('#env-switch-close').onClick(close);
@@ -6705,64 +6962,66 @@ class EnvSwitch {
         const s = localStorage.getItem('gameState');
         const bytes = s ? await (0,compress/* gzSize */.F8)(s) : 0;
         this.div.d1('#env-switch-message').text(`Save is ${bytes}b`);
-        this.div.show();
-        document.addEventListener('keydown', this.onKey, true);
+        super.show();
         return new Promise(r => (this.resolve = r));
     }
     choose(a) {
-        document.removeEventListener('keydown', this.onKey, true);
-        this.div.hide();
+        super.hide();
         this.resolve?.(a);
+    }
+    modalKeyHandled(e) {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            this.choose('cancel');
+            return true;
+        }
+        return false;
     }
 }
 
 ;// ./src/html/save-slots.html
-/* harmony default export */ const save_slots = ("<div id=\"save-slots-popup\" class=\"column gap-form\">\n    <h3 id=\"save-title\" class=\"popup-title\">SAVE GAME - SELECT SLOT</h3>\n    <div class=\"imported-save-section\">\n        <div class=\"imported-save template save-slot\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">Imported</div>\n                <button class=\"slot-delete close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Imported Save</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"exported-save-section\">\n        <div class=\"exported-save template save-slot\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">Exported</div>\n                <button class=\"slot-delete close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Exported Save</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"slots\">\n        <div class=\"slot template save-slot\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">1</div>\n                <button class=\"slot-delete close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Empty Slot</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"save-actions row aligned-end\">\n        <button id=\"save-cancel\" class=\"cancel-button\">Cancel</button>\n    </div>\n    <div class=\"popup-help-text\">\n        Click a slot to select • ESC to cancel\n    </div>\n</div>");
+/* harmony default export */ const save_slots = ("<div id=\"save-slots-modal\" class=\"column gap-form\">\n    <h3 id=\"save-title\" class=\"popup-title\">SAVE GAME - SELECT SLOT</h3>\n    <div class=\"imported-save-section\">\n        <div class=\"imported-save template save-slot\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">Imported</div>\n                <button class=\"slot-delete close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Imported Save</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"exported-save-section\">\n        <div class=\"exported-save template save-slot\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">Exported</div>\n                <button class=\"slot-delete close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Exported Save</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"slots\">\n        <div class=\"slot template save-slot\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">1</div>\n                <button class=\"slot-delete close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Empty Slot</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"save-actions row aligned-end\">\n        <button id=\"save-cancel\" class=\"cancel-button\">Cancel</button>\n    </div>\n    <div class=\"popup-help-text\">\n        Click a slot to select • ESC to cancel\n    </div>\n</div>\n");
+// EXTERNAL MODULE: ./src/game/capabilities.ts
+var capabilities = __webpack_require__(793);
 ;// ./src/ui/save-slots.ts
 
 
 
-class SaveSlotsUI {
+
+class SaveSlots extends Modal {
     constructor(gameState) {
+        super('#save-slots-modal');
         this.gameState = gameState;
         this.currentAction = 'save';
         this.isAutoLoadAtStartup = false;
-        this.popup = d1('#save-slots-popup');
-        this.popup.appendFileHtml(save_slots);
-        this.setupKeyHandler();
-        this.popup.d1('#save-cancel').onClick(() => this.hidePopup());
+        this.div.appendFileHtml(save_slots);
+        this.div.d1('#save-cancel').onClick(() => this.hide());
     }
     async showSaveDialog() {
         this.currentAction = 'save';
-        this.popup.d1('#save-title').text('SAVE GAME - SELECT SLOT');
+        this.div.d1('#save-title').text('SAVE GAME - SELECT SLOT');
         await this.renderSlots();
-        this.showPopup();
+        this.show();
     }
     async showLoadDialog() {
         this.currentAction = 'load';
         this.isAutoLoadAtStartup = false;
-        this.popup.d1('#save-title').text('LOAD GAME - SELECT SLOT');
+        this.div.d1('#save-title').text('LOAD GAME - SELECT SLOT');
         await this.renderSlots();
-        this.showPopup();
+        this.show();
     }
     async showAutoLoadDialog() {
         this.currentAction = 'load';
         this.isAutoLoadAtStartup = true;
-        this.popup.d1('#save-title').text('LOAD GAME - SELECT SLOT');
+        this.div.d1('#save-title').text('LOAD GAME - SELECT SLOT');
         await this.renderSlots();
-        this.showPopup();
-    }
-    showPopup() {
-        const rect = d1('#game-container').bounds();
-        this.popup.style('left', `${rect.left + 50}px`)
-            .style('top', `${rect.top + 50}px`);
-        this.popup.show();
+        this.show();
     }
     async renderSlots() {
         await this.renderEphemeralSave('imported', 'importedSave', 'Imported');
         await this.renderEphemeralSave('exported', 'exportedSave', 'Exported');
         const slots = await this.getSlotData();
-        this.popup.d1('.slots').dList('.slot').updateFrom(slots, (slotDiv, slotData) => {
+        this.div.d1('.slots').dList('.slot').updateFrom(slots, (slotDiv, slotData) => {
             const index = slots.indexOf(slotData);
             const slotNum = index + 1;
             slotDiv.d1('.slot-number').text(slotNum.toString());
@@ -6785,7 +7044,7 @@ class SaveSlotsUI {
         });
     }
     async renderEphemeralSave(type, storageKey, displayName) {
-        const section = this.popup.d1(`.${type}-save-section`);
+        const section = this.div.d1(`.${type}-save-section`);
         if (this.currentAction === 'save') {
             section.style('display', 'none');
             return;
@@ -6799,7 +7058,7 @@ class SaveSlotsUI {
         const saveDiv = section.d1(`.${type}-save`);
         const bytes = await (0,compress/* gzSize */.F8)(JSON.stringify(data));
         saveDiv.d1('.slot-status').text(`Firehouse #${data.firehouseNum || 0}`);
-        saveDiv.d1('.slot-details').text(`${(data.pawns || []).length} firefighters - ${bytes}b`);
+        saveDiv.d1('.slot-details').text(`${(0,capabilities/* withCapabilities */.X)(data.pawns || []).length} firefighters - ${bytes}b`);
         saveDiv.classed('slot-exists', true).classed('slot-empty', false);
         saveDiv.onClick(() => this.loadEphemeralSave(storageKey, displayName));
         saveDiv.d1('.slot-delete').on('click', async (event) => {
@@ -6813,7 +7072,7 @@ class SaveSlotsUI {
         if (!data)
             return;
         this.gameState.introSucceeded = data.introSucceeded;
-        this.gameState.pawns = data.pawns || [];
+        this.gameState.pawns = (0,capabilities/* withCapabilities */.X)(data.pawns || []);
         this.gameState.firehouseNum = data.firehouseNum || 0;
         localStorage.removeItem(storageKey);
         if (this.gameState.introSucceeded) {
@@ -6821,7 +7080,7 @@ class SaveSlotsUI {
             FirehouseMode.emit(this.gameState.pawns);
         }
         this.isAutoLoadAtStartup = false;
-        this.hidePopup();
+        this.hide();
         console.log(`${displayName} save loaded`);
     }
     deleteEphemeralSave(storageKey, displayName) {
@@ -6847,13 +7106,13 @@ class SaveSlotsUI {
             this.loadFromSlot(slotNum);
         }
         this.isAutoLoadAtStartup = false;
-        this.hidePopup();
+        this.hide();
     }
     saveToSlot(slotNum) {
         const key = `gameState_${slotNum}`;
         const data = {
             introSucceeded: this.gameState.introSucceeded,
-            pawns: this.gameState.pawns,
+            pawns: (0,capabilities/* withCapabilities */.X)(this.gameState.pawns),
             firehouseNum: this.gameState.firehouseNum
         };
         localStorage.setItem(key, JSON.stringify(data));
@@ -6870,7 +7129,7 @@ class SaveSlotsUI {
         }
         const parsed = JSON.parse(data);
         this.gameState.introSucceeded = parsed.introSucceeded;
-        this.gameState.pawns = parsed.pawns || [];
+        this.gameState.pawns = (0,capabilities/* withCapabilities */.X)(parsed.pawns || []);
         this.gameState.firehouseNum = parsed.firehouseNum || 0;
         if (this.gameState.introSucceeded) {
             const { FirehouseMode } = __webpack_require__(522);
@@ -6905,74 +7164,116 @@ class SaveSlotsUI {
             const bytes = await (0,compress/* gzSize */.F8)(data);
             return {
                 exists: true,
-                pawns: parsed.pawns || [],
+                pawns: (0,capabilities/* withCapabilities */.X)(parsed.pawns || []),
                 firehouseNum: parsed.firehouseNum || 0,
                 bytes
             };
         }));
     }
-    hidePopup() {
-        this.popup.hide();
-        // If canceling auto-load at startup, start fresh intro
+    hide() {
+        super.hide();
         if (this.isAutoLoadAtStartup) {
             this.isAutoLoadAtStartup = false;
             this.startFreshGame();
         }
     }
-    setupKeyHandler() {
-        document.addEventListener('keydown', (e) => {
-            if (!this.popup.showing())
-                return;
-            if (e.key === 'Escape') {
-                this.hidePopup();
-            }
-            else if (e.key >= '1' && e.key <= '3') {
-                this.selectSlot(parseInt(e.key));
-            }
-        });
+    modalKeyHandled(e) {
+        if (e.key >= '1' && e.key <= '3') {
+            this.selectSlot(parseInt(e.key));
+            return true;
+        }
+        return false;
     }
 }
 
 ;// ./src/html/branch-runner.html
-/* harmony default export */ const branch_runner = ("<div id=\"branch-runner-popup\">\n    <h3 class=\"popup-title\">BRANCH RUNNER</h3>\n    <div class=\"branch-actions\">\n        <button id=\"refresh-branches\" class=\"refresh-button\">Refresh</button>\n    </div>\n    <div class=\"branches\">\n        <div class=\"branch template branch-item\">\n            <div class=\"branch-info\">\n                <div class=\"branch-name\"></div>\n                <div class=\"branch-title\"></div>\n            </div>\n            <div class=\"branch-actions\">\n                <a class=\"pr-link\" href=\"#\" target=\"_blank\">PR</a>\n                <button class=\"branch-run\">Run</button>\n            </div>\n        </div>\n    </div>\n    <div class=\"popup-actions\">\n        <button id=\"branch-cancel\" class=\"cancel-button\">Cancel</button>\n    </div>\n    <div class=\"progress-messages\" style=\"display: none;\">\n        <div class=\"progress-title\">Running branch...</div>\n        <div class=\"progress-log\"></div>\n    </div>\n    <div class=\"popup-help-text\">\n        Click Run to test branch • Refresh to update list • ESC to cancel\n    </div>\n</div>");
+/* harmony default export */ const branch_runner = ("<div id=\"branch-runner-modal\" class=\"column gap-form\">\n    <h3 class=\"popup-title\">BRANCH RUNNER</h3>\n    <div class=\"branch-actions\">\n        <button id=\"refresh-branches\" class=\"refresh-button\">Refresh</button>\n    </div>\n    <div class=\"branches\">\n        <div class=\"branch template branch-item\">\n            <div class=\"branch-info\">\n                <div class=\"branch-name\"></div>\n                <div class=\"branch-title\"></div>\n            </div>\n            <div class=\"branch-actions\">\n                <a class=\"pr-link\" href=\"#\" target=\"_blank\">PR</a>\n                <button class=\"branch-run\">Run</button>\n            </div>\n        </div>\n    </div>\n    <div class=\"popup-actions\">\n        <button id=\"branch-cancel\" class=\"cancel-button\">Cancel</button>\n    </div>\n    <div class=\"progress-messages hidden\">\n        <div class=\"progress-title\">Running branch...</div>\n        <div class=\"progress-log\"></div>\n    </div>\n    <div class=\"popup-help-text\">\n        Click Run to test branch • Refresh to update list • ESC to cancel\n    </div>\n</div>\n");
 ;// ./src/git.ts
 
-const apiCall = (endpoint, data) => {
+const apiCall = async (endpoint, data) => {
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', `/api/git/${endpoint}`, false); // synchronous
+    xhr.open('POST', `/api/git/${endpoint}`, true); // asynchronous
     xhr.setRequestHeader('Content-Type', 'application/json');
-    try {
-        xhr.send(JSON.stringify(data || {}));
-        if (xhr.status !== 200) {
-            throw new Error(`API call failed: ${xhr.statusText}`);
+    return new Promise((resolve, reject) => {
+        xhr.onload = () => {
+            if (xhr.status === 200) {
+                try {
+                    resolve(JSON.parse(xhr.responseText));
+                }
+                catch (e) {
+                    reject(new Error(`Failed to parse response: ${e}`));
+                }
+            }
+            else {
+                reject(new Error(`API call failed: ${xhr.statusText}`));
+            }
+        };
+        xhr.onerror = () => reject(new Error('Network error'));
+        xhr.ontimeout = () => reject(new Error('Request timeout'));
+        xhr.timeout = 30000; // 30 second timeout
+        try {
+            xhr.send(JSON.stringify(data || {}));
         }
-        return JSON.parse(xhr.responseText);
-    }
-    catch (error) {
-        (0,utils/* bomb */.fv)(`Git API call failed: ${endpoint}\n${error.message}`);
-        return null;
-    }
+        catch (error) {
+            reject(new Error(`Git API call failed: ${endpoint}\n${error.message}`));
+        }
+    });
 };
 const git = {
-    fetchBranches() {
-        apiCall('fetch');
+    async fetchBranches() {
+        try {
+            await apiCall('fetch');
+        }
+        catch (error) {
+            (0,utils/* bomb */.fv)(`Failed to fetch branches: ${error.message}`);
+        }
     },
-    listCodexBranches() {
-        const result = apiCall('list-branches');
-        return result || { branches: [] };
+    async listCodexBranches() {
+        try {
+            const result = await apiCall('list-branches');
+            return result || { branches: [] };
+        }
+        catch (error) {
+            (0,utils/* bomb */.fv)(`Failed to list branches: ${error.message}`);
+            return { branches: [] };
+        }
     },
-    cloneRepo(targetDir) {
-        apiCall('clone', { targetDir });
+    async cloneRepo(targetDir) {
+        try {
+            await apiCall('clone', { targetDir });
+        }
+        catch (error) {
+            (0,utils/* bomb */.fv)(`Failed to clone repo: ${error.message}`);
+        }
     },
-    checkoutBranch(repoDir, branch) {
-        apiCall('checkout', { repoDir, branch });
+    async checkoutBranch(repoDir, branch) {
+        try {
+            await apiCall('checkout', { repoDir, branch });
+        }
+        catch (error) {
+            (0,utils/* bomb */.fv)(`Failed to checkout branch: ${error.message}`);
+        }
     },
-    startBranchServer(repoDir) {
-        apiCall('start-server', { repoDir });
+    async startBranchServer(repoDir) {
+        try {
+            await apiCall('start-server', { repoDir });
+        }
+        catch (error) {
+            (0,utils/* bomb */.fv)(`Failed to start server: ${error.message}`);
+        }
     },
-    getBranchInfo() {
-        const result = apiCall('branch-info');
-        return result || { branch: 'main', hasChanges: false };
+    async getBranchInfo() {
+        try {
+            const result = await apiCall('branch-info');
+            return result || { branch: 'main', hasChanges: false };
+        }
+        catch (error) {
+            (0,utils/* bomb */.fv)(`Failed to get branch info: ${error.message}`);
+            return { branch: 'main', hasChanges: false };
+        }
+    },
+    async killServer() {
+        await apiCall('kill-server');
     }
 };
 
@@ -6980,134 +7281,117 @@ const git = {
 
 
 
-class BranchRunnerUI {
+class BranchRunnerUI extends Modal {
     constructor() {
+        super('#branch-runner-modal');
         this.branchTab = null;
-        this.popup = d1('#branch-runner-popup');
-        this.popup.appendFileHtml(branch_runner);
+        this.isRunning = false;
+        this.div.appendFileHtml(branch_runner);
         this.setupEventHandlers();
-        this.setupKeyHandler();
     }
-    showDialog() {
-        this.refreshBranches();
-        this.showPopup();
-    }
-    showPopup() {
-        const rect = d1('#game-container').bounds();
-        this.popup.style('left', `${rect.left + 50}px`)
-            .style('top', `${rect.top + 50}px`);
-        this.popup.show();
-    }
-    hidePopup() {
-        this.popup.hide();
+    async showDialog() {
+        this.show();
+        await this.refreshBranches();
     }
     setupEventHandlers() {
-        this.popup.d1('#branch-cancel').onClick(() => this.hidePopup());
-        this.popup.d1('#refresh-branches').onClick(() => this.refreshBranches());
+        this.div.d1('#branch-cancel').onClick(() => this.hide());
+        this.div.d1('#refresh-branches').onClick(() => void this.refreshBranches());
     }
-    refreshBranches() {
-        git.fetchBranches();
-        const result = git.listCodexBranches();
-        const branches = result.branches || [];
-        this.popup.d1('.branches').dList('.branch').updateFrom(branches, (branchDiv, branchData) => {
-            const branch = typeof branchData === 'string' ? branchData : branchData.branch;
-            const title = typeof branchData === 'string' ? '' : branchData.title;
-            const number = typeof branchData === 'string' ? 0 : branchData.number;
-            // Set branch name and title
-            branchDiv.d1('.branch-name').text(branch);
-            if (title) {
-                branchDiv.d1('.branch-title').text(title).show();
+    async refreshBranches() {
+        await git.fetchBranches();
+        const r = await git.listCodexBranches();
+        const b = r.branches || [];
+        this.div.d1('.branches').dList('.branch').updateFrom(b, (d, data) => {
+            const n = typeof data === 'string' ? data : data.branch;
+            const t = typeof data === 'string' ? '' : data.title;
+            const num = typeof data === 'string' ? 0 : data.number;
+            d.d1('.branch-name').text(n);
+            t ? d.d1('.branch-title').text(t).show() : d.d1('.branch-title').hide();
+            if (num > 0) {
+                const u = `https://github.com/${this.getRepoPath()}/pull/${num}`;
+                d.d1('.pr-link').href(u).show();
             }
-            else {
-                branchDiv.d1('.branch-title').hide();
-            }
-            // Set PR link
-            if (number > 0) {
-                const prUrl = `https://github.com/${this.getRepoPath()}/pull/${number}`;
-                branchDiv.d1('.pr-link').href(prUrl).show();
-            }
-            else {
-                branchDiv.d1('.pr-link').hide();
-            }
-            branchDiv.d1('.branch-run').onClick(() => this.runBranch(branch));
+            else
+                d.d1('.pr-link').hide();
+            const runBtn = d.d1('.branch-run');
+            runBtn.on('click', null).onClick(() => this.runBranch(n));
+            if (this.isRunning)
+                runBtn.disable(true).text('Running...');
+            else
+                runBtn.disable(false).text('Run');
         });
     }
     async runBranch(branch) {
-        const targetDir = '/Users/jeffbay/src/firehouse-rl-branch';
-        // Show progress UI immediately
-        this.popup.d1('.branches').hide();
-        this.popup.d1('.popup-actions').hide();
-        this.popup.d1('.popup-help-text').hide();
-        this.popup.d1('.progress-messages').show();
-        const progressLog = this.popup.d1('.progress-log');
-        const addMessage = (msg) => {
-            progressLog.append('div').text(msg);
-            console.log(`Branch Runner: ${msg}`);
-        };
+        if (this.isRunning)
+            return;
+        this.isRunning = true;
+        const target = '/Users/jeffbay/src/firehouse-rl-branch';
+        this.div.d1('.branches').hide();
+        this.div.d1('.popup-actions').hide();
+        this.div.d1('.popup-help-text').hide();
+        this.div.d1('.progress-messages').show();
+        const log = this.div.d1('.progress-log');
+        const msg = (m) => { log.append('div').text(m); console.log(`Branch Runner: ${m}`); };
         try {
-            addMessage(`Cloning repository to ${targetDir}...`);
-            await this.delay(100); // Allow UI to update
-            git.cloneRepo(targetDir);
-            addMessage('Repository ready');
-            addMessage(`Checking out branch: ${branch}`);
+            msg('Stopping any existing server on port 8081...');
+            try {
+                await git.killServer();
+                msg('Server stopped (or was not running)');
+            }
+            catch (e) {
+                msg('No server was running to stop');
+            }
+            msg(`Cloning repository to ${target}...`);
             await this.delay(100);
-            git.checkoutBranch(targetDir, branch);
-            addMessage(`Branch ${branch} checked out and updated`);
-            addMessage('Starting webpack dev server on port 8081...');
+            await git.cloneRepo(target);
+            msg('Repository ready');
+            msg(`Checking out branch: ${branch}`);
             await this.delay(100);
-            git.startBranchServer(targetDir);
-            addMessage('Server starting - waiting 5 seconds for full startup...');
-            // Give server more time to fully start
+            await git.checkoutBranch(target, branch);
+            msg(`Branch ${branch} checked out and updated`);
+            msg('Starting webpack dev server on port 8081...');
+            await this.delay(100);
+            await git.startBranchServer(target);
+            msg('Server starting - waiting 5 seconds for full startup...');
             await this.delay(5000);
-            addMessage('Opening branch in browser tab');
+            msg('Opening branch in browser tab');
             if (this.branchTab && !this.branchTab.closed) {
                 this.branchTab.location.href = 'http://localhost:8081';
                 this.branchTab.focus();
             }
-            else {
+            else
                 this.branchTab = window.open('http://localhost:8081', 'branch-testing');
-            }
-            addMessage('Branch server ready! Check browser tab.');
-            // Hide popup after a moment
+            msg('Branch server ready! Check browser tab.');
             await this.delay(2000);
-            this.hidePopup();
+            this.hide();
             this.resetProgressUI();
         }
-        catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
-            addMessage(`Error: ${message}`);
-            addMessage('Check console for details. Click Cancel to close.');
-            console.error('Branch runner error:', error);
+        catch (e) {
+            const m = e instanceof Error ? e.message : String(e);
+            msg(`Error: ${m}`);
+            msg('Check console for details. Click Cancel to close.');
+            console.error('Branch runner error:', e);
+        }
+        finally {
+            this.isRunning = false;
         }
     }
-    delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
+    delay(ms) { return new Promise(r => setTimeout(r, ms)); }
     resetProgressUI() {
-        this.popup.d1('.progress-log').text('');
-        this.popup.d1('.progress-messages').hide();
-        this.popup.d1('.branches').show();
-        this.popup.d1('.popup-actions').show();
-        this.popup.d1('.popup-help-text').show();
+        this.div.d1('.progress-log').text('');
+        this.div.d1('.progress-messages').hide();
+        this.div.d1('.branches').show();
+        this.div.d1('.popup-actions').show();
+        this.div.d1('.popup-help-text').show();
     }
-    getRepoPath() {
-        // Extract owner/repo from current location or hardcode
-        return 'jlb0170/firehouse-rl'; // Update this if repo path is different
-    }
-    setupKeyHandler() {
-        document.addEventListener('keydown', (e) => {
-            if (!this.popup.showing())
-                return;
-            if (e.key === 'Escape') {
-                this.hidePopup();
-            }
-        });
-    }
+    getRepoPath() { return 'jlb0170/firehouse-rl'; }
 }
 
 // EXTERNAL MODULE: ./src/draw/fire.ts
 var fire = __webpack_require__(267);
 ;// ./src/game/game.ts
+
+
 
 
 
@@ -7135,6 +7419,7 @@ class Game {
         this.running = false;
         this.holding = false;
         this.stepTimer = timer_timer('step');
+        this.speed = 1;
         this.showLighting = false;
         this.showDarkness = true;
         this.mutedLayers = new Set();
@@ -7142,6 +7427,24 @@ class Game {
         this.helpSystem = new HelpSystem();
         this.feedback = new Feedback();
         this.envSwitch = new EnvSwitch();
+        this.setSpeed = (n) => {
+            this.speed = n;
+            if (this.running)
+                this.stepTimer.restartInMillis(this.delay(), this.tick);
+        };
+        this.showSpeeds = () => {
+            const m = d1('#speed-buttons');
+            m.show();
+            const h = (e) => {
+                m.hide();
+                const s = e.target.getAttribute('data-speed');
+                if (s)
+                    this.setSpeed(parseFloat(s));
+                document.removeEventListener('mouseup', h);
+            };
+            document.addEventListener('mouseup', h);
+        };
+        this.delay = () => 350 / this.speed;
         this.updateStepInfo = () => {
             if (!GameStepped.current)
                 return;
@@ -7191,7 +7494,7 @@ class Game {
             if (!this.running)
                 return;
             this.step();
-            this.stepTimer.restartInMillis(350, this.tick);
+            this.stepTimer.restartInMillis(this.delay(), this.tick);
         };
         this.chooseSwitchAction = () => this.envSwitch.show();
         this.switchEnv = async () => {
@@ -7225,7 +7528,7 @@ class Game {
             this.map.smokeDisplay.clear();
             this.map.uiRenderer.clearStrokes();
             this.drawMap();
-            this.firehouse.show(this.state.firehouseNum, pawns);
+            this.firehouse.open(this.state.firehouseNum, pawns);
         };
         this.map = new map_Map(config/* Config */.T.WIDTH, config/* Config */.T.HEIGHT);
         window.map = this.map;
@@ -7236,10 +7539,10 @@ class Game {
         this.setupControls();
         if ((0,utils/* isLocal */.IX)() && !(0,utils/* isBranchRunner */.ZL)()) {
             this.branchRunner = new BranchRunnerUI();
-            (0,utils.$1)('branch-runner').style.display = 'block';
+            d1('#branch-runner').show();
         }
         if ((0,utils/* isLocal */.IX)()) {
-            this.showBranchInfo();
+            void this.showBranchInfo();
         }
         this.setupDebugControls();
         this.updateEnvButton();
@@ -7255,7 +7558,17 @@ class Game {
         ui_renderer/* RedrawMap */.iQ.on(() => this.drawMap());
         ui_renderer/* FrameRendered */.HO.on(() => this.updateStepInfo());
         this.state = new state.GameState(this.map);
-        this.saveSlots = new SaveSlotsUI(this.state);
+        ModalShowing.on(s => {
+            if (s) {
+                this.pauseForModal();
+                this.map.uiRenderer.freeze();
+            }
+            else {
+                this.map.uiRenderer.unfreeze();
+                this.resumeFromModal();
+            }
+        });
+        this.saveSlots = new SaveSlots(this.state);
         this.firehouse = new FirehouseModal();
         state.FirehouseMode.on(this.enterFirehouse);
         // Auto-show load dialog if saves exist, otherwise start normally
@@ -7277,14 +7590,16 @@ class Game {
         this.map.onClick(this.ui.onClick);
     }
     setupControls() {
-        (0,utils/* onClick */.Af)((0,utils.$1)('playpause-button'), () => this.togglePlayPause());
+        const play = (0,utils.$1)('playpause-button');
+        (0,utils/* onClick */.Af)(play, () => this.togglePlayPause());
+        play.addEventListener('mousedown', this.showSpeeds);
         (0,utils/* onClick */.Af)((0,utils.$1)('next-button'), () => this.step());
         (0,utils/* onClick */.Af)((0,utils.$1)('freeze-button'), () => this.toggleFreeze());
-        (0,utils/* onClick */.Af)((0,utils.$1)('help-button'), (e) => {
+        (0,utils/* onClick */.Af)((0,utils.$1)('help-button'), e => {
             e.stopPropagation();
             this.toggleHelp();
         });
-        (0,utils/* onClick */.Af)((0,utils.$1)('feedback-button'), (e) => {
+        (0,utils/* onClick */.Af)((0,utils.$1)('feedback-button'), e => {
             e.stopPropagation();
             this.showFeedback();
         });
@@ -7300,7 +7615,7 @@ class Game {
         (0,utils/* onClick */.Af)((0,utils.$1)('save-game'), () => this.saveSlots.showSaveDialog());
         (0,utils/* onClick */.Af)((0,utils.$1)('switch-env'), this.switchEnv);
         if (this.branchRunner) {
-            (0,utils/* onClick */.Af)((0,utils.$1)('branch-runner'), () => this.branchRunner.showDialog());
+            (0,utils/* onClick */.Af)((0,utils.$1)('branch-runner'), () => void this.branchRunner.showDialog());
         }
         this.createLayerButtons();
         game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
@@ -7504,248 +7819,18 @@ class Game {
     updateEnvButton() {
         (0,utils.$1)('switch-env').textContent = location.host.includes('github.io') ? 'LCL' : 'PROD';
     }
-    showBranchInfo() {
+    async showBranchInfo() {
         try {
-            const branchInfo = git.getBranchInfo();
-            const changesText = branchInfo.hasChanges ? ' (uncommitted changes)' : '';
-            const displayText = `Branch: ${branchInfo.branch}${changesText}`;
-            const branchInfoDiv = (0,utils.$1)('branch-info');
-            branchInfoDiv.textContent = displayText;
-            branchInfoDiv.style.display = 'block';
+            const { branch, hasChanges } = await git.getBranchInfo();
+            const d = d1('#branch-info');
+            if (branch === 'main' || branch === 'master')
+                d.hide();
+            else
+                d.text(`Branch: ${branch}${hasChanges ? ' (uncommitted changes)' : ''}`).show();
         }
-        catch (error) {
-            // Silently ignore errors - branch info is nice-to-have
+        catch (e) {
+            console.error('showBranchInfo', e);
         }
-    }
-}
-
-
-/***/ }),
-
-/***/ 267:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   v: () => (/* binding */ Fire)
-/* harmony export */ });
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
-/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(919);
-/* harmony import */ var _drawable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(721);
-/* harmony import */ var _smoke__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(502);
-/* harmony import */ var _game_layers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(633);
-
-
-
-
-
-class Fire extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
-    constructor() {
-        super(...arguments);
-        this.layer = 'fire';
-        this.light = () => 3;
-        this.char = () => "▲"; // "🔥"
-        this.color = () => _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .FIRE */ .ZK.random();
-    }
-    step() {
-        if (!(0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(this.age)) {
-            this.cell.died(this);
-            return;
-        }
-        this.cell.reborn(new _smoke__WEBPACK_IMPORTED_MODULE_3__/* .Smoke */ ._());
-        _game_layers__WEBPACK_IMPORTED_MODULE_4__/* .CellLayers */ .v.materialLayers.forEach(l => {
-            const d = this.cell.layers.data[l];
-            if (d?.material)
-                d.material.ignite();
-        });
-        if ((0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(4)) {
-            (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randFrom */ .Kt)(this.cell.neighbors()).reborn(new Fire());
-        }
-        if ((0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(4)) {
-            const neighbor = (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randFrom */ .Kt)(this.cell.neighbors());
-            if (!neighbor.passable())
-                return;
-            this.cell.queueMove(this, neighbor.xy);
-        }
-    }
-    merge(other) {
-        (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .bombUnless */ .Nb)(other instanceof Fire, 'merge mismatch');
-        return other.olderThan(this) ? 'replace' : 'kill';
-    }
-}
-
-
-/***/ }),
-
-/***/ 314:
-/***/ ((module) => {
-
-
-
-/*
-  MIT License http://www.opensource.org/licenses/mit-license.php
-  Author Tobias Koppers @sokra
-*/
-module.exports = function (cssWithMappingToString) {
-  var list = [];
-
-  // return the list of modules as css string
-  list.toString = function toString() {
-    return this.map(function (item) {
-      var content = "";
-      var needLayer = typeof item[5] !== "undefined";
-      if (item[4]) {
-        content += "@supports (".concat(item[4], ") {");
-      }
-      if (item[2]) {
-        content += "@media ".concat(item[2], " {");
-      }
-      if (needLayer) {
-        content += "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {");
-      }
-      content += cssWithMappingToString(item);
-      if (needLayer) {
-        content += "}";
-      }
-      if (item[2]) {
-        content += "}";
-      }
-      if (item[4]) {
-        content += "}";
-      }
-      return content;
-    }).join("");
-  };
-
-  // import a list of modules into the list
-  list.i = function i(modules, media, dedupe, supports, layer) {
-    if (typeof modules === "string") {
-      modules = [[null, modules, undefined]];
-    }
-    var alreadyImportedModules = {};
-    if (dedupe) {
-      for (var k = 0; k < this.length; k++) {
-        var id = this[k][0];
-        if (id != null) {
-          alreadyImportedModules[id] = true;
-        }
-      }
-    }
-    for (var _k = 0; _k < modules.length; _k++) {
-      var item = [].concat(modules[_k]);
-      if (dedupe && alreadyImportedModules[item[0]]) {
-        continue;
-      }
-      if (typeof layer !== "undefined") {
-        if (typeof item[5] === "undefined") {
-          item[5] = layer;
-        } else {
-          item[1] = "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {").concat(item[1], "}");
-          item[5] = layer;
-        }
-      }
-      if (media) {
-        if (!item[2]) {
-          item[2] = media;
-        } else {
-          item[1] = "@media ".concat(item[2], " {").concat(item[1], "}");
-          item[2] = media;
-        }
-      }
-      if (supports) {
-        if (!item[4]) {
-          item[4] = "".concat(supports);
-        } else {
-          item[1] = "@supports (".concat(item[4], ") {").concat(item[1], "}");
-          item[4] = supports;
-        }
-      }
-      list.push(item);
-    }
-  };
-  return list;
-};
-
-/***/ }),
-
-/***/ 328:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  n: () => (/* binding */ Display)
-});
-
-// EXTERNAL MODULE: ./src/game/config.ts + 47 modules
-var config = __webpack_require__(843);
-// EXTERNAL MODULE: ./src/utils.ts
-var utils = __webpack_require__(185);
-// EXTERNAL MODULE: ./src/game/xy.ts
-var game_xy = __webpack_require__(88);
-;// ./src/ui/click.ts
-const toClick = (e) => ({
-    button: e.button === 2 ? 'RIGHT' : 'LEFT',
-    shift: e.shiftKey,
-    ctrl: e.ctrlKey,
-    alt: e.altKey,
-    meta: e.metaKey
-});
-
-;// ./src/ui/display.ts
-
-
-
-
-class Display {
-    constructor(width, height, transparent = false) {
-        this.coordsFromEvent = (e) => {
-            const canvas = this.canvas();
-            const rect = canvas.getBoundingClientRect();
-            const x = Math.floor((e.clientX - rect.left) / config/* Config */.T.FONT_SIZE);
-            const y = Math.floor((e.clientY - rect.top) / config/* Config */.T.FONT_SIZE);
-            return game_xy.XY.at(x, y);
-        };
-        this.display = transparent
-            ? config/* Config */.T.createTransparentDisplay(width, height)
-            : config/* Config */.T.createDisplay(width, height);
-        this.clear();
-    }
-    draw(x, y, char, fg, bg) {
-        this.display.draw(x, y, char, fg, bg);
-    }
-    clear() {
-        this.display.clear();
-    }
-    canvas() {
-        return (0,utils/* bombUnless */.Nb)(this.display.getContainer(), () => 'Failed to get canvas');
-    }
-    attachTo(container, styles) {
-        const canvas = this.canvas();
-        Object.assign(canvas.style, styles);
-        container.appendChild(canvas);
-    }
-    onClick(callback) {
-        const canvas = this.canvas();
-        const h = (e) => {
-            const xy = this.coordsFromEvent(e);
-            const c = toClick(e);
-            if (game_xy.XY.oob(xy.x, xy.y)) {
-                callback(undefined, c);
-                return;
-            }
-            callback(xy, c);
-        };
-        (0,utils/* onClick */.Af)(canvas, h);
-        canvas.addEventListener('contextmenu', e => { e.preventDefault(); h(e); });
-    }
-    onMousemove(callback) {
-        const canvas = this.canvas();
-        (0,utils/* onMousemove */.iT)(canvas, e => {
-            const xy = this.coordsFromEvent(e);
-            if (game_xy.XY.oob(xy.x, xy.y))
-                return;
-            callback(xy);
-        });
     }
 }
 
@@ -7940,10 +8025,12 @@ var pawn = __webpack_require__(705);
 var fire = __webpack_require__(267);
 // EXTERNAL MODULE: ./src/ui/text-stroke.ts
 var text_stroke = __webpack_require__(485);
-// EXTERNAL MODULE: ./src/game/game.ts + 125 modules
-var game = __webpack_require__(243);
+// EXTERNAL MODULE: ./src/game/game.ts + 126 modules
+var game = __webpack_require__(331);
 // EXTERNAL MODULE: ./src/game/state.ts
 var state = __webpack_require__(522);
+// EXTERNAL MODULE: ./src/game/capabilities.ts
+var capabilities = __webpack_require__(793);
 ;// ./src/game/names.ts
 const firsts = "Mary,Anna,Emma,Elizabeth,Minnie,Margaret,Ida,Alice,Bertha,Sarah,Annie,Clara,Ella,Florence,Cora,Martha,Laura,Nellie,Grace,Carrie,Maude,Mabel,Bessie,Jennie,Gertrude,Julia,Hattie,Edith,Mattie,Rose,Catherine,Lillian,Ada,Lillie,Helen,Jessie,Louise,Ethel,Lula,Myrtle,Eva,Frances,Lena,Lucy,Edna,Maggie,Pearl,Daisy,Fannie,Josephine,Dora,Rosa,Katherine,Agnes,Marie,Nora,May,Mamie,Blanche,Stella,Ellen,Nancy,Effie,Sallie,Nettie,Della,Lizzie,Flora,Susie,Maud,Mae,Etta,Harriet,Sadie,Caroline,Katie,Lydia,Elsie,Kate,Susan,Mollie,Alma,Addie,Georgia,Eliza,Lulu,Nannie,Lottie,Amanda,Belle,Charlotte,Rebecca,Ruth,Viola,Olive,Amelia,Hannah,Jane,Virginia,Emily,Matilda,Irene,Kathryn,Esther,Willie,Henrietta,Ollie,Amy,Rachel,Sara,Estella,Theresa,Augusta,Ora,Pauline,Josie,Lola,Sophia,Leona,Anne,Mildred,Ann,Beulah,Callie,Lou,Delia,Eleanor,Barbara,Iva,Louisa,Maria,Mayme,Evelyn,Estelle,Nina,Betty,Marion,Bettie,Dorothy,Luella,Inez,Lela,Rosie,Allie,Millie,Janie,Cornelia,Victoria,Ruby,Winifred,Alta,Celia,Christine,Beatrice,Birdie,Harriett,Mable,Myra,Sophie,Tillie,Isabel,Sylvia,Carolyn,Isabelle,Leila,Sally,Ina,Essie,Bertie,Nell,Alberta,Katharine,Lora,Rena,Mina,Rhoda,Mathilda,Abbie,Eula,Dollie,Hettie,Eunice,Fanny,Ola,Lenora,Adelaide,Christina,Lelia,Nelle,Sue,Johanna,Lilly,Lucinda,Minerva,Lettie,Roxie,Cynthia,Helena,Hilda,Hulda,Bernice,Genevieve,Jean,Cordelia,Marian,Francis,Jeanette,Adeline,Gussie,Leah,Lois,Lura,Mittie,Hallie,Isabella,Olga,Phoebe,Teresa,Hester,Lida,Lina,Winnie,Claudia,Marguerite,Vera,Cecelia,Bess,Emilie,John,Rosetta,Verna,Myrtie,Cecilia,Elva,Olivia,Ophelia,Georgie,Elnora,Violet,Adele,Lily,Linnie,Loretta,Madge,Polly,Virgie,Eugenia,Lucile,Lucille,Mabelle,Rosalie,Kittie,Meta,Angie,Dessie,Georgiana,Lila,Regina,Selma,Wilhelmina,Bridget,Lilla,Malinda,Vina,Freda,Gertie,Jeannette,Louella,Mandy,Roberta,Cassie,Corinne,Ivy,Melissa,Lyda,Naomi,Norma,Bell,Margie,Nona,Zella,Dovie,Elvira,Erma,Irma,Leota,William,Artie,Blanch,Charity,Lorena,Lucretia,Orpha,Alvina,Annette,Catharine,Elma,Geneva,Janet,Lee,Leora,Lona,Miriam,Zora,Linda,Octavia,Sudie,Zula,Adella,Alpha,Frieda,George,Joanna,Leonora,Priscilla,Tennie,Angeline,Docia,Ettie,Flossie,Hanna,Letha,Minta,Retta,Rosella,Adah,Berta,Elisabeth,Elise,Goldie,Leola,Margret,Adaline,Floy,Idella,Juanita,Lenna,Lucie,Missouri,Nola,Zoe,Eda,Isabell,James,Julie,Letitia,Madeline,Malissa,Mariah,Pattie,Vivian,Almeda,Aurelia,Claire,Dolly,Hazel,Jannie,Kathleen,Kathrine,Lavinia,Marietta,Melvina,Ona,Pinkie,Samantha,Susanna,Chloe,Donnie,Elsa,Gladys,Matie,Pearle,Vesta,Vinnie,Antoinette,Clementine,Edythe,Harriette,Libbie,Lilian,Lue,Lutie,Magdalena,Meda,Rita,Tena,Zelma,Adelia,Annetta,Antonia,Dona,Elizebeth,Georgianna,Gracie,Iona,Lessie,Leta,Liza,Mertie,Molly,Neva,Oma,Alida,Alva,Cecile,Cleo,Donna,Ellie,Ernestine,Evie,Frankie,Helene,Minna,Myrta,Prudence,Queen,Rilla,Savannah,Tessie,Tina,Agatha,America,Anita,Arminta,Dorothea,Ira,Luvenia,Marjorie,Maybelle,Mellie,Nan,Pearlie,Sidney,Velma,Clare,Constance,Dixie,Ila,Iola,Jimmie,Louvenia,Lucia,Ludie,Luna,Metta,Patsy,Phebe,Sophronia,Adda,Avis,Betsy,Bonnie,Cecil,Cordie,Emmaline,Ethelyn,Hortense,June,Louie,Lovie,Marcella,Melinda,Mona,Odessa,Veronica,Aimee,Annabel,Ava,Bella,Carolina,Cathrine,Christena,Clyde,Dena,Dolores,Eleanore,Elmira,Fay,Frank,Jenny,Kizzie,Lonnie,Loula,Magdalene,Mettie,Mintie,Peggy,Reba,Serena,Vida,Zada,Abigail,Celestine,Celina,Claudie,Clemmie,Connie,Daisie,Deborah,Dessa,Easter,Eddie,Emelia,Emmie,Imogene,India,Jeanne,Joan,Lenore,Liddie,Lotta,Mame,Nevada,Rachael,Robert,Sina,Willa,Aline,Beryl,Charles,Daisey,Dorcas,Edmonia,Effa,Eldora,Eloise,Emmer,Era,Gena,Henry,Iris,Izora,Lennie,Lissie,Mallie,Malvina,Mathilde,Mazie,Queenie,Rosina,Salome,Theodora,Therese,Vena,Wanda,Wilda,Altha,Anastasia,Besse,Bird,Birtie,Clarissa,Claude,Delilah,Diana,Emelie,Erna,Fern,Florida,Frona,Hilma,Joseph,Juliet,Leonie,Lugenia,Mammie,Manda,Manerva,Manie,Nella,Paulina,Philomena,Rae,Selina,Sena,Theodosia,Tommie,Una,Vernie,Adela,Althea,Amalia,Amber,Angelina,Annabelle,Anner,Arie,Clarice,Corda,Corrie,Dell,Dellar,Donie,Doris,Elda,Elinor,Emeline,Emilia,Esta,Estell,Etha,Fred,Hope,Indiana,Ione,Jettie,Johnnie,Josiephine,Kitty,Lavina,Leda,Letta,Mahala,Marcia,Margarette,Maudie,Maye,Norah,Oda,Patty,Paula,Permelia,Rosalia,Roxanna,Sula,Vada,Winnifred,Adline,Almira,Alvena,Arizona,Becky,Bennie,Bernadette,Camille,Cordia,Corine,Dicie,Dove,Drusilla,Elena,Elenora,Elmina,Ethyl,Evalyn,Evelina,Faye,Huldah,Idell,Inga,Irena,Jewell,Kattie,Lavenia,Leslie,Lovina,Lulie,Magnolia,Margeret,Margery,Media,Millicent,Nena,Ocie,Orilla,Osie,Pansy,Ray,Rosia,Rowena,Shirley,Tabitha,Thomas,Verdie,Walter,Zetta,Zoa,Zona,Albertina,Albina,Alyce,Amie,Angela,Annis,Carol,Carra,Clarence,Clarinda,Delphia,Dillie,Doshie,Drucilla,Etna,Eugenie,Eulalia,Eve,Felicia,Florance,Fronie,Geraldine,Gina,Glenna,Grayce,Hedwig,Jessica,Jossie,Katheryn,Katy,Lea,Leanna,Leitha,Leone,Lidie,Loma,Lular,Magdalen,Maymie,Minervia,Muriel,Neppie,Olie,Onie,Osa,Otelia,Paralee,Patience,Rella,Rillie,Rosanna,Theo,Tilda,Tishie,Tressa,Viva,Yetta,Zena,Zola,Abby,Aileen,Alba,Alda,Alla,Alverta,Ara,Ardelia,Ardella,Arrie,Arvilla,Augustine,Aurora,Bama,Bena,Byrd,Calla,Camilla,Carey,Carlotta,Celestia,Cherry,Cinda,Classie,Claudine,Clemie,Clifford,Clyda,Creola,Debbie,Dee,Dinah,Doshia,Ednah,Edyth,Eleanora,Electa,Eola,Erie,Eudora,Euphemia,Evalena,Evaline,Faith,Fidelia,Freddie,Golda,Harry,Helma,Hermine,Hessie,Ivah,Janette,Jennette,Joella,Kathryne,Lacy,Lanie,Lauretta,Leana,Leatha,Leo,Liller,Lillis,Louetta,Madie,Mai,Martina,Maryann,Melva,Mena,Mercedes,Merle,Mima,Minda,Monica,Nealie,Netta,Nolia,Nonie,Odelia,Ottilie,Phyllis,Robbie,Sabina,Sada,Sammie,Suzanne,Sybilla,Thea,Tressie,Vallie,Venie,Viney,Wilhelmine,Winona,Zelda,Zilpha,Adelle,Adina,Adrienne,Albertine,Alys,Ana,Araminta,Arthur,Birtha,Bulah,Caddie,Celie,Charlotta,Clair,Concepcion,Cordella,Corrine,Delila,Delphine,Dosha,Edgar,Elaine,Elisa,Ellar,Elmire,Elvina,Ena,Estie,Etter,Fronnie,Genie,Georgina,Glenn,Gracia,Guadalupe,Gwendolyn,Hassie,Honora,Icy,Isa,Isadora,Jesse,Jewel,Joe,Johannah,Juana,Judith,Judy,Junie,Lavonia,Lella,Lemma,Letty,Linna,Littie,Lollie,Lorene,Louis,Love,Lovisa,Lucina,Lynn,Madora,Mahalia,Manervia,Manuela,Margarett,Margaretta,Margarita,Marilla,Mignon,Mozella,Natalie,Nelia,Nolie,Omie,Opal,Ossie,Ottie,Ottilia,Parthenia,Penelope,Pinkey,Pollie,Rennie,Reta,Roena,Rosalee,Roseanna,Ruthie,Sabra,Sannie,Selena,Sibyl,Tella,Tempie,Tennessee,Teressa,Texas,Theda,Thelma,Thursa,Ula,Vannie,Verona,Vertie,Wilma,John,William,James,Charles,George,Frank,Joseph,Thomas,Henry,Robert,Edward,Harry,Walter,Arthur,Fred,Albert,Samuel,David,Louis,Joe,Charlie,Clarence,Richard,Andrew,Daniel,Ernest,Will,Jesse,Oscar,Lewis,Peter,Benjamin,Frederick,Willie,Alfred,Sam,Roy,Herbert,Jacob,Tom,Elmer,Carl,Lee,Howard,Martin,Michael,Bert,Herman,Jim,Francis,Harvey,Earl,Eugene,Ralph,Ed,Claude,Edwin,Ben,Charley,Paul,Edgar,Isaac,Otto,Luther,Lawrence,Ira,Patrick,Guy,Oliver,Theodore,Hugh,Clyde,Alexander,August,Floyd,Homer,Jack,Leonard,Horace,Marion,Philip,Allen,Archie,Stephen,Chester,Willis,Raymond,Rufus,Warren,Jessie,Milton,Alex,Leo,Julius,Ray,Sidney,Bernard,Dan,Jerry,Calvin,Perry,Dave,Anthony,Eddie,Amos,Dennis,Clifford,Leroy,Wesley,Alonzo,Garfield,Franklin,Emil,Leon,Nathan,Harold,Matthew,Levi,Moses,Everett,Lester,Winfield,Adam,Lloyd,Mack,Fredrick,Jay,Jess,Melvin,Noah,Aaron,Alvin,Norman,Gilbert,Elijah,Victor,Gus,Nelson,Jasper,Silas,Jake,Christopher,Mike,Percy,Adolph,Maurice,Cornelius,Felix,Reuben,Wallace,Claud,Roscoe,Sylvester,Earnest,Hiram,Otis,Simon,Willard,Irvin,Mark,Jose,Wilbur,Abraham,Virgil,Clinton,Elbert,Leslie,Marshall,Owen,Wiley,Anton,Morris,Manuel,Phillip,Augustus,Emmett,Eli,Nicholas,Wilson,Alva,Harley,Newton,Timothy,Marvin,Ross,Curtis,Edmund,Jeff,Elias,Harrison,Stanley,Columbus,Lon,Ora,Ollie,Pearl,Russell,Solomon,Arch,Asa,Clayton,Enoch,Irving,Mathew,Nathaniel,Scott,Hubert,Lemuel,Andy,Ellis,Emanuel,Joshua,Millard,Vernon,Wade,Cyrus,Miles,Rudolph,Sherman,Austin,Bill,Chas,Lonnie,Monroe,Byron,Edd,Emery,Grant,Jerome,Max,Mose,Steve,Gordon,Abe,Pete,Chris,Clark,Gustave,Orville,Lorenzo,Bruce,Marcus,Preston,Bob,Dock,Donald,Jackson,Cecil,Barney,Delbert,Edmond,Anderson,Christian,Glenn,Jefferson,Luke,Neal,Burt,Ike,Myron,Tony,Conrad,Joel,Matt,Riley,Vincent,Emory,Isaiah,Nick,Ezra,Green,Juan,Clifton,Lucius,Porter,Arnold,Bud,Jeremiah,Taylor,Forrest,Roland,Spencer,Burton,Don,Emmet,Gustav,Louie,Morgan,Ned,Van,Ambrose,Chauncey,Elisha,Ferdinand,General,Julian,Kenneth,Mitchell,Allie,Josh,Judson,Lyman,Napoleon,Pedro,Berry,Dewitt,Ervin,Forest,Lynn,Pink,Ruben,Sanford,Ward,Douglas,Ole,Omer,Ulysses,Walker,Wilbert,Adelbert,Benjiman,Ivan,Jonas,Major,Abner,Archibald,Caleb,Clint,Dudley,Granville,King,Mary,Merton,Antonio,Bennie,Carroll,Freeman,Josiah,Milo,Royal,Dick,Earle,Elza,Emerson,Fletcher,Judge,Laurence,Roger,Seth,Glen,Hugo,Jimmie,Johnnie,Neil,Washington,Elwood,Gust,Harmon,Jordan,Simeon,Wayne,Wilber,Clem,Evan,Frederic,Irwin,Junius,Lafayette,Loren,Madison,Mason,Orval,Abram,Aubrey,Elliott,Hans,Karl,Minor,Wash,Wilfred,Allan,Alphonse,Dallas,Dee,Isiah,Jason,Johnny,Lawson,Lew,Micheal,Orin,Addison,Cal,Erastus,Francisco,Hardy,Lucien,Randolph,Stewart,Vern,Wilmer,Zack,Adrian,Alvah,Bertram,Clay,Ephraim,Fritz,Giles,Grover,Harris,Isom,Jesus,Johnie,Jonathan,Lucian,Malcolm,Merritt,Otho,Perley,Rolla,Sandy,Tomas,Wilford,Adolphus,Angus,Arther,Carlos,Cary,Cassius,Davis,Hamilton,Harve,Israel,Leander,Melville,Merle,Murray,Pleasant,Sterling,Steven,Axel,Boyd,Bryant,Clement,Erwin,Ezekiel,Foster,Frances,Geo,Houston,Issac,Jules,Larkin,Mat,Morton,Orlando,Pierce,Prince,Rollie,Rollin,Sim,Stuart,Wilburn,Bennett,Casper,Christ,Dell,Egbert,Elmo,Fay,Gabriel,Hector,Horatio,Lige,Saul,Smith,Squire,Tobe,Tommie,Wyatt,Alford,Alma,Alton,Andres,Burl,Cicero,Dean,Dorsey,Enos,Howell,Lou,Loyd,Mahlon,Nat,Omar,Oran,Parker,Raleigh,Reginald,Rubin,Seymour,Wm,Young,Benjamine,Carey,Carlton,Eldridge,Elzie,Garrett,Isham,Johnson,Larry,Logan,Merrill,Mont,Oren,Pierre,Rex,Rodney,Ted,Webster,West,Wheeler,Willam,Al,Aloysius,Alvie,Anna,Art,Augustine,Bailey,Benjaman,Beverly,Bishop,Clair,Cloyd,Coleman,Dana,Duncan,Dwight,Emile,Evert,Henderson,Hunter,Jean,Lem,Luis,Mathias,Maynard,Miguel,Mortimer,Nels,Norris,Pat,Phil,Rush,Santiago,Sol,Sydney,Thaddeus,Thornton,Tim,Travis,Truman,Watson,Webb,Wellington,Winfred,Wylie,Alec,Basil,Baxter,Bertrand,Buford,Burr,Cleveland,Colonel,Dempsey,Early,Ellsworth,Fate,Finley,Gabe,Garland,Gerald,Herschel,Hezekiah,Justus,Lindsey,Marcellus,Olaf,Olin,Pablo,Rolland,Turner,Verne,Volney,Williams,Almon,Alois,Alonza,Anson,Authur,Benton,Billie,Cornelious,Darius,Denis,Dillard,Doctor,Elvin,Emma,Eric,Evans,Gideon,Haywood,Hilliard,Hosea,Lincoln,Lonzo,Lucious,Lum,Malachi,Newt,Noel,Orie,Palmer,Pinkney,Shirley,Sumner,Terry,Urban,Uriah,Valentine,Waldo,Warner,Wong,Zeb,Abel,Alden,Archer,Avery,Carson,Cullen,Doc,Eben,Elige,Elizabeth,Elmore,Ernst,Finis,Freddie,Godfrey,Guss,Hamp,Hermann,Isadore,Isreal,Jones,June,Lacy,Lafe,Leland,Llewellyn,Ludwig,Manford,Maxwell,Minnie,Obie,Octave,Orrin,Ossie,Oswald,Park,Parley,Ramon,Rice,Stonewall,Theo,Tillman,Addie,Aron,Ashley,Bernhard,Bertie,Berton,Buster,Butler,Carleton,Carrie,Clara,Clarance,Clare,Crawford,Danial,Dayton,Dolphus,Elder,Ephriam,Fayette,Felipe,Fernando,Flem,Florence,Ford,Harlan,Hayes,Henery,Hoy,Huston,Ida,Ivory,Jonah,Justin,Lenard,Leopold,Lionel,Manley,Marquis,Marshal,Mart,Odie,Olen,Oral,Orley,Otha,Press,Price,Quincy,Randall,Rich,Richmond,Romeo,Russel,Rutherford,Shade,Shelby,Solon,Thurman,Tilden,Troy,Woodson,Worth,Aden,Alcide,Alf,Algie,Arlie,Bart,Bedford,Benito,Billy,Bird,Birt,Bruno,Burley,Chancy,Claus,Cliff,Clovis,Connie,Creed,Delos,Duke,Eber,Eligah,Elliot,Elton,Emmitt,Gene,Golden,Hal,Hardin,Harman,Hervey,Hollis,Ivey,Jennie,Len,Lindsay,Lonie,Lyle,Mac,Mal,Math,Miller,Orson,Osborne,Percival,Pleas,Ples,Rafael,Raoul,Roderick,Rose,Shelton,Sid,Theron,Tobias,Toney,Tyler,Vance,Vivian,Walton,Watt,Weaver,Wilton,Adolf,Albin,Albion,Allison,Alpha,Alpheus,Anastacio,Andre,Annie,Arlington,Armand,Asberry,Asbury,Asher,Augustin,Auther,Author,Ballard,Blas,Caesar,Candido,Cato,Clarke,Clemente,Colin,Commodore,Cora,Coy,Cruz,Curt,Damon,Davie,Delmar,Dexter,Dora,Doss,Drew,Edson,Elam,Elihu,Eliza,Elsie,Erie,Ernie,Ethel,Ferd,Friend,Garry,Gary,Grace,Gustaf,Hallie,Hampton,Harrie,Hattie,Hence,Hillard,Hollie,Holmes,Hope,Hyman,Ishmael,Jarrett,Jessee,Joeseph,Junious,Kirk,Levy,Mervin,Michel,Milford,Mitchel,Nellie,Noble,Obed,Oda,Orren,Ottis,Rafe,Redden,Reese,Rube,Ruby,Rupert,Salomon,Sammie,Sanders,Soloman,Stacy,Stanford,Stanton,Thad,Titus,Tracy,Vernie,Wendell,Wilhelm,Willian,Yee,Zeke,Ab,Abbott,Agustus,Albertus,Almer,Alphonso,Alvia,Artie,Arvid,Ashby,Augusta,Aurthur,Babe,Baldwin,Barnett,Bartholomew,Barton,Bernie,Blaine,Boston,Brad,Bradford,Bradley,Brooks,Buck,Budd,Ceylon,Chalmers,Chesley,Chin,Cleo,Crockett,Cyril,Daisy,Denver,Dow,Duff,Edie,Edith,Elick,Elie,Eliga,Eliseo,Elroy,Ely,Ennis,Enrique,Erasmus,Esau,Everette,Firman,Fleming,Flora,Gardner,Gee,Gorge,Gottlieb,Gregorio,Gregory,Gustavus,Halsey,Handy,Hardie,Harl,Hayden,Hays,Hermon,Hershel,Holly,Hosteen,Hoyt,Hudson,Huey,Humphrey,Hunt,Hyrum,Irven,Isam,Ivy,Jabez,Jewel,Jodie,Judd,Julious,Justice,Katherine,Kelly,Kit,Knute,Lavern,Lawyer,Layton,Leonidas,Lewie,Lillie,Linwood,Loran,Lorin,Mace,Malcom,Manly,Manson,Matthias,Mattie,Merida,Miner,Montgomery,Moroni,Murdock,Myrtle,Nate,Nathanial,Nimrod,Nora,Norval,Nova,Orion,Orla,Orrie,Payton,Philo,Phineas,Presley,Ransom,Reece,Rene,Roswell,Rowland,Sampson,Samual,Santos,Schuyler,Sheppard,Spurgeon,Starling,Sylvanus,Theadore,Theophile,Tilmon,Tommy,Unknown,Vann,Wes,Winston,Wood,Woodie,Worthy,Wright,York,Zachariah".split(',');
 const lasts = "Abbott,Abel,Adams,Addison,Adkins,Agent,Aldrich,Aldridge,Alexander,Alford,Allen,Appleton,Armstrong,Arrington,Arwood,Atkins,Austin,Avery,Bailey,Baine,Baird,Baldwin,Bankston,Barker,Barnes,Barnett,Barry,Barton,Baughan,Beard,Beasley,Beck,Bell,Bennefield,Bennett,Berry,Bishop,Black,Blackwell,Blake,Blaxton,Blaylock,Blevins,Bonds,Boone,Boston,Botiler,Boyd,Bradford,Brannon,Brazeall,Brewer,Bridgeman,Brimer,Brooks,Brown,Bryant,Burdick,Burnet,Burns,Burrell,Byars,Bynum,Cagle,Cagner,Cain,Calvert,Campbell,Canada,Cantrell,Carroll,Carter,Cary,Casey,Cates,Chambers,Chappell,Chillcoat,Clark,Cline,Cole,Collman,Commens,Compton	Conly,Cooper,Cotton,Cowart,Cox,Cummings,Curtis,Davidson,Davis,Deason,Dempsey,Derrick,Dickenson,Dodd,Donough,Dougherty,Dorris,Doss,Dover,Downy,Dunahoo,Duncan,Dunlap,Dupre,Eaton,Eatton,Ellenbury,Elliott,Ellis,England,Estes,Evans,Ezell,Fair,Farley,Farris,Faught,Forester,Fowler,Freeman,Frost,Gamble,Ganes,Gardener,Garrison,Garson,Gentle,George,Gibson,Gice,Gilbert,Glenn,Godsey,Goodwin,Gosset,Grantham,Grastey,Green,Griffin,Guest,Gunter,Guthrie,Hadder,Haines,Haley,Hamilton,Hampton,Hand,Harbin,Harmon,Harper,Harris,Hatchett,Haw,Haynes,Hays,Hebster,Hefner,Henderson,Hendon,Henson,Hewitt,Hicks,Hightower	Hill,Hiller,Hilton,Hinesley,Hix,Hogg,Holden,Holloway,Holt,Hood,Hoover,Hopson,Horton,Howard,Howells,Hudson,Hughes,Hyde,Ingle,Inmon,Isabell,Ivy,Jack,Jackson,James,Jamison,Jeffries,Jenkins,Johnson,Kely),Kemp,Key,Kidd,Kiker,Kile,Kilpatrick,Kimbrell,King,Knight,Knox,Lambert,Lane,Laneford,Laramore,Lauderdale,Lawson,Lay,League,Lewis,Little,Litton,Livingston,Logan,Long,Looney,Love,Lovelady,Lovell,Lovett,Lynn,Manasco,Mann,Martin,Mathews,McClane,McClung,McClure,McColum,McCoy,McCue,McCullan,McCullar,McDaniel,McDuff,McKay,McNames,McNeil,McNutt,Mellican,Merritt,Metcalf,Miles,Miller,Mitchell,Mize,Mobley,Montgomery,Moody,Mooney,Morgan,Morris,Morrison,Motes,Mullins,Musgrove,Nelson,Nesmith,Newman,Nolen,Noles,Nortwich,Oden,Odom,O'Henry,O'Mary,O'Rear,O'Steen,Overton,Owsley,Pace,Painter,Parsons,Partain,Patek,Patterson,Payne,Peak,Pearson,Pencard,Penn,Penyl,Perkins,Perry,Peters,Pittman,Plott,Poe,Pool,Portridge,Posey,Pouder,Powell,Preston,Pugh,Pulliam,Purdy,Radford,Ramey,Ramie,Ray,Raynes,Reeves,Richardson,Riddle,Rivers,Roberts,Robinson,Roden,Rollins,Romines,Ronow,Rowe,Rush,Russell,Rutledge,Sam,Samples,Sanford,Sarun,Scogin,Segars,Setton,Sexton,Seymore,Shadix,Shain,Shank,Shelly,Shelton,Shipman,Siddens,Simmons,Simpson,Sims,Slater,Slaughter,Smathers,Smith,Sneed,South,Southern,Spain,Spane,Sparks,Staten,Steel,Stephenson,Stevens,Stewart,Stokes,Stone,Strange,Sunmers,Surin,Sutherland,Suttles,Swindle,Taberson,Tarbutton,Taylor,Teague,Tedford,Thomanson,Thomas,Thompson,Thornton,Threadgill,Tidwell,Tittle,Tubs,Tucker,Turner,Tyler,Underwood,Ussery,Wadsworth,Waid,Wakefield,Walker,Walston,Ward,Ware,Warren,Watson,Watts,Weaver,Webb,Welborn,Welsh,West,Whisenhunt,White,Whitfield,Whitman,Whitney,Whitten,Wiley,Willborn,Williams,Willis,Willson,Wilson,Wise,Woodley,Woods,Wooley,Wright,Yarborough,York,Young".split(',');
@@ -7985,6 +8072,7 @@ Names.liAll = Object.keys(Names.lastBy);
 const randomName = Names.randomName;
 
 ;// ./src/game/levels/intro.ts
+
 
 
 
@@ -8044,9 +8132,11 @@ class Intro {
     }
     addPawns() {
         const a = randomName([]);
-        this.pawns.push(this.map.createAt(xy.XY.at(55, 24), new pawn/* Pawn */.vc(a)));
+        const ca = capabilities/* Capabilities */.F.basic();
+        this.pawns.push(this.map.createAt(xy.XY.at(55, 24), new pawn/* Pawn */.vc(a, ca)));
         const b = randomName([a]);
-        this.pawns.push(this.map.createAt(xy.XY.at(39, 24), new pawn/* Pawn */.vc(b)));
+        const cb = capabilities/* Capabilities */.F.basic();
+        this.pawns.push(this.map.createAt(xy.XY.at(39, 24), new pawn/* Pawn */.vc(b, cb)));
     }
     addBarracksWin() {
         const rect = Rect.xyWH(xy.XY.at(60, 8), 9, 9);
@@ -8058,7 +8148,7 @@ class Intro {
                 if ((0,utils/* hasContent */.ov)(unrescued))
                     return;
                 this.map.uiRenderer.remove('barracks-label');
-                state.FirehouseMode.emit(this.pawns.map(p => p.name || ''));
+                state.FirehouseMode.emit((0,capabilities/* withCapabilities */.X)(this.pawns));
                 (0,utils/* each */.__)(ends, check => check());
             }),
             pawn/* PawnDied */.hq.on(_dead => {
@@ -8288,6 +8378,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ui_text_stroke__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(485);
 /* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(919);
 /* harmony import */ var _signal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(334);
+/* harmony import */ var _capabilities__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(793);
+
 
 
 
@@ -8298,16 +8390,16 @@ class GameState {
         this.introSucceeded = false;
         this.pawns = [];
         this.firehouseNum = 0;
-        FirehouseMode.on(names => {
+        FirehouseMode.on(pawns => {
             this.introSucceeded = true;
-            this.pawns = names;
+            this.pawns = (0,_capabilities__WEBPACK_IMPORTED_MODULE_4__/* .withCapabilities */ .X)(pawns);
             if (!this.firehouseNum)
                 this.firehouseNum = (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randTo */ .JD)(97) + 3;
             this.save();
         });
     }
     save() {
-        const data = { introSucceeded: this.introSucceeded, pawns: this.pawns, firehouseNum: this.firehouseNum };
+        const data = { introSucceeded: this.introSucceeded, pawns: (0,_capabilities__WEBPACK_IMPORTED_MODULE_4__/* .withCapabilities */ .X)(this.pawns), firehouseNum: this.firehouseNum };
         localStorage.setItem('gameState', JSON.stringify(data));
         _ui_text_stroke__WEBPACK_IMPORTED_MODULE_1__/* .TextStroke */ .m.centered(this.map, 'GAME SAVED', this.map.h - 2, 'saved', _ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .Colors */ .Jy.rotate(new _ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .Colors */ .Jy([_ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .WHITE */ .UE, _ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .FOREGROUND */ .u6])), 500);
     }
@@ -8317,7 +8409,7 @@ class GameState {
             return;
         const d = JSON.parse(s);
         this.introSucceeded = d.introSucceeded;
-        this.pawns = d.pawns || [];
+        this.pawns = (0,_capabilities__WEBPACK_IMPORTED_MODULE_4__/* .withCapabilities */ .X)(d.pawns || []);
         this.firehouseNum = d.firehouseNum || 0;
         if (this.introSucceeded)
             FirehouseMode.emit(this.pawns);
@@ -8731,22 +8823,20 @@ const PawnBurned = new signal/* Signal */.H();
 const PawnDied = new signal/* Signal */.H();
 const TaskRemoved = new signal/* Signal */.H();
 class Pawn extends drawable/* Drawable */.h {
-    constructor(name) {
+    constructor(name, capabilities) {
         super();
         this.name = name;
+        this.capabilities = capabilities;
         this.selected = false;
         this.passable = false;
         this.material = new material/* Material */.i(this);
+        this.desc = () => this.material.desc(this.name);
         this.layer = 'pawn';
         this.transparency = 0;
         this.light = () => this.material.light(3);
         this.char = () => '@';
         this.color = () => this.material.color(colors/* WHITE */.UE);
         this.tasks = [];
-    }
-    desc() {
-        const d = this.name ? this.name : super.desc();
-        return this.material.desc(d);
     }
     recalcPaths() {
         this.tasks.forEach(t => t.cleanup());
@@ -8776,9 +8866,11 @@ class Pawn extends drawable/* Drawable */.h {
     step() {
         this.material.step(() => {
             if (this.material.isBurning()) {
-                this.squawk("ouch", colors/* FIRE */.ZK);
+                this.squawk('ouch', colors/* FIRE */.ZK);
                 PawnBurned.emit(this);
             }
+            if (this.coughed())
+                return;
             if (this.tasks.length > 0) {
                 const task = this.tasks[0];
                 task.step();
@@ -8786,11 +8878,19 @@ class Pawn extends drawable/* Drawable */.h {
                     task.cleanup();
                     this.removeTask(task);
                 }
-                else {
+                else
                     this.recalcPaths();
-                }
             }
         });
+    }
+    coughed() {
+        if (!this.cell.smoke())
+            return false;
+        const c = utils/* isInTestMode */.Jo ? this.age % 2 === 0 : (0,utils/* oneIn */.A7)(2);
+        if (!c)
+            return false;
+        this.squawk('cough', colors/* LAMP */.zu);
+        return true;
     }
     dying() {
         super.dying();
@@ -8799,6 +8899,8 @@ class Pawn extends drawable/* Drawable */.h {
         (0,utils/* each */.__)(this.tasks, t => t.cleanup());
     }
     squawk(text, colors) {
+        if (utils/* isInTestMode */.Jo)
+            return;
         const directions = [
             { dx: 0, dy: -1 }, // up
             { dx: 1, dy: -1 }, // up-right
@@ -8984,6 +9086,34 @@ class Drawable {
 }
 Drawable.alive = new Set();
 Drawable.nextId = 0;
+
+
+/***/ }),
+
+/***/ 793:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   F: () => (/* binding */ Capabilities),
+/* harmony export */   X: () => (/* binding */ withCapabilities)
+/* harmony export */ });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
+
+const roll = () => (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .half */ .MX)((0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .rollD6 */ .gJ)(4));
+const make = (skills) => skills.reduce((a, s) => ({ ...a, [s]: 0 }), { score: roll() });
+const Capabilities = {
+    basic: () => ({
+        strength: make(['inventory', 'carry', 'drag', 'break']),
+        breath: make(['smoke', 'hold']),
+        constitution: make(['damage', 'toxin']),
+        speed: make(['charge', 'dodge']),
+        dexterity: make(['extinguish', 'throw', 'upright']),
+        charisma: make(['persuade', 'calm', 'command'])
+    })
+};
+const withCapabilities = (pawns) => pawns.map(pawn => typeof pawn === 'string'
+    ? { name: pawn, capabilities: Capabilities.basic() }
+    : { name: pawn.name, capabilities: pawn.capabilities ?? Capabilities.basic() });
 
 
 /***/ }),
@@ -14692,7 +14822,7 @@ class Task {
 /* harmony export */ });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
 /* harmony import */ var _display__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(328);
-/* harmony import */ var _game_game__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(243);
+/* harmony import */ var _game_game__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(331);
 /* harmony import */ var _signal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(334);
 
 
@@ -14871,7 +15001,7 @@ class Material {
         this.extinguish = () => { this.burn = null; };
         this.isBurning = () => this.burn !== null;
         this.light = (base) => this.isBurning() ? base + 1 : base;
-        this.color = (base) => this.isBurning() && (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(3) ? _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .FIRE */ .ZK.random() : base;
+        this.color = (base) => this.isBurning() && !_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo && (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(3) ? _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .FIRE */ .ZK.random() : base;
         this.remaining = () => this.burn ?? 0;
         this.desc = (base) => this.isBurning() ? `${base} ▲` : base;
     }
@@ -14879,14 +15009,14 @@ class Material {
         if (this.burn === null)
             return stillAlive();
         const cell = this.owner.cell;
-        if ((0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(2))
+        if (!_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo && (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(2))
             cell.reborn(new _smoke__WEBPACK_IMPORTED_MODULE_1__/* .Smoke */ ._());
         if (this.burn <= 0) {
             cell.died(this.owner);
             return;
         }
         this.burn--;
-        if ((0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(2))
+        if (!_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo && (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(2))
             cell.reborn(new _fire__WEBPACK_IMPORTED_MODULE_2__/* .Fire */ .v());
         stillAlive();
     }
@@ -15017,8 +15147,8 @@ var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
 
        /* harmony default export */ const src_style = (style/* default */.A && style/* default */.A.locals ? style/* default */.A.locals : undefined);
 
-// EXTERNAL MODULE: ./src/game/game.ts + 125 modules
-var game = __webpack_require__(243);
+// EXTERNAL MODULE: ./src/game/game.ts + 126 modules
+var game = __webpack_require__(331);
 // EXTERNAL MODULE: ./src/compress.ts
 var compress = __webpack_require__(74);
 ;// ./src/index.ts
@@ -15067,7 +15197,11 @@ function showError(message, stack) {
     });
     const pre = document.createElement('pre');
     pre.textContent = `ERROR: ${message}\n\nStack trace:\n${stack || 'No stack trace available'}`;
-    errorDiv.append(pre, issueButton, statusDiv, closeButton);
+    const copyButton = document.createElement('button');
+    copyButton.className = 'submit-button error-copy';
+    copyButton.textContent = 'Copy Error';
+    copyButton.addEventListener('click', () => navigator.clipboard.writeText(pre.textContent || ''));
+    errorDiv.append(pre, issueButton, copyButton, statusDiv, closeButton);
     container.appendChild(errorDiv);
 }
 window.addEventListener('error', (event) => {
