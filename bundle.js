@@ -6750,7 +6750,7 @@ class FirehouseModal extends Modal {
 // EXTERNAL MODULE: ./src/game/state.ts
 var state = __webpack_require__(522);
 ;// ./src/html/feedback.html
-/* harmony default export */ const feedback = ("<div id=\"feedback-modal\" class=\"column gap-form\">\n        <div class=\"feedback-header row items-between cross-aligned-center gap-modal-header\">\n            <h3>Submit Feedback</h3>\n            <button id=\"feedback-close\" class=\"close-button\">×</button>\n        </div>\n        <div class=\"feedback-form column gap-form\">\n            <div class=\"input-group\">\n                <label for=\"feedback-title\">Title:</label>\n                <input id=\"feedback-title\" type=\"text\" placeholder=\"\">\n            </div>\n            <div class=\"input-group\">\n                <label for=\"feedback-body\">Details:</label>\n                <textarea id=\"feedback-body\" rows=\"6\" placeholder=\"Start typing...\"></textarea>\n            </div>\n            <div class=\"input-group\">\n                <label for=\"feedback-screenshot\">Screenshot (drop/paste or upload, 10MB max):</label>\n                <input id=\"feedback-screenshot\" type=\"file\" accept=\"image/*\">\n            </div>\n            <div class=\"feedback-actions row aligned-end gap-buttons\">\n                <div id=\"feedback-normal-buttons\" class=\"row gap-buttons\">\n                    <button id=\"feedback-submit\" class=\"submit-button\">Submit Feedback</button>\n                    <button id=\"feedback-cancel\" class=\"cancel-button\">Cancel</button>\n                </div>\n                <div id=\"feedback-success-buttons\" class=\"hidden row gap-buttons\">\n                    <button id=\"feedback-ok\" class=\"submit-button\">OK</button>\n                </div>\n            </div>\n        <div id=\"feedback-status\" class=\"feedback-status hidden\"></div>\n    </div>\n    </div>\n");
+/* harmony default export */ const feedback = ("<div id=\"feedback-modal\" class=\"column gap-form\">\n        <div class=\"feedback-header row items-between cross-aligned-center gap-modal-header\">\n            <h3>Submit Feedback</h3>\n            <button id=\"feedback-close\" class=\"close-button\">×</button>\n        </div>\n        <div class=\"feedback-form column gap-form\">\n            <div class=\"input-group\">\n                <label for=\"feedback-title\">Title:</label>\n                <input id=\"feedback-title\" type=\"text\" placeholder=\"\">\n            </div>\n            <div class=\"input-group\">\n                <label for=\"feedback-body\">Details:</label>\n                <textarea id=\"feedback-body\" rows=\"6\" placeholder=\"Start typing...\"></textarea>\n            </div>\n            <div class=\"input-group\">\n                <label for=\"feedback-screenshot\">Screenshot (drop/paste or upload, 10MB max):</label>\n                <input id=\"feedback-screenshot\" type=\"file\" accept=\"image/*\">\n                <div id=\"feedback-image-preview\" class=\"hidden\">\n                    <img id=\"feedback-preview-img\" alt=\"Preview\" style=\"max-width: 300px; max-height: 200px; border: 1px solid #ccc; border-radius: 4px; margin-top: 8px;\">\n                    <button id=\"feedback-remove-image\" type=\"button\" style=\"margin-left: 8px; padding: 2px 6px; font-size: 12px;\">Remove</button>\n                </div>\n            </div>\n            <div class=\"feedback-actions row aligned-end gap-buttons\">\n                <div id=\"feedback-normal-buttons\" class=\"row gap-buttons\">\n                    <button id=\"feedback-submit\" class=\"submit-button\">Submit Feedback</button>\n                    <button id=\"feedback-cancel\" class=\"cancel-button\">Cancel</button>\n                </div>\n                <div id=\"feedback-success-buttons\" class=\"hidden row gap-buttons\">\n                    <button id=\"feedback-ok\" class=\"submit-button\">OK</button>\n                </div>\n            </div>\n        <div id=\"feedback-status\" class=\"feedback-status hidden\"></div>\n    </div>\n    </div>\n");
 ;// ./src/ui/feedback.ts
 
 
@@ -6760,16 +6760,41 @@ class Feedback extends Modal {
         this.titleTouched = false;
         this.isSubmitting = false;
         this.image = null;
+        this.documentListenersAdded = false;
+        this.handleDragOver = (e) => {
+            if (!this.isVisible())
+                return;
+            e.preventDefault();
+        };
+        this.handleDrop = (e) => {
+            if (!this.isVisible())
+                return;
+            e.preventDefault();
+            const f = e.dataTransfer?.files?.[0];
+            if (f && f.type.startsWith('image/'))
+                this.read(f);
+        };
+        this.handlePaste = (e) => {
+            if (!this.isVisible())
+                return;
+            const f = e.clipboardData?.files?.[0];
+            if (f && f.type.startsWith('image/')) {
+                e.preventDefault();
+                this.read(f);
+            }
+        };
         this.div.appendFileHtml(feedback);
         this.setupEventListeners();
     }
     show() {
         super.show();
         this.reset();
+        this.addDocumentListeners();
         this.div.d1('#feedback-body').focus();
     }
     hide() {
         super.hide();
+        this.removeDocumentListeners();
         this.reset();
     }
     prefill(title, body) {
@@ -6786,6 +6811,7 @@ class Feedback extends Modal {
         this.div.d1('#feedback-body').setVal('');
         this.div.d1('#feedback-screenshot').setVal('');
         this.div.d1('#feedback-status').text('').hide();
+        this.div.d1('#feedback-image-preview').hide();
         this.resetButtons();
         this.updateSubmitButton();
     }
@@ -6804,20 +6830,7 @@ class Feedback extends Modal {
         });
         const i = this.div.d1('#feedback-screenshot');
         i.on('change', () => this.pick());
-        this.div.on('dragover', e => e.preventDefault());
-        this.div.on('drop', e => {
-            e.preventDefault();
-            const f = e.dataTransfer?.files?.[0];
-            if (f)
-                this.read(f);
-        });
-        this.div.on('paste', e => {
-            const f = e.clipboardData?.files?.[0];
-            if (f) {
-                e.preventDefault();
-                this.read(f);
-            }
-        });
+        this.div.d1('#feedback-remove-image').onClick(() => this.removeImage());
     }
     modalKeyHandled(e) {
         if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
@@ -6876,18 +6889,50 @@ class Feedback extends Modal {
         if (f)
             this.read(f);
     }
+    addDocumentListeners() {
+        if (this.documentListenersAdded)
+            return;
+        this.documentListenersAdded = true;
+        document.addEventListener('dragover', this.handleDragOver);
+        document.addEventListener('drop', this.handleDrop);
+        document.addEventListener('paste', this.handlePaste);
+    }
+    removeDocumentListeners() {
+        if (!this.documentListenersAdded)
+            return;
+        this.documentListenersAdded = false;
+        document.removeEventListener('dragover', this.handleDragOver);
+        document.removeEventListener('drop', this.handleDrop);
+        document.removeEventListener('paste', this.handlePaste);
+    }
+    removeImage() {
+        this.image = null;
+        this.div.d1('#feedback-screenshot').setVal('');
+        this.div.d1('#feedback-image-preview').hide();
+        this.div.d1('#feedback-status').hide().text('');
+    }
     read(f) {
         const s = this.div.d1('#feedback-status');
         if (f.size > 10000000) {
             s.show().style('color', '#f44').text('Screenshot too large (10MB max)');
             this.div.d1('#feedback-screenshot').setVal('');
             this.image = null;
+            this.div.d1('#feedback-image-preview').hide();
             return;
         }
         s.hide().text('');
         const r = new FileReader();
-        r.onload = () => this.image = r.result;
+        r.onload = () => {
+            this.image = r.result;
+            this.showImagePreview(this.image);
+        };
         r.readAsDataURL(f);
+    }
+    showImagePreview(imageData) {
+        const preview = this.div.d1('#feedback-image-preview');
+        const img = this.div.d1('#feedback-preview-img');
+        img.attr('src', imageData);
+        preview.show();
     }
     async submit() {
         if (this.isSubmitting)
