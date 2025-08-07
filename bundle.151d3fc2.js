@@ -423,6 +423,8 @@ button.solo { background: #060; color: #fff }
 .bold { font-weight: bold }
 .clickable { cursor: pointer }
 
+.spacer { height: 10px }
+
 .input { padding: 8px; background: var(--color-background-1); border: 1px solid var(--color-border); color: var(--color-foreground); border-radius: 4px; font-family: monospace; font-size: 14px }
 .input:focus { outline: none; border-color: var(--color-foreground); box-shadow: 0 0 5px rgba(0,170,0,.3) }
 
@@ -435,7 +437,7 @@ button.solo { background: #060; color: #fff }
 
 .panel { background: var(--color-background-1); border: 1px solid var(--color-border); border-radius: 4px; padding: 8px }
 .panel-dark { background: #1a1a1a }
-.panel-dashed { border-style: dashed }
+.panel-dashed { border: 1px dashed var(--color-border); padding: 6px; border-radius: 4px }
 .panel-title { margin: 0 0 5px 0; color: #0a0; background-color: #1a1a1a; padding: 8px 10px; border-bottom: 2px solid #444; margin: -5px -5px 4px -5px }
 
 /* Base Layout Classes - compact by default */
@@ -883,12 +885,11 @@ body {
     margin: 0;
 }
 
-.firefighter {
-    padding: 4px 8px;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: background-color 0.2s;
-}
+.firefighter { display: grid; grid-template-columns: 1fr 6ch; align-items: center }
+.firefighter { padding: 4px 8px; cursor: pointer; border-radius: 3px; transition: background-color 0.2s; width: 100% }
+.firefighter .n { overflow: hidden; text-overflow: ellipsis }
+.firefighter .m { text-align: right }
+.firefighter.selected .m::after { content: '====>' }
 
 .firefighter:hover {
     background-color: #2a2a2a;
@@ -6135,7 +6136,7 @@ class WaitTask extends task/* Task */.Y {
 class ExtinguishTask extends task/* Task */.Y {
     constructor() {
         super(...arguments);
-        this.t = 10;
+        this.t = 5;
         this.done = false;
         this.id = `extinguish-${Date.now()}-${Math.random()}`;
         this.color = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy(['#f00', '#00f']));
@@ -6631,7 +6632,7 @@ class UI {
 // EXTERNAL MODULE: ./src/signal.ts
 var signal = __webpack_require__(334);
 ;// ./src/html/firehouse.html
-/* harmony default export */ const firehouse = ("<div id=\"firehouse-modal\" class=\"modal-window column gap-form\">\n        <div class=\"firehouse-header row items-between cross-aligned-center gap-modal-header border-bottom\">\n            <h3 id=\"firehouse-title\"></h3>\n            <button id=\"firehouse-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div class=\"global row gap-form items-between\">\n            <div class=\"firehouse-panel panel column gap-terminal-info\">\n                <h4>Upgrades</h4>\n                <div>a better place to live and work</div>\n            </div>\n            <div class=\"firehouse-panel panel column gap-terminal-info\">\n                <h4>Fire Engine</h4>\n                <div>how you get to missions</div>\n            </div>\n            <div class=\"firehouse-panel panel column gap-terminal-info\">\n                <h4>Resources</h4>\n                <div>use these to buy things</div>\n            </div>\n        </div>\n        <div class=\"personnel-row row gap-form items-between\">\n            <div class=\"people panel row gap-terminal-info\">\n                <div class=\"firehouse-panel panel-dashed column gap-terminal-info\">\n                    <h4>Personnel</h4>\n                    <div class=\"names column gap-terminal-info\">\n                        <div class=\"firefighter template\">Name</div>\n                    </div>\n                </div>\n                <div class=\"firehouse-panel panel column gap-terminal-info inspector\">\n                    <h4>Inspector</h4>\n                    <div class=\"details\">\n                        <div class=\"name\"></div>\n                        <table class=\"capabilities\">\n                            <tr class=\"capability template\">\n                                <td class=\"capability-value\">10</td>\n                                <td class=\"capability-name\">\n                                    <span class=\"capability-text\">strength</span>\n                                    <div class=\"capability-tooltip\"></div>\n                                </td>\n                                <td class=\"capability-skills\"></td>\n                            </tr>\n                        </table>\n                    </div>\n                </div>\n            </div>\n            <div class=\"firehouse-panel panel column gap-terminal-info\">\n                <h4>Equipment</h4>\n                <div>unallocated equipment</div>\n            </div>\n        </div>\n        <div class=\"firehouse-actions row aligned-end\">\n            <button id=\"firehouse-ok\" class=\"button-primary\">OK</button>\n        </div>\n    </div>\n\n");
+/* harmony default export */ const firehouse = ("<div id=\"firehouse-modal\" class=\"modal-window column gap-form\">\n        <div class=\"firehouse-header row items-between cross-aligned-center gap-modal-header border-bottom\">\n            <h3 id=\"firehouse-title\"></h3>\n            <button id=\"firehouse-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div class=\"global row gap-form items-between\">\n            <div class=\"firehouse-panel panel column gap-terminal-info\">\n                <h4>Upgrades</h4>\n                <div>a better place to live and work</div>\n            </div>\n            <div class=\"firehouse-panel panel column gap-terminal-info\">\n                <h4>Fire Engine</h4>\n                <div>how you get to missions</div>\n            </div>\n            <div class=\"firehouse-panel panel column gap-terminal-info\">\n                <h4>Resources</h4>\n                <div>use these to buy things</div>\n            </div>\n        </div>\n        <div class=\"spacer\"></div>\n        <div class=\"personnel-row row gap-form items-between\">\n            <div class=\"people panel row gap-terminal-info\">\n                <div class=\"firehouse-panel panel column gap-terminal-info\">\n                    <h4>Personnel</h4>\n                    <div class=\"panel-dashed\">\n                        <div class=\"names column gap-terminal-info\">\n                            <div class=\"firefighter template\"><span class=\"n\">Name</span><span class=\"m\"></span></div>\n                        </div>\n                    </div>\n                </div>\n                <div class=\"firehouse-panel panel column gap-terminal-info inspector\">\n                    <h4>Inspector</h4>\n                    <div class=\"panel-dashed\">\n                        <div class=\"details\">\n                            <div class=\"name\"></div>\n                            <table class=\"capabilities\">\n                                <tr class=\"capability template\">\n                                    <td class=\"capability-value\">10</td>\n                                    <td class=\"capability-name\">\n                                        <span class=\"capability-text\">strength</span>\n                                        <div class=\"capability-tooltip\"></div>\n                                    </td>\n                                    <td class=\"capability-skills\"></td>\n                                </tr>\n                            </table>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"firehouse-panel panel column gap-terminal-info\">\n                <h4>Equipment</h4>\n                <div>unallocated equipment</div>\n            </div>\n        </div>\n        <div class=\"firehouse-actions row aligned-end\">\n            <button id=\"firehouse-ok\" class=\"button-primary\">OK</button>\n        </div>\n    </div>\n\n");
 ;// ./src/ui/modal.ts
 
 
@@ -6698,10 +6699,9 @@ class FirehouseModal extends Modal {
     }
     updatePersonnelList() {
         this.div.d1('.names').dList('.firefighter').updateFrom(this.pawns, (d, p) => {
-            const text = p === this.selectedPawn ? `👤 ${p.name} ====>` : `👤 ${p.name}`;
-            d.text(text)
-                .onClick(() => this.inspect(p))
-                .classed('selected', p === this.selectedPawn);
+            d.d1('.n').text(`👤 ${p.name}`);
+            d.onClick(() => this.inspect(p));
+            d.classed('selected', p === this.selectedPawn);
         });
     }
     inspect(pawn) {
@@ -15048,7 +15048,7 @@ class Material {
         this.light = (base) => this.isBurning() ? base + 1 : base;
         this.color = (base) => this.isBurning() && !_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo && (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(3) ? _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .FIRE */ .ZK.random() : base;
         this.remaining = () => this.burn ?? 0;
-        this.desc = (base) => this.isBurning() ? `${base} ▲` : base;
+        this.desc = (base) => this.isBurning() ? `${base} ▲${this.remaining()}` : base;
     }
     step(stillAlive) {
         if (this.burn === null)
