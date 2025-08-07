@@ -7868,9 +7868,11 @@ class Game {
         // Check if we're in production (no local server)
         if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
             try {
+                console.log('fetching build info on prod');
                 const response = await fetch('/firehouse-rl-play/build-info.txt');
                 if (response.ok) {
                     const text = await response.text();
+                    console.log('build', text);
                     const sha = text.match(/Git SHA: (\w+)/)?.[1];
                     const commit = text.match(/Commit: (.+)/)?.[1];
                     if (sha) {
