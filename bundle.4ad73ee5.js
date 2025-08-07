@@ -7878,11 +7878,10 @@ class Game {
         }
         else {
             try {
-                console.error('fetching build info on prod');
                 const response = await fetch('/firehouse-rl-play/build-info.txt');
                 if (response.ok) {
                     const text = await response.text();
-                    console.error('build', text);
+                    console.log('build', text);
                     const sha = text.match(/Git SHA: (\w+)/)?.[1];
                     const commit = text.match(/Commit: (.+)/)?.[1];
                     if (sha) {
