@@ -6949,11 +6949,10 @@ class Feedback extends Modal {
         this.updateSubmitButton();
         statusDiv.show().style('color', '#0a0').text('Submitting feedback...');
         try {
-            const b = this.image ? body + '\\n\\n![screenshot](' + this.image + ')' : body;
             const response = await fetch('https://k69b0whqzl.execute-api.us-west-1.amazonaws.com/firehouse-rl-feedback-lambda', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, body: b })
+                body: JSON.stringify({ title, body, image: this.image })
             });
             if (response.ok) {
                 const result = await response.json();
@@ -7865,9 +7864,26 @@ class Game {
         (0,utils.$1)('switch-env').textContent = location.host.includes('github.io') ? 'LCL' : 'PROD';
     }
     async showBranchInfo() {
+        const d = d1('#branch-info');
+        // Check if we're in production (no local server)
+        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            try {
+                const response = await fetch('/build-info.txt');
+                if (response.ok) {
+                    const text = await response.text();
+                    const sha = text.match(/Git SHA: (\w+)/)?.[1];
+                    if (sha) {
+                        d.text(`Prod: ${sha}`).show();
+                        return;
+                    }
+                }
+            }
+            catch (e) {
+                // Fall through to normal branch detection
+            }
+        }
         try {
             const { branch, hasChanges } = await git.getBranchInfo();
-            const d = d1('#branch-info');
             if (branch === 'main' || branch === 'master')
                 d.hide();
             else
