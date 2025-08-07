@@ -7878,7 +7878,7 @@ class Game {
         }
         else {
             try {
-                const response = await fetch('/firehouse-rl-play/build-info.txt');
+                const response = await fetch('./build-info.txt');
                 if (response.ok) {
                     const text = await response.text();
                     console.log('build', text);
