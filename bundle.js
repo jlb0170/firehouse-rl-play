@@ -7585,9 +7585,8 @@ class Game {
             this.branchRunner = new BranchRunnerUI();
             d1('#branch-runner').show();
         }
-        if ((0,utils/* isLocal */.IX)()) {
-            void this.showBranchInfo();
-        }
+        // Always show branch info (shows SHA on prod, branch on local)
+        void this.showBranchInfo();
         this.setupDebugControls();
         this.updateEnvButton();
         const initializer = new game_initializer.Initializer(this.map);
@@ -7865,37 +7864,33 @@ class Game {
     }
     async showBranchInfo() {
         const d = d1('#branch-info');
-        // Check if we're in production (no local server)
-        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        if ((0,utils/* isLocal */.IX)()) {
             try {
-                console.log('fetching build info on prod');
+                const { branch, hasChanges } = await git.getBranchInfo();
+                if (branch === 'main' || branch === 'master')
+                    d.hide();
+                else
+                    d.text(`Branch: ${branch}${hasChanges ? ' (uncommitted changes)' : ''}`).show();
+            }
+            catch (e) {
+                console.error('showBranchInfo', e);
+            }
+        }
+        else {
+            try {
                 const response = await fetch('/firehouse-rl-play/build-info.txt');
                 if (response.ok) {
                     const text = await response.text();
-                    console.log('build', text);
                     const sha = text.match(/Git SHA: (\w+)/)?.[1];
                     const commit = text.match(/Commit: (.+)/)?.[1];
                     if (sha) {
                         const display = commit ? `Prod: ${sha} - ${commit}` : `Prod: ${sha}`;
                         d.text(display).show();
-                        return;
                     }
                 }
             }
             catch (e) {
-                // Fall through to normal branch detection
             }
-        }
-        try {
-            const { branch, hasChanges } = await git.getBranchInfo();
-            if (branch === 'main' || branch === 'master')
-                d.hide();
-            else
-                d.text(`Branch: ${branch}${hasChanges ? ' (uncommitted changes)' : ''}`).show();
-        }
-        catch (e) {
-            // Don't hide on error - we might be in production
-            console.error('showBranchInfo', e);
         }
     }
 }
