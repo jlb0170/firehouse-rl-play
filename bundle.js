@@ -7585,6 +7585,7 @@ class Game {
             this.branchRunner = new BranchRunnerUI();
             d1('#branch-runner').show();
         }
+        console.error('showing branch info');
         void this.showBranchInfo();
         this.setupDebugControls();
         this.updateEnvButton();
