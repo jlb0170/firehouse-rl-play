@@ -977,7 +977,7 @@ body {
 } 
 
 /* Firehouse Modal */
-#firehouse-modal { min-width: 300px; }
+#firehouse-modal { width: fit-content; }
 
 .firehouse-header {
     margin-bottom: 10px;
@@ -991,7 +991,24 @@ body {
 }
 
 .names {
-    margin: 10px 0;
+    margin: 0;
+}
+
+.firefighter {
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+
+.firefighter:hover {
+    background-color: #2a2a2a;
+}
+
+.firefighter.selected {
+    background-color: #1a3a1a;
+    border-left: 3px solid #0a0;
+    padding-left: 5px;
 }
 
 .firehouse-panel {
@@ -999,13 +1016,68 @@ body {
     border: 1px solid #444;
     padding: 5px;
 }
+
+.people {
+    border: 1px solid #444;
+    padding: 5px;
+}
+
+.people .firehouse-panel {
+    border: 1px dashed #444;
+}
 .firehouse-panel h4 {
     margin: 0 0 5px 0;
     color: #0a0;
+    background-color: #1a1a1a;
+    padding: 8px 10px;
+    border-bottom: 2px solid #444;
+    margin: -5px -5px 4px -5px;
 }
 .inspector {
     border: 1px solid #444;
     padding: 5px;
+}
+
+.inspector .capabilities {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.inspector .capability-value {
+    text-align: right;
+    padding-right: 8px;
+    width: 20px;
+}
+
+.inspector .capability-name {
+    padding-right: 8px;
+    position: relative;
+}
+
+.inspector .capability-skills {
+    color: #888;
+}
+
+.capability-tooltip {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    padding: 8px;
+    z-index: 1000;
+    white-space: nowrap;
+    margin-left: 10px;
+}
+
+.capability:hover .capability-tooltip {
+    display: block;
+}
+
+.capability-tooltip div {
+    color: #0a0;
+    padding: 2px 0;
 }
 
 .firehouse-actions {
@@ -6675,7 +6747,7 @@ class UI {
 // EXTERNAL MODULE: ./src/signal.ts
 var signal = __webpack_require__(334);
 ;// ./src/html/firehouse.html
-/* harmony default export */ const firehouse = ("<div id=\"firehouse-modal\" class=\"column gap-form\">\n        <div class=\"firehouse-header row items-between cross-aligned-center gap-modal-header\">\n            <h3 id=\"firehouse-title\"></h3>\n            <button id=\"firehouse-close\" class=\"close-button\">×</button>\n        </div>\n        <div class=\"row gap-form items-fill\">\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Upgrades</h4>\n                <div>a better place to live and work</div>\n            </div>\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Fire Engine</h4>\n                <div>how you get to missions</div>\n            </div>\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Resources</h4>\n                <div>use these to buy things</div>\n            </div>\n        </div>\n        <div class=\"row gap-form items-fill\">\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Personnel</h4>\n                <div class=\"names column gap-terminal-info\">\n                    <div class=\"firefighter template\">Name</div>\n                </div>\n            </div>\n            <div class=\"firehouse-panel column gap-terminal-info inspector\">\n                <h4>Inspector</h4>\n                <div class=\"details\">\n                    <div class=\"name\"></div>\n                    <div class=\"caps\">\n                        <div class=\"capability template\">strength 10</div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Equipment</h4>\n                <div>unallocated equipment</div>\n            </div>\n        </div>\n        <div class=\"firehouse-actions row aligned-end\">\n            <button id=\"firehouse-ok\" class=\"submit-button\">OK</button>\n        </div>\n    </div>\n\n");
+/* harmony default export */ const firehouse = ("<div id=\"firehouse-modal\" class=\"column gap-form\">\n        <div class=\"firehouse-header row items-between cross-aligned-center gap-modal-header\">\n            <h3 id=\"firehouse-title\"></h3>\n            <button id=\"firehouse-close\" class=\"close-button\">×</button>\n        </div>\n        <div class=\"global row gap-form items-between\">\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Upgrades</h4>\n                <div>a better place to live and work</div>\n            </div>\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Fire Engine</h4>\n                <div>how you get to missions</div>\n            </div>\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Resources</h4>\n                <div>use these to buy things</div>\n            </div>\n        </div>\n        <div class=\"personnel-row row gap-form items-between\">\n            <div class=\"people row gap-terminal-info\">\n                <div class=\"firehouse-panel column gap-terminal-info\">\n                    <h4>Personnel</h4>\n                    <div class=\"names column gap-terminal-info\">\n                        <div class=\"firefighter template\">Name</div>\n                    </div>\n                </div>\n                <div class=\"firehouse-panel column gap-terminal-info inspector\">\n                    <h4>Inspector</h4>\n                    <div class=\"details\">\n                        <div class=\"name\"></div>\n                        <table class=\"capabilities\">\n                            <tr class=\"capability template\">\n                                <td class=\"capability-value\">10</td>\n                                <td class=\"capability-name\">\n                                    <span class=\"capability-text\">strength</span>\n                                    <div class=\"capability-tooltip\"></div>\n                                </td>\n                                <td class=\"capability-skills\"></td>\n                            </tr>\n                        </table>\n                    </div>\n                </div>\n            </div>\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Equipment</h4>\n                <div>unallocated equipment</div>\n            </div>\n        </div>\n        <div class=\"firehouse-actions row aligned-end\">\n            <button id=\"firehouse-ok\" class=\"submit-button\">OK</button>\n        </div>\n    </div>\n\n");
 ;// ./src/ui/modal.ts
 
 
@@ -6722,22 +6794,48 @@ Modal.list = [];
 class FirehouseModal extends Modal {
     constructor() {
         super('#firehouse-modal');
+        this.selectedPawn = null;
+        this.pawns = [];
         this.div.appendFileHtml(firehouse);
         this.div.d1('#firehouse-close').onClick(() => this.hide());
         this.div.d1('#firehouse-ok').onClick(() => this.hide());
     }
     open(num, pawns) {
+        this.pawns = pawns;
+        this.selectedPawn = null;
         this.div.d1('#firehouse-title').text(`Firehouse ${num}`);
-        this.div.d1('.names').dList('.firefighter').updateFrom(pawns, (d, p) => d.text(p.name).onClick(() => this.inspect(p)));
-        this.div.d1('.inspector .name').text('');
-        this.div.d1('.inspector .caps').dList('.capability').updateFrom([], () => { });
+        if (pawns.length > 0) {
+            this.inspect(pawns[0]);
+        }
+        else {
+            this.updatePersonnelList();
+        }
         this.show();
     }
+    updatePersonnelList() {
+        this.div.d1('.names').dList('.firefighter').updateFrom(this.pawns, (d, p) => {
+            const text = p === this.selectedPawn ? `👤 ${p.name} ====>` : `👤 ${p.name}`;
+            d.text(text)
+                .onClick(() => this.inspect(p))
+                .classed('selected', p === this.selectedPawn);
+        });
+    }
     inspect(pawn) {
-        this.div.d1('.inspector .name').text(pawn.name);
-        this.div.d1('.inspector .caps').dList('.capability').updateFrom(Object.entries(pawn.capabilities), (cDiv, [n, cap]) => {
-            const skills = Object.entries(cap).filter(([k]) => k !== 'score').map(([k, v]) => `${k} ${v}`).join(' ');
-            cDiv.text(`${n} ${cap.score} ${skills}`);
+        this.selectedPawn = pawn;
+        this.updatePersonnelList();
+        this.div.d1('.inspector .details .name').text('');
+        this.div.d1('.inspector .details .capabilities').dList('.capability').updateFrom(Object.entries(pawn.capabilities), (row, [n, capability]) => {
+            const nonZeroSkills = Object.entries(capability)
+                .filter(([k, v]) => k !== 'score' && v !== 0)
+                .map(([k, v]) => `${v} ${k}`)
+                .join(' ');
+            const allSkills = Object.entries(capability)
+                .filter(([k]) => k !== 'score')
+                .map(([k, v]) => `${v} ${k}`);
+            row.d1('.capability-value').text(capability.score.toString());
+            row.d1('.capability-name .capability-text').text(n);
+            row.d1('.capability-skills').text(nonZeroSkills);
+            row.d1('.capability-name .capability-tooltip').html(allSkills.map(s => `<div>${s}</div>`).join(''));
         });
         draw_pawn/* PawnSelected */.Ei.emit(new draw_pawn/* Pawn */.vc(pawn.name, pawn.capabilities));
     }
@@ -9161,7 +9259,9 @@ Drawable.nextId = 0;
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
 
 const roll = () => (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .half */ .MX)((0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .rollD6 */ .gJ)(4));
-const make = (skills) => skills.reduce((a, s) => ({ ...a, [s]: 0 }), { score: roll() });
+const skillValues = [0, 0, 0, 0, 0, 0, 1, 1, 2];
+const skillValue = () => _utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo ? 0 : (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randFrom */ .Kt)(skillValues);
+const make = (skills) => skills.reduce((a, s) => ({ ...a, [s]: skillValue() }), { score: roll() });
 const Capabilities = {
     basic: () => ({
         strength: make(['inventory', 'carry', 'drag', 'break']),
