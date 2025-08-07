@@ -388,6 +388,56 @@ var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBP
 ___CSS_LOADER_EXPORT___.push([module.id, `/* Layout System */
 .hidden { display: none !important; }
 
+:root {
+  --color-background: #000;
+  --color-background-1: #111;
+  --color-background-2: #222;
+  --color-background-3: #333;
+  --color-foreground: #0a0;
+  --color-border: #444;
+  --color-accent: #0f0;
+}
+
+/* Utilities */
+.modal-window button { background: var(--color-background-3); color: #fff; border: 1px solid #666; border-radius: 3px; cursor: pointer; font-family: monospace; font-size: 14px; padding: 6px 12px }
+.modal-window button:hover { background: #555 }
+.modal-window button:disabled { background: #222; color: #666; cursor: not-allowed }
+.button-primary { background: var(--color-foreground); color: #000; border: 1px solid var(--color-foreground); border-radius: 3px; cursor: pointer; font-family: monospace; font-size: 14px; padding: 6px 12px }
+.button-primary:hover:not(:disabled) { background: #0c0 }
+.button-secondary { background: var(--color-background-3); color: var(--color-foreground); border: 1px solid #666; border-radius: 3px; cursor: pointer; font-family: monospace; font-size: 14px; padding: 6px 12px }
+.button-secondary:hover { background: #555 }
+.button-secondary:disabled { background: #222; color: #666; cursor: not-allowed }
+.button-link { background: #2a4a5d; color: #fff; border: 1px solid #3a5a7d; padding: 4px 8px; border-radius: 3px; font-weight: bold }
+.button-link:hover { background: #3a5a7d }
+
+/* Button size modifier */
+.button-large { font-size: 16px; padding: 8px 12px }
+
+/* Button state modifiers */
+button.muted { background: #666; color: #999 }
+button.solo { background: #060; color: #fff }
+
+/* Text utilities */
+.text-subtle { color: #444 }
+.text-danger { color: #f44 }
+.bold { font-weight: bold }
+.clickable { cursor: pointer }
+
+.input { padding: 8px; background: var(--color-background-1); border: 1px solid var(--color-border); color: var(--color-foreground); border-radius: 4px; font-family: monospace; font-size: 14px }
+.input:focus { outline: none; border-color: var(--color-foreground); box-shadow: 0 0 5px rgba(0,170,0,.3) }
+
+.border { border: 1px solid var(--color-border) }
+.border-dashed { border-style: dashed }
+.border-top { border-top: 1px solid var(--color-border) }
+.border-right { border-right: 1px solid var(--color-border) }
+.border-bottom { border-bottom: 1px solid var(--color-border) }
+.border-left { border-left: 1px solid var(--color-border) }
+
+.panel { background: var(--color-background-1); border: 1px solid var(--color-border); border-radius: 4px; padding: 8px }
+.panel-dark { background: #1a1a1a }
+.panel-dashed { border-style: dashed }
+.panel-title { margin: 0 0 5px 0; color: #0a0; background-color: #1a1a1a; padding: 8px 10px; border-bottom: 2px solid #444; margin: -5px -5px 4px -5px }
+
 /* Base Layout Classes - compact by default */
 .row {
     display: flex;
@@ -497,57 +547,10 @@ body {
     /* Flex properties handled by classes */
 }
 
-.branch-run {
-    background: #4a5d23;
-    color: white;
-    border: 1px solid #5a7029;
-    padding: 4px 12px;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: bold;
-    flex-shrink: 0;
-}
-
-.branch-run:hover {
-    background: #5a7029;
-    border-color: #6a8035;
-}
-
-.pr-link {
-    background: #2a4a5d;
-    color: white;
-    border: 1px solid #3a5a7d;
-    padding: 4px 8px;
-    border-radius: 3px;
-    text-decoration: none;
-    font-size: 10px;
-    font-weight: bold;
-}
-
-.pr-link:hover {
-    background: #3a5a7d;
-    border-color: #4a6a8d;
-}
-
 .branches {
     max-height: 400px;
     overflow-y: auto;
     margin: 10px 0;
-}
-
-.refresh-button {
-    background: #2a4a5d;
-    color: white;
-    border: 1px solid #3a5a7d;
-    padding: 6px 12px;
-    border-radius: 3px;
-    cursor: pointer;
-    margin-bottom: 10px;
-}
-
-.refresh-button:hover {
-    background: #3a5a7d;
 }
 
 #controls {
@@ -566,62 +569,6 @@ body {
     border-radius: 3px;
     padding: 2px;
 }
-
-
-.layer-button {
-    background: #333;
-    color: #fff;
-    border: 1px solid #666;
-    padding: 4px 8px;
-    font-family: monospace;
-    font-size: 12px;
-    cursor: pointer;
-    border-radius: 2px;
-}
-
-.layer-button:hover {
-    background: #555;
-}
-
-.layer-button.muted {
-    background: #666;
-    color: #999;
-}
-
-.layer-button.solo {
-    background: #060;
-    color: #fff;
-}
-
-.control-button {
-    background: #333;
-    color: #fff;
-    border: 1px solid #666;
-    padding: 8px 12px;
-    margin-right: 5px;
-    font-family: monospace;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 3px;
-}
-
-.control-button:hover {
-    background: #555;
-}
-
-.control-button:active {
-    background: #222;
-}
-
-.control-button:disabled {
-    background: #222;
-    color: #666;
-    cursor: not-allowed;
-}
-
-
-
-
 
 #game-container {
     flex-shrink: 0;
@@ -762,7 +709,6 @@ body {
 
 .feedback-header {
     margin-bottom: 20px;
-    border-bottom: 1px solid #444;
     padding-bottom: 10px;
 }
 
@@ -804,69 +750,18 @@ body {
 }
 
 #feedback-title, #feedback-screenshot {
-    padding: 8px;
-    background: #111;
-    border: 1px solid #444;
-    color: #0a0;
-    border-radius: 4px;
     font-family: monospace;
     font-size: 14px;
 }
 
 #feedback-body {
-    padding: 8px;
-    background: #111;
-    border: 1px solid #444;
-    color: #0a0;
-    border-radius: 4px;
     font-family: monospace;
     font-size: 14px;
     resize: vertical;
     min-height: 120px;
 }
 
-#feedback-title:focus, #feedback-body:focus {
-    outline: none;
-    border-color: #0a0;
-    box-shadow: 0 0 5px rgba(0, 170, 0, 0.3);
-}
-
 .feedback-actions { margin-top: 10px; }
-
-.submit-button, .cancel-button {
-    padding: 8px 16px;
-    border: 1px solid #444;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: monospace;
-    font-size: 14px;
-}
-
-.submit-button {
-    background: #0a0;
-    color: #000;
-    border-color: #0a0;
-}
-
-.submit-button:hover:not(:disabled) {
-    background: #0c0;
-}
-
-.submit-button:disabled {
-    background: #444;
-    color: #666;
-    border-color: #444;
-    cursor: not-allowed;
-}
-
-.cancel-button {
-    background: #333;
-    color: #0a0;
-}
-
-.cancel-button:hover {
-    background: #444;
-}
 
 .feedback-status {
     padding: 10px;
@@ -892,7 +787,6 @@ body {
     margin: 0 0 20px 0;
     color: #0a0;
     font-size: 18px;
-    border-bottom: 1px solid #444;
     padding-bottom: 10px;
 }
 
@@ -900,7 +794,6 @@ body {
     margin: 10px 0;
     padding: 12px;
     background: #111;
-    border: 1px solid #444;
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -957,14 +850,11 @@ body {
     text-align: center;
     color: #666;
     font-size: 12px;
-    border-top: 1px solid #444;
-    padding-top: 10px;
 }
 
 .imported-save-section {
     margin-bottom: 15px;
     padding-bottom: 15px;
-    border-bottom: 1px solid #444;
 }
 
 .imported-save-section .slot-number {
@@ -981,7 +871,6 @@ body {
 
 .firehouse-header {
     margin-bottom: 10px;
-    border-bottom: 1px solid #444;
     padding-bottom: 5px;
 }
 .firehouse-header h3 {
@@ -1013,17 +902,13 @@ body {
 
 .firehouse-panel {
     margin: 0;
-    border: 1px solid #444;
-    padding: 5px;
 }
 
 .people {
-    border: 1px solid #444;
     padding: 5px;
 }
 
 .people .firehouse-panel {
-    border: 1px dashed #444;
 }
 .firehouse-panel h4 {
     margin: 0 0 5px 0;
@@ -1034,7 +919,6 @@ body {
     margin: -5px -5px 4px -5px;
 }
 .inspector {
-    border: 1px solid #444;
     padding: 5px;
 }
 
@@ -6043,7 +5927,7 @@ var config = __webpack_require__(843);
 // EXTERNAL MODULE: ./src/draw/pawn.ts + 1 modules
 var draw_pawn = __webpack_require__(705);
 ;// ./src/html/terminal.html
-/* harmony default export */ const terminal = ("<div id=\"terminal\">\n    <div id=\"terminal-content\">\n        <div class=\"cell-container\">\n            <div class=\"cell-coord\"></div>\n            <div class=\"layers\">\n                <div class=\"layer template\">\n                    <span class=\"name\">floor</span>: <span style=\"color: #444\" class=\"description\">Floor(4477)</span>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div id=\"selected-info\">\n        <div class=\"selected-container\">\n            <div class=\"pawn-desc\">firefighter 10</div>\n            <div class=\"capabilities\">\n                <div class=\"capability template\">strength 10</div>\n            </div>\n            <div class=\"tasks\">\n                <div class=\"task-info template\">\n                    <span class=\"task-desc\">go to 73, 26</span>\n                    <span class=\"clear-task\" data-index=\"0\" style=\"cursor: pointer; color: #f44; font-weight: bold;\">[x]</span>\n                </div>\n            </div>\n            <div id=\"clear-all\" style=\"cursor: pointer; color: #f44; font-weight: bold;\" title=\"clear all\">[xx]</div>\n        </div>\n    </div>\n</div>\n");
+/* harmony default export */ const terminal = ("<div id=\"terminal\">\n    <div id=\"terminal-content\">\n        <div class=\"cell-container\">\n            <div class=\"cell-coord\"></div>\n            <div class=\"layers\">\n                <div class=\"layer template\">\n                    <span class=\"name\">floor</span>: <span class=\"description text-subtle\">Floor(4477)</span>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div id=\"selected-info\">\n        <div class=\"selected-container\">\n            <div class=\"pawn-desc\">firefighter 10</div>\n            <div class=\"capabilities\">\n                <div class=\"capability template\">strength 10</div>\n            </div>\n            <div class=\"tasks\">\n                <div class=\"task-info template\">\n                    <span class=\"task-desc\">go to 73, 26</span>\n                    <span class=\"clear-task clickable text-danger bold\" data-index=\"0\">[x]</span>\n                </div>\n            </div>\n            <div id=\"clear-all\" class=\"clickable text-danger bold\" title=\"clear all\">[xx]</div>\n        </div>\n    </div>\n</div>\n");
 ;// ./src/ui/terminal.ts
 
 
@@ -6747,7 +6631,7 @@ class UI {
 // EXTERNAL MODULE: ./src/signal.ts
 var signal = __webpack_require__(334);
 ;// ./src/html/firehouse.html
-/* harmony default export */ const firehouse = ("<div id=\"firehouse-modal\" class=\"column gap-form\">\n        <div class=\"firehouse-header row items-between cross-aligned-center gap-modal-header\">\n            <h3 id=\"firehouse-title\"></h3>\n            <button id=\"firehouse-close\" class=\"close-button\">×</button>\n        </div>\n        <div class=\"global row gap-form items-between\">\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Upgrades</h4>\n                <div>a better place to live and work</div>\n            </div>\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Fire Engine</h4>\n                <div>how you get to missions</div>\n            </div>\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Resources</h4>\n                <div>use these to buy things</div>\n            </div>\n        </div>\n        <div class=\"personnel-row row gap-form items-between\">\n            <div class=\"people row gap-terminal-info\">\n                <div class=\"firehouse-panel column gap-terminal-info\">\n                    <h4>Personnel</h4>\n                    <div class=\"names column gap-terminal-info\">\n                        <div class=\"firefighter template\">Name</div>\n                    </div>\n                </div>\n                <div class=\"firehouse-panel column gap-terminal-info inspector\">\n                    <h4>Inspector</h4>\n                    <div class=\"details\">\n                        <div class=\"name\"></div>\n                        <table class=\"capabilities\">\n                            <tr class=\"capability template\">\n                                <td class=\"capability-value\">10</td>\n                                <td class=\"capability-name\">\n                                    <span class=\"capability-text\">strength</span>\n                                    <div class=\"capability-tooltip\"></div>\n                                </td>\n                                <td class=\"capability-skills\"></td>\n                            </tr>\n                        </table>\n                    </div>\n                </div>\n            </div>\n            <div class=\"firehouse-panel column gap-terminal-info\">\n                <h4>Equipment</h4>\n                <div>unallocated equipment</div>\n            </div>\n        </div>\n        <div class=\"firehouse-actions row aligned-end\">\n            <button id=\"firehouse-ok\" class=\"submit-button\">OK</button>\n        </div>\n    </div>\n\n");
+/* harmony default export */ const firehouse = ("<div id=\"firehouse-modal\" class=\"modal-window column gap-form\">\n        <div class=\"firehouse-header row items-between cross-aligned-center gap-modal-header border-bottom\">\n            <h3 id=\"firehouse-title\"></h3>\n            <button id=\"firehouse-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div class=\"global row gap-form items-between\">\n            <div class=\"firehouse-panel panel column gap-terminal-info\">\n                <h4>Upgrades</h4>\n                <div>a better place to live and work</div>\n            </div>\n            <div class=\"firehouse-panel panel column gap-terminal-info\">\n                <h4>Fire Engine</h4>\n                <div>how you get to missions</div>\n            </div>\n            <div class=\"firehouse-panel panel column gap-terminal-info\">\n                <h4>Resources</h4>\n                <div>use these to buy things</div>\n            </div>\n        </div>\n        <div class=\"personnel-row row gap-form items-between\">\n            <div class=\"people panel row gap-terminal-info\">\n                <div class=\"firehouse-panel panel-dashed column gap-terminal-info\">\n                    <h4>Personnel</h4>\n                    <div class=\"names column gap-terminal-info\">\n                        <div class=\"firefighter template\">Name</div>\n                    </div>\n                </div>\n                <div class=\"firehouse-panel panel column gap-terminal-info inspector\">\n                    <h4>Inspector</h4>\n                    <div class=\"details\">\n                        <div class=\"name\"></div>\n                        <table class=\"capabilities\">\n                            <tr class=\"capability template\">\n                                <td class=\"capability-value\">10</td>\n                                <td class=\"capability-name\">\n                                    <span class=\"capability-text\">strength</span>\n                                    <div class=\"capability-tooltip\"></div>\n                                </td>\n                                <td class=\"capability-skills\"></td>\n                            </tr>\n                        </table>\n                    </div>\n                </div>\n            </div>\n            <div class=\"firehouse-panel panel column gap-terminal-info\">\n                <h4>Equipment</h4>\n                <div>unallocated equipment</div>\n            </div>\n        </div>\n        <div class=\"firehouse-actions row aligned-end\">\n            <button id=\"firehouse-ok\" class=\"button-primary\">OK</button>\n        </div>\n    </div>\n\n");
 ;// ./src/ui/modal.ts
 
 
@@ -6848,7 +6732,7 @@ class FirehouseModal extends Modal {
 // EXTERNAL MODULE: ./src/game/state.ts
 var state = __webpack_require__(522);
 ;// ./src/html/feedback.html
-/* harmony default export */ const feedback = ("<div id=\"feedback-modal\" class=\"column gap-form\">\n        <div class=\"feedback-header row items-between cross-aligned-center gap-modal-header\">\n            <h3>Submit Feedback</h3>\n            <button id=\"feedback-close\" class=\"close-button\">×</button>\n        </div>\n        <div class=\"feedback-form column gap-form\">\n            <div class=\"input-group\">\n                <label for=\"feedback-title\">Title:</label>\n                <input id=\"feedback-title\" type=\"text\" placeholder=\"\">\n            </div>\n            <div class=\"input-group\">\n                <label for=\"feedback-body\">Details:</label>\n                <textarea id=\"feedback-body\" rows=\"6\" placeholder=\"Start typing...\"></textarea>\n            </div>\n            <div class=\"input-group\">\n                <label for=\"feedback-screenshot\">Screenshot (drop/paste or upload, 10MB max):</label>\n                <input id=\"feedback-screenshot\" type=\"file\" accept=\"image/*\">\n                <div id=\"feedback-image-preview\" class=\"hidden\">\n                    <img id=\"feedback-preview-img\" alt=\"Preview\" style=\"max-width: 300px; max-height: 200px; border: 1px solid #ccc; border-radius: 4px; margin-top: 8px;\">\n                    <button id=\"feedback-remove-image\" type=\"button\" style=\"margin-left: 8px; padding: 2px 6px; font-size: 12px;\">Remove</button>\n                </div>\n            </div>\n            <div class=\"feedback-actions row aligned-end gap-buttons\">\n                <div id=\"feedback-normal-buttons\" class=\"row gap-buttons\">\n                    <button id=\"feedback-submit\" class=\"submit-button\">Submit Feedback</button>\n                    <button id=\"feedback-cancel\" class=\"cancel-button\">Cancel</button>\n                </div>\n                <div id=\"feedback-success-buttons\" class=\"hidden row gap-buttons\">\n                    <button id=\"feedback-ok\" class=\"submit-button\">OK</button>\n                </div>\n            </div>\n        <div id=\"feedback-status\" class=\"feedback-status hidden\"></div>\n    </div>\n    </div>\n");
+/* harmony default export */ const feedback = ("<div id=\"feedback-modal\" class=\"modal-window column gap-form\">\n        <div class=\"feedback-header row items-between cross-aligned-center gap-modal-header border-bottom\">\n            <h3>Submit Feedback</h3>\n            <button id=\"feedback-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div class=\"feedback-form column gap-form\">\n            <div class=\"input-group\">\n                <label for=\"feedback-title\">Title:</label>\n                <input id=\"feedback-title\" class=\"input\" type=\"text\" placeholder=\"\">\n            </div>\n            <div class=\"input-group\">\n                <label for=\"feedback-body\">Details:</label>\n                <textarea id=\"feedback-body\" class=\"input\" rows=\"6\" placeholder=\"Start typing...\"></textarea>\n            </div>\n            <div class=\"input-group\">\n                <label for=\"feedback-screenshot\">Screenshot (drop/paste or upload, 10MB max):</label>\n                <input id=\"feedback-screenshot\" class=\"input\" type=\"file\" accept=\"image/*\">\n                <div id=\"feedback-image-preview\" class=\"hidden\">\n                    <img id=\"feedback-preview-img\" alt=\"Preview\" style=\"max-width: 300px; max-height: 200px; border: 1px solid #ccc; border-radius: 4px; margin-top: 8px;\">\n                    <button id=\"feedback-remove-image\" type=\"button\" style=\"margin-left: 8px; padding: 2px 6px; font-size: 12px;\">Remove</button>\n                </div>\n            </div>\n            <div class=\"feedback-actions row aligned-end gap-buttons\">\n                <div id=\"feedback-normal-buttons\" class=\"row gap-buttons\">\n                    <button id=\"feedback-submit\" class=\"button-primary\">Submit Feedback</button>\n                    <button id=\"feedback-cancel\" class=\"button-secondary\">Cancel</button>\n                </div>\n                <div id=\"feedback-success-buttons\" class=\"hidden row gap-buttons\">\n                    <button id=\"feedback-ok\" class=\"button-primary\">OK</button>\n                </div>\n            </div>\n        <div id=\"feedback-status\" class=\"feedback-status hidden\"></div>\n    </div>\n    </div>\n");
 ;// ./src/ui/feedback.ts
 
 
@@ -7084,7 +6968,7 @@ class Feedback extends Modal {
 }
 
 ;// ./src/html/switch-env.html
-/* harmony default export */ const switch_env = ("<div id=\"env-switch-modal\" class=\"column gap-form\">\n    <div class=\"row items-between cross-aligned-center gap-modal-header\">\n        <h3>SWITCH ENVIRONMENT</h3>\n        <button id=\"env-switch-close\" class=\"close-button\">×</button>\n    </div>\n    <div id=\"env-switch-message\"></div>\n    <div class=\"row aligned-end gap-buttons\">\n        <button id=\"env-switch-cancel\" class=\"cancel-button\">Cancel</button>\n        <button id=\"env-switch-save-push\" class=\"submit-button\">Save &amp; Push</button>\n        <button id=\"env-switch-save\" class=\"submit-button\">Save Here &amp; Switch</button>\n        <button id=\"env-switch-switch\" class=\"submit-button\">Switch Only</button>\n    </div>\n</div>\n");
+/* harmony default export */ const switch_env = ("<div id=\"env-switch-modal\" class=\"modal-window column gap-form\">\n    <div class=\"row items-between cross-aligned-center gap-modal-header border-bottom\">\n        <h3>SWITCH ENVIRONMENT</h3>\n        <button id=\"env-switch-close\" class=\"button-secondary close-button\">×</button>\n    </div>\n    <div id=\"env-switch-message\"></div>\n    <div class=\"row aligned-end gap-buttons\">\n        <button id=\"env-switch-cancel\" class=\"button-secondary\">Cancel</button>\n        <button id=\"env-switch-save-push\" class=\"button-primary\">Save &amp; Push</button>\n        <button id=\"env-switch-save\" class=\"button-primary\">Save Here &amp; Switch</button>\n        <button id=\"env-switch-switch\" class=\"button-primary\">Switch Only</button>\n    </div>\n</div>\n");
 ;// ./src/ui/env-switch.ts
 
 
@@ -7122,7 +7006,7 @@ class EnvSwitch extends Modal {
 }
 
 ;// ./src/html/save-slots.html
-/* harmony default export */ const save_slots = ("<div id=\"save-slots-modal\" class=\"column gap-form\">\n    <h3 id=\"save-title\" class=\"popup-title\">SAVE GAME - SELECT SLOT</h3>\n    <div class=\"imported-save-section\">\n        <div class=\"imported-save template save-slot\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">Imported</div>\n                <button class=\"slot-delete close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Imported Save</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"exported-save-section\">\n        <div class=\"exported-save template save-slot\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">Exported</div>\n                <button class=\"slot-delete close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Exported Save</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"slots\">\n        <div class=\"slot template save-slot\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">1</div>\n                <button class=\"slot-delete close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Empty Slot</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"save-actions row aligned-end\">\n        <button id=\"save-cancel\" class=\"cancel-button\">Cancel</button>\n    </div>\n    <div class=\"popup-help-text\">\n        Click a slot to select • ESC to cancel\n    </div>\n</div>\n");
+/* harmony default export */ const save_slots = ("<div id=\"save-slots-modal\" class=\"modal-window column gap-form\">\n    <h3 id=\"save-title\" class=\"popup-title border-bottom\">SAVE GAME - SELECT SLOT</h3>\n    <div class=\"imported-save-section border-bottom\">\n        <div class=\"imported-save template save-slot panel\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">Imported</div>\n                <button class=\"slot-delete button-secondary close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Imported Save</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"exported-save-section\">\n        <div class=\"exported-save template save-slot panel\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">Exported</div>\n                <button class=\"slot-delete button-secondary close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Exported Save</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"slots\">\n        <div class=\"slot template save-slot panel\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">1</div>\n                <button class=\"slot-delete button-secondary close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Empty Slot</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"save-actions row aligned-end\">\n        <button id=\"save-cancel\" class=\"button-secondary\">Cancel</button>\n    </div>\n    <div class=\"popup-help-text\">\n        Click a slot to select • ESC to cancel\n    </div>\n</div>\n");
 // EXTERNAL MODULE: ./src/game/capabilities.ts
 var capabilities = __webpack_require__(793);
 ;// ./src/ui/save-slots.ts
@@ -7329,7 +7213,7 @@ class SaveSlots extends Modal {
 }
 
 ;// ./src/html/branch-runner.html
-/* harmony default export */ const branch_runner = ("<div id=\"branch-runner-modal\" class=\"column gap-form\">\n    <h3 class=\"popup-title\">BRANCH RUNNER</h3>\n    <div class=\"branch-actions\">\n        <button id=\"refresh-branches\" class=\"refresh-button\">Refresh</button>\n    </div>\n    <div class=\"branches\">\n        <div class=\"branch template branch-item\">\n            <div class=\"branch-info\">\n                <div class=\"branch-name\"></div>\n                <div class=\"branch-title\"></div>\n            </div>\n            <div class=\"branch-actions\">\n                <a class=\"pr-link\" href=\"#\" target=\"_blank\">PR</a>\n                <button class=\"branch-run\">Run</button>\n            </div>\n        </div>\n    </div>\n    <div class=\"popup-actions\">\n        <button id=\"branch-cancel\" class=\"cancel-button\">Cancel</button>\n    </div>\n    <div class=\"progress-messages hidden\">\n        <div class=\"progress-title\">Running branch...</div>\n        <div class=\"progress-log\"></div>\n    </div>\n    <div class=\"popup-help-text\">\n        Click Run to test branch • Refresh to update list • ESC to cancel\n    </div>\n</div>\n");
+/* harmony default export */ const branch_runner = ("<div id=\"branch-runner-modal\" class=\"modal-window column gap-form\">\n    <h3 class=\"popup-title border-bottom\">BRANCH RUNNER</h3>\n    <div class=\"branch-actions\">\n        <button id=\"refresh-branches\" class=\"button-link\">Refresh</button>\n    </div>\n    <div class=\"branches\">\n        <div class=\"branch template branch-item\">\n            <div class=\"branch-info\">\n                <div class=\"branch-name\"></div>\n                <div class=\"branch-title\"></div>\n            </div>\n            <div class=\"branch-actions\">\n                <a class=\"button-link\" href=\"#\" target=\"_blank\">PR</a>\n                <button class=\"button-primary\">Run</button>\n            </div>\n        </div>\n    </div>\n    <div class=\"popup-actions\">\n        <button id=\"branch-cancel\" class=\"button-secondary\">Cancel</button>\n    </div>\n    <div class=\"progress-messages hidden\">\n        <div class=\"progress-title\">Running branch...</div>\n        <div class=\"progress-log\"></div>\n    </div>\n    <div class=\"popup-help-text\">\n        Click Run to test branch • Refresh to update list • ESC to cancel\n    </div>\n</div>\n");
 ;// ./src/git.ts
 
 const apiCall = async (endpoint, data) => {
@@ -7948,7 +7832,7 @@ class Game {
         game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
             const button = document.createElement('button');
             button.id = `layer-${layerName}`;
-            button.className = 'layer-button';
+            button.className = 'button-secondary';
             button.textContent = layerAbbrevs[layerName] || layerName.slice(0, 3);
             layerGroup.appendChild(button);
         });
