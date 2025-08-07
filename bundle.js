@@ -7868,7 +7868,7 @@ class Game {
         // Check if we're in production (no local server)
         if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
             try {
-                const response = await fetch('./build-info.txt');
+                const response = await fetch('/firehouse-rl-play/build-info.txt');
                 if (response.ok) {
                     const text = await response.text();
                     const sha = text.match(/Git SHA: (\w+)/)?.[1];
