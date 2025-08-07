@@ -7872,8 +7872,10 @@ class Game {
                 if (response.ok) {
                     const text = await response.text();
                     const sha = text.match(/Git SHA: (\w+)/)?.[1];
+                    const commit = text.match(/Commit: (.+)/)?.[1];
                     if (sha) {
-                        d.text(`Prod: ${sha}`).show();
+                        const display = commit ? `Prod: ${sha} - ${commit}` : `Prod: ${sha}`;
+                        d.text(display).show();
                         return;
                     }
                 }
@@ -7890,6 +7892,7 @@ class Game {
                 d.text(`Branch: ${branch}${hasChanges ? ' (uncommitted changes)' : ''}`).show();
         }
         catch (e) {
+            // Don't hide on error - we might be in production
             console.error('showBranchInfo', e);
         }
     }
