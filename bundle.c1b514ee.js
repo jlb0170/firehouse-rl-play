@@ -115,6 +115,7 @@ module.exports = function (list, options) {
 /* harmony export */   F8: () => (/* binding */ gzSize),
 /* harmony export */   ZI: () => (/* binding */ gzip),
 /* harmony export */   kd: () => (/* binding */ gunzip),
+/* harmony export */   vy: () => (/* binding */ gzBytes),
 /* harmony export */   wz: () => (/* binding */ longUrl)
 /* harmony export */ });
 const encode = (u8) => btoa(String.fromCharCode(...u8));
@@ -139,7 +140,8 @@ const gunzip = async (b) => {
     return new TextDecoder().decode(await pump(ds.readable));
 };
 const longUrl = (u) => u.length > 2000;
-const gzSize = async (s) => atob(await gzip(s)).length;
+const gzBytes = (g) => atob(g).length;
+const gzSize = async (s) => gzBytes(await gzip(s));
 
 
 /***/ }),
@@ -209,6 +211,7 @@ class XY {
 }
 XY.w = _config__WEBPACK_IMPORTED_MODULE_3__/* .Config */ .T.WIDTH;
 XY.h = _config__WEBPACK_IMPORTED_MODULE_3__/* .Config */ .T.HEIGHT;
+XY.matches = (a, b) => a && b ? a.x === b.x && a.y === b.y : a === b;
 XY.at = (x, y) => new XY(x, y);
 
 
@@ -5921,8 +5924,8 @@ class map_Map {
 }
 map_Map.active = new Set();
 
-// EXTERNAL MODULE: ./src/game/initializer.ts + 6 modules
-var game_initializer = __webpack_require__(482);
+// EXTERNAL MODULE: ./src/game/initializer.ts + 7 modules
+var initializer = __webpack_require__(602);
 // EXTERNAL MODULE: ./src/game/config.ts + 47 modules
 var config = __webpack_require__(843);
 // EXTERNAL MODULE: ./src/draw/pawn.ts + 1 modules
@@ -6379,6 +6382,16 @@ class MenuState {
         this.showTimer = timer_timer('show');
         this.hideTimer = timer_timer('hide');
         this.helpId = 'menu-help';
+        this.sync = () => {
+            const base = this.pawn.cell?.xy;
+            if (!base || game_xy.XY.matches(base, this.lastBase))
+                return;
+            this.lastBase = base;
+            this.hideHelp();
+            this.hideMenu();
+            this.showMenu();
+            ui_renderer/* Repaint */.G2.emit();
+        };
         this.died = (pawn) => {
             if (pawn === this.pawn)
                 this.ui.setState('select');
@@ -6415,16 +6428,13 @@ class MenuState {
         this.pawn = pawn;
         this.pawn.selected = true;
         draw_pawn/* PawnSelected */.Ei.emit(pawn);
-        this.unsubMove = draw_pawn/* PawnMoved */.w.on(({ pawn }) => {
-            if (pawn === this.pawn) {
-                this.hideHelp();
-                this.hideMenu();
-                this.showMenu();
-            }
-        });
+        this.unsubMove = draw_pawn/* PawnMoved */.w.on(({ pawn }) => { if (pawn === this.pawn)
+            this.sync(); });
         this.unsubDied = draw_pawn/* PawnDied */.hq.on(this.died);
+        this.unsubFrame = ui_renderer/* FrameRendered */.HO.on(this.sync);
         document.addEventListener('keydown', this.key);
         this.showMenu();
+        this.lastBase = this.pawn.cell.xy;
     }
     exit() {
         this.pawn.selected = false;
@@ -6433,6 +6443,7 @@ class MenuState {
         this.hideHelp();
         this.unsubMove?.();
         this.unsubDied?.();
+        this.unsubFrame?.();
         document.removeEventListener('keydown', this.key);
     }
     showMenu() {
@@ -6594,7 +6605,6 @@ class ObservePawnState {
 
 
 
-
 class UI {
     constructor(terminal, map) {
         this.terminal = terminal;
@@ -6614,13 +6624,6 @@ class UI {
             menu: new MenuState(this),
             observe: new ObservePawnState(this)
         };
-        draw_pawn/* TaskRemoved */.qe.on(() => {
-            if (this.state === 'menu') {
-                const menuState = this.states.menu;
-                this.setState('menu', menuState.pawn);
-                ui_renderer/* Repaint */.G2.emit();
-            }
-        });
     }
     setState(newState, data) {
         this.states[this.state].exit?.();
@@ -6676,6 +6679,8 @@ Modal.list = [];
 
 
 
+
+const FirehouseClosed = new signal/* Signal */.H();
 class FirehouseModal extends Modal {
     constructor() {
         super('#firehouse-modal');
@@ -6724,8 +6729,11 @@ class FirehouseModal extends Modal {
         draw_pawn/* PawnSelected */.Ei.emit(new draw_pawn/* Pawn */.vc(pawn.name, pawn.capabilities));
     }
     hide() {
+        const wasShowing = this.div.showing();
         super.hide();
         draw_pawn/* PawnSelected */.Ei.emit(null);
+        if (wasShowing)
+            FirehouseClosed.emit();
     }
 }
 
@@ -6969,7 +6977,10 @@ class Feedback extends Modal {
 
 ;// ./src/html/switch-env.html
 /* harmony default export */ const switch_env = ("<div id=\"env-switch-modal\" class=\"modal-window column gap-form\">\n    <div class=\"row items-between cross-aligned-center gap-modal-header border-bottom\">\n        <h3>SWITCH ENVIRONMENT</h3>\n        <button id=\"env-switch-close\" class=\"button-secondary close-button\">×</button>\n    </div>\n    <div id=\"env-switch-message\"></div>\n    <div class=\"row aligned-end gap-buttons\">\n        <button id=\"env-switch-cancel\" class=\"button-secondary\">Cancel</button>\n        <button id=\"env-switch-save-push\" class=\"button-primary\">Save &amp; Push</button>\n        <button id=\"env-switch-save\" class=\"button-primary\">Save Here &amp; Switch</button>\n        <button id=\"env-switch-switch\" class=\"button-primary\">Switch Only</button>\n    </div>\n</div>\n");
+// EXTERNAL MODULE: ./src/storage.ts
+var storage = __webpack_require__(421);
 ;// ./src/ui/env-switch.ts
+
 
 
 
@@ -6985,7 +6996,7 @@ class EnvSwitch extends Modal {
         this.div.d1('#env-switch-switch').onClick(() => this.choose('switch'));
     }
     async show() {
-        const s = localStorage.getItem('gameState');
+        const s = storage/* storage */.I.get('gameState');
         const bytes = s ? await (0,compress/* gzSize */.F8)(s) : 0;
         this.div.d1('#env-switch-message').text(`Save is ${bytes}b`);
         super.show();
@@ -7010,6 +7021,8 @@ class EnvSwitch extends Modal {
 // EXTERNAL MODULE: ./src/game/capabilities.ts
 var capabilities = __webpack_require__(793);
 ;// ./src/ui/save-slots.ts
+
+
 
 
 
@@ -7097,24 +7110,20 @@ class SaveSlots extends Modal {
         const data = this.getSaveData(storageKey);
         if (!data)
             return;
-        this.gameState.introSucceeded = data.introSucceeded;
-        this.gameState.pawns = (0,capabilities/* withCapabilities */.X)(data.pawns || []);
-        this.gameState.firehouseNum = data.firehouseNum || 0;
-        localStorage.removeItem(storageKey);
-        if (this.gameState.introSucceeded) {
-            const { FirehouseMode } = __webpack_require__(522);
-            FirehouseMode.emit(this.gameState.pawns);
-        }
+        this.gameState.loadData(data);
+        storage/* storage */.I.remove(storageKey);
+        if (this.gameState.introSucceeded)
+            state/* FirehouseMode */.M.emit(this.gameState.pawns);
         this.isAutoLoadAtStartup = false;
         this.hide();
         console.log(`${displayName} save loaded`);
     }
     deleteEphemeralSave(storageKey, displayName) {
-        localStorage.removeItem(storageKey);
+        storage/* storage */.I.remove(storageKey);
         console.log(`${displayName} save deleted`);
     }
     getSaveData(storageKey) {
-        const data = localStorage.getItem(storageKey);
+        const data = storage/* storage */.I.get(storageKey);
         if (!data)
             return null;
         try {
@@ -7136,17 +7145,12 @@ class SaveSlots extends Modal {
     }
     saveToSlot(slotNum) {
         const key = `gameState_${slotNum}`;
-        const data = {
-            introSucceeded: this.gameState.introSucceeded,
-            pawns: (0,capabilities/* withCapabilities */.X)(this.gameState.pawns),
-            firehouseNum: this.gameState.firehouseNum
-        };
-        localStorage.setItem(key, JSON.stringify(data));
+        storage/* storage */.I.set(key, JSON.stringify(this.gameState.data()));
         console.log(`Game saved to slot ${slotNum}`);
     }
     loadFromSlot(slotNum) {
         const key = `gameState_${slotNum}`;
-        const data = localStorage.getItem(key);
+        const data = storage/* storage */.I.get(key);
         if (!data) {
             // If loading and slot is empty, start fresh intro
             console.log(`Starting fresh game (empty slot ${slotNum})`);
@@ -7154,18 +7158,14 @@ class SaveSlots extends Modal {
             return;
         }
         const parsed = JSON.parse(data);
-        this.gameState.introSucceeded = parsed.introSucceeded;
-        this.gameState.pawns = (0,capabilities/* withCapabilities */.X)(parsed.pawns || []);
-        this.gameState.firehouseNum = parsed.firehouseNum || 0;
-        if (this.gameState.introSucceeded) {
-            const { FirehouseMode } = __webpack_require__(522);
-            FirehouseMode.emit(this.gameState.pawns);
-        }
+        this.gameState.loadData(parsed);
+        if (this.gameState.introSucceeded)
+            state/* FirehouseMode */.M.emit(this.gameState.pawns);
         console.log(`Game loaded from slot ${slotNum}`);
     }
     deleteSlot(slotNum) {
         const key = `gameState_${slotNum}`;
-        localStorage.removeItem(key);
+        storage/* storage */.I.remove(key);
         console.log(`Deleted save slot ${slotNum}`);
     }
     startFreshGame() {
@@ -7174,16 +7174,16 @@ class SaveSlots extends Modal {
     hasSavedGames() {
         return [1, 2, 3].some(slotNum => {
             const key = `gameState_${slotNum}`;
-            return localStorage.getItem(key) !== null;
+            return storage/* storage */.I.get(key) !== null;
         }) || this.hasEphemeralSave('importedSave') || this.hasEphemeralSave('exportedSave');
     }
     hasEphemeralSave(storageKey) {
-        return localStorage.getItem(storageKey) !== null;
+        return storage/* storage */.I.get(storageKey) !== null;
     }
     async getSlotData() {
         return Promise.all([1, 2, 3].map(async (slotNum) => {
             const key = `gameState_${slotNum}`;
-            const data = localStorage.getItem(key);
+            const data = storage/* storage */.I.get(key);
             if (!data)
                 return { exists: false, pawns: [], firehouseNum: 0, bytes: 0 };
             const parsed = JSON.parse(data);
@@ -7198,10 +7198,7 @@ class SaveSlots extends Modal {
     }
     hide() {
         super.hide();
-        if (this.isAutoLoadAtStartup) {
-            this.isAutoLoadAtStartup = false;
-            this.startFreshGame();
-        }
+        this.isAutoLoadAtStartup = false;
     }
     modalKeyHandled(e) {
         if (e.key >= '1' && e.key <= '3') {
@@ -7213,7 +7210,7 @@ class SaveSlots extends Modal {
 }
 
 ;// ./src/html/branch-runner.html
-/* harmony default export */ const branch_runner = ("<div id=\"branch-runner-modal\" class=\"modal-window column gap-form\">\n    <h3 class=\"popup-title border-bottom\">BRANCH RUNNER</h3>\n    <div class=\"branch-actions\">\n        <button id=\"refresh-branches\" class=\"button-link\">Refresh</button>\n    </div>\n    <div class=\"branches\">\n        <div class=\"branch template branch-item\">\n            <div class=\"branch-info\">\n                <div class=\"branch-name\"></div>\n                <div class=\"branch-title\"></div>\n            </div>\n            <div class=\"branch-actions\">\n                <a class=\"button-link\" href=\"#\" target=\"_blank\">PR</a>\n                <button class=\"button-primary\">Run</button>\n            </div>\n        </div>\n    </div>\n    <div class=\"popup-actions\">\n        <button id=\"branch-cancel\" class=\"button-secondary\">Cancel</button>\n    </div>\n    <div class=\"progress-messages hidden\">\n        <div class=\"progress-title\">Running branch...</div>\n        <div class=\"progress-log\"></div>\n    </div>\n    <div class=\"popup-help-text\">\n        Click Run to test branch • Refresh to update list • ESC to cancel\n    </div>\n</div>\n");
+/* harmony default export */ const branch_runner = ("<div id=\"branch-runner-modal\" class=\"modal-window column gap-form\">\n    <h3 class=\"popup-title border-bottom\">BRANCH RUNNER</h3>\n    <div class=\"branch-actions\">\n        <button id=\"refresh-branches\" class=\"button-link\">Refresh</button>\n    </div>\n    <div class=\"branches\">\n        <div class=\"branch template branch-item\">\n            <div class=\"branch-info\">\n                <div class=\"branch-name\"></div>\n                <div class=\"branch-title\"></div>\n            </div>\n            <div class=\"branch-actions\">\n                <a class=\"button-link pr-link\" href=\"#\" target=\"_blank\">PR</a>\n                <button class=\"button-primary branch-run\">Run</button>\n            </div>\n        </div>\n    </div>\n    <div class=\"popup-actions\">\n        <button id=\"branch-cancel\" class=\"button-secondary\">Cancel</button>\n    </div>\n    <div class=\"progress-messages hidden\">\n        <div class=\"progress-title\">Running branch...</div>\n        <div class=\"progress-log\"></div>\n    </div>\n    <div class=\"popup-help-text\">\n        Click Run to test branch • Refresh to update list • ESC to cancel\n    </div>\n</div>\n");
 ;// ./src/git.ts
 
 const apiCall = async (endpoint, data) => {
@@ -7439,6 +7436,7 @@ var fire = __webpack_require__(267);
 
 
 
+
 const GameStepped = new signal/* SignalWithCurrent */.Y();
 class Game {
     constructor() {
@@ -7529,17 +7527,16 @@ class Game {
                 return;
             if (act === 'save' || act === 'push') {
                 this.state.save();
-                const gameStateData = localStorage.getItem('gameState');
-                if (gameStateData) {
-                    localStorage.setItem('exportedSave', gameStateData);
-                }
+                const gameStateData = storage/* storage */.I.get('gameState');
+                if (gameStateData)
+                    storage/* storage */.I.set('exportedSave', gameStateData);
             }
             let url = this.envDest();
             if (act === 'push') {
-                const s = localStorage.getItem('gameState');
+                const s = storage/* storage */.I.get('gameState');
                 if (s) {
                     const g = await (0,compress/* gzip */.ZI)(s);
-                    alert(`Pushing ${atob(g).length} bytes`);
+                    alert(`Pushing ${(0,compress/* gzBytes */.vy)(g)} bytes`);
                     url += '?import=' + encodeURIComponent(g);
                     if ((0,compress/* longUrl */.wz)(url))
                         alert('Save may exceed url length and be truncated');
@@ -7549,12 +7546,20 @@ class Game {
         };
         this.enterFirehouse = (pawns) => {
             this.pause();
+            this.resetCounters();
             this.map.killAll();
             this.map.display.clear();
             this.map.smokeDisplay.clear();
             this.map.uiRenderer.clearStrokes();
             this.drawMap();
             this.firehouse.open(this.state.firehouseNum, pawns);
+        };
+        this.afterFirehouse = () => {
+            this.resetCounters();
+            const opts = this.initializer.startNext();
+            if (opts.showDarkness !== undefined)
+                this.showDarkness = opts.showDarkness;
+            this.updateDarknessToggleButton();
         };
         this.map = new map_Map(config/* Config */.T.WIDTH, config/* Config */.T.HEIGHT);
         window.map = this.map;
@@ -7570,8 +7575,8 @@ class Game {
         void this.showBranchInfo();
         this.setupDebugControls();
         this.updateEnvButton();
-        const initializer = new game_initializer.Initializer(this.map);
-        initializer.initialize();
+        this.initializer = new initializer.Initializer(this.map);
+        this.initializer.initialize();
         this.map.lighting.redraw();
         this.drawMap();
         this.updatePlayPauseButton();
@@ -7581,7 +7586,7 @@ class Game {
         document.addEventListener('keyup', this.keyUp);
         ui_renderer/* RedrawMap */.iQ.on(() => this.drawMap());
         ui_renderer/* FrameRendered */.HO.on(() => this.updateStepInfo());
-        this.state = new state.GameState(this.map);
+        this.state = new state/* GameState */.m(this.map);
         ModalShowing.on(s => {
             if (s) {
                 this.pauseForModal();
@@ -7594,7 +7599,8 @@ class Game {
         });
         this.saveSlots = new SaveSlots(this.state);
         this.firehouse = new FirehouseModal();
-        state.FirehouseMode.on(this.enterFirehouse);
+        state/* FirehouseMode */.M.on(this.enterFirehouse);
+        FirehouseClosed.on(this.afterFirehouse);
         // Auto-show load dialog if saves exist, otherwise start normally
         if (this.saveSlots.hasSavedGames()) {
             this.saveSlots.showAutoLoadDialog();
@@ -7603,6 +7609,11 @@ class Game {
             this.state.load();
         }
         GameStepped.emit({ frame: 0, stepMs: 0 });
+    }
+    resetCounters() {
+        GameStepped.emit({ frame: 0, stepMs: 0 });
+        ui_renderer/* FrameRendered */.HO.emit(0);
+        this.updateStepInfo();
     }
     attachToDOM() {
         const container = (0,utils.$1)('game-container');
@@ -7634,9 +7645,9 @@ class Game {
         (0,utils/* onClick */.Af)((0,utils.$1)('darkness-toggle'), () => this.toggleDarkness());
         (0,utils/* onClick */.Af)((0,utils.$1)('layer-on'), () => this.turnOnAllLayers());
         (0,utils/* onClick */.Af)((0,utils.$1)('layer-off'), () => this.turnOffAllLayers());
-        (0,utils/* onClick */.Af)((0,utils.$1)('clear-game'), () => this.state.clear());
         (0,utils/* onClick */.Af)((0,utils.$1)('load-game'), () => this.saveSlots.showLoadDialog());
         (0,utils/* onClick */.Af)((0,utils.$1)('save-game'), () => this.saveSlots.showSaveDialog());
+        (0,utils/* onClick */.Af)((0,utils.$1)('new-game'), () => this.confirmNewGame());
         (0,utils/* onClick */.Af)((0,utils.$1)('switch-env'), this.switchEnv);
         if (this.branchRunner) {
             (0,utils/* onClick */.Af)((0,utils.$1)('branch-runner'), () => void this.branchRunner.showDialog());
@@ -7843,6 +7854,10 @@ class Game {
     updateEnvButton() {
         (0,utils.$1)('switch-env').textContent = location.host.includes('github.io') ? 'LCL' : 'PROD';
     }
+    updateDarknessToggleButton() {
+        const button = (0,utils.$1)('darkness-toggle');
+        button.textContent = this.showDarkness ? 'DK*' : 'DK';
+    }
     async showBranchInfo() {
         const d = d1('#branch-info');
         if ((0,utils/* isLocal */.IX)()) {
@@ -7873,6 +7888,13 @@ class Game {
             }
             catch (e) {
             }
+        }
+    }
+    confirmNewGame() {
+        const ok = confirm('Start a new game?\nThis will abandon your current progress.');
+        if (ok) {
+            this.resetCounters();
+            this.state.restartIntro();
         }
     }
 }
@@ -7918,7 +7940,271 @@ class SignalWithCurrent extends Signal {
 
 /***/ }),
 
-/***/ 482:
+/***/ 421:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   I: () => (/* binding */ storage)
+/* harmony export */ });
+/* unused harmony export Storage */
+class Storage {
+    constructor() {
+        this.get = (k) => localStorage.getItem(k);
+        this.set = (k, v) => localStorage.setItem(k, v);
+        this.remove = (k) => localStorage.removeItem(k);
+    }
+}
+const storage = new Storage();
+
+
+/***/ }),
+
+/***/ 483:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   $: () => (/* binding */ Door)
+/* harmony export */ });
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(919);
+/* harmony import */ var _drawable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(721);
+/* harmony import */ var _material__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(994);
+
+
+
+class Door extends _drawable__WEBPACK_IMPORTED_MODULE_1__/* .Drawable */ .h {
+    constructor() {
+        super(...arguments);
+        this.layer = 'walls';
+        this.open = false;
+        this.passable = false;
+        this.transparency = 0;
+        this.material = new _material__WEBPACK_IMPORTED_MODULE_2__/* .Material */ .i(this);
+        this.light = () => this.material.light(0);
+        this.char = () => this.open ? '/' : '+';
+        this.color = () => this.material.color(_ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .WOOD */ .wB);
+        this.desc = () => this.material.desc(this.open ? 'Open Door' : 'Door');
+    }
+    toggle() {
+        this.open = !this.open;
+        this.passable = this.open;
+        this.transparency = this.open ? 1 : 0;
+    }
+    step() { this.material.step(() => { }); }
+}
+
+
+/***/ }),
+
+/***/ 485:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   m: () => (/* binding */ TextStroke)
+/* harmony export */ });
+/* harmony import */ var _game_xy__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(88);
+/* harmony import */ var _stroke__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(891);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(185);
+/* harmony import */ var _colors__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(919);
+
+
+
+
+class TextStroke {
+    static create(map, text, xy, colorFn = () => _colors__WEBPACK_IMPORTED_MODULE_2__/* .WHITE */ .UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
+        const stroke = new _stroke__WEBPACK_IMPORTED_MODULE_3__/* .Stroke */ .t([], colorFn, isValid, zIndex);
+        (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .each */ .__)(text, (c, i) => {
+            const cell = map.get(xy.add(i, 0));
+            stroke.add(cell, c, bg);
+        });
+        return stroke;
+    }
+    static render(map, text, xy, id, colorFn = () => _colors__WEBPACK_IMPORTED_MODULE_2__/* .WHITE */ .UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
+        const stroke = TextStroke.create(map, text, xy, colorFn, isValid, zIndex, bg);
+        map.uiRenderer.replace(id, stroke);
+    }
+    static centered(map, text, y, id, colorFn = () => _colors__WEBPACK_IMPORTED_MODULE_2__/* .WHITE */ .UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
+        const xy = _game_xy__WEBPACK_IMPORTED_MODULE_0__.XY.at((0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .centeredStart */ .jw)(map.w, text), y);
+        TextStroke.render(map, text, xy, id, colorFn, isValid, zIndex, bg);
+    }
+    static centeredPlusY(map, text, yOffset, id, colorFn = () => _colors__WEBPACK_IMPORTED_MODULE_2__/* .WHITE */ .UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
+        TextStroke.centered(map, text, (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .half */ .MX)(map.h) + yOffset, id, colorFn, isValid, zIndex, bg);
+    }
+}
+
+
+/***/ }),
+
+/***/ 502:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   _: () => (/* binding */ Smoke)
+/* harmony export */ });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(919);
+/* harmony import */ var _drawable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(721);
+/* harmony import */ var _game_xy__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(88);
+
+
+
+
+class Smoke extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
+    constructor() {
+        super(...arguments);
+        this.layer = 'smoke';
+        this.transparency = 0.1;
+        this.light = () => 0;
+        this.char = () => '+';
+        this.color = () => _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .SMOKE */ .oE.random();
+    }
+    draw(_debug, illumination) {
+        if (illumination <= 0)
+            return false;
+        const fg = this.color();
+        this.cell.map.drawAtSmoke(this.cell.xy.x, this.cell.xy.y, this.char(), fg, 'transparent');
+        return false;
+    }
+    agedOut() {
+        if (_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo) {
+            return this.age > 3;
+        }
+        return !(0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(this.age / 3);
+    }
+    shouldDrift() {
+        if (_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo) {
+            return this.age % 4 === 0;
+        }
+        return (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(4);
+    }
+    driftTo() {
+        if (_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo) {
+            const r = this.r();
+            if (_game_xy__WEBPACK_IMPORTED_MODULE_3__.XY.oob(r.xy.x, r.xy.y))
+                return this.l();
+            return r;
+        }
+        return this.cell.map.get(this.cell.xy.random());
+    }
+    drift() {
+        const target = this.driftTo();
+        if (!target.passable())
+            return;
+        this.cell.queueMove(this, target.xy);
+    }
+    step() {
+        if (this.agedOut()) {
+            this.cell.died(this);
+            return;
+        }
+        if (this.shouldDrift())
+            this.drift();
+    }
+}
+
+
+/***/ }),
+
+/***/ 522:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   M: () => (/* binding */ FirehouseMode),
+/* harmony export */   m: () => (/* binding */ GameState)
+/* harmony export */ });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
+/* harmony import */ var _ui_text_stroke__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(485);
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(919);
+/* harmony import */ var _signal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(334);
+/* harmony import */ var _capabilities__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(793);
+/* harmony import */ var _storage__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(421);
+
+
+
+
+
+
+class GameState {
+    constructor(map) {
+        this.map = map;
+        this.introSucceeded = false;
+        this.pawns = [];
+        this.firehouseNum = 0;
+        this.data = () => ({ introSucceeded: this.introSucceeded, pawns: (0,_capabilities__WEBPACK_IMPORTED_MODULE_4__/* .withCapabilities */ .X)(this.pawns), firehouseNum: this.firehouseNum });
+        this.loadData = (d) => {
+            this.introSucceeded = d.introSucceeded;
+            this.pawns = (0,_capabilities__WEBPACK_IMPORTED_MODULE_4__/* .withCapabilities */ .X)(d.pawns || []);
+            this.firehouseNum = d.firehouseNum || 0;
+        };
+        this.reset = () => {
+            this.introSucceeded = false;
+            this.pawns = [];
+            this.firehouseNum = 0;
+        };
+        FirehouseMode.on(pawns => {
+            this.introSucceeded = true;
+            this.pawns = (0,_capabilities__WEBPACK_IMPORTED_MODULE_4__/* .withCapabilities */ .X)(pawns);
+            if (!this.firehouseNum)
+                this.firehouseNum = (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randTo */ .JD)(97) + 3;
+            this.save();
+        });
+    }
+    save() {
+        _storage__WEBPACK_IMPORTED_MODULE_5__/* .storage */ .I.set('gameState', JSON.stringify(this.data()));
+        _ui_text_stroke__WEBPACK_IMPORTED_MODULE_1__/* .TextStroke */ .m.centered(this.map, 'GAME SAVED', this.map.h - 2, 'saved', _ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .Colors */ .Jy.rotate(new _ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .Colors */ .Jy([_ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .WHITE */ .UE, _ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .FOREGROUND */ .u6])), 500);
+    }
+    load() {
+        const s = _storage__WEBPACK_IMPORTED_MODULE_5__/* .storage */ .I.get('gameState');
+        if (!s)
+            return;
+        this.loadData(JSON.parse(s));
+        if (this.introSucceeded)
+            FirehouseMode.emit(this.pawns);
+    }
+    restartIntro() {
+        this.reset();
+        this.map.killAll();
+        this.map.display.clear();
+        this.map.smokeDisplay.clear();
+        this.map.uiRenderer.clearStrokes();
+        const { Initializer } = __webpack_require__(602);
+        const initializer = new Initializer(this.map);
+        initializer.initialize();
+        this.map.lighting.redraw();
+    }
+}
+const FirehouseMode = new _signal__WEBPACK_IMPORTED_MODULE_3__/* .Signal */ .H();
+
+
+/***/ }),
+
+/***/ 540:
+/***/ ((module) => {
+
+
+
+/* istanbul ignore next  */
+function insertStyleElement(options) {
+  var element = document.createElement("style");
+  options.setAttributes(element, options.attributes);
+  options.insert(element, options.options);
+  return element;
+}
+module.exports = insertStyleElement;
+
+/***/ }),
+
+/***/ 601:
+/***/ ((module) => {
+
+
+
+module.exports = function (i) {
+  return i[1];
+};
+
+/***/ }),
+
+/***/ 602:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 // ESM COMPAT FLAG
@@ -8191,7 +8477,7 @@ class Intro {
                 if ((0,utils/* hasContent */.ov)(unrescued))
                     return;
                 this.map.uiRenderer.remove('barracks-label');
-                state.FirehouseMode.emit((0,capabilities/* withCapabilities */.X)(this.pawns));
+                state/* FirehouseMode */.M.emit((0,capabilities/* withCapabilities */.X)(this.pawns));
                 (0,utils/* each */.__)(ends, check => check());
             }),
             pawn/* PawnDied */.hq.on(_dead => {
@@ -8230,7 +8516,22 @@ class Intro {
     }
 }
 
+;// ./src/game/levels/level1.ts
+
+
+class Level1 {
+    constructor(init, map) {
+        this.init = init;
+        this.map = map;
+        this.showDarkness = false;
+    }
+    setup() {
+        text_stroke/* TextStroke */.m.centered(this.map, 'LEVEL 1 (unimplemented)', this.map.h - 2, 'level-banner', colors/* Colors */.Jy.rotate(colors/* FIRE */.ZK));
+    }
+}
+
 ;// ./src/game/initializer.ts
+
 
 
 
@@ -8242,9 +8543,20 @@ class Initializer {
         this.map = map;
     }
     initialize() {
+        this.start(new Intro(this, this.map));
+    }
+    start(level) {
+        this.reset();
         this.addField();
-        const intro = new Intro(this, this.map);
-        intro.setup();
+        level.setup();
+        return { showDarkness: level.showDarkness };
+    }
+    startNext() { return this.start(new Level1(this, this.map)); }
+    reset() {
+        this.map.killAll();
+        this.map.display.clear();
+        this.map.smokeDisplay.clear();
+        this.map.uiRenderer.clearStrokes();
     }
     addField() {
         Rect.xyWH(xy.XY.at(0, 0), this.map.w, this.map.h).eachCell(xy => {
@@ -8261,256 +8573,6 @@ class Initializer {
     }
 }
 
-
-/***/ }),
-
-/***/ 483:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   $: () => (/* binding */ Door)
-/* harmony export */ });
-/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(919);
-/* harmony import */ var _drawable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(721);
-/* harmony import */ var _material__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(994);
-
-
-
-class Door extends _drawable__WEBPACK_IMPORTED_MODULE_1__/* .Drawable */ .h {
-    constructor() {
-        super(...arguments);
-        this.layer = 'walls';
-        this.open = false;
-        this.passable = false;
-        this.transparency = 0;
-        this.material = new _material__WEBPACK_IMPORTED_MODULE_2__/* .Material */ .i(this);
-        this.light = () => this.material.light(0);
-        this.char = () => this.open ? '/' : '+';
-        this.color = () => this.material.color(_ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .WOOD */ .wB);
-        this.desc = () => this.material.desc(this.open ? 'Open Door' : 'Door');
-    }
-    toggle() {
-        this.open = !this.open;
-        this.passable = this.open;
-        this.transparency = this.open ? 1 : 0;
-    }
-    step() { this.material.step(() => { }); }
-}
-
-
-/***/ }),
-
-/***/ 485:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   m: () => (/* binding */ TextStroke)
-/* harmony export */ });
-/* harmony import */ var _game_xy__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(88);
-/* harmony import */ var _stroke__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(891);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(185);
-/* harmony import */ var _colors__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(919);
-
-
-
-
-class TextStroke {
-    static create(map, text, xy, colorFn = () => _colors__WEBPACK_IMPORTED_MODULE_2__/* .WHITE */ .UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
-        const stroke = new _stroke__WEBPACK_IMPORTED_MODULE_3__/* .Stroke */ .t([], colorFn, isValid, zIndex);
-        (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .each */ .__)(text, (c, i) => {
-            const cell = map.get(xy.add(i, 0));
-            stroke.add(cell, c, bg);
-        });
-        return stroke;
-    }
-    static render(map, text, xy, id, colorFn = () => _colors__WEBPACK_IMPORTED_MODULE_2__/* .WHITE */ .UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
-        const stroke = TextStroke.create(map, text, xy, colorFn, isValid, zIndex, bg);
-        map.uiRenderer.replace(id, stroke);
-    }
-    static centered(map, text, y, id, colorFn = () => _colors__WEBPACK_IMPORTED_MODULE_2__/* .WHITE */ .UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
-        const xy = _game_xy__WEBPACK_IMPORTED_MODULE_0__.XY.at((0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .centeredStart */ .jw)(map.w, text), y);
-        TextStroke.render(map, text, xy, id, colorFn, isValid, zIndex, bg);
-    }
-    static centeredPlusY(map, text, yOffset, id, colorFn = () => _colors__WEBPACK_IMPORTED_MODULE_2__/* .WHITE */ .UE, isValid = () => true, zIndex = 10, bg = 'transparent') {
-        TextStroke.centered(map, text, (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .half */ .MX)(map.h) + yOffset, id, colorFn, isValid, zIndex, bg);
-    }
-}
-
-
-/***/ }),
-
-/***/ 502:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   _: () => (/* binding */ Smoke)
-/* harmony export */ });
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
-/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(919);
-/* harmony import */ var _drawable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(721);
-/* harmony import */ var _game_xy__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(88);
-
-
-
-
-class Smoke extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
-    constructor() {
-        super(...arguments);
-        this.layer = 'smoke';
-        this.transparency = 0.1;
-        this.light = () => 0;
-        this.char = () => '+';
-        this.color = () => _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .SMOKE */ .oE.random();
-    }
-    draw(_debug, illumination) {
-        if (illumination <= 0)
-            return false;
-        const fg = this.color();
-        this.cell.map.drawAtSmoke(this.cell.xy.x, this.cell.xy.y, this.char(), fg, 'transparent');
-        return false;
-    }
-    agedOut() {
-        if (_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo) {
-            return this.age > 3;
-        }
-        return !(0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(this.age / 3);
-    }
-    shouldDrift() {
-        if (_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo) {
-            return this.age % 4 === 0;
-        }
-        return (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(4);
-    }
-    driftTo() {
-        if (_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo) {
-            const r = this.r();
-            if (_game_xy__WEBPACK_IMPORTED_MODULE_3__.XY.oob(r.xy.x, r.xy.y))
-                return this.l();
-            return r;
-        }
-        return this.cell.map.get(this.cell.xy.random());
-    }
-    drift() {
-        const target = this.driftTo();
-        if (!target.passable())
-            return;
-        this.cell.queueMove(this, target.xy);
-    }
-    step() {
-        if (this.agedOut()) {
-            this.cell.died(this);
-            return;
-        }
-        if (this.shouldDrift())
-            this.drift();
-    }
-}
-
-
-/***/ }),
-
-/***/ 522:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   FirehouseMode: () => (/* binding */ FirehouseMode),
-/* harmony export */   GameState: () => (/* binding */ GameState)
-/* harmony export */ });
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(185);
-/* harmony import */ var _ui_text_stroke__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(485);
-/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(919);
-/* harmony import */ var _signal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(334);
-/* harmony import */ var _capabilities__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(793);
-
-
-
-
-
-class GameState {
-    constructor(map) {
-        this.map = map;
-        this.introSucceeded = false;
-        this.pawns = [];
-        this.firehouseNum = 0;
-        FirehouseMode.on(pawns => {
-            this.introSucceeded = true;
-            this.pawns = (0,_capabilities__WEBPACK_IMPORTED_MODULE_4__/* .withCapabilities */ .X)(pawns);
-            if (!this.firehouseNum)
-                this.firehouseNum = (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randTo */ .JD)(97) + 3;
-            this.save();
-        });
-    }
-    save() {
-        const data = { introSucceeded: this.introSucceeded, pawns: (0,_capabilities__WEBPACK_IMPORTED_MODULE_4__/* .withCapabilities */ .X)(this.pawns), firehouseNum: this.firehouseNum };
-        localStorage.setItem('gameState', JSON.stringify(data));
-        _ui_text_stroke__WEBPACK_IMPORTED_MODULE_1__/* .TextStroke */ .m.centered(this.map, 'GAME SAVED', this.map.h - 2, 'saved', _ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .Colors */ .Jy.rotate(new _ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .Colors */ .Jy([_ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .WHITE */ .UE, _ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .FOREGROUND */ .u6])), 500);
-    }
-    load() {
-        const s = localStorage.getItem('gameState');
-        if (!s)
-            return;
-        const d = JSON.parse(s);
-        this.introSucceeded = d.introSucceeded;
-        this.pawns = (0,_capabilities__WEBPACK_IMPORTED_MODULE_4__/* .withCapabilities */ .X)(d.pawns || []);
-        this.firehouseNum = d.firehouseNum || 0;
-        if (this.introSucceeded)
-            FirehouseMode.emit(this.pawns);
-    }
-    clear() {
-        localStorage.removeItem('gameState');
-        for (let i = 1; i <= 3; i++) {
-            localStorage.removeItem(`gameState_${i}`);
-        }
-        this.introSucceeded = false;
-        this.pawns = [];
-        this.firehouseNum = 0;
-    }
-    restartIntro() {
-        this.introSucceeded = false;
-        this.pawns = [];
-        this.firehouseNum = 0;
-        // Clear everything first (like enterFirehouse does)
-        this.map.killAll();
-        this.map.display.clear();
-        this.map.smokeDisplay.clear();
-        this.map.uiRenderer.clearStrokes();
-        // Then reinitialize the intro level
-        const { Initializer } = __webpack_require__(482);
-        const initializer = new Initializer(this.map);
-        initializer.initialize();
-        this.map.lighting.redraw();
-    }
-}
-const FirehouseMode = new _signal__WEBPACK_IMPORTED_MODULE_3__/* .Signal */ .H();
-
-
-/***/ }),
-
-/***/ 540:
-/***/ ((module) => {
-
-
-
-/* istanbul ignore next  */
-function insertStyleElement(options) {
-  var element = document.createElement("style");
-  options.setAttributes(element, options.attributes);
-  options.insert(element, options.options);
-  return element;
-}
-module.exports = insertStyleElement;
-
-/***/ }),
-
-/***/ 601:
-/***/ ((module) => {
-
-
-
-module.exports = function (i) {
-  return i[1];
-};
 
 /***/ }),
 
@@ -8807,11 +8869,10 @@ __webpack_require__.d(__webpack_exports__, {
   zW: () => (/* binding */ PawnBurned),
   hq: () => (/* binding */ PawnDied),
   w: () => (/* binding */ PawnMoved),
-  Ei: () => (/* binding */ PawnSelected),
-  qe: () => (/* binding */ TaskRemoved)
+  Ei: () => (/* binding */ PawnSelected)
 });
 
-// UNUSED EXPORTS: PawnBorn
+// UNUSED EXPORTS: PawnBorn, TaskRemoved
 
 // EXTERNAL MODULE: ./src/ui/colors.ts
 var colors = __webpack_require__(919);
@@ -15196,7 +15257,10 @@ var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
 var game = __webpack_require__(331);
 // EXTERNAL MODULE: ./src/compress.ts
 var compress = __webpack_require__(74);
+// EXTERNAL MODULE: ./src/storage.ts
+var storage = __webpack_require__(421);
 ;// ./src/index.ts
+
 
 
 
@@ -15225,7 +15289,7 @@ function showError(message, stack) {
     issueButton.addEventListener('click', async () => {
         issueButton.disabled = true;
         statusDiv.textContent = 'Submitting issue...';
-        const save = localStorage.getItem('gameState');
+        const save = storage/* storage */.I.get('gameState');
         const zipped = save ? await (0,compress/* gzip */.ZI)(save) : '';
         const body = `Stack trace:\n${stack || 'none'}\n\nSave:\n${zipped}`;
         try {
@@ -15259,7 +15323,7 @@ async function init() {
         const q = new URLSearchParams(location.search);
         const imp = q.get('import');
         if (imp) {
-            localStorage.setItem('importedSave', await (0,compress/* gunzip */.kd)(imp));
+            storage/* storage */.I.set('importedSave', await (0,compress/* gunzip */.kd)(imp));
             history.replaceState(null, '', location.pathname);
         }
         new game/* Game */.Z();

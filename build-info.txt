@@ -1,3 +1,3 @@
-Git SHA: 8b8c26a4
-Commit: minor fixes
-Built: 2025-08-07 23:04:29 UTC
+Git SHA: 9bc1e499
+Commit: Merge branch 'menu-pawn-lock'
+Built: 2025-08-08 12:11:40 UTC
