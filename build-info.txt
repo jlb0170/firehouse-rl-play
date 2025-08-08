@@ -1,3 +1,3 @@
-Git SHA: 9bc1e499
-Commit: Merge branch 'menu-pawn-lock'
-Built: 2025-08-08 12:11:40 UTC
+Git SHA: e9d8ca61
+Commit: fixed signal recursion stack depth, added title firehouse and port number
+Built: 2025-08-08 14:00:13 UTC

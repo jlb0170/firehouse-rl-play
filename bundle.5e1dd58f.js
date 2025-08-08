@@ -6679,7 +6679,6 @@ Modal.list = [];
 
 
 
-
 const FirehouseClosed = new signal/* Signal */.H();
 class FirehouseModal extends Modal {
     constructor() {
@@ -6726,12 +6725,10 @@ class FirehouseModal extends Modal {
             row.d1('.capability-skills').text(nonZeroSkills);
             row.d1('.capability-name .capability-tooltip').html(allSkills.map(s => `<div>${s}</div>`).join(''));
         });
-        draw_pawn/* PawnSelected */.Ei.emit(new draw_pawn/* Pawn */.vc(pawn.name, pawn.capabilities));
     }
     hide() {
         const wasShowing = this.div.showing();
         super.hide();
-        draw_pawn/* PawnSelected */.Ei.emit(null);
         if (wasShowing)
             FirehouseClosed.emit();
     }
@@ -7912,10 +7909,25 @@ class Game {
 class Signal {
     constructor() {
         this.listeners = new Set();
+        this.q = [];
+        this.emitting = false;
     }
     emit(t) {
-        for (const onT of this.listeners)
-            onT(t);
+        this.q.push(t);
+        if (this.emitting)
+            return;
+        this.emitting = true;
+        try {
+            while (this.q.length) {
+                const n = this.q.shift();
+                const ls = Array.from(this.listeners);
+                for (const onT of ls)
+                    onT(n);
+            }
+        }
+        finally {
+            this.emitting = false;
+        }
     }
     on(onT) {
         this.listeners.add(onT);
@@ -15259,7 +15271,13 @@ var game = __webpack_require__(331);
 var compress = __webpack_require__(74);
 // EXTERNAL MODULE: ./src/storage.ts
 var storage = __webpack_require__(421);
+// EXTERNAL MODULE: ./src/utils.ts
+var utils = __webpack_require__(185);
+// EXTERNAL MODULE: ./src/game/state.ts
+var state = __webpack_require__(522);
 ;// ./src/index.ts
+
+
 
 
 
@@ -15318,6 +15336,20 @@ window.addEventListener('error', (event) => {
     console.error('Stack trace:', event.error?.stack);
     showError(event.error?.message || 'Unknown error', event.error?.stack);
 });
+const setTitle = () => {
+    const s = storage/* storage */.I.get('gameState');
+    let n = 0;
+    if (s)
+        try {
+            n = JSON.parse(s).firehouseNum || 0;
+        }
+        catch { }
+    const l = (0,utils/* isLocal */.IX)();
+    const b = l ? 'FireRL' : 'Firehouse RL';
+    const t = n ? (l ? `${b}#${n}` : `${b} #${n}`) : b;
+    const p = location.port;
+    document.title = l && p ? `${t}:${p}` : t;
+};
 async function init() {
     try {
         const q = new URLSearchParams(location.search);
@@ -15326,6 +15358,8 @@ async function init() {
             storage/* storage */.I.set('importedSave', await (0,compress/* gunzip */.kd)(imp));
             history.replaceState(null, '', location.pathname);
         }
+        setTitle();
+        state/* FirehouseMode */.M.on(() => setTitle());
         new game/* Game */.Z();
     }
     catch (error) {
