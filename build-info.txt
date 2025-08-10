@@ -1,3 +1,3 @@
-Git SHA: e9d8ca61
-Commit: fixed signal recursion stack depth, added title firehouse and port number
-Built: 2025-08-08 14:00:13 UTC
+Git SHA: 3bff5936
+Commit: huge firehouse json refactoring, bugs everywhere
+Built: 2025-08-10 01:16:49 UTC
