@@ -1214,7 +1214,6 @@ const FirehouseStorage = {
 
 
 
-
 class GameState {
     constructor(map) {
         this.map = map;
@@ -1234,7 +1233,7 @@ class GameState {
         };
         FirehouseMode.on(pawns => {
             this.introSucceeded = true;
-            this.firehouse.pawns = pawns.map(p => new firehouse/* PawnModel */.A(p.name, p.capabilities));
+            this.firehouse.pawns = pawns;
             if (!this.firehouse.firehouseNum)
                 this.firehouse.firehouseNum = (0,utils/* randTo */.JD)(97) + 3;
             this.save();
@@ -1251,7 +1250,7 @@ class GameState {
         try {
             this.loadData(JSON.parse(saveJson));
             if (this.introSucceeded)
-                FirehouseMode.emit(this.firehouse.pawns.map(pm => pm.toPawn()));
+                FirehouseMode.emit(this.firehouse.pawns);
         }
         catch (e) {
             const key = `badSaves_gameState_${Date.now()}`;
@@ -6382,6 +6381,9 @@ class PawnModel {
         this.name = name;
         this.capabilities = capabilities;
         this.toPawn = () => new _draw_pawn__WEBPACK_IMPORTED_MODULE_0__/* .Pawn */ .vc(this.name, this.capabilities);
+        this.initialLevelUp = () => {
+            this.capabilities.initialLevelUp();
+        };
     }
 }
 class FirehouseModel {
@@ -6813,6 +6815,7 @@ class Skill {
         this.level = level;
         (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .addMethodInvisible */ .IP)(this, 'toJSON', () => ({ name: this.name, level: this.level }));
     }
+    improve() { this.level++; }
 }
 Skill.random = (name) => new Skill(name, 0);
 Skill.fromJSON = (json) => new Skill(json?.name ?? '', json?.level ?? 0);
@@ -6827,6 +6830,9 @@ const CAPABILITY_SKILL_DEFS = {
 const NAMES = Object.keys(CAPABILITY_SKILL_DEFS);
 class Capabilities {
     constructor(data) {
+        this.initialLevelUp = () => {
+            (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randFrom */ .Kt)(this.map[(0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randFrom */ .Kt)(NAMES)]).improve();
+        };
         this.map = (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .toMap */ .J9)(NAMES, name => data[name]);
         NAMES.forEach(name => (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .addGetter */ .rW)(this, name, () => this.map[name]));
         (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .addMethodInvisible */ .IP)(this, 'toJSON', () => (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .toMap */ .J9)(NAMES, n => this.map[n]));
@@ -13057,7 +13063,10 @@ const rot90 = (rows) => {
 };
 const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
+// EXTERNAL MODULE: ./src/game/models/firehouse.ts
+var firehouse = __webpack_require__(646);
 ;// ./src/game/levels/intro.ts
+
 
 
 
@@ -13083,6 +13092,7 @@ class Intro {
         this.initializer = initializer;
         this.map = map;
         this.pawns = [];
+        this.pawnModels = [];
     }
     setup() {
         this.addWorldOnFireRoom();
@@ -13117,12 +13127,17 @@ class Intro {
         });
     }
     addPawns() {
-        const a = randomName([]);
-        const ca = capabilities/* Capabilities */.FD.basic();
-        this.pawns.push(this.map.createAt(xy.XY.at(55, 24), new pawn/* Pawn */.vc(a, ca)));
-        const b = randomName([a]);
-        const cb = capabilities/* Capabilities */.FD.basic();
-        this.pawns.push(this.map.createAt(xy.XY.at(39, 24), new pawn/* Pawn */.vc(b, cb)));
+        const add = (x, y) => {
+            const usedNames = this.pawnModels.map(m => m.name);
+            const model = new firehouse/* PawnModel */.A(randomName(usedNames), capabilities/* Capabilities */.FD.basic());
+            const pawn = model.toPawn();
+            this.map.createAt(xy.XY.at(x, y), pawn);
+            this.pawns.push(pawn);
+            this.pawnModels.push(model);
+            return model;
+        };
+        add(55, 24);
+        add(39, 24);
     }
     addBarracksWin() {
         const base = Fragment.load(intro_barracks_namespaceObject);
@@ -13139,7 +13154,8 @@ class Intro {
                 if (unrescued.length > 0)
                     return;
                 this.map.uiRenderer.remove('barracks-label');
-                state/* FirehouseMode */.M.emit(this.pawns);
+                this.pawnModels.forEach(m => m.initialLevelUp());
+                state/* FirehouseMode */.M.emit(this.pawnModels);
                 ends.forEach(end => end());
             }),
             pawn/* PawnDied */.hq.on(_dead => {
@@ -14587,7 +14603,7 @@ class SaveSlots extends modal/* Modal */.a {
             this.gameState.loadData(parsed);
             storage/* storage */.I.remove(storageKey);
             if (this.gameState.introSucceeded)
-                state/* FirehouseMode */.M.emit(this.gameState.firehouse.pawns.map(pm => pm.toPawn()));
+                state/* FirehouseMode */.M.emit(this.gameState.firehouse.pawns);
             this.isAutoLoadAtStartup = false;
             this.hide();
             console.log(`${displayName} save loaded`);
@@ -14645,7 +14661,7 @@ class SaveSlots extends modal/* Modal */.a {
             const parsed = JSON.parse(raw);
             this.gameState.loadData(parsed);
             if (this.gameState.introSucceeded)
-                state/* FirehouseMode */.M.emit(this.gameState.firehouse.pawns.map(pm => pm.toPawn()));
+                state/* FirehouseMode */.M.emit(this.gameState.firehouse.pawns);
             console.log(`Game loaded from slot ${slotNum}`);
         }
         catch (e) {
@@ -15043,20 +15059,16 @@ class Game {
         };
         this.enterFirehouse = (pawns) => {
             this.pause();
-            this.resetCounters();
             this.map.killAll();
             this.map.display.clear();
             this.map.smokeDisplay.clear();
             this.map.uiRenderer.clearStrokes();
             this.drawMap();
-            const list = Array.isArray(pawns) && pawns.length && 'toPawn' in pawns[0]
-                ? pawns
-                : pawns.map(p => new ((__webpack_require__(646)/* .PawnModel */ .A))(p.name, p.capabilities));
-            this.firehouse.open(this.state.firehouse.firehouseNum, list);
+            this.firehouse.open(this.state.firehouse.firehouseNum, pawns);
         };
         this.afterFirehouse = () => {
-            this.resetCounters();
             const opts = this.initializer.startNext();
+            this.resetCounters();
             if (opts.showDarkness !== undefined)
                 this.showDarkness = opts.showDarkness;
             this.updateDarknessToggleButton();
@@ -15389,10 +15401,10 @@ class Game {
     }
     confirmNewGame() {
         const ok = confirm('Start a new game?\nThis will abandon your current progress.');
-        if (ok) {
-            this.resetCounters();
-            this.state.restartIntro();
-        }
+        if (!ok)
+            return;
+        this.resetCounters();
+        this.state.restartIntro();
     }
 }
 
