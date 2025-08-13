@@ -1035,6 +1035,8 @@ body {
 #speed-buttons { position: absolute; top: 100% }
 #speed-buttons button { width: 100% }
 
+#terminal .row { }
+
 `, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
@@ -9645,6 +9647,9 @@ ___CSS_LOADER_EXPORT___.push([module.id, `#editor-panel .label { color: #0a0; ma
 #editor-panel .option { margin-left: 4px }
 
 #editor-panel .choices { flex-wrap: wrap }
+#editor-panel #layer-choices .layer .row.gap-buttons { flex-wrap: nowrap }
+#editor-panel #layer-choices .layer .choices { flex-wrap: wrap; flex: 1 1 auto; min-width: 0; max-width: 100% }
+#editor-panel #layer-choices .layer .actions { flex: 0 0 auto }
 
 #fragment-preview {
   position: absolute;
@@ -9702,7 +9707,21 @@ ___CSS_LOADER_EXPORT___.push([module.id, `#editor-panel .label { color: #0a0; ma
 }
 
 #layer-choices .choices .choice { position: relative; display: inline-flex; align-items: center; gap: 4px }
-#layer-choices .choices .choice .close-button { margin-left: 4px; pointer-events: auto; position: static; width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center } `, ""]);
+#layer-choices .choices .choice .close-button { margin-left: 4px; pointer-events: auto; position: static; width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center } 
+
+#editor-panel #layer-choices .layer .editor-item .close-button {
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #f44;
+  border-color: #f44;
+  background: #000;
+} 
+
+`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -16336,7 +16355,7 @@ var floor = __webpack_require__(9177);
 // EXTERNAL MODULE: ./src/html/html.ts
 var html = __webpack_require__(467);
 ;// ./src/html/editor-panel.html
-/* harmony default export */ const editor_panel = ("<div id=\"terminal\">\n  <div id=\"editor-panel\" class=\"column gap-body\">\n    <div class=\"top column gap-controls\">\n      <div class=\"row cross-aligned-center gap-button-group\">\n        <div class=\"label\"></div>\n        <div id=\"layer-choices\" class=\"column gap-controls\">\n          <div class=\"layer template\">\n            <div class=\"row gap-buttons\">\n              <div class=\"name\"></div>\n              <div class=\"choices row gap-buttons\">\n                <button class=\"choice template\"></button>\n              </div>\n              <div class=\"actions row gap-buttons\"></div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"bottom column gap-controls\">\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Paint</div>\n        <div class=\"char\"></div>\n        <div class=\"cell-coord\"></div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Stutter</div>\n        <input id=\"stutter\" type=\"range\" min=\"0\" max=\"100\" value=\"0\" />\n        <div id=\"stutter-val\">0%</div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"undo-btn\" class=\"button-secondary\">undo</button>\n        <button id=\"paste-btn\" class=\"button-secondary\" disabled>paste</button>\n        <button id=\"copy-cancel\" class=\"button-secondary\" disabled>cxl</button>\n      </div>\n      <div id=\"tool-row\" class=\"column gap-buttons\">\n        <button class=\"tool template\" data-tool=\"\"></button>\n      </div>\n      <div id=\"fragment-preview\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">Fragment</div>\n          <button id=\"fragment-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <pre id=\"fragment-text\"></pre>\n      </div>\n      <div id=\"symbol-picker\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">New Item</div>\n          <button id=\"symbol-picker-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div id=\"symbol-grid\" class=\"symbols\"></div>\n        <div class=\"actions\">\n          <input id=\"editor-item-name\" type=\"text\" placeholder=\"name\" />\n          <button id=\"editor-item-add\" class=\"button-secondary\" disabled>Add</button>\n        </div>\n      </div>\n      <div class=\"fill\"></div>\n      <div id=\"controls-help\" class=\"text-subtle\">\n        L/R: paint/erase · Shift: constrain · Ctrl: all layers · Hold C: copy\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"copy-fragment\" class=\"button-secondary\">cc clipboard</button>\n        <button id=\"submit-fragment\" class=\"button-secondary\">submit issue</button>\n        <button id=\"show-fragment\" class=\"button-secondary\">show fragment</button>\n      </div>\n    </div>\n  </div>\n</div> ");
+/* harmony default export */ const editor_panel = ("<div id=\"terminal\">\n  <div id=\"editor-panel\" class=\"column gap-body\">\n    <div class=\"top column gap-controls\">\n      <div class=\"row cross-aligned-center gap-button-group\">\n        <div class=\"label\"></div>\n        <div id=\"layer-choices\" class=\"column gap-controls\">\n          <div class=\"layer template\">\n            <div class=\"row gap-buttons\">\n              <div class=\"name\"></div>\n              <div class=\"choices row gap-buttons\">\n                <button class=\"choice template\"></button>\n              </div>\n              <div class=\"editor-items column gap-buttons\">\n                <div class=\"editor-item row gap-buttons template\">\n                  <button class=\"choice\"></button>\n                  <button class=\"button-secondary close-button\">×</button>\n                </div>\n              </div>\n              <div class=\"actions row gap-buttons\"></div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"bottom column gap-controls\">\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Paint</div>\n        <div class=\"char\"></div>\n        <div class=\"cell-coord\"></div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Stutter</div>\n        <input id=\"stutter\" type=\"range\" min=\"0\" max=\"100\" value=\"0\" />\n        <div id=\"stutter-val\">0%</div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"undo-btn\" class=\"button-secondary\">undo</button>\n        <button id=\"paste-btn\" class=\"button-secondary\" disabled>paste</button>\n        <button id=\"copy-cancel\" class=\"button-secondary\" disabled>cxl</button>\n      </div>\n      <div id=\"tool-row\" class=\"column gap-buttons\">\n        <button class=\"tool template\" data-tool=\"\"></button>\n      </div>\n      <div id=\"fragment-preview\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">Fragment</div>\n          <button id=\"fragment-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <pre id=\"fragment-text\"></pre>\n      </div>\n      <div id=\"symbol-picker\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">New Item</div>\n          <button id=\"symbol-picker-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div id=\"symbol-grid\" class=\"symbols\"></div>\n        <div class=\"actions\">\n          <input id=\"editor-item-name\" type=\"text\" placeholder=\"name\" />\n          <button id=\"editor-item-add\" class=\"button-secondary\" disabled>Add</button>\n        </div>\n      </div>\n      <div class=\"fill\"></div>\n      <div id=\"controls-help\" class=\"text-subtle\">\n        L/R: paint/erase · Shift: constrain · Ctrl: all layers · Hold C: copy\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"copy-fragment\" class=\"button-secondary\">cc clipboard</button>\n        <button id=\"submit-fragment\" class=\"button-secondary\">submit issue</button>\n        <button id=\"show-fragment\" class=\"button-secondary\">show fragment</button>\n      </div>\n    </div>\n  </div>\n</div> ");
 // EXTERNAL MODULE: ./src/game/layers.ts
 var game_layers = __webpack_require__(5633);
 // EXTERNAL MODULE: ./src/game/cell-types.ts
@@ -16404,29 +16423,35 @@ class EditorPanel {
             }));
             this.render();
         };
+        this.refresh = () => this.render();
         this.div = (0,html.d1)('#terminal');
         this.div.appendFileHtml(editor_panel);
         this.render();
     }
     render() {
         const lc = this.div.d1('#layer-choices');
-        lc.dList('.layer').updateFrom(game_layers/* CellLayers */.v.layerNames, (row, n) => {
+        const visible = (game_layers/* CellLayers */.v.layerNames.filter(n => n !== 'smoke' && n !== 'fire' && n !== 'floor'));
+        lc.dList('.layer').updateFrom(visible, (row, n) => {
             row.d1('.name').text(n);
-            const choices = n === 'items' ? [...layerChoices[n], ...this.extraItems] : layerChoices[n];
+            const choices = layerChoices[n];
             const choicesDiv = row.d1('.choices');
             choicesDiv.dList('button').updateFrom(choices, (b, ch) => {
                 b.text(`${ch.char} ${ch.label}`);
-                b.classed('selected', this.layer === n && this.choice?.label === ch.label);
+                b.classed('selected', this.layer === n && !!this.choice &&
+                    this.choice.label === ch.label && this.choice.char === ch.char);
                 b.onClick(() => { this.layer = n; this.choice = ch; this.updatePaintInfo(); this.render(); });
-                if (n === 'items' && ch.editor) {
-                    const x = document.createElement('span');
-                    x.textContent = '×';
-                    x.className = 'close-button';
-                    x.onclick = (e) => { e.stopPropagation(); this.onDeleteEditorItem?.(ch.char); };
-                    const bn = b.node();
-                    if (bn)
-                        bn.appendChild(x);
-                }
+            });
+            const col = row.d1('.editor-items');
+            const editorChoices = n === 'items' ? this.extraItems : [];
+            n === 'items' ? col.show() : col.hide();
+            col.dList('.editor-item').updateFrom(editorChoices, (r, ch) => {
+                const btn = r.d1('button.choice');
+                btn.text(`${ch.char} ${ch.label}`);
+                btn.classed('selected', this.layer === n && !!this.choice &&
+                    this.choice.label === ch.label && this.choice.char === ch.char);
+                btn.onClick(() => { this.layer = n; this.choice = ch; this.updatePaintInfo(); this.render(); });
+                const x = r.d1('button.close-button');
+                x.onClick(() => this.onDeleteEditorItem?.(ch.char));
             });
             if (n === 'items') {
                 const actions = row.d1('.actions');
@@ -16784,6 +16809,7 @@ class Editor {
         this.panel.setEditorItems(this.editorItems);
         this.panel.layer = 'items';
         this.panel.choice = { label: name, char: s, make: () => new EditorItem(s, name), editor: true };
+        this.panel.refresh();
         const v = document.getElementById('symbol-picker');
         if (v) {
             v.classList.add('hidden');
