@@ -9644,6 +9644,8 @@ ___CSS_LOADER_EXPORT___.push([module.id, `#editor-panel .label { color: #0a0; ma
 
 #editor-panel .option { margin-left: 4px }
 
+#editor-panel .choices { flex-wrap: wrap }
+
 #fragment-preview {
   position: absolute;
   z-index: 1000;
@@ -9660,7 +9662,47 @@ ___CSS_LOADER_EXPORT___.push([module.id, `#editor-panel .label { color: #0a0; ma
   overflow: auto;
   border: 1px solid #0a0;
   padding: 8px;
-} `, ""]);
+}
+
+#symbol-picker {
+  position: absolute;
+  z-index: 1000;
+  background: #000;
+  border: 1px solid #0a0;
+  padding: 8px;
+  max-width: calc(var(--map-width, 80vw));
+  max-height: 70vh;
+  overflow: auto;
+}
+
+#symbol-picker .symbols {
+  display: grid;
+  grid-template-columns: repeat(120, 1ch);
+  gap: 2px;
+}
+
+#symbol-picker .sym {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1ch;
+  height: 1.25em;
+  border: 1px solid #0a0;
+  cursor: pointer;
+  font-family: monospace;
+}
+
+#symbol-picker .sym.selected { background: #060; color: #000 }
+
+#symbol-picker .actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+#layer-choices .choices .choice { position: relative; display: inline-flex; align-items: center; gap: 4px }
+#layer-choices .choices .choice .close-button { margin-left: 4px; pointer-events: auto; position: static; width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center } `, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -16294,12 +16336,31 @@ var floor = __webpack_require__(9177);
 // EXTERNAL MODULE: ./src/html/html.ts
 var html = __webpack_require__(467);
 ;// ./src/html/editor-panel.html
-/* harmony default export */ const editor_panel = ("<div id=\"terminal\">\n  <div id=\"editor-panel\" class=\"column gap-body\">\n    <div class=\"top column gap-controls\">\n      <div class=\"row cross-aligned-center gap-button-group\">\n        <div class=\"label\">Layers</div>\n        <div id=\"layer-choices\" class=\"column gap-controls\">\n          <div class=\"layer template\">\n            <div class=\"row gap-buttons\">\n              <div class=\"name\"></div>\n              <div class=\"choices row gap-buttons\">\n                <button class=\"template\"></button>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"bottom column gap-controls\">\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Paint</div>\n        <div class=\"char\"></div>\n        <div class=\"cell-coord\"></div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Stutter</div>\n        <input id=\"stutter\" type=\"range\" min=\"0\" max=\"100\" value=\"0\" />\n        <div id=\"stutter-val\">0%</div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"undo-btn\" class=\"button-secondary\">undo</button>\n        <button id=\"paste-btn\" class=\"button-secondary\" disabled>paste</button>\n        <button id=\"copy-cancel\" class=\"button-secondary\" disabled>cxl</button>\n      </div>\n      <div id=\"tool-row\" class=\"column gap-buttons\">\n        <button class=\"tool template\" data-tool=\"\"></button>\n      </div>\n      <div id=\"fragment-preview\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">Fragment</div>\n          <button id=\"fragment-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <pre id=\"fragment-text\"></pre>\n      </div>\n      <div class=\"fill\"></div>\n      <div id=\"controls-help\" class=\"text-subtle\">\n        L/R: paint/erase · Shift: constrain · Ctrl: all layers · Hold C: copy\n      </div>\n      <div class=\"row gap-buttons\">\n        <span>MAP FRAGMENT:</span>\n        <button id=\"show-fragment\" class=\"button-secondary\">show</button>\n        <button id=\"copy-fragment\" class=\"button-secondary\">cc clipboard</button>\n        <button id=\"submit-fragment\" class=\"button-secondary\">submit via issue</button>\n      </div>\n    </div>\n  </div>\n</div> ");
+/* harmony default export */ const editor_panel = ("<div id=\"terminal\">\n  <div id=\"editor-panel\" class=\"column gap-body\">\n    <div class=\"top column gap-controls\">\n      <div class=\"row cross-aligned-center gap-button-group\">\n        <div class=\"label\"></div>\n        <div id=\"layer-choices\" class=\"column gap-controls\">\n          <div class=\"layer template\">\n            <div class=\"row gap-buttons\">\n              <div class=\"name\"></div>\n              <div class=\"choices row gap-buttons\">\n                <button class=\"choice template\"></button>\n              </div>\n              <div class=\"actions row gap-buttons\"></div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"bottom column gap-controls\">\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Paint</div>\n        <div class=\"char\"></div>\n        <div class=\"cell-coord\"></div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Stutter</div>\n        <input id=\"stutter\" type=\"range\" min=\"0\" max=\"100\" value=\"0\" />\n        <div id=\"stutter-val\">0%</div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"undo-btn\" class=\"button-secondary\">undo</button>\n        <button id=\"paste-btn\" class=\"button-secondary\" disabled>paste</button>\n        <button id=\"copy-cancel\" class=\"button-secondary\" disabled>cxl</button>\n      </div>\n      <div id=\"tool-row\" class=\"column gap-buttons\">\n        <button class=\"tool template\" data-tool=\"\"></button>\n      </div>\n      <div id=\"fragment-preview\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">Fragment</div>\n          <button id=\"fragment-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <pre id=\"fragment-text\"></pre>\n      </div>\n      <div id=\"symbol-picker\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">New Item</div>\n          <button id=\"symbol-picker-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div id=\"symbol-grid\" class=\"symbols\"></div>\n        <div class=\"actions\">\n          <input id=\"editor-item-name\" type=\"text\" placeholder=\"name\" />\n          <button id=\"editor-item-add\" class=\"button-secondary\" disabled>Add</button>\n        </div>\n      </div>\n      <div class=\"fill\"></div>\n      <div id=\"controls-help\" class=\"text-subtle\">\n        L/R: paint/erase · Shift: constrain · Ctrl: all layers · Hold C: copy\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"copy-fragment\" class=\"button-secondary\">cc clipboard</button>\n        <button id=\"submit-fragment\" class=\"button-secondary\">submit issue</button>\n        <button id=\"show-fragment\" class=\"button-secondary\">show fragment</button>\n      </div>\n    </div>\n  </div>\n</div> ");
 // EXTERNAL MODULE: ./src/game/layers.ts
 var game_layers = __webpack_require__(5633);
 // EXTERNAL MODULE: ./src/game/cell-types.ts
 var cell_types = __webpack_require__(7767);
+// EXTERNAL MODULE: ./src/draw/drawable.ts
+var drawable = __webpack_require__(1721);
+;// ./src/draw/editor-item.ts
+
+class EditorItem extends drawable/* Drawable */.h {
+    constructor(symbol, name) {
+        super();
+        this.symbol = symbol;
+        this.name = name;
+        this.layer = 'items';
+        this.passable = false;
+        this.light = () => 0;
+        this.char = () => this.symbol;
+        this.color = () => '#0a0';
+        this.keyName = () => this.name;
+    }
+}
+
 ;// ./src/ui/editor-panel.ts
+
 
 
 
@@ -16332,7 +16393,17 @@ class EditorPanel {
         this.layer = 'walls';
         this.choice = layerChoices['walls'][0];
         this.stutter = 0;
+        this.extraItems = [];
         this.setCell = (c) => { this.cell = c; this.updateCell(); };
+        this.setEditorItems = (items) => {
+            this.extraItems = items.map(it => ({
+                label: it.name,
+                char: it.symbol,
+                make: () => new EditorItem(it.symbol, it.name),
+                editor: true
+            }));
+            this.render();
+        };
         this.div = (0,html.d1)('#terminal');
         this.div.appendFileHtml(editor_panel);
         this.render();
@@ -16341,12 +16412,34 @@ class EditorPanel {
         const lc = this.div.d1('#layer-choices');
         lc.dList('.layer').updateFrom(game_layers/* CellLayers */.v.layerNames, (row, n) => {
             row.d1('.name').text(n);
-            const choices = layerChoices[n];
-            row.d1('.choices').dList('button').updateFrom(choices, (b, ch) => {
-                b.text(ch.label);
+            const choices = n === 'items' ? [...layerChoices[n], ...this.extraItems] : layerChoices[n];
+            const choicesDiv = row.d1('.choices');
+            choicesDiv.dList('button').updateFrom(choices, (b, ch) => {
+                b.text(`${ch.char} ${ch.label}`);
                 b.classed('selected', this.layer === n && this.choice?.label === ch.label);
                 b.onClick(() => { this.layer = n; this.choice = ch; this.updatePaintInfo(); this.render(); });
+                if (n === 'items' && ch.editor) {
+                    const x = document.createElement('span');
+                    x.textContent = '×';
+                    x.className = 'close-button';
+                    x.onclick = (e) => { e.stopPropagation(); this.onDeleteEditorItem?.(ch.char); };
+                    const bn = b.node();
+                    if (bn)
+                        bn.appendChild(x);
+                }
             });
+            if (n === 'items') {
+                const actions = row.d1('.actions');
+                actions.selectAll('*').remove();
+                const add = document.createElement('button');
+                add.id = 'add-item';
+                add.className = 'button-secondary';
+                add.textContent = 'Add';
+                const actNode = actions.node();
+                if (actNode)
+                    actNode.appendChild(add);
+                add.addEventListener('click', (e) => { e.stopPropagation(); e.preventDefault(); this.onAddItem?.(); });
+            }
         });
         const tools = ['draw', 'line', 'box', 'fill-box', 'circ-in-rect', 'circ-in-rect-filled', 'circ-radius', 'circ-radius-filled'];
         this.div.d1('#tool-row').dList('.tool').updateFrom(tools, (b, t) => {
@@ -16400,6 +16493,7 @@ var rect = __webpack_require__(6893);
 
 
 
+
 const UI = {
     shapeId: 'editor-shape',
     pasteId: 'editor-paste',
@@ -16424,6 +16518,8 @@ class Editor {
         this.undoStack = [];
         this.hovered = null;
         this.pasteId = UI.pasteId;
+        this.editorItems = [];
+        this.symbolSel = null;
         this.withStroke = (id, z, visible, draw) => {
             const s = new stroke/* Stroke */.t([], () => UI.color, visible, z);
             draw(s);
@@ -16544,9 +16640,9 @@ class Editor {
                             continue;
                         const ch = d.char();
                         chars[y][x] = ch;
-                        const tn = d.constructor?.name;
-                        if (tn && ch !== '.')
-                            key.set(ch, tn);
+                        const name = typeof d.keyName === 'function' ? d.keyName() : d.constructor?.name;
+                        if (name && ch !== '.')
+                            key.set(ch, name);
                         break;
                     }
                 }
@@ -16613,6 +16709,8 @@ class Editor {
         };
         this.map = new map/* Map */.T(config/* Config */.T.WIDTH, config/* Config */.T.HEIGHT);
         this.panel = new EditorPanel();
+        this.panel.onAddItem = () => this.openSymbolPicker();
+        this.panel.onDeleteEditorItem = s => this.deleteEditorItem(s);
         this.attach();
         this.init();
         this.previewHandlers = {
@@ -16638,9 +16736,111 @@ class Editor {
         this.setupLayerControls();
         this.drawMap();
     }
+    openSymbolPicker() {
+        const v = document.getElementById('symbol-picker');
+        if (!v)
+            return;
+        const grid = document.getElementById('symbol-grid');
+        grid.innerHTML = '';
+        const used = this.usedSymbols();
+        const symbols = this.buildSymbols().filter(ch => !used.has(ch));
+        symbols.forEach(ch => {
+            const s = document.createElement('div');
+            s.textContent = ch;
+            s.className = 'sym';
+            s.onclick = () => {
+                this.symbolSel = ch;
+                [...grid.children].forEach(el => el.classList.remove('selected'));
+                s.classList.add('selected');
+                this.updateAddEnabled();
+            };
+            grid.appendChild(s);
+        });
+        const name = document.getElementById('editor-item-name');
+        name.value = '';
+        name.oninput = () => this.updateAddEnabled();
+        const add = document.getElementById('editor-item-add');
+        add.onclick = () => this.addEditorItem();
+        const close = document.getElementById('symbol-picker-close');
+        close.onclick = () => { v.classList.add('hidden'); v.style.left = ''; v.style.top = ''; };
+        v.classList.remove('hidden');
+        requestAnimationFrame(() => this.centerFragment(v));
+    }
+    updateAddEnabled() {
+        const add = document.getElementById('editor-item-add');
+        const name = document.getElementById('editor-item-name').value.trim();
+        add.disabled = !this.symbolSel || name.length === 0;
+    }
+    addEditorItem() {
+        if (!this.symbolSel)
+            return;
+        const name = document.getElementById('editor-item-name').value.trim();
+        if (!name)
+            return;
+        const s = this.symbolSel;
+        if (this.editorItems.some(it => it.symbol === s))
+            return;
+        this.editorItems.push({ symbol: s, name });
+        this.panel.setEditorItems(this.editorItems);
+        this.panel.layer = 'items';
+        this.panel.choice = { label: name, char: s, make: () => new EditorItem(s, name), editor: true };
+        const v = document.getElementById('symbol-picker');
+        if (v) {
+            v.classList.add('hidden');
+            v.style.left = '';
+            v.style.top = '';
+        }
+        this.symbolSel = null;
+    }
+    deleteEditorItem(symbol) {
+        if (!confirm('Remove this item and all instances?'))
+            return;
+        this.editorItems = this.editorItems.filter(it => it.symbol !== symbol);
+        this.panel.setEditorItems(this.editorItems);
+        this.map.eachCell(cell => {
+            const d = cell.layers.data['items'];
+            if (d && typeof d.char === 'function' && d.char() === symbol && d instanceof EditorItem)
+                cell.died(d);
+        });
+        this.drawMap();
+    }
+    usedSymbols() {
+        const s = new Set();
+        const order = ['pawn', 'fire', 'walls', 'items', 'floor'];
+        for (let y = 0; y < this.map.h; y++)
+            for (let x = 0; x < this.map.w; x++) {
+                const cell = this.map.grid[y][x];
+                for (const n of order) {
+                    const d = cell.layers.data[n];
+                    if (!d)
+                        continue;
+                    const ch = d.char();
+                    if (ch)
+                        s.add(ch);
+                    break;
+                }
+            }
+        return s;
+    }
+    buildSymbols() {
+        const r = [];
+        const add = (a, b) => { for (let i = a; i <= b; i++)
+            r.push(String.fromCharCode(i)); };
+        add(33, 126);
+        const ranges = [
+            [0x2190, 0x21FF], // arrows
+            [0x2580, 0x259F], // blocks
+            [0x25A0, 0x25FF], // geometric
+            [0x2700, 0x27BF] // dingbats
+        ];
+        ranges.forEach(([a, b]) => add(a, b));
+        return r.filter(ch => ch !== '.');
+    }
     attach() {
         const c = (0,utils.$1)('game-container');
         c.style.position = 'relative';
+        const root = document.documentElement;
+        root.style.setProperty('--map-width', `${this.map.w}ch`);
         this.map.display.attachTo(c, { display: 'block', zIndex: '1' });
         this.map.smokeDisplay.attachTo(c, { position: 'absolute', top: '0', left: '0', zIndex: '2', pointerEvents: 'none' });
         this.map.uiRenderer.attachTo(c, { position: 'absolute', top: '0', left: '0', zIndex: '3', pointerEvents: 'none' });
