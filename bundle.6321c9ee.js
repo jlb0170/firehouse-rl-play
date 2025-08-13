@@ -9642,7 +9642,25 @@ ___CSS_LOADER_EXPORT___.push([module.id, `#editor-panel .label { color: #0a0; ma
   border-color: #0c0;
 }
 
-#editor-panel .option { margin-left: 4px } `, ""]);
+#editor-panel .option { margin-left: 4px }
+
+#fragment-preview {
+  position: absolute;
+  z-index: 1000;
+  background: #000;
+  border: 1px solid #0a0;
+  padding: 8px;
+}
+
+#fragment-preview > .row { margin-bottom: 6px }
+
+#fragment-preview pre {
+  max-width: 80vw;
+  max-height: 70vh;
+  overflow: auto;
+  border: 1px solid #0a0;
+  padding: 8px;
+} `, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -16276,7 +16294,7 @@ var floor = __webpack_require__(9177);
 // EXTERNAL MODULE: ./src/html/html.ts
 var html = __webpack_require__(467);
 ;// ./src/html/editor-panel.html
-/* harmony default export */ const editor_panel = ("<div id=\"terminal\">\n  <div id=\"editor-panel\" class=\"column gap-body\">\n    <div class=\"top column gap-controls\">\n      <div class=\"row cross-aligned-center gap-button-group\">\n        <div class=\"label\">Layers</div>\n        <div id=\"layer-choices\" class=\"column gap-controls\">\n          <div class=\"layer template\">\n            <div class=\"row gap-buttons\">\n              <div class=\"name\"></div>\n              <div class=\"choices row gap-buttons\">\n                <button class=\"template\"></button>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"bottom column gap-controls\">\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Paint</div>\n        <div class=\"char\"></div>\n        <div class=\"cell-coord\"></div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Stutter</div>\n        <input id=\"stutter\" type=\"range\" min=\"0\" max=\"100\" value=\"0\" />\n        <div id=\"stutter-val\">0%</div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"undo-btn\" class=\"button-secondary\">undo</button>\n        <button id=\"paste-btn\" class=\"button-secondary\" disabled>paste</button>\n        <button id=\"copy-cancel\" class=\"button-secondary\" disabled>cxl</button>\n        <button id=\"copy-fragment\" class=\"button-secondary\">cc clipboard</button>\n        <button id=\"submit-fragment\" class=\"button-secondary\">submit issue</button>\n      </div>\n      <div id=\"tool-row\" class=\"column gap-buttons\">\n        <button class=\"tool template\" data-tool=\"\"></button>\n      </div>\n      <div class=\"fill\"></div>\n      <div id=\"controls-help\" class=\"text-subtle\">\n        L/R: paint/erase · Shift: constrain · Ctrl: all layers · Hold C: copy\n      </div>\n    </div>\n  </div>\n</div> ");
+/* harmony default export */ const editor_panel = ("<div id=\"terminal\">\n  <div id=\"editor-panel\" class=\"column gap-body\">\n    <div class=\"top column gap-controls\">\n      <div class=\"row cross-aligned-center gap-button-group\">\n        <div class=\"label\">Layers</div>\n        <div id=\"layer-choices\" class=\"column gap-controls\">\n          <div class=\"layer template\">\n            <div class=\"row gap-buttons\">\n              <div class=\"name\"></div>\n              <div class=\"choices row gap-buttons\">\n                <button class=\"template\"></button>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"bottom column gap-controls\">\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Paint</div>\n        <div class=\"char\"></div>\n        <div class=\"cell-coord\"></div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Stutter</div>\n        <input id=\"stutter\" type=\"range\" min=\"0\" max=\"100\" value=\"0\" />\n        <div id=\"stutter-val\">0%</div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"undo-btn\" class=\"button-secondary\">undo</button>\n        <button id=\"paste-btn\" class=\"button-secondary\" disabled>paste</button>\n        <button id=\"copy-cancel\" class=\"button-secondary\" disabled>cxl</button>\n      </div>\n      <div id=\"tool-row\" class=\"column gap-buttons\">\n        <button class=\"tool template\" data-tool=\"\"></button>\n      </div>\n      <div id=\"fragment-preview\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">Fragment</div>\n          <button id=\"fragment-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <pre id=\"fragment-text\"></pre>\n      </div>\n      <div class=\"fill\"></div>\n      <div id=\"controls-help\" class=\"text-subtle\">\n        L/R: paint/erase · Shift: constrain · Ctrl: all layers · Hold C: copy\n      </div>\n      <div class=\"row gap-buttons\">\n        <span>MAP FRAGMENT:</span>\n        <button id=\"show-fragment\" class=\"button-secondary\">show</button>\n        <button id=\"copy-fragment\" class=\"button-secondary\">cc clipboard</button>\n        <button id=\"submit-fragment\" class=\"button-secondary\">submit via issue</button>\n      </div>\n    </div>\n  </div>\n</div> ");
 // EXTERNAL MODULE: ./src/game/layers.ts
 var game_layers = __webpack_require__(5633);
 // EXTERNAL MODULE: ./src/game/cell-types.ts
@@ -16506,6 +16524,77 @@ class Editor {
             });
             this.pushUndo(inverse);
             this.drawMap();
+        };
+        this.renderCroppedFragment = () => {
+            const w = this.map.w, h = this.map.h;
+            const chars = [];
+            const key = new globalThis.Map();
+            for (let y = 0; y < h; y++) {
+                chars[y] = [];
+                for (let x = 0; x < w; x++)
+                    chars[y][x] = '.';
+            }
+            const order = ['pawn', 'fire', 'walls', 'items', 'floor'];
+            for (let y = 0; y < h; y++)
+                for (let x = 0; x < w; x++) {
+                    const cell = this.map.grid[y][x];
+                    for (const n of order) {
+                        const d = cell.layers.data[n];
+                        if (!d)
+                            continue;
+                        const ch = d.char();
+                        chars[y][x] = ch;
+                        const tn = d.constructor?.name;
+                        if (tn && ch !== '.')
+                            key.set(ch, tn);
+                        break;
+                    }
+                }
+            let minX = w, minY = h, maxX = -1, maxY = -1;
+            for (let y = 0; y < h; y++)
+                for (let x = 0; x < w; x++) {
+                    if (chars[y][x] !== '.') {
+                        if (x < minX)
+                            minX = x;
+                        if (y < minY)
+                            minY = y;
+                        if (x > maxX)
+                            maxX = x;
+                        if (y > maxY)
+                            maxY = y;
+                    }
+                }
+            if (maxX < minX || maxY < minY) { // no content
+                const lines = ['.', 'KEY'];
+                return lines.join('\n');
+            }
+            const m = 2;
+            minX = Math.max(0, minX - m);
+            minY = Math.max(0, minY - m);
+            maxX = Math.min(w - 1, maxX + m);
+            maxY = Math.min(h - 1, maxY + m);
+            const rows = [];
+            for (let y = minY; y <= maxY; y++) {
+                let row = '';
+                for (let x = minX; x <= maxX; x++)
+                    row += chars[y][x];
+                rows.push(row);
+            }
+            const lines = [...rows, 'KEY'];
+            for (const [ch, tn] of key.entries())
+                lines.push(`${ch} = ${tn}`);
+            return lines.join('\n');
+        };
+        this.centerFragment = (v) => {
+            const m = document.getElementById('main');
+            if (!m)
+                return;
+            const r = m.getBoundingClientRect();
+            const vw = v.offsetWidth, vh = v.offsetHeight;
+            const x = r.left + (r.width - vw) / 2;
+            const y = r.top + (r.height - vh) / 2;
+            v.style.left = `${Math.max(0, Math.round(x))}px`;
+            v.style.top = `${Math.max(0, Math.round(y))}px`;
         };
         this.onKeyDown = (e) => {
             if (e.key === 'c' || e.key === 'C')
@@ -16961,7 +17050,7 @@ class Editor {
         const copyFrag = document.getElementById('copy-fragment');
         if (copyFrag)
             copyFrag.addEventListener('click', async () => {
-                const txt = this.map.renderToFragment(false);
+                const txt = this.renderCroppedFragment();
                 try {
                     await navigator.clipboard.writeText(txt);
                 }
@@ -16970,11 +17059,34 @@ class Editor {
         const submitFrag = document.getElementById('submit-fragment');
         if (submitFrag)
             submitFrag.addEventListener('click', () => {
-                const txt = this.map.renderToFragment(false);
+                const txt = this.renderCroppedFragment();
                 const title = 'Editor: map fragment';
                 const body = `\n\n\`\`\`\n${txt}\n\`\`\``;
                 this.feedback.show();
                 this.feedback.prefill(title, body);
+            });
+        const showFrag = document.getElementById('show-fragment');
+        if (showFrag)
+            showFrag.addEventListener('click', () => {
+                const txt = this.renderCroppedFragment();
+                const pre = document.getElementById('fragment-text');
+                if (pre)
+                    pre.textContent = txt;
+                const v = document.getElementById('fragment-preview');
+                if (v) {
+                    v.classList.remove('hidden');
+                    requestAnimationFrame(() => this.centerFragment(v));
+                }
+            });
+        const closeFrag = document.getElementById('fragment-close');
+        if (closeFrag)
+            closeFrag.addEventListener('click', () => {
+                const v = document.getElementById('fragment-preview');
+                if (v) {
+                    v.classList.add('hidden');
+                    v.style.left = '';
+                    v.style.top = '';
+                }
             });
         window.keydownC = false;
         window.addEventListener('keydown', this.onKeyDown);
