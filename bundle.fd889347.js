@@ -95,7 +95,7 @@ class Lamp extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
         this.layer = 'items';
         this.transparency = 1;
         this.material = new _material__WEBPACK_IMPORTED_MODULE_4__/* .Material */ .im(this, _material__WEBPACK_IMPORTED_MODULE_4__/* .WOOD */ .wB);
-        this.passable = false;
+        this.passable = true;
         this.light = () => this.material.light(5);
         this.char = () => '*';
         this.color = () => this.material.color(_ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .LAMP */ .zu.random());
@@ -1085,8 +1085,6 @@ body {
 /* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1919);
 /* harmony import */ var _drawable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1721);
 /* harmony import */ var _smoke__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4502);
-/* harmony import */ var _game_layers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(5633);
-
 
 
 
@@ -1105,11 +1103,7 @@ class Fire extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
             return;
         }
         this.cell.reborn(new _smoke__WEBPACK_IMPORTED_MODULE_3__/* .Smoke */ ._());
-        _game_layers__WEBPACK_IMPORTED_MODULE_4__/* .CellLayers */ .v.materialLayers.forEach(l => {
-            const d = this.cell.layers.data[l];
-            if (d?.material)
-                d.material.ignite();
-        });
+        this.cell.ignite();
         if ((0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(4)) {
             (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .randFrom */ .Kt)(this.cell.neighbors()).reborn(new Fire());
         }
@@ -6733,7 +6727,7 @@ class Drawable {
         Drawable.alive.add(this);
     }
     step() { }
-    desc() { return `${this.constructor.name}(${this.id})`; }
+    desc() { return `${this.constructor.name}`; }
     draw(_debug, illumination) {
         const fg = this.applyIllumination(this.color(), illumination);
         this.cell.map.drawAt(this.cell.xy.x, this.cell.xy.y, this.char(), fg, _ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .BACKGROUND */ .h4);
@@ -6792,6 +6786,11 @@ class Drawable {
     }
     merge(_other, _from) {
         throw new Error('merge not implemented');
+    }
+    ignite() {
+        const material = this.material;
+        if (material?.ignite)
+            material.ignite();
     }
     diedAndAlreadyRemovedFromCell() { Drawable.alive.delete(this); }
     dying() {
@@ -6967,7 +6966,7 @@ class Lighting {
         this._colors = Array.from({ length: map.h }, () => Array.from({ length: map.w }, () => ({ r: 0, g: 0, b: 0, w: 0 })));
         this.clear();
     }
-    enable() { this._enabled = true; }
+    enable() { this._enabled = true; this.map.eachCell(cell => this.update(cell)); }
     disable() { this._enabled = false; this._sources.clear(); this.clear(); }
     enabled() { return this._enabled; }
     clear() {
@@ -7268,7 +7267,7 @@ class Pawn extends drawable/* Drawable */.h {
     dying() {
         super.dying();
         PawnDied.emit(this);
-        this.cell.create(new Corpse(this, 'burning'));
+        this.cell.reborn(new Corpse(this, 'burning'));
         (0,utils/* each */.__)(this.tasks, t => t.cleanup());
     }
     squawk(text, colors) {
@@ -7883,7 +7882,7 @@ class Terminal {
             content.d1('.cell-coord').text(cell.xy.x + ', ' + cell.xy.y);
             content.dList('.layer').updateFrom(cell.presentLayers(), (layer, snapshot) => {
                 layer.d1('.name').text(snapshot.name);
-                layer.d1('.description').text(snapshot.desc);
+                layer.d1('.description').text(snapshot.desc).style('color', snapshot.color);
             });
         }), () => {
             content.d1('.cell-coord').text('no cell selected');
@@ -11260,19 +11259,17 @@ class Level1 {
     setup() {
         const f = fragment/* Fragment */.F.fromText(apartment_complex);
         f.place(this.map, game_xy.XY.at(0, 0));
-        this.igniteRandomWalls(8);
+        this.igniteRandomStoves(1);
         this.spawnPawns();
     }
-    igniteRandomWalls(n) {
+    igniteRandomStoves(n) {
         let k = 0;
         for (let i = 0; i < 1000 && k < n; i++) {
             const xy = this.randomXY();
-            const w = this.map.get(xy).wall();
-            if (!w)
-                continue;
-            if (w.material?.ignite)
-                w.material.ignite();
-            k++;
+            this.map.get(xy).onItem(/Oven/, stove => {
+                stove.cell.neighbors().forEach(cell => cell.ignite());
+                k++;
+            });
         }
     }
     spawnPawns() {
@@ -12754,6 +12751,17 @@ class Cell {
                 desc: drawable.desc(),
                 color: drawable.color()
             };
+        });
+    }
+    onItem(namePattern, onFoundItem) {
+        const item = this.items();
+        if (item && namePattern.test(item.desc())) {
+            onFoundItem(item);
+        }
+    }
+    ignite() {
+        game_layers/* CellLayers */.v.materialLayers.forEach(l => {
+            this.layers.data[l]?.ignite();
         });
     }
     create(drawable) { return this.map.create(this, drawable); }
