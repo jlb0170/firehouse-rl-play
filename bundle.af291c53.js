@@ -1,10 +1,10 @@
 /******/ (() => { // webpackBootstrap
-/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 88:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   XY: () => (/* binding */ XY)
@@ -76,6 +76,7 @@ XY.at = (x, y) => new XY(x, y);
 /***/ 225:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   z: () => (/* binding */ Lamp)
 /* harmony export */ });
@@ -117,6 +118,7 @@ class Lamp extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
 /***/ 239:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   j: () => (/* binding */ Wall)
 /* harmony export */ });
@@ -150,6 +152,7 @@ class Wall extends _drawable__WEBPACK_IMPORTED_MODULE_1__/* .Drawable */ .h {
 /***/ 334:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   H: () => (/* binding */ Signal),
 /* harmony export */   Y: () => (/* binding */ SignalWithCurrent)
@@ -203,6 +206,7 @@ class SignalWithCurrent extends Signal {
 /***/ 467:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   d1: () => (/* binding */ d1)
 /* harmony export */ });
@@ -222,6 +226,7 @@ function addMethodsToTypedSel(typedSel) {
         (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(childSel.node(), `Child element not found: ${selector}`);
         return addMethodsToTypedSel(childSel);
     };
+    enhanced.dList = function (selector) { return dListFor(this, selector); };
     enhanced.focus = function () {
         const node = this.node();
         (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(node && typeof node.focus === 'function', 'Node or focus not found');
@@ -247,10 +252,12 @@ function addMethodsToTypedSel(typedSel) {
         const node = this.node();
         return node?.value || '';
     };
+    enhanced.trimmed = function () { return this.getVal().trim(); };
     enhanced.setVal = function (value) {
         const node = this.node();
         if (node)
             node.value = value;
+        return this;
     };
     enhanced.disable = function (disabled) {
         const node = this.node();
@@ -258,18 +265,19 @@ function addMethodsToTypedSel(typedSel) {
             node.disabled = disabled;
         return this;
     };
-    enhanced.onClick = function (handler) {
-        this.on('click', handler);
+    enhanced.enable = function (enabled) {
+        const node = this.node();
+        if (node && 'disabled' in node)
+            node.disabled = !enabled;
         return this;
     };
-    enhanced.onInput = function (handler) {
-        this.on('input', handler);
+    enhanced.onClick = function (handler) { this.on('click', handler); return this; };
+    enhanced.onInput = function (handler) { this.on('input', handler); return this; };
+    enhanced.onKeyDown = function (handler) {
+        this.on('keydown', handler);
         return this;
     };
-    enhanced.href = function (url) {
-        this.attr('href', url);
-        return this;
-    };
+    enhanced.href = function (url) { this.attr('href', url); return this; };
     enhanced.htmlData = function (n) {
         const node = this.node();
         return node ? node.getAttribute(`data-${n}`) : null;
@@ -279,43 +287,39 @@ function addMethodsToTypedSel(typedSel) {
         (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(node, 'Node not found for bounds()');
         return node.getBoundingClientRect();
     };
-    enhanced.dList = function (selector) {
-        const parent = this;
-        const parentNode = parent.node();
-        const templateAttr = `data-template-${selector.replace(/[^a-zA-Z0-9]/g, '-')}`;
-        let templateId = parentNode.getAttribute(templateAttr);
-        let template;
-        if (!templateId || !templateCache.has(templateId)) {
-            const templateSel = parent.d1(`${selector}.template`);
-            const templateNode = templateSel.node();
-            (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(templateNode, `Template not found: ${selector}.template`);
-            template = templateNode.cloneNode(true);
-            template.classList.remove('template');
-            templateSel.remove();
-            templateId = `template-${templateIdCounter++}`;
-            templateCache.set(templateId, template);
-            parentNode.setAttribute(templateAttr, templateId);
-        }
-        else {
-            template = templateCache.get(templateId);
-        }
-        return {
-            updateFrom(data, onNodeAndDatum) {
-                const items = parent.selectAll(selector).data(data);
-                items.exit().remove();
-                const enterItems = items.enter().append(() => {
-                    const itemNode = template.cloneNode(true);
-                    return itemNode;
-                });
-                const allItems = enterItems.merge(items);
-                allItems.each(function (datum, i) {
-                    const itemSel = addMethodsToTypedSel(d3__WEBPACK_IMPORTED_MODULE_0__/* .select */ .Ltv(this));
-                    onNodeAndDatum(itemSel, datum);
-                });
-            }
-        };
-    };
     return enhanced;
+}
+function dListFor(parent, selector) {
+    const parentNode = parent.node();
+    (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(parentNode, 'Parent node missing for dList');
+    const templateAttr = `data-template-${selector.replace(/[^a-zA-Z0-9]/g, '-')}`;
+    let templateId = parentNode.getAttribute(templateAttr);
+    let template;
+    if (!templateId || !templateCache.has(templateId)) {
+        const templateSel = parent.d1(`${selector}.template`);
+        const templateNode = templateSel.node();
+        (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(templateNode, `Template not found: ${selector}.template`);
+        template = templateNode.cloneNode(true);
+        template.classList.remove('template');
+        templateSel.remove();
+        templateId = `template-${templateIdCounter++}`;
+        templateCache.set(templateId, template);
+        parentNode.setAttribute(templateAttr, templateId);
+    }
+    else
+        template = templateCache.get(templateId);
+    return {
+        updateFrom(data, onNodeAndDatum) {
+            const items = parent.selectAll(selector).data(data);
+            items.exit().remove();
+            const enterItems = items.enter().append(() => template.cloneNode(true));
+            const allItems = enterItems.merge(items);
+            allItems.each(function (datum) {
+                const itemSel = addMethodsToTypedSel(d3__WEBPACK_IMPORTED_MODULE_0__/* .select */ .Ltv(this));
+                onNodeAndDatum(itemSel, datum);
+            });
+        }
+    };
 }
 const d1 = (selector) => {
     const sel = d3__WEBPACK_IMPORTED_MODULE_0__/* .select */ .Ltv(selector);
@@ -336,18 +340,11 @@ const d1 = (selector) => {
         (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(childSel.node(), `Child element not found: ${selector}`);
         return addMethodsToTypedSel(childSel);
     };
-    enhanced.show = function () {
-        const node = this.node();
-        if (node)
-            node.classList.remove('hidden');
-        return this;
-    };
-    enhanced.hide = function () {
-        const node = this.node();
-        if (node)
-            node.classList.add('hidden');
-        return this;
-    };
+    enhanced.dList = function (selector) { return dListFor(this, selector); };
+    enhanced.show = function () { const n = this.node(); if (n)
+        n.classList.remove('hidden'); return this; };
+    enhanced.hide = function () { const n = this.node(); if (n)
+        n.classList.add('hidden'); return this; };
     enhanced.showing = function () {
         const node = this.node();
         return node ? !node.classList.contains('hidden') : false;
@@ -356,10 +353,12 @@ const d1 = (selector) => {
         const node = this.node();
         return node?.value || '';
     };
+    enhanced.trimmed = function () { return this.getVal().trim(); };
     enhanced.setVal = function (value) {
         const node = this.node();
         if (node)
             node.value = value;
+        return this;
     };
     enhanced.disable = function (disabled) {
         const node = this.node();
@@ -367,18 +366,19 @@ const d1 = (selector) => {
             node.disabled = disabled;
         return this;
     };
-    enhanced.onClick = function (handler) {
-        this.on('click', handler);
+    enhanced.enable = function (enabled) {
+        const node = this.node();
+        if (node && 'disabled' in node)
+            node.disabled = !enabled;
         return this;
     };
-    enhanced.onInput = function (handler) {
-        this.on('input', handler);
+    enhanced.onClick = function (handler) { this.on('click', handler); return this; };
+    enhanced.onInput = function (handler) { this.on('input', handler); return this; };
+    enhanced.onKeyDown = function (handler) {
+        this.on('keydown', handler);
         return this;
     };
-    enhanced.href = function (url) {
-        this.attr('href', url);
-        return this;
-    };
+    enhanced.href = function (url) { this.attr('href', url); return this; };
     enhanced.htmlData = function (n) {
         const node = this.node();
         return node ? node.getAttribute(`data-${n}`) : null;
@@ -397,6 +397,7 @@ const d1 = (selector) => {
 /***/ 540:
 /***/ ((module) => {
 
+"use strict";
 
 
 /* istanbul ignore next  */
@@ -410,9 +411,44 @@ module.exports = insertStyleElement;
 
 /***/ }),
 
+/***/ 612:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var map = {
+	"./apartment-big.txt": 4806,
+	"./apartment-complex.txt": 9620,
+	"./house.txt": 5833,
+	"./intro-barracks.txt": 4461,
+	"./level1.txt": 4648,
+	"./test-editor-items.txt": 9444
+};
+
+
+function webpackContext(req) {
+	var id = webpackContextResolve(req);
+	return __webpack_require__(id);
+}
+function webpackContextResolve(req) {
+	if(!__webpack_require__.o(map, req)) {
+		var e = new Error("Cannot find module '" + req + "'");
+		e.code = 'MODULE_NOT_FOUND';
+		throw e;
+	}
+	return map[req];
+}
+webpackContext.keys = function webpackContextKeys() {
+	return Object.keys(map);
+};
+webpackContext.resolve = webpackContextResolve;
+module.exports = webpackContext;
+webpackContext.id = 612;
+
+/***/ }),
+
 /***/ 891:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   t: () => (/* binding */ Stroke)
 /* harmony export */ });
@@ -435,9 +471,116 @@ class Stroke {
 
 /***/ }),
 
+/***/ 1073:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  Z: () => (/* binding */ DrawableType)
+});
+
+// EXTERNAL MODULE: ./src/draw/door.ts
+var door = __webpack_require__(2483);
+// EXTERNAL MODULE: ./src/draw/lamp.ts
+var lamp = __webpack_require__(225);
+// EXTERNAL MODULE: ./src/draw/wall.ts
+var wall = __webpack_require__(239);
+// EXTERNAL MODULE: ./src/draw/floor.ts
+var floor = __webpack_require__(9177);
+// EXTERNAL MODULE: ./src/draw/smoke.ts
+var smoke = __webpack_require__(4502);
+// EXTERNAL MODULE: ./src/draw/fire.ts
+var fire = __webpack_require__(1267);
+// EXTERNAL MODULE: ./src/draw/pawn.ts + 1 modules
+var pawn = __webpack_require__(2705);
+// EXTERNAL MODULE: ./src/game/capabilities.ts
+var capabilities = __webpack_require__(3793);
+// EXTERNAL MODULE: ./src/draw/editor-item.ts
+var editor_item = __webpack_require__(6372);
+// EXTERNAL MODULE: ./src/draw/drawable.ts
+var drawable = __webpack_require__(1721);
+// EXTERNAL MODULE: ./src/draw/material.ts
+var material = __webpack_require__(2994);
+;// ./src/draw/prop-item.ts
+
+
+class PropItem extends drawable/* Drawable */.h {
+    constructor(symbol, name, materialType, passable = true) {
+        super();
+        this.symbol = symbol;
+        this.name = name;
+        this.materialType = materialType;
+        this.layer = 'items';
+        this.light = () => this.material.light(this.materialType.light);
+        this.char = () => this.symbol;
+        this.color = () => this.material.color(this.materialType.color);
+        this.desc = () => this.material.desc(this.name);
+        this.passable = passable;
+        this.material = new material/* Material */.im(this, materialType);
+    }
+    step() {
+        this.material.step(() => { });
+    }
+}
+
+// EXTERNAL MODULE: ./src/utils.ts
+var utils = __webpack_require__(6185);
+;// ./src/game/drawable-types.ts
+
+
+
+
+
+
+
+
+
+
+
+
+class DrawableType {
+}
+DrawableType.registry = {
+    'Wall': () => new wall/* Wall */.j(),
+    'Door': () => new door/* Door */.$(),
+    'Lamp': () => new lamp/* Lamp */.z(),
+    'Floor': () => new floor/* Floor */.Z(),
+    'Smoke': () => new smoke/* Smoke */._(),
+    'Fire': () => new fire/* Fire */.v(),
+    'Pawn': () => new pawn/* Pawn */.vc('firefighter', capabilities/* Capabilities */.FD.basic()),
+    'Bush': () => new PropItem('✰', 'Bush', material/* PLANT */.G5),
+    'Counter': () => new PropItem('░', 'Counter', material/* BRICK */.qv),
+    'Sink': () => new PropItem('f', 'Sink', material/* METAL */.cJ),
+    'Tv': () => new PropItem(']', 'Tv', material/* METAL */.cJ),
+    'Chair': () => new PropItem('h', 'Chair', material/* WOOD */.wB),
+    'Oven': () => new PropItem('◉', 'Oven', material/* METAL */.cJ),
+    'Table': () => new PropItem('◘', 'Table', material/* WOOD */.wB),
+    'Refrigerator': () => new PropItem('[', 'Refrigerator', material/* METAL */.cJ, false),
+    'Bed': () => new PropItem('=', 'Bed', material/* WOOD */.wB),
+    'Tub': () => new PropItem('_', 'Tub', material/* METAL */.cJ),
+    'Toilet': () => new PropItem('↻', 'Toilet', material/* METAL */.cJ),
+    'Washer/dryer': () => new PropItem('◛', 'Washer/dryer', material/* METAL */.cJ),
+    'Coin machine': () => new PropItem('❱', 'Coin machine', material/* METAL */.cJ, false),
+};
+DrawableType.make = (symbol, name) => {
+    const f = DrawableType.registry[name];
+    if (f) {
+        const drawable = f();
+        (0,utils/* bombUnless */.Nb)(drawable.char() === symbol, `Symbol mismatch: expected '${symbol}' but ${name} has char '${drawable.char()}'`);
+        return drawable;
+    }
+    return new editor_item/* EditorItem */.R(symbol, name);
+};
+
+
+/***/ }),
+
 /***/ 1113:
 /***/ ((module) => {
 
+"use strict";
 
 
 /* istanbul ignore next  */
@@ -458,6 +601,7 @@ module.exports = styleTagTransform;
 /***/ 1208:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
@@ -565,6 +709,7 @@ button.solo { background: #060; color: #fff }
 .fill { flex: 1; }
 .full-width { width: 100%; }
 .fit-content-width { width: fit-content; }
+.fit-container { width: 100%; }
 
 /* Semantic Gap Classes */
 .gap-body { gap: 20px; }
@@ -1047,6 +1192,7 @@ body {
 /***/ 1267:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   v: () => (/* binding */ Fire)
 /* harmony export */ });
@@ -1101,6 +1247,7 @@ class Fire extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
 /***/ 1364:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -6632,6 +6779,7 @@ const Text = (/* unused pure expression or super */ null && (text));
 /***/ 1485:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   m: () => (/* binding */ TextStroke)
 /* harmony export */ });
@@ -6671,6 +6819,7 @@ class TextStroke {
 /***/ 1601:
 /***/ ((module) => {
 
+"use strict";
 
 
 module.exports = function (i) {
@@ -6682,6 +6831,7 @@ module.exports = function (i) {
 /***/ 1721:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   h: () => (/* binding */ Drawable)
 /* harmony export */ });
@@ -6776,6 +6926,7 @@ Drawable.nextId = 0;
 /***/ 1877:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   YZ: () => (/* binding */ Task),
 /* harmony export */   k$: () => (/* binding */ TASK_COLOR),
@@ -6814,16 +6965,21 @@ class Task {
 /***/ 1919:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Jy: () => (/* binding */ Colors),
 /* harmony export */   LS: () => (/* binding */ BONE),
+/* harmony export */   SK: () => (/* binding */ COLOR_METAL),
 /* harmony export */   UE: () => (/* binding */ WHITE),
+/* harmony export */   Ui: () => (/* binding */ COLOR_BRICK),
 /* harmony export */   XE: () => (/* binding */ BORDER),
 /* harmony export */   ZK: () => (/* binding */ FIRE),
 /* harmony export */   h4: () => (/* binding */ BACKGROUND),
 /* harmony export */   oE: () => (/* binding */ SMOKE),
+/* harmony export */   sX: () => (/* binding */ COLOR_WOOD),
 /* harmony export */   u6: () => (/* binding */ FOREGROUND),
 /* harmony export */   wB: () => (/* binding */ WOOD),
+/* harmony export */   yv: () => (/* binding */ COLOR_PLANT),
 /* harmony export */   zu: () => (/* binding */ LAMP)
 /* harmony export */ });
 /* unused harmony export SMOLDERING */
@@ -6833,6 +6989,10 @@ const FOREGROUND = "#0a0";
 const BACKGROUND = "#000";
 const BORDER = "#444";
 const WOOD = "#8B4513";
+const COLOR_WOOD = "#8B4513";
+const COLOR_METAL = "#808080";
+const COLOR_BRICK = "#800000";
+const COLOR_PLANT = "#008000";
 const SMOLDERING = '#6c200e';
 const BONE = "#fff";
 const WHITE = "#fff";
@@ -6865,6 +7025,7 @@ const LAMP = new Colors(['#ccffff', '#99ddff', '#66ccff']);
 /***/ 2483:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   $: () => (/* binding */ Door)
 /* harmony export */ });
@@ -6901,6 +7062,7 @@ class Door extends _drawable__WEBPACK_IMPORTED_MODULE_1__/* .Drawable */ .h {
 /***/ 2615:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   R: () => (/* binding */ Lighting),
 /* harmony export */   c: () => (/* binding */ COLOR_INTENSITY)
@@ -7089,6 +7251,7 @@ class Lighting {
 /***/ 2705:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -7299,12 +7462,16 @@ Pawn.HOVER_PATH_COLOR = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy([
 /***/ 2994:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   G5: () => (/* binding */ PLANT),
 /* harmony export */   SN: () => (/* binding */ MEAT),
+/* harmony export */   cJ: () => (/* binding */ METAL),
 /* harmony export */   im: () => (/* binding */ Material),
+/* harmony export */   qv: () => (/* binding */ BRICK),
 /* harmony export */   wB: () => (/* binding */ WOOD)
 /* harmony export */ });
-/* unused harmony exports MaterialType, Wood, Meat */
+/* unused harmony exports MaterialType, Wood, Meat, Plant, Metal, Brick */
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6185);
 /* harmony import */ var _smoke__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4502);
 /* harmony import */ var _fire__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1267);
@@ -7314,11 +7481,17 @@ Pawn.HOVER_PATH_COLOR = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy([
 
 
 class MaterialType {
+    constructor() {
+        this.flammable = true;
+        this.light = 0;
+        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .BORDER */ .XE;
+    }
 }
 class Wood extends MaterialType {
     constructor() {
         super(...arguments);
         this.hits = 40;
+        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .COLOR_WOOD */ .sX;
     }
     step(owner) {
         if (!_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo && (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(2))
@@ -7336,15 +7509,55 @@ class Meat extends MaterialType {
     step(_owner) { }
 }
 Meat.instance = new Meat();
+class Plant extends MaterialType {
+    constructor() {
+        super(...arguments);
+        this.hits = 10;
+        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .COLOR_PLANT */ .yv;
+    }
+    step(owner) {
+        owner.cell.reborn(new _smoke__WEBPACK_IMPORTED_MODULE_1__/* .Smoke */ ._());
+        if (!_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo && (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(4))
+            owner.cell.reborn(new _fire__WEBPACK_IMPORTED_MODULE_2__/* .Fire */ .v());
+    }
+}
+Plant.instance = new Plant();
+class Metal extends MaterialType {
+    constructor() {
+        super(...arguments);
+        this.flammable = false;
+        this.hits = 50;
+        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .COLOR_METAL */ .SK;
+    }
+    step(_owner) { }
+}
+Metal.instance = new Metal();
+class Brick extends MaterialType {
+    constructor() {
+        super(...arguments);
+        this.flammable = false;
+        this.hits = 20;
+        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .COLOR_BRICK */ .Ui;
+    }
+    step(_owner) { }
+}
+Brick.instance = new Brick();
 const MEAT = Meat.instance;
 const WOOD = Wood.instance;
+const PLANT = Plant.instance;
+const METAL = Metal.instance;
+const BRICK = Brick.instance;
 class Material {
     constructor(owner, type) {
         this.owner = owner;
         this.type = type;
         this.burn = null;
-        this.ignite = () => { if (this.burn === null)
-            this.burn = this.type.hits; };
+        this.ignite = () => {
+            if (!this.type.flammable)
+                return;
+            if (this.burn === null)
+                this.burn = this.type.hits;
+        };
         this.extinguish = () => { this.burn = null; };
         this.isBurning = () => this.burn !== null;
         this.light = (base) => this.isBurning() ? base + 1 : base;
@@ -7372,14 +7585,19 @@ class Material {
 /***/ 3720:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Dg: () => (/* binding */ ellipseFromRect),
 /* harmony export */   IM: () => (/* binding */ eachLine),
 /* harmony export */   QI: () => (/* binding */ eachEllipseBorderRect),
+/* harmony export */   er: () => (/* binding */ rectFromCenter),
+/* harmony export */   iV: () => (/* binding */ squareBetween),
 /* harmony export */   xh: () => (/* binding */ eachEllipseFill)
 /* harmony export */ });
 /* unused harmony export eachEllipseBorder */
 /* harmony import */ var _game_xy__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(88);
+/* harmony import */ var _game_rect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6893);
+
 
 const safe = (x, y, on) => { if (!_game_xy__WEBPACK_IMPORTED_MODULE_0__.XY.oob(x, y))
     on(_game_xy__WEBPACK_IMPORTED_MODULE_0__.XY.at(x, y)); };
@@ -7518,6 +7736,18 @@ const ellipseFromRect = (r) => {
     const rx = (br.x - ul.x) / 2, ry = (br.y - ul.y) / 2;
     return { cx, cy, rx, ry };
 };
+const squareBetween = (a, b) => {
+    const dx = Math.abs(b.x - a.x);
+    const dy = Math.abs(b.y - a.y);
+    const d = Math.max(dx, dy);
+    const bx = a.x + Math.sign(b.x - a.x) * d;
+    const by = a.y + Math.sign(b.y - a.y) * d;
+    return _game_rect__WEBPACK_IMPORTED_MODULE_1__/* .Rect */ .r.between(a, _game_xy__WEBPACK_IMPORTED_MODULE_0__.XY.at(bx, by));
+};
+const rectFromCenter = (c, p, square) => {
+    const a = _game_xy__WEBPACK_IMPORTED_MODULE_0__.XY.at(2 * c.x - p.x, 2 * c.y - p.y);
+    return square ? squareBetween(a, p) : _game_rect__WEBPACK_IMPORTED_MODULE_1__/* .Rect */ .r.between(a, p);
+};
 
 
 /***/ }),
@@ -7525,6 +7755,7 @@ const ellipseFromRect = (r) => {
 /***/ 3793:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   FD: () => (/* binding */ Capabilities),
 /* harmony export */   Xk: () => (/* binding */ NAMES),
@@ -7574,9 +7805,18 @@ const capabilityEntries = (caps) => NAMES.map(n => [n, caps[n]]);
 
 /***/ }),
 
+/***/ 4461:
+/***/ ((module) => {
+
+"use strict";
+module.exports = ".#########\n.#.......#\n.#.*...*.#\n*#.......#\n.+.......#\n*#.......#\n.#.*...*.#\n.#.......#\n.#########\nKEY\n# = Wall\n* = Lamp\n+ = Door ";
+
+/***/ }),
+
 /***/ 4502:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   _: () => (/* binding */ Smoke)
 /* harmony export */ });
@@ -7644,9 +7884,18 @@ class Smoke extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
 
 /***/ }),
 
+/***/ 4648:
+/***/ ((module) => {
+
+"use strict";
+module.exports = ".....................................................................\n.............###++#####................*.............................\n.............#........#..............................................\n..+##++###++##+##.....#..............................................\n.#...........#.*#.*...#..............................########........\n.+..............#.....+.............................#.....*.#........\n.+............*.+.....#.........................*...#.......#....*...\n.#...........#..#.....#.....................*.......#.......+........\n.#......###+############+.+####..............*......#.......#....*...\n.+......#....#..+.....#........#....................#.......#........\n.#...........#..#.....#........#....................#.......+........\n.#......#....#..#.....#........#....................#.......#........\n.+###+########..#.....#.......####+#................#.......#........\n.##.....#....##+#####+#.......##...#........####+##+#####+####.......\n.##.....#..*.#..#.............##...#........#.......#.......##.......\n.##.....#....#..#.......*...*.##...#........#..*....#.......##.......\n.#+.....+.#+#####+#####+###....#...#.......####.....#.......##.......\n.+......#.#..#............#...##...#.......##.#.....#.......##.......\n..###+###+#######.....*...#....+...........##.#.....#.......##.......\n..#.....#.#..#.........######+##...######+#.##......+.......##.......\n..#.....#.#..#.......#+...+...##*..#.......####....*#.......##.......\n..#.....#.#*.#.......#....#....+...#........###.....#........#.......\n..#....*#.#.*#.......#....#...##...#.......########.#####+####.......\n..#+#+########...*...#....#...#######+#+#+####.####+#####.##..+###+#.\n........#.#..........+....#....#..*+.......#..#.....+.......#......#.\n........#.#*.........#....+....#...#.......####.....#.......#......+.\n........#.#..........#####.##+#.#..###########......#.......#......#.\n........#.#........########.#..######.........*.....#.......#......#.\n........#.#........#......#*..*+...##...........#+#######...#..*.*.#.\n........#.#........#......#....#...++...........+...#.*.#...#......#.\n........#.#........#..*...#....#...##...........#...#...+...#......#.\n........#.#........+......#....#...#.######################+###+###..\n........#.###.+###+###+####....+....#...........#...#...#...#........\n...*....#..........#...........#....#...........#...###+##*.#........\n........#..........+...........#....#...........+.......+............\n........#..........#...........#....#...........#.......#....*.......\n........#..........#...........#....#...........###+#+###............\n........#..........######++##########................................\n........#.................+....#...*.................................\n........#.....................+......................................\n........#...................................................*........\n........##########+############........**............................\n.....................................................................\nKEY\n# = Wall\n+ = Door\n* = Lamp\n";
+
+/***/ }),
+
 /***/ 4732:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   E: () => (/* binding */ submitIssue)
 /* harmony export */ });
@@ -7667,9 +7916,18 @@ const submitIssue = async (title, body, image) => {
 
 /***/ }),
 
+/***/ 4806:
+/***/ ((module) => {
+
+"use strict";
+module.exports = "..............\n..............\n..##########..\n..#.==.#*f↻#..\n..#.==.#...#..\n..#.==.#...#..\n..#*...#.._#..\n..#..◘h#.._#..\n..#..h###+##..\n..##+##*..✰#..\n..#........+..\n..#*.......#..\n..#▭.▭....✰#..\n..#[.▭.*h.]#..\n..#[.▭.h◘.]#..\n..#▭.▭.h◘.]#..\n..#◉.▭..h.]#..\n..#ff▭*...✰#..\n..######..*#..\n.......#####..\n..............\n..............\nKEY\n# = Wall\n= = Bed\n* = Lamp\nf = sink\n↻ = toilet\n_ = tub\n◘ = Table\nh = Chair\n+ = Door\n✰ = Bush\n▭ = counter\n[ = refrigerator\n] = TV\n◉ = oven\n";
+
+/***/ }),
+
 /***/ 4873:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -7685,8 +7943,8 @@ var html = __webpack_require__(467);
 var compress = __webpack_require__(5074);
 // EXTERNAL MODULE: ./src/game/map.ts + 2 modules
 var map = __webpack_require__(7283);
-// EXTERNAL MODULE: ./src/game/initializer.ts + 6 modules
-var initializer = __webpack_require__(7854);
+// EXTERNAL MODULE: ./src/game/initializer.ts + 3 modules
+var initializer = __webpack_require__(7349);
 // EXTERNAL MODULE: ./src/game/config.ts
 var config = __webpack_require__(6457);
 // EXTERNAL MODULE: ./src/draw/pawn.ts + 1 modules
@@ -9011,7 +9269,7 @@ class Game {
         this.stepTimer = timer('step');
         this.speed = 1;
         this.showLighting = false;
-        this.showDarkness = true;
+        this.showDarkness = false;
         this.mutedLayers = new Set();
         this.soloLayer = null;
         this.helpSystem = new HelpSystem();
@@ -9127,6 +9385,7 @@ class Game {
             if (opts.showDarkness !== undefined)
                 this.showDarkness = opts.showDarkness;
             this.updateDarknessToggleButton();
+            this.updateLightingEnabled();
         };
         this.map = new map/* Map */.T(config/* Config */.T.WIDTH, config/* Config */.T.HEIGHT);
         window.map = this.map;
@@ -9144,7 +9403,7 @@ class Game {
         this.updateEnvButton();
         this.initializer = new initializer.Initializer(this.map);
         this.initializer.initialize();
-        this.map.lighting.redraw();
+        this.updateLightingEnabled();
         this.drawMap();
         this.updatePlayPauseButton();
         this.updateFreezeButton();
@@ -9349,16 +9608,26 @@ class Game {
         }
         return new Set(game_layers/* CellLayers */.v.layerNames.filter(layer => !this.mutedLayers.has(layer)));
     }
+    updateLightingEnabled() {
+        if (this.showLighting || this.showDarkness) {
+            this.map.lighting.enable();
+            this.map.lighting.redraw();
+        }
+        else
+            this.map.lighting.disable();
+    }
     toggleLighting() {
         this.showLighting = !this.showLighting;
         const button = (0,utils.$1)('lighting-toggle');
         button.textContent = this.showLighting ? 'LT*' : 'LT';
+        this.updateLightingEnabled();
         this.drawMap();
     }
     toggleDarkness() {
         this.showDarkness = !this.showDarkness;
         const button = (0,utils.$1)('darkness-toggle');
         button.textContent = this.showDarkness ? 'DK*' : 'DK';
+        this.updateLightingEnabled();
         this.drawMap();
     }
     toggleLayerVisibility(layerName) {
@@ -9470,6 +9739,7 @@ class Game {
 /***/ 5056:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
+"use strict";
 
 
 /* istanbul ignore next  */
@@ -9486,6 +9756,7 @@ module.exports = setAttributesWithoutAttributes;
 /***/ 5072:
 /***/ ((module) => {
 
+"use strict";
 
 
 var stylesInDOM = [];
@@ -9576,6 +9847,7 @@ module.exports = function (list, options) {
 /***/ 5074:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   F8: () => (/* binding */ gzSize),
 /* harmony export */   ZI: () => (/* binding */ gzip),
@@ -9614,6 +9886,7 @@ const gzSize = async (s) => gzBytes(await gzip(s));
 /***/ 5164:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
@@ -9645,11 +9918,6 @@ ___CSS_LOADER_EXPORT___.push([module.id, `#editor-panel .label { color: #0a0; ma
 }
 
 #editor-panel .option { margin-left: 4px }
-
-#editor-panel .choices { flex-wrap: wrap }
-#editor-panel #layer-choices .layer .row.gap-buttons { flex-wrap: nowrap }
-#editor-panel #layer-choices .layer .choices { flex-wrap: wrap; flex: 1 1 auto; min-width: 0; max-width: 100% }
-#editor-panel #layer-choices .layer .actions { flex: 0 0 auto }
 
 #fragment-preview {
   position: absolute;
@@ -9731,6 +9999,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `#editor-panel .label { color: #0a0; ma
 /***/ 5264:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -9763,17 +10032,17 @@ class Feedback extends modal/* Modal */.a {
             if (!this.isVisible())
                 return;
             e.preventDefault();
-            const f = e.dataTransfer?.files?.[0];
-            if (f && f.type.startsWith('image/'))
-                this.read(f);
+            const file = e.dataTransfer?.files?.[0];
+            if (file && file.type.startsWith('image/'))
+                this.read(file);
         };
         this.handlePaste = (e) => {
             if (!this.isVisible())
                 return;
-            const f = e.clipboardData?.files?.[0];
-            if (f && f.type.startsWith('image/')) {
+            const file = e.clipboardData?.files?.[0];
+            if (file && file.type.startsWith('image/')) {
                 e.preventDefault();
-                this.read(f);
+                this.read(file);
             }
         };
         this.div.appendFileHtml(feedback);
@@ -9874,13 +10143,13 @@ class Feedback extends modal/* Modal */.a {
     updateSubmitButton() {
         const bodyTextarea = this.div.d1('#feedback-body');
         const submitButton = this.div.d1('#feedback-submit');
-        const hasBody = bodyTextarea.getVal().trim().length > 0;
+        const hasBody = bodyTextarea.trimmed().length > 0;
         submitButton.disable(this.isSubmitting || !hasBody);
     }
     pick() {
-        const f = this.div.d1('#feedback-screenshot').node().files?.[0];
-        if (f)
-            this.read(f);
+        const file = this.div.d1('#feedback-screenshot').node().files?.[0];
+        if (file)
+            this.read(file);
     }
     addDocumentListeners() {
         if (this.documentListenersAdded)
@@ -9933,8 +10202,8 @@ class Feedback extends modal/* Modal */.a {
         const titleInput = this.div.d1('#feedback-title');
         const bodyTextarea = this.div.d1('#feedback-body');
         const statusDiv = this.div.d1('#feedback-status');
-        let title = titleInput.getVal().trim();
-        const body = bodyTextarea.getVal().trim();
+        let title = titleInput.trimmed();
+        const body = bodyTextarea.trimmed();
         if (!title) {
             title = this.generateTitleFromBody(body);
         }
@@ -9978,6 +10247,7 @@ class Feedback extends modal/* Modal */.a {
 /***/ 5382:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   a: () => (/* binding */ Modal),
 /* harmony export */   r: () => (/* binding */ ModalShowing)
@@ -10028,6 +10298,7 @@ Modal.list = [];
 /***/ 5633:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   v: () => (/* binding */ CellLayers)
 /* harmony export */ });
@@ -10094,9 +10365,18 @@ CellLayers.materialLayers = ['walls', 'items', 'pawn'];
 
 /***/ }),
 
+/***/ 5833:
+/***/ ((module) => {
+
+"use strict";
+module.exports = "...........................\n...........................\n...............✰✰..✰.......\n...........✰✰.....✰...✰....\n............✰.✰..✰...T.....\n...✰T.✰.........✰...✰......\n....✰................✰✰....\n..........#########.✰✰.....\n....✰.....#...*.hh#........\n..........#....h◘◘#..✰.....\n..✰✰......#....h◘◘#........\n...✰...#######....#.....✰..\n....T..#*.#..#...*#........\n.......#=.#..#....#..T.....\n.......#=.#..#....#........\n.....✰.#..#..+....#.....✰..\n.......#..##+####+#....T...\n.......#.....#*...#✰....✰..\n.......#.....+....#✰...✰...\n.......#######....#✰...✰...\n.............#....#✰.......\n.....✰.....###....#✰.✰..✰..\n..........##.+....#✰..✰....\n..........#..####+#........\n.......✰✰.#..#✰✰.....✰✰.✰..\n..........#..#✰............\n.....T.✰✰.####✰............\n.......✰✰.......T.T........\n...........................\n...........................\nKEY\n✰ = bush\nT = tree\n# = Wall\n* = Lamp\nh = chair\n◘ = table\n= = bed\n+ = Door\n";
+
+/***/ }),
+
 /***/ 6185:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   $1: () => (/* binding */ $1),
 /* harmony export */   A7: () => (/* binding */ oneIn),
@@ -10162,10 +10442,22 @@ const rollD6 = (n) => {
     times(n, _ => s += randTo(6) + 1);
     return s;
 };
-function times(n, fOfIndex) {
-    bombIf(n < 0, 'Cannot iterate negatively');
-    for (let i = 0; i < n; i++)
-        fOfIndex(i);
+function times(startOrEnd, endOrCallback, maybeCallback) {
+    if (typeof endOrCallback === 'function') {
+        const endExclusive = startOrEnd;
+        const callback = endOrCallback;
+        bombIf(endExclusive < 0, 'Cannot iterate negatively');
+        for (let index = 0; index < endExclusive; index++)
+            callback(index);
+    }
+    else {
+        const startInclusive = startOrEnd;
+        const endExclusive = endOrCallback;
+        const callback = maybeCallback;
+        bombIf(endExclusive < startInclusive, 'Cannot iterate negatively');
+        for (let index = startInclusive; index < endExclusive; index++)
+            callback(index);
+    }
 }
 const downTimes = (n, f) => {
     bombIf(n < 0, 'Cannot iterate down from a negative number');
@@ -10264,6 +10556,7 @@ const isBranchRunner = () => window.location.port === '8081';
 /***/ 6314:
 /***/ ((module) => {
 
+"use strict";
 
 
 /*
@@ -10352,9 +10645,36 @@ module.exports = function (cssWithMappingToString) {
 
 /***/ }),
 
+/***/ 6372:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   R: () => (/* binding */ EditorItem)
+/* harmony export */ });
+/* harmony import */ var _drawable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1721);
+
+class EditorItem extends _drawable__WEBPACK_IMPORTED_MODULE_0__/* .Drawable */ .h {
+    constructor(symbol, name) {
+        super();
+        this.symbol = symbol;
+        this.name = name;
+        this.layer = 'items';
+        this.passable = false;
+        this.light = () => 0;
+        this.char = () => this.symbol;
+        this.color = () => '#0a0';
+        this.keyName = () => this.name;
+    }
+}
+
+
+/***/ }),
+
 /***/ 6457:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   T: () => (/* binding */ Config)
 /* harmony export */ });
@@ -10390,6 +10710,7 @@ Config.createTransparentDisplay = (width, height) => _a.display(width, height, '
 /***/ 6830:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Y: () => (/* binding */ XYL)
 /* harmony export */ });
@@ -10428,6 +10749,7 @@ XYL._cache = new Map();
 /***/ 6893:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   r: () => (/* binding */ Rect)
 /* harmony export */ });
@@ -10511,6 +10833,7 @@ Rect.between = (start, end) => {
 /***/ 7283:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -10790,6 +11113,7 @@ map_Map.active = new Set();
 /***/ 7328:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -10886,157 +11210,10 @@ class Display {
 
 /***/ }),
 
-/***/ 7659:
-/***/ ((module) => {
-
-
-
-var memo = {};
-
-/* istanbul ignore next  */
-function getTarget(target) {
-  if (typeof memo[target] === "undefined") {
-    var styleTarget = document.querySelector(target);
-
-    // Special case to return head of iframe instead of iframe itself
-    if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
-      try {
-        // This will throw an exception if access to iframe is blocked
-        // due to cross-origin restrictions
-        styleTarget = styleTarget.contentDocument.head;
-      } catch (e) {
-        // istanbul ignore next
-        styleTarget = null;
-      }
-    }
-    memo[target] = styleTarget;
-  }
-  return memo[target];
-}
-
-/* istanbul ignore next  */
-function insertBySelector(insert, style) {
-  var target = getTarget(insert);
-  if (!target) {
-    throw new Error("Couldn't find a style target. This probably means that the value for the 'insert' parameter is invalid.");
-  }
-  target.appendChild(style);
-}
-module.exports = insertBySelector;
-
-/***/ }),
-
-/***/ 7767:
+/***/ 7349:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   I: () => (/* binding */ CellTypes)
-/* harmony export */ });
-/* harmony import */ var _draw_door__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2483);
-/* harmony import */ var _draw_lamp__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(225);
-/* harmony import */ var _draw_wall__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(239);
-/* harmony import */ var _draw_floor__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(9177);
-/* harmony import */ var _draw_smoke__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(4502);
-/* harmony import */ var _draw_fire__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(1267);
-/* harmony import */ var _draw_pawn__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(2705);
-/* harmony import */ var _capabilities__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(3793);
-
-
-
-
-
-
-
-
-class CellTypes {
-}
-CellTypes.registry = {
-    'Wall': () => new _draw_wall__WEBPACK_IMPORTED_MODULE_2__/* .Wall */ .j(),
-    'Door': () => new _draw_door__WEBPACK_IMPORTED_MODULE_0__/* .Door */ .$(),
-    'Lamp': () => new _draw_lamp__WEBPACK_IMPORTED_MODULE_1__/* .Lamp */ .z(),
-    'Floor': () => new _draw_floor__WEBPACK_IMPORTED_MODULE_3__/* .Floor */ .Z(),
-    'Smoke': () => new _draw_smoke__WEBPACK_IMPORTED_MODULE_4__/* .Smoke */ ._(),
-    'Fire': () => new _draw_fire__WEBPACK_IMPORTED_MODULE_5__/* .Fire */ .v(),
-    'Pawn': () => new _draw_pawn__WEBPACK_IMPORTED_MODULE_6__/* .Pawn */ .vc('firefighter', _capabilities__WEBPACK_IMPORTED_MODULE_7__/* .Capabilities */ .FD.basic())
-};
-CellTypes.make = (name) => {
-    const f = CellTypes.registry[name];
-    return f ? f() : null;
-};
-
-
-/***/ }),
-
-/***/ 7825:
-/***/ ((module) => {
-
-
-
-/* istanbul ignore next  */
-function apply(styleElement, options, obj) {
-  var css = "";
-  if (obj.supports) {
-    css += "@supports (".concat(obj.supports, ") {");
-  }
-  if (obj.media) {
-    css += "@media ".concat(obj.media, " {");
-  }
-  var needLayer = typeof obj.layer !== "undefined";
-  if (needLayer) {
-    css += "@layer".concat(obj.layer.length > 0 ? " ".concat(obj.layer) : "", " {");
-  }
-  css += obj.css;
-  if (needLayer) {
-    css += "}";
-  }
-  if (obj.media) {
-    css += "}";
-  }
-  if (obj.supports) {
-    css += "}";
-  }
-  var sourceMap = obj.sourceMap;
-  if (sourceMap && typeof btoa !== "undefined") {
-    css += "\n/*# sourceMappingURL=data:application/json;base64,".concat(btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))), " */");
-  }
-
-  // For old IE
-  /* istanbul ignore if  */
-  options.styleTagTransform(css, styleElement, options.options);
-}
-function removeStyleElement(styleElement) {
-  // istanbul ignore if
-  if (styleElement.parentNode === null) {
-    return false;
-  }
-  styleElement.parentNode.removeChild(styleElement);
-}
-
-/* istanbul ignore next  */
-function domAPI(options) {
-  if (typeof document === "undefined") {
-    return {
-      update: function update() {},
-      remove: function remove() {}
-    };
-  }
-  var styleElement = options.insertStyleElement(options);
-  return {
-    update: function update(obj) {
-      apply(styleElement, options, obj);
-    },
-    remove: function remove() {
-      removeStyleElement(styleElement);
-    }
-  };
-}
-module.exports = domAPI;
-
-/***/ }),
-
-/***/ 7854:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
+"use strict";
 // ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
 
@@ -11109,76 +11286,10 @@ Names.fiAll = Object.keys(Names.firstBy);
 Names.liAll = Object.keys(Names.lastBy);
 const randomName = Names.randomName;
 
-;// ./src/maps/fragments/intro-barracks.txt
-const intro_barracks_namespaceObject = ".#########\n.#.......#\n.#.*...*.#\n*#.......#\n.+.......#\n*#.......#\n.#.*...*.#\n.#.......#\n.#########\nKEY\n# = Wall\n* = Lamp\n+ = Door ";
-// EXTERNAL MODULE: ./src/game/cell-types.ts
-var cell_types = __webpack_require__(7767);
-;// ./src/game/fragment.ts
-
-
-
-class Fragment {
-    constructor(gridRows, symbolKey) {
-        this.width = () => Math.max(...this.grid.map(row => row.length));
-        this.height = () => this.grid.length;
-        this.grid = gridRows;
-        this.key = symbolKey;
-    }
-    static fromText(text) {
-        const { grid, key } = Fragment.parse(text);
-        return new Fragment(grid, key);
-    }
-    static load(text) { return Fragment.fromText(text); }
-    static parse(text) {
-        const lines = text.split('\n').map(line => line.replace(/\r$/, ''));
-        const keyIndex = lines.findIndex(line => /^\s*key\b/i.test(line));
-        const bodyLines = lines.slice(0, keyIndex);
-        const keyLines = lines.slice(keyIndex + 1);
-        const grid = bodyLines.filter(line => line.trim().length);
-        const key = {};
-        const re = /^\s*(\S)\s*=\s*(\w+)/;
-        (0,utils/* each */.__)(keyLines, line => {
-            const [matched, symbol, type] = line.trim().match(re) ?? [];
-            if (!matched)
-                return;
-            key[symbol] = capitalize(type);
-        });
-        return { grid, key };
-    }
-    rotate(turns) {
-        let rows = this.grid;
-        const count = (0,utils/* positiveMod */.Wh)(turns, 4);
-        (0,utils/* times */.Hn)(count, _ => rows = rot90(rows));
-        return new Fragment(rows, this.key);
-    }
-    place(map, upperLeft) {
-        (0,utils/* each */.__)(this.grid, (row, rowIndex) => {
-            (0,utils/* each */.__)(row, (char, colIndex) => {
-                const typeName = this.key[char];
-                if (!typeName)
-                    return;
-                const drawable = cell_types/* CellTypes */.I.make(typeName);
-                if (drawable)
-                    map.get(upperLeft.add(colIndex, rowIndex)).create(drawable);
-            });
-        });
-        return rect/* Rect */.r.xyWH(upperLeft, this.width(), this.height());
-    }
-}
-const rot90 = (rows) => {
-    const height = rows.length;
-    const width = Math.max(...rows.map(row => row.length));
-    const matrix = rows.map(row => row.padEnd(width, ' '));
-    const result = [];
-    (0,utils/* times */.Hn)(width, x => {
-        let row = '';
-        (0,utils/* downTimes */.nd)(height, y => row += matrix[y][x]);
-        result.push(row);
-    });
-    return result;
-};
-const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
-
+// EXTERNAL MODULE: ./src/maps/fragments/intro-barracks.txt
+var intro_barracks = __webpack_require__(4461);
+// EXTERNAL MODULE: ./src/game/fragment.ts
+var fragment = __webpack_require__(8535);
 // EXTERNAL MODULE: ./src/game/models/firehouse.ts
 var firehouse = __webpack_require__(8646);
 ;// ./src/game/levels/intro.ts
@@ -11256,7 +11367,7 @@ class Intro {
         add(39, 24);
     }
     addBarracksWin() {
-        const base = Fragment.load(intro_barracks_namespaceObject);
+        const base = fragment/* Fragment */.F.load(intro_barracks);
         const rotated = base.rotate((0,utils/* randTo */.JD)(4));
         const upperLeft = game_xy.XY.at(59, 8);
         const rect = rotated.place(this.map, upperLeft);
@@ -11299,8 +11410,8 @@ class Intro {
     }
 }
 
-;// ./src/maps/fragments/level1.txt
-const level1_namespaceObject = "..........................................................................................\n..........................................................................................\n..........................................................................................\n..........................................................................................\n..........................###++#####................*.....................................\n..........................#........#......................................................\n...............+##++###++##+##.....#......................................................\n..............#...........#.*#.*...#..............................########................\n..............+..............#.....+.............................#.....*.#................\n..............+............*.+.....#.........................*...#.......#....*...........\n..............#...........#..#.....#.....................*.......#.......+................\n..............#......###+############+.+####..............*......#.......#....*...........\n..............+......#....#..+.....#........#....................#.......#................\n..............#...........#..#.....#........#....................#.......+................\n..............#......#....#..#.....#........#....................#.......#................\n..............+###+########..#.....#.......####+#................#.......#................\n..............##.....#....##+#####+#.......##...#........####+##+#####+####...............\n..............##.....#..*.#..#.............##...#........#.......#.......##...............\n..............##.....#....#..#.......*...*.##...#........#..*....#.......##...............\n..............#+.....+.#+#####+#####+###....#...#.......####.....#.......##...............\n..............+......#.#..#............#...##...#.......##.#.....#.......##...............\n...............###+###+#######.....*...#....+...........##.#.....#.......##...............\n...............#.....#.#..#.........######+##...######+#.##......+.......##...............\n...............#.....#.#..#.......#+...+...##*..#.......####....*#.......##...............\n...............#.....#.#*.#.......#....#....+...#........###.....#........#...............\n...............#....*#.#.*#.......#....#...##...#.......########.#####+####...............\n...............#+#+########...*...#....#...#######+#+#+####.####+#####.##..+###+#.........\n.....................#.#..........+....#....#..*+.......#..#.....+.......#......#.........\n.....................#.#*.........#....+....#...#.......####.....#.......#......+.........\n.....................#.#..........#####.##+#.#..###########......#.......#......#.........\n.....................#.#........########.#..######.........*.....#.......#......#.........\n.....................#.#........#......#*..*+...##...........#+#######...#..*.*.#.........\n.....................#.#........#......#....#...++...........+...#.*.#...#......#.........\n.....................#.#........#..*...#....#...##...........#...#...+...#......#.........\n.....................#.#........+......#....#...#.######################+###+###..........\n.....................#.###.+###+###+####....+....#...........#...#...#...#................\n................*....#..........#...........#....#...........#...###+##*.#................\n.....................#..........+...........#....#...........+.......+....................\n.....................#..........#...........#....#...........#.......#....*...............\n.....................#..........#...........#....#...........###+#+###....................\n.....................#..........######++##########........................................\n.....................#.................+....#...*.........................................\n.....................#.....................+..............................................\n.....................#...................................................*................\n.....................##########+############........**....................................\n..........................................................................................\n..........................................................................................\n..........................................................................................\n..........................................................................................\n..........................................................................................\nKEY\n# = Wall\n+ = Door\n* = Lamp\n";
+// EXTERNAL MODULE: ./src/maps/fragments/apartment-complex.txt
+var apartment_complex = __webpack_require__(9620);
 ;// ./src/game/levels/level1.ts
 
 
@@ -11315,7 +11426,7 @@ class Level1 {
         this.randomXY = () => game_xy.XY.at((0,utils/* randTo */.JD)(this.map.w), (0,utils/* randTo */.JD)(this.map.h));
     }
     setup() {
-        const f = Fragment.fromText(level1_namespaceObject);
+        const f = fragment/* Fragment */.F.fromText(apartment_complex);
         f.place(this.map, game_xy.XY.at(0, 0));
         this.igniteRandomWalls(8);
         this.spawnPawns();
@@ -11388,9 +11499,119 @@ class Initializer {
 
 /***/ }),
 
+/***/ 7659:
+/***/ ((module) => {
+
+"use strict";
+
+
+var memo = {};
+
+/* istanbul ignore next  */
+function getTarget(target) {
+  if (typeof memo[target] === "undefined") {
+    var styleTarget = document.querySelector(target);
+
+    // Special case to return head of iframe instead of iframe itself
+    if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
+      try {
+        // This will throw an exception if access to iframe is blocked
+        // due to cross-origin restrictions
+        styleTarget = styleTarget.contentDocument.head;
+      } catch (e) {
+        // istanbul ignore next
+        styleTarget = null;
+      }
+    }
+    memo[target] = styleTarget;
+  }
+  return memo[target];
+}
+
+/* istanbul ignore next  */
+function insertBySelector(insert, style) {
+  var target = getTarget(insert);
+  if (!target) {
+    throw new Error("Couldn't find a style target. This probably means that the value for the 'insert' parameter is invalid.");
+  }
+  target.appendChild(style);
+}
+module.exports = insertBySelector;
+
+/***/ }),
+
+/***/ 7825:
+/***/ ((module) => {
+
+"use strict";
+
+
+/* istanbul ignore next  */
+function apply(styleElement, options, obj) {
+  var css = "";
+  if (obj.supports) {
+    css += "@supports (".concat(obj.supports, ") {");
+  }
+  if (obj.media) {
+    css += "@media ".concat(obj.media, " {");
+  }
+  var needLayer = typeof obj.layer !== "undefined";
+  if (needLayer) {
+    css += "@layer".concat(obj.layer.length > 0 ? " ".concat(obj.layer) : "", " {");
+  }
+  css += obj.css;
+  if (needLayer) {
+    css += "}";
+  }
+  if (obj.media) {
+    css += "}";
+  }
+  if (obj.supports) {
+    css += "}";
+  }
+  var sourceMap = obj.sourceMap;
+  if (sourceMap && typeof btoa !== "undefined") {
+    css += "\n/*# sourceMappingURL=data:application/json;base64,".concat(btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))), " */");
+  }
+
+  // For old IE
+  /* istanbul ignore if  */
+  options.styleTagTransform(css, styleElement, options.options);
+}
+function removeStyleElement(styleElement) {
+  // istanbul ignore if
+  if (styleElement.parentNode === null) {
+    return false;
+  }
+  styleElement.parentNode.removeChild(styleElement);
+}
+
+/* istanbul ignore next  */
+function domAPI(options) {
+  if (typeof document === "undefined") {
+    return {
+      update: function update() {},
+      remove: function remove() {}
+    };
+  }
+  var styleElement = options.insertStyleElement(options);
+  return {
+    update: function update(obj) {
+      apply(styleElement, options, obj);
+    },
+    remove: function remove() {
+      removeStyleElement(styleElement);
+    }
+  };
+}
+module.exports = domAPI;
+
+/***/ }),
+
 /***/ 8421:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   I: () => (/* binding */ storage)
 /* harmony export */ });
@@ -11407,9 +11628,97 @@ const storage = new Storage();
 
 /***/ }),
 
+/***/ 8535:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   F: () => (/* binding */ Fragment)
+/* harmony export */ });
+/* harmony import */ var _drawable_types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1073);
+/* harmony import */ var _rect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6893);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6185);
+
+
+
+class Fragment {
+    constructor(gridRows, symbolKey) {
+        this.rows = () => this.grid.map(r => r.padEnd(this.width(), '.'));
+        this.width = () => Math.max(...this.grid.map(row => row.length));
+        this.height = () => this.grid.length;
+        this.grid = gridRows;
+        this.key = symbolKey;
+    }
+    static fromText(text) {
+        const { grid, key } = Fragment.parse(text);
+        return new Fragment(grid, key);
+    }
+    static load(text) { return Fragment.fromText(text); }
+    static parse(text) {
+        const lines = text.split('\n').map(line => line.replace(/\r$/, ''));
+        const keyIndex = lines.findIndex(line => /^\s*key\b/i.test(line));
+        const bodyLines = lines.slice(0, keyIndex);
+        const keyLines = lines.slice(keyIndex + 1);
+        const grid = bodyLines.filter(line => line.trim().length);
+        const key = {};
+        const re = /^\s*(\S)\s*=\s*(\S+(?:\s+\S+)*)/;
+        (0,_utils__WEBPACK_IMPORTED_MODULE_2__/* .each */ .__)(keyLines, line => {
+            const [matched, symbol, type] = line.trim().match(re) ?? [];
+            if (!matched)
+                return;
+            key[symbol] = capitalize(type);
+        });
+        return { grid, key };
+    }
+    rotate(turns) {
+        let rows = this.grid;
+        const count = (0,_utils__WEBPACK_IMPORTED_MODULE_2__/* .positiveMod */ .Wh)(turns, 4);
+        (0,_utils__WEBPACK_IMPORTED_MODULE_2__/* .times */ .Hn)(count, _ => rows = rot90(rows));
+        return new Fragment(rows, this.key);
+    }
+    pad(n) {
+        const w = this.width();
+        const border = '.'.repeat(w + n * 2);
+        const mid = this.grid.map(r => '.'.repeat(n) + r.padEnd(w, '.') + '.'.repeat(n));
+        const top = Array(n).fill(border);
+        const rows = [...top, ...mid, ...top];
+        return new Fragment(rows, this.key);
+    }
+    place(map, upperLeft) {
+        (0,_utils__WEBPACK_IMPORTED_MODULE_2__/* .each */ .__)(this.grid, (row, rowIndex) => {
+            (0,_utils__WEBPACK_IMPORTED_MODULE_2__/* .each */ .__)(row, (char, colIndex) => {
+                const typeName = this.key[char];
+                if (!typeName)
+                    return;
+                const drawable = _drawable_types__WEBPACK_IMPORTED_MODULE_0__/* .DrawableType */ .Z.make(char, typeName);
+                if (drawable)
+                    map.get(upperLeft.add(colIndex, rowIndex)).create(drawable);
+            });
+        });
+        return _rect__WEBPACK_IMPORTED_MODULE_1__/* .Rect */ .r.xyWH(upperLeft, this.width(), this.height());
+    }
+}
+const rot90 = (rows) => {
+    const height = rows.length;
+    const width = Math.max(...rows.map(row => row.length));
+    const matrix = rows.map(row => row.padEnd(width, ' '));
+    const result = [];
+    (0,_utils__WEBPACK_IMPORTED_MODULE_2__/* .times */ .Hn)(width, x => {
+        let row = '';
+        (0,_utils__WEBPACK_IMPORTED_MODULE_2__/* .downTimes */ .nd)(height, y => row += matrix[y][x]);
+        result.push(row);
+    });
+    return result;
+};
+const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
+
+/***/ }),
+
 /***/ 8646:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   A: () => (/* binding */ PawnModel),
 /* harmony export */   o: () => (/* binding */ FirehouseModel)
@@ -11442,6 +11751,7 @@ class FirehouseModel {
 /***/ 8668:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -11636,6 +11946,7 @@ class Cell {
 /***/ 8846:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -11712,6 +12023,7 @@ class FirehouseModal extends modal/* Modal */.a {
 /***/ 9177:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Z: () => (/* binding */ Floor)
 /* harmony export */ });
@@ -11735,6 +12047,7 @@ class Floor extends _drawable__WEBPACK_IMPORTED_MODULE_1__/* .Drawable */ .h {
 /***/ 9308:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -11840,7 +12153,7 @@ class GameState {
         this.map.display.clear();
         this.map.smokeDisplay.clear();
         this.map.uiRenderer.clearStrokes();
-        const { Initializer } = __webpack_require__(7854);
+        const { Initializer } = __webpack_require__(7349);
         const initializer = new Initializer(this.map);
         initializer.initialize();
         this.map.lighting.redraw();
@@ -11851,9 +12164,18 @@ const FirehouseMode = new signal/* Signal */.H();
 
 /***/ }),
 
+/***/ 9444:
+/***/ ((module) => {
+
+"use strict";
+module.exports = ".#.\n#U#\n.u.\nKEY\n# = Wall\n* = Lamp\n+ = Door\nU = Unknown\nu = little unknown\n";
+
+/***/ }),
+
 /***/ 9447:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -16035,9 +16357,18 @@ function defaultConstrain(transform, extent, translateExtent) {
 
 /***/ }),
 
+/***/ 9620:
+/***/ ((module) => {
+
+"use strict";
+module.exports = ".........................................................\n.........................................................\n...........##+##.........................................\n...........#*..######....................................\n..#####....#✰...*░ff#....................................\n..#*..######].h..░.◉#....................................\n..#✰...*░ff#].◘h.░.░#....................................\n..#].h..░.◉#].◘h.░.[#....................................\n..#].◘h.░.░#].h*.░.[#....................................\n..#].◘h.░.[#✰....░.░#....................................\n..#].h*.░.[#.......*###################################..\n..#✰....░.░#.........#f◉░[[░*.#..*....#f◉░[[░*.#..*...#..\n..#.......*#✰..*##+###f.......+...===.#f.......+...===#..\n..+........##+###h...#░░░░░░..#h◘.===##░░░░░░..#h◘.===#..\n..#✰..*##+##_..#h◘...#*.......##h....#.*.......##h....#..\n..##+###h..#_..#...*##..hh*...*#######...hh*...*#######..\n..#_..#h◘..#...#.==.#..h◘◘h....#....*#..h◘◘h....#....*#..\n..#_..#...*#...#.==.#..........+....f#..........+....f#..\n..#...#.==.#↻f*#.==.#*✰]]]]✰..✰#__..↻#*✰]]]]✰..✰#__..↻#..\n..#...#.==.##################+################+########..\n..#↻f*#.==.#..........................................#..\n..##########..........................................+..\n........+............................................##..\n........+............................................#...\n....###+###+#....###+#....###+#....###+#....###+#....+...\n....#...#*..######*..######*..######*..######*..######...\n....#◛.◛#✰...*░ff#✰...*░ff#✰...*░ff#✰...*░ff#✰...*░ff#...\n....#...#].h..░.◉#].h..░.◉#].h..░.◉#].h..░.◉#].h..░.◉#...\n....#◛.❱#].◘h.░.░#].◘h.░.░#].◘h.░.░#].◘h.░.░#].◘h.░.░#...\n....#..◛#].◘h.░.[#].◘h.░.[#].◘h.░.[#].◘h.░.[#].◘h.░.[#...\n....#◛..#].h*.░.[#].h*.░.[#].h*.░.[#].h*.░.[#].h*.░.[#...\n....#..◛#✰....░.░#✰....░.░#✰....░.░#✰....░.░#✰....░.░#...\n....#####.......*#.......*#.......*#.......*#.......*#...\n........#........#........#........#........#........#...\n........#✰..*##+##✰..*##+##✰..*##+##✰..*##+##✰..*##+##...\n........##+###h..##+###h..##+###h..##+###h..##+###h..#...\n........#_..#h◘..#_..#h◘..#_..#h◘..#_..#h◘..#_..#h◘..#...\n........#_..#...*#_..#...*#_..#...*#_..#...*#_..#...*#...\n........#...#.==.#...#.==.#...#.==.#...#.==.#...#.==.#...\n........#...#.==.#...#.==.#...#.==.#...#.==.#...#.==.#...\n........#↻f*#.==.#↻f*#.==.#↻f*#.==.#↻f*#.==.#↻f*#.==.#...\n........##############################################...\n.........................................................\n.........................................................\nKEY\n# = Wall\n+ = Door\n* = Lamp\n✰ = Bush\n░ = Counter\nf = Sink\n] = Tv\nh = Chair\n◉ = Oven\n◘ = Table\n[ = Refrigerator\n= = Bed\n_ = Tub\n↻ = Toilet\n◛ = washer/dryer\n❱ = coin machine\n";
+
+/***/ }),
+
 /***/ 9889:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   G2: () => (/* binding */ Repaint),
 /* harmony export */   HO: () => (/* binding */ FrameRendered),
@@ -16200,6 +16531,9 @@ class UIRenderer {
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
+// This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
+(() => {
+"use strict";
 
 // UNUSED EXPORTS: generateError
 
@@ -16355,46 +16689,45 @@ var floor = __webpack_require__(9177);
 // EXTERNAL MODULE: ./src/html/html.ts
 var html = __webpack_require__(467);
 ;// ./src/html/editor-panel.html
-/* harmony default export */ const editor_panel = ("<div id=\"terminal\">\n  <div id=\"editor-panel\" class=\"column gap-body\">\n    <div class=\"top column gap-controls\">\n      <div class=\"row cross-aligned-center gap-button-group\">\n        <div class=\"label\"></div>\n        <div id=\"layer-choices\" class=\"column gap-controls\">\n          <div class=\"layer template\">\n            <div class=\"row gap-buttons\">\n              <div class=\"name\"></div>\n              <div class=\"choices row gap-buttons\">\n                <button class=\"choice template\"></button>\n              </div>\n              <div class=\"editor-items column gap-buttons\">\n                <div class=\"editor-item row gap-buttons template\">\n                  <button class=\"choice\"></button>\n                  <button class=\"button-secondary close-button\">×</button>\n                </div>\n              </div>\n              <div class=\"actions row gap-buttons\"></div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"bottom column gap-controls\">\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Paint</div>\n        <div class=\"char\"></div>\n        <div class=\"cell-coord\"></div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Stutter</div>\n        <input id=\"stutter\" type=\"range\" min=\"0\" max=\"100\" value=\"0\" />\n        <div id=\"stutter-val\">0%</div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"undo-btn\" class=\"button-secondary\">undo</button>\n        <button id=\"paste-btn\" class=\"button-secondary\" disabled>paste</button>\n        <button id=\"copy-cancel\" class=\"button-secondary\" disabled>cxl</button>\n      </div>\n      <div id=\"tool-row\" class=\"column gap-buttons\">\n        <button class=\"tool template\" data-tool=\"\"></button>\n      </div>\n      <div id=\"fragment-preview\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">Fragment</div>\n          <button id=\"fragment-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <pre id=\"fragment-text\"></pre>\n      </div>\n      <div id=\"symbol-picker\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">New Item</div>\n          <button id=\"symbol-picker-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div id=\"symbol-grid\" class=\"symbols\"></div>\n        <div class=\"actions\">\n          <input id=\"editor-item-name\" type=\"text\" placeholder=\"name\" />\n          <button id=\"editor-item-add\" class=\"button-secondary\" disabled>Add</button>\n        </div>\n      </div>\n      <div class=\"fill\"></div>\n      <div id=\"controls-help\" class=\"text-subtle\">\n        L/R: paint/erase · Shift: constrain · Ctrl: all layers · Hold C: copy\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"copy-fragment\" class=\"button-secondary\">cc clipboard</button>\n        <button id=\"submit-fragment\" class=\"button-secondary\">submit issue</button>\n        <button id=\"show-fragment\" class=\"button-secondary\">show fragment</button>\n      </div>\n    </div>\n  </div>\n</div> ");
+/* harmony default export */ const editor_panel = ("<div id=\"terminal\">\n  <div id=\"editor-panel\" class=\"column gap-body\">\n    <div class=\"top column gap-controls\">\n      <div class=\"row fit-container cross-aligned-center gap-button-group\">\n        <div class=\"label\"></div>\n        <div id=\"layer-choices\" class=\"column fit-container gap-controls\">\n          <div class=\"layer template\">\n            <div class=\"row fit-container gap-buttons\">\n              <div class=\"name\"></div>\n              <div class=\"column fit-container\">\n                <div class=\"choices gap-buttons\">\n                  <button class=\"choice template\"></button>\n                </div>\n                <div class=\"editor-items column gap-buttons\">\n                  <div class=\"editor-item row\">\n                    <button id=\"add-item\" class=\"button-secondary\">Add</button>\n                  </div>\n                  <div class=\"editor-item-buttons\">\n                    <div class=\"editor-item row template\">\n                      <button class=\"choice\"></button>\n                      <button class=\"button-secondary close-button\">×</button>\n                    </div>\n                  </div>\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"bottom column gap-controls\">\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Paint</div>\n        <div class=\"char\"></div>\n        <div class=\"cell-coord\"></div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Stutter</div>\n        <input id=\"stutter\" type=\"range\" min=\"0\" max=\"100\" value=\"0\" />\n        <div id=\"stutter-val\">0%</div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"undo-btn\" class=\"button-secondary\">undo</button>\n        <button id=\"paste-btn\" class=\"button-secondary\" disabled>paste</button>\n        <button id=\"rotate-left\" class=\"button-secondary hidden\" disabled>⟲</button>\n        <button id=\"rotate-right\" class=\"button-secondary hidden\" disabled>⟳</button>\n        <button id=\"copy-cancel\" class=\"button-secondary\" disabled>cxl</button>\n      </div>\n      <div id=\"tool-row\" class=\"column gap-buttons\">\n        <button class=\"tool template\" data-tool=\"\"></button>\n      </div>\n      <div id=\"fragment-preview\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">Fragment</div>\n          <button id=\"fragment-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <pre id=\"fragment-text\"></pre>\n      </div>\n      <div id=\"symbol-picker\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">New Item</div>\n          <button id=\"symbol-picker-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div id=\"symbol-grid\" class=\"symbols\">\n          <div class=\"sym template\"></div>\n        </div>\n        <div class=\"actions\">\n          <input id=\"editor-item-name\" type=\"text\" placeholder=\"name\" />\n          <button id=\"editor-item-add\" class=\"button-secondary\" disabled>Add</button>\n        </div>\n      </div>\n      <div id=\"fragment-loader\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">Load Fragment</div>\n          <button id=\"fragment-loader-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div id=\"fragment-list\" class=\"column gap-buttons\">\n          <button class=\"fragment-file template\" data-file=\"\"></button>\n        </div>\n      </div>\n      <div class=\"fill\"></div>\n      <div id=\"controls-help\" class=\"text-subtle\">\n        L/R: paint/erase · Shift: constrain · Ctrl: all layers · Hold C: copy · ←/→ or L/R: rotate\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"load-fragment\" class=\"button-secondary\">load fragment</button>\n        <button id=\"copy-fragment\" class=\"button-secondary\">cc clipboard</button>\n        <button id=\"submit-fragment\" class=\"button-secondary\">submit issue</button>\n        <button id=\"show-fragment\" class=\"button-secondary\">show fragment</button>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"clear-map\" class=\"button-secondary\">clear</button>\n      </div>\n    </div>\n  </div>\n</div>");
 // EXTERNAL MODULE: ./src/game/layers.ts
 var game_layers = __webpack_require__(5633);
-// EXTERNAL MODULE: ./src/game/cell-types.ts
-var cell_types = __webpack_require__(7767);
-// EXTERNAL MODULE: ./src/draw/drawable.ts
-var drawable = __webpack_require__(1721);
-;// ./src/draw/editor-item.ts
-
-class EditorItem extends drawable/* Drawable */.h {
-    constructor(symbol, name) {
-        super();
-        this.symbol = symbol;
-        this.name = name;
-        this.layer = 'items';
-        this.passable = false;
-        this.light = () => 0;
-        this.char = () => this.symbol;
-        this.color = () => '#0a0';
-        this.keyName = () => this.name;
-    }
-}
-
+// EXTERNAL MODULE: ./src/game/drawable-types.ts + 1 modules
+var drawable_types = __webpack_require__(1073);
+// EXTERNAL MODULE: ./src/draw/editor-item.ts
+var editor_item = __webpack_require__(6372);
 ;// ./src/ui/editor-panel.ts
 
 
 
 
 
-const layerChoices = {
-    pawn: [{ label: 'Pawn', char: '@', make: () => cell_types/* CellTypes */.I.make('Pawn') }],
-    smoke: [{ label: 'Smoke', char: '+', make: () => cell_types/* CellTypes */.I.make('Smoke') }],
-    fire: [{ label: 'Fire', char: '▲', make: () => cell_types/* CellTypes */.I.make('Fire') }],
-    walls: [
-        { label: 'Wall', char: '#', make: () => cell_types/* CellTypes */.I.make('Wall') },
-        { label: 'Door', char: '+', make: () => cell_types/* CellTypes */.I.make('Door') },
-    ],
-    items: [{ label: 'Lamp', char: '*', make: () => cell_types/* CellTypes */.I.make('Lamp') }],
-    floor: [{ label: 'Floor', char: '.', make: () => cell_types/* CellTypes */.I.make('Floor') }]
+const buildLayerChoices = () => {
+    const choices = {
+        pawn: [],
+        smoke: [],
+        fire: [],
+        walls: [],
+        items: [],
+        floor: []
+    };
+    // Populate from DrawableType registry
+    Object.entries(drawable_types/* DrawableType */.Z.registry).forEach(([name, factory]) => {
+        const drawable = factory();
+        const char = drawable.char();
+        const choice = { label: name, char, make: () => drawable_types/* DrawableType */.Z.make(char, name) };
+        // Skip Floor, Fire, and Smoke as requested
+        if (name === 'Floor' || name === 'Fire' || name === 'Smoke')
+            return;
+        // Use the drawable's layer property to categorize
+        const layer = drawable.layer;
+        if (choices[layer]) {
+            choices[layer].push(choice);
+        }
+    });
+    return choices;
 };
+const layerChoices = buildLayerChoices();
 const TOOL_LABELS = {
     'draw': 'draw',
     'line': 'line',
@@ -16410,7 +16743,7 @@ class EditorPanel {
         this.cell = null;
         this.tool = 'draw';
         this.layer = 'walls';
-        this.choice = layerChoices['walls'][0];
+        this.choice = null;
         this.stutter = 0;
         this.extraItems = [];
         this.setCell = (c) => { this.cell = c; this.updateCell(); };
@@ -16418,7 +16751,7 @@ class EditorPanel {
             this.extraItems = items.map(it => ({
                 label: it.name,
                 char: it.symbol,
-                make: () => new EditorItem(it.symbol, it.name),
+                make: () => new editor_item/* EditorItem */.R(it.symbol, it.name),
                 editor: true
             }));
             this.render();
@@ -16426,6 +16759,7 @@ class EditorPanel {
         this.refresh = () => this.render();
         this.div = (0,html.d1)('#terminal');
         this.div.appendFileHtml(editor_panel);
+        this.choice = layerChoices['walls'][0] || null;
         this.render();
     }
     render() {
@@ -16441,10 +16775,10 @@ class EditorPanel {
                     this.choice.label === ch.label && this.choice.char === ch.char);
                 b.onClick(() => { this.layer = n; this.choice = ch; this.updatePaintInfo(); this.render(); });
             });
-            const col = row.d1('.editor-items');
+            const editorItems = row.d1('.editor-items');
             const editorChoices = n === 'items' ? this.extraItems : [];
-            n === 'items' ? col.show() : col.hide();
-            col.dList('.editor-item').updateFrom(editorChoices, (r, ch) => {
+            n === 'items' ? editorItems.show() : editorItems.hide();
+            editorItems.d1('.editor-item-buttons').dList('.editor-item').updateFrom(editorChoices, (r, ch) => {
                 const btn = r.d1('button.choice');
                 btn.text(`${ch.char} ${ch.label}`);
                 btn.classed('selected', this.layer === n && !!this.choice &&
@@ -16454,16 +16788,7 @@ class EditorPanel {
                 x.onClick(() => this.onDeleteEditorItem?.(ch.char));
             });
             if (n === 'items') {
-                const actions = row.d1('.actions');
-                actions.selectAll('*').remove();
-                const add = document.createElement('button');
-                add.id = 'add-item';
-                add.className = 'button-secondary';
-                add.textContent = 'Add';
-                const actNode = actions.node();
-                if (actNode)
-                    actNode.appendChild(add);
-                add.addEventListener('click', (e) => { e.stopPropagation(); e.preventDefault(); this.onAddItem?.(); });
+                editorItems.d1('#add-item').onClick(() => this.onAddItem?.());
             }
         });
         const tools = ['draw', 'line', 'box', 'fill-box', 'circ-in-rect', 'circ-in-rect-filled', 'circ-radius', 'circ-radius-filled'];
@@ -16502,8 +16827,43 @@ var stroke = __webpack_require__(891);
 // EXTERNAL MODULE: ./src/ui/ui-renderer.ts
 var ui_renderer = __webpack_require__(9889);
 // EXTERNAL MODULE: ./src/game/rect.ts
-var rect = __webpack_require__(6893);
+var game_rect = __webpack_require__(6893);
+// EXTERNAL MODULE: ./src/game/fragment.ts
+var fragment = __webpack_require__(8535);
+;// ./src/editor-defs.ts
+const BUILTIN_DRAWABLES = [
+    { symbol: '#', name: 'Wall' },
+    { symbol: '+', name: 'Door' },
+    { symbol: '*', name: 'Lamp' },
+    { symbol: '.', name: 'Floor' },
+    { symbol: '+', name: 'Smoke' },
+    { symbol: '▲', name: 'Fire' },
+    { symbol: '@', name: 'Pawn' }
+];
+class EditorDefs {
+    constructor() {
+        this.extra = [];
+        this.all = () => [...BUILTIN_DRAWABLES, ...this.extra];
+        this.register = (definition) => {
+            if (this.extra.some(existing => existing.symbol === definition.symbol && existing.name === definition.name))
+                return;
+            this.extra.push(definition);
+        };
+        this.remove = (symbol) => {
+            this.extra = this.extra.filter(definition => definition.symbol !== symbol);
+        };
+        this.symbolFor = (typeName) => {
+            const definition = this.all().find(d => d.name === typeName);
+            return definition ? definition.symbol : typeName[0];
+        };
+        this.extraDefs = () => this.extra;
+    }
+}
+
 ;// ./src/editor.ts
+
+
+
 
 
 
@@ -16531,6 +16891,8 @@ class Editor {
         this.feedback = new feedback/* Feedback */.G();
         this.muted = new Set();
         this.solo = null;
+        this.showLighting = false;
+        this.showDarkness = false;
         this.painting = false;
         this.paintingShift = false;
         this.paintingCtrl = false;
@@ -16543,7 +16905,7 @@ class Editor {
         this.undoStack = [];
         this.hovered = null;
         this.pasteId = UI.pasteId;
-        this.editorItems = [];
+        this.defs = new EditorDefs();
         this.symbolSel = null;
         this.withStroke = (id, z, visible, draw) => {
             const s = new stroke/* Stroke */.t([], () => UI.color, visible, z);
@@ -16551,37 +16913,25 @@ class Editor {
             this.map.uiRenderer.replace(id, s);
             ui_renderer/* Repaint */.G2.emit();
         };
-        this.squareBetween = (a, b) => {
-            const dx = Math.abs(b.x - a.x), dy = Math.abs(b.y - a.y);
-            const d = Math.max(dx, dy);
-            const bx = a.x + Math.sign(b.x - a.x) * d;
-            const by = a.y + Math.sign(b.y - a.y) * d;
-            return rect/* Rect */.r.between(a, game_xy.XY.at(bx, by));
-        };
-        this.toRectFromCenter = (c, p, square) => {
-            const a = game_xy.XY.at(2 * c.x - p.x, 2 * c.y - p.y);
-            const b = game_xy.XY.at(p.x, p.y);
-            return square ? this.squareBetween(a, b) : rect/* Rect */.r.between(a, b);
-        };
-        this.previewEllipse = (r, filled) => {
-            const ul = r.ul, br = r.br;
+        this.previewEllipse = (rect, filled) => {
+            const ul = rect.ul, br = rect.br;
             this.withStroke(this.shapeId, UI.strokeZ, () => this.painting && (this.panel.tool === 'circ-in-rect' || this.panel.tool === 'circ-in-rect-filled' ||
                 this.panel.tool === 'circ-radius' || this.panel.tool === 'circ-radius-filled'), s => {
                 const add = (xy) => s.add(this.map.get(xy), this.panel.choice?.char || '#');
                 if (filled) {
-                    const { cx, cy, rx, ry } = (0,shapes/* ellipseFromRect */.Dg)(r);
+                    const { cx, cy, rx, ry } = (0,shapes/* ellipseFromRect */.Dg)(rect);
                     (0,shapes/* eachEllipseFill */.xh)(cx, cy, rx, ry, add);
                 }
                 else
                     (0,shapes/* eachEllipseBorderRect */.QI)(ul.x, ul.y, br.x, br.y, add);
             });
         };
-        this.commitEllipse = (r, filled) => {
-            const ul = r.ul, br = r.br;
+        this.commitEllipse = (rect, filled) => {
+            const ul = rect.ul, br = rect.br;
             const ops = [];
             const apply = (xy) => { this.applyXY(xy, ops); return true; };
             if (filled) {
-                const { cx, cy, rx, ry } = (0,shapes/* ellipseFromRect */.Dg)(r);
+                const { cx, cy, rx, ry } = (0,shapes/* ellipseFromRect */.Dg)(rect);
                 (0,shapes/* eachEllipseFill */.xh)(cx, cy, rx, ry, apply);
             }
             else
@@ -16599,7 +16949,7 @@ class Editor {
             const before = ops ? this.recordCell(cell) : null;
             this.opOn(cell);
             if (ops && before)
-                ops.push({ x: xy.x, y: xy.y, type: 'set', names: before });
+                ops.push({ xy, type: 'set', names: before });
         };
         this.opOn = (cell) => {
             if (this.op === 'paint')
@@ -16620,27 +16970,32 @@ class Editor {
             // Apply inverse ops
             const inverse = [];
             ops.forEach(op => {
-                const xy = game_xy.XY.at(op.x, op.y);
-                const cell = this.map.get(xy);
+                const cell = this.map.get(op.xy);
                 if (op.type === 'set') {
-                    // clear all then set recorded names
                     const prev = [];
-                    game_layers/* CellLayers */.v.layerNames.forEach((n) => { const d = cell.layers.data[n]; if (d) {
-                        prev.push(d.constructor?.name);
-                        cell.died(d);
-                    } });
-                    op.names.forEach(n => { const d = cell_types/* CellTypes */.I.make(n); if (d)
-                        cell.create(d); });
-                    inverse.push({ x: op.x, y: op.y, type: 'set', names: prev });
+                    game_layers/* CellLayers */.v.layerNames.forEach((layerName) => {
+                        const drawable = cell.layers.data[layerName];
+                        if (drawable) {
+                            prev.push(drawable.constructor?.name);
+                            cell.died(drawable);
+                        }
+                    });
+                    op.names.forEach(name => {
+                        const symbol = this.defs.symbolFor(name);
+                        cell.create(drawable_types/* DrawableType */.Z.make(symbol, name));
+                    });
+                    inverse.push({ xy: op.xy, type: 'set', names: prev });
                 }
                 else {
-                    // clear: record current and clear
                     const prev = [];
-                    game_layers/* CellLayers */.v.layerNames.forEach((n) => { const d = cell.layers.data[n]; if (d) {
-                        prev.push(d.constructor?.name);
-                        cell.died(d);
-                    } });
-                    inverse.push({ x: op.x, y: op.y, type: 'set', names: prev });
+                    game_layers/* CellLayers */.v.layerNames.forEach((layerName) => {
+                        const drawable = cell.layers.data[layerName];
+                        if (drawable) {
+                            prev.push(drawable.constructor?.name);
+                            cell.died(drawable);
+                        }
+                    });
+                    inverse.push({ xy: op.xy, type: 'set', names: prev });
                 }
             });
             this.pushUndo(inverse);
@@ -16659,15 +17014,15 @@ class Editor {
             for (let y = 0; y < h; y++)
                 for (let x = 0; x < w; x++) {
                     const cell = this.map.grid[y][x];
-                    for (const n of order) {
-                        const d = cell.layers.data[n];
-                        if (!d)
+                    for (const layerName of order) {
+                        const drawable = cell.layers.data[layerName];
+                        if (!drawable)
                             continue;
-                        const ch = d.char();
-                        chars[y][x] = ch;
-                        const name = typeof d.keyName === 'function' ? d.keyName() : d.constructor?.name;
-                        if (name && ch !== '.')
-                            key.set(ch, name);
+                        const symbol = drawable.char();
+                        chars[y][x] = symbol;
+                        const name = typeof drawable.keyName === 'function' ? drawable.keyName() : drawable.constructor?.name;
+                        if (name && symbol !== '.')
+                            key.set(symbol, name);
                         break;
                     }
                 }
@@ -16706,32 +17061,51 @@ class Editor {
                 lines.push(`${ch} = ${tn}`);
             return lines.join('\n');
         };
-        this.centerFragment = (v) => {
-            const m = document.getElementById('main');
-            if (!m)
-                return;
-            const r = m.getBoundingClientRect();
-            const vw = v.offsetWidth, vh = v.offsetHeight;
-            const x = r.left + (r.width - vw) / 2;
-            const y = r.top + (r.height - vh) / 2;
-            v.style.left = `${Math.max(0, Math.round(x))}px`;
-            v.style.top = `${Math.max(0, Math.round(y))}px`;
+        this.toggleLighting = () => {
+            this.showLighting = !this.showLighting;
+            (0,html.d1)('#lighting-toggle').text(this.showLighting ? 'LT*' : 'LT');
+            this.updateLightingEnabled();
+            this.drawMap();
+        };
+        this.toggleDarkness = () => {
+            this.showDarkness = !this.showDarkness;
+            (0,html.d1)('#darkness-toggle').text(this.showDarkness ? 'DK*' : 'DK');
+            this.updateLightingEnabled();
+            this.drawMap();
+        };
+        this.clearMap = () => {
+            this.painting = false;
+            this.origin = null;
+            this.lock = null;
+            this.clearPreview();
+            this.clearCopy();
+            this.undoStack = [];
+            this.map.killAll();
+            this.map.fill(() => new floor/* Floor */.Z());
+            this.updateLightingEnabled();
+            this.drawMap();
         };
         this.onKeyDown = (e) => {
             if (e.key === 'c' || e.key === 'C')
                 window.keydownC = true;
             if (e.key === 'Escape' && this.copyBuf)
                 this.clearCopy();
+            if (!this.copyBuf)
+                return;
+            if (e.key === 'l' || e.key === 'L' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                this.rotateCopy('left');
+            }
+            else if (e.key === 'r' || e.key === 'R' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                this.rotateCopy('right');
+            }
         };
         this.onKeyUp = (e) => {
             if (e.key === 'c' || e.key === 'C')
                 window.keydownC = false;
         };
-        this.hide = (sel) => {
-            const e = document.querySelector(sel);
-            if (e)
-                e.classList.add('hidden');
-        };
+        this.hide = (sel) => { (0,html.d1)(sel).hide(); };
         this.map = new map/* Map */.T(config/* Config */.T.WIDTH, config/* Config */.T.HEIGHT);
         this.panel = new EditorPanel();
         this.panel.onAddItem = () => this.openSymbolPicker();
@@ -16762,114 +17136,103 @@ class Editor {
         this.drawMap();
     }
     openSymbolPicker() {
-        const v = document.getElementById('symbol-picker');
-        if (!v)
-            return;
-        const grid = document.getElementById('symbol-grid');
-        grid.innerHTML = '';
+        const picker = (0,html.d1)('#symbol-picker');
+        const grid = picker.d1('#symbol-grid');
         const used = this.usedSymbols();
-        const symbols = this.buildSymbols().filter(ch => !used.has(ch));
-        symbols.forEach(ch => {
-            const s = document.createElement('div');
-            s.textContent = ch;
-            s.className = 'sym';
-            s.onclick = () => {
-                this.symbolSel = ch;
-                [...grid.children].forEach(el => el.classList.remove('selected'));
-                s.classList.add('selected');
+        const symbols = this.buildSymbols().filter(symbol => !used.has(symbol));
+        grid.dList('.sym').updateFrom(symbols, (node, symbol) => {
+            node.text(symbol).onClick(() => {
+                this.symbolSel = symbol;
+                grid.selectAll('.sym').classed('selected', false);
+                node.classed('selected', true);
                 this.updateAddEnabled();
-            };
-            grid.appendChild(s);
+            });
         });
-        const name = document.getElementById('editor-item-name');
-        name.value = '';
-        name.oninput = () => this.updateAddEnabled();
-        const add = document.getElementById('editor-item-add');
-        add.onclick = () => this.addEditorItem();
-        const close = document.getElementById('symbol-picker-close');
-        close.onclick = () => { v.classList.add('hidden'); v.style.left = ''; v.style.top = ''; };
-        v.classList.remove('hidden');
-        requestAnimationFrame(() => this.centerFragment(v));
+        const nameInput = (0,html.d1)('#editor-item-name');
+        nameInput.setVal('').onInput(() => this.updateAddEnabled());
+        nameInput.onKeyDown(event => {
+            if (event.key === 'Enter')
+                this.addEditorItem();
+        });
+        (0,html.d1)('#editor-item-add').onClick(() => this.addEditorItem());
+        (0,html.d1)('#symbol-picker-close').onClick(() => picker.hide());
+        this.symbolSel = null;
+        this.updateAddEnabled();
+        picker.show();
+        requestAnimationFrame(() => this.centerFragment(picker));
     }
     updateAddEnabled() {
-        const add = document.getElementById('editor-item-add');
-        const name = document.getElementById('editor-item-name').value.trim();
-        add.disabled = !this.symbolSel || name.length === 0;
+        const name = (0,html.d1)('#editor-item-name').trimmed();
+        const isEnabled = this.symbolSel && name.length > 0;
+        (0,html.d1)('#editor-item-add')
+            .enable(!!isEnabled)
+            .text(this.symbolSel ? `Add ${this.symbolSel}` : 'Add');
     }
     addEditorItem() {
         if (!this.symbolSel)
             return;
-        const name = document.getElementById('editor-item-name').value.trim();
+        const name = (0,html.d1)('#editor-item-name').trimmed();
         if (!name)
             return;
-        const s = this.symbolSel;
-        if (this.editorItems.some(it => it.symbol === s))
+        const symbol = this.symbolSel;
+        if (this.defs.extraDefs().some(item => item.symbol === symbol))
             return;
-        this.editorItems.push({ symbol: s, name });
-        this.panel.setEditorItems(this.editorItems);
+        this.defs.register({ symbol, name });
+        this.panel.setEditorItems(this.defs.extraDefs());
         this.panel.layer = 'items';
-        this.panel.choice = { label: name, char: s, make: () => new EditorItem(s, name), editor: true };
+        this.panel.choice = { label: name, char: symbol, make: () => new editor_item/* EditorItem */.R(symbol, name), editor: true };
         this.panel.refresh();
-        const v = document.getElementById('symbol-picker');
-        if (v) {
-            v.classList.add('hidden');
-            v.style.left = '';
-            v.style.top = '';
-        }
+        (0,html.d1)('#symbol-picker').hide();
         this.symbolSel = null;
     }
     deleteEditorItem(symbol) {
         if (!confirm('Remove this item and all instances?'))
             return;
-        this.editorItems = this.editorItems.filter(it => it.symbol !== symbol);
-        this.panel.setEditorItems(this.editorItems);
+        this.defs.remove(symbol);
+        this.panel.setEditorItems(this.defs.extraDefs());
         this.map.eachCell(cell => {
-            const d = cell.layers.data['items'];
-            if (d && typeof d.char === 'function' && d.char() === symbol && d instanceof EditorItem)
-                cell.died(d);
+            const drawable = cell.layers.data['items'];
+            if (drawable && typeof drawable.char === 'function' && drawable.char() === symbol && drawable instanceof editor_item/* EditorItem */.R)
+                cell.died(drawable);
         });
         this.drawMap();
     }
     usedSymbols() {
-        const s = new Set();
+        const symbols = new Set();
         const order = ['pawn', 'fire', 'walls', 'items', 'floor'];
-        for (let y = 0; y < this.map.h; y++)
-            for (let x = 0; x < this.map.w; x++) {
-                const cell = this.map.grid[y][x];
-                for (const n of order) {
-                    const d = cell.layers.data[n];
-                    if (!d)
-                        continue;
-                    const ch = d.char();
-                    if (ch)
-                        s.add(ch);
-                    break;
-                }
-            }
-        return s;
+        this.map.eachCell(cell => {
+            const layer = order.find(name => cell.layers.data[name]);
+            if (!layer)
+                return;
+            const drawable = cell.layers.data[layer];
+            const symbol = drawable?.char();
+            if (symbol)
+                symbols.add(symbol);
+        });
+        return symbols;
     }
     buildSymbols() {
-        const r = [];
-        const add = (a, b) => { for (let i = a; i <= b; i++)
-            r.push(String.fromCharCode(i)); };
-        add(33, 126);
+        const symbols = [];
+        const pushRange = (start, end) => (0,utils/* times */.Hn)(start, end + 1, index => symbols.push(String.fromCharCode(index)));
+        pushRange(33, 126);
         const ranges = [
-            [0x2190, 0x21FF], // arrows
-            [0x2580, 0x259F], // blocks
-            [0x25A0, 0x25FF], // geometric
-            [0x2700, 0x27BF] // dingbats
+            [0x2190, 0x21FF],
+            [0x2580, 0x259F],
+            [0x25A0, 0x25FF],
+            [0x2700, 0x27BF]
         ];
-        ranges.forEach(([a, b]) => add(a, b));
-        return r.filter(ch => ch !== '.');
+        (0,utils/* each */.__)(ranges, ([start, end]) => pushRange(start, end));
+        return symbols.filter(symbol => symbol !== '.');
     }
     attach() {
-        const c = (0,utils.$1)('game-container');
-        c.style.position = 'relative';
+        const container = (0,html.d1)('#game-container');
+        container.style('position', 'relative');
         const root = document.documentElement;
         root.style.setProperty('--map-width', `${this.map.w}ch`);
-        this.map.display.attachTo(c, { display: 'block', zIndex: '1' });
-        this.map.smokeDisplay.attachTo(c, { position: 'absolute', top: '0', left: '0', zIndex: '2', pointerEvents: 'none' });
-        this.map.uiRenderer.attachTo(c, { position: 'absolute', top: '0', left: '0', zIndex: '3', pointerEvents: 'none' });
+        const node = container.node();
+        this.map.display.attachTo(node, { display: 'block', zIndex: '1' });
+        this.map.smokeDisplay.attachTo(node, { position: 'absolute', top: '0', left: '0', zIndex: '2', pointerEvents: 'none' });
+        this.map.uiRenderer.attachTo(node, { position: 'absolute', top: '0', left: '0', zIndex: '3', pointerEvents: 'none' });
         this.map.onMousemove(cell => this.onMove(cell));
         this.map.onMousedown((cell, click) => this.onDown(cell, click));
     }
@@ -16924,10 +17287,10 @@ class Editor {
             this.clearPreview();
             return;
         }
-        const r = rect/* Rect */.r.between(this.origin, this.lastTarget.xy);
+        const rect = game_rect/* Rect */.r.between(this.origin, this.lastTarget.xy);
         const ops = [];
         const on = (xy) => this.applyXY(xy, ops);
-        filled ? r.eachCell(on) : r.eachBorder(on);
+        filled ? rect.eachCell(on) : rect.eachBorder(on);
         this.pushUndo(ops);
         this.clearPreview();
     }
@@ -16946,169 +17309,198 @@ class Editor {
     previewRect(toCell, filled) {
         if (!this.origin)
             return;
-        const r = rect/* Rect */.r.between(this.origin, toCell.xy);
+        const rect = game_rect/* Rect */.r.between(this.origin, toCell.xy);
         this.withStroke(this.shapeId, UI.strokeZ, () => this.painting && (this.panel.tool === (filled ? 'fill-box' : 'box')), s => {
             const add = (xy) => s.add(this.map.get(xy), this.panel.choice?.char || '#');
             if (filled)
-                r.eachCell(add);
+                rect.eachCell(add);
             else
-                r.eachBorder(add);
+                rect.eachBorder(add);
         });
     }
     previewEllipseRect(toCell, filled) {
         if (!this.origin)
             return;
-        const r = this.paintingShift ? this.squareBetween(this.origin, toCell.xy)
-            : rect/* Rect */.r.between(this.origin, toCell.xy);
-        this.previewEllipse(r, filled);
+        const rect = this.paintingShift ? (0,shapes/* squareBetween */.iV)(this.origin, toCell.xy)
+            : game_rect/* Rect */.r.between(this.origin, toCell.xy);
+        this.previewEllipse(rect, filled);
     }
     previewEllipseCenter(toCell, filled) {
         if (!this.origin)
             return;
-        const r = this.toRectFromCenter(this.origin, toCell.xy, this.paintingShift);
-        this.previewEllipse(r, filled);
+        const rect = (0,shapes/* rectFromCenter */.er)(this.origin, toCell.xy, this.paintingShift);
+        this.previewEllipse(rect, filled);
     }
     pushUndo(ops) { if (ops.length)
         this.undoStack.push(ops); }
     recordCell(cell) {
         return game_layers/* CellLayers */.v.layerNames
-            .map((l) => cell.layers.data[l]?.constructor?.name)
-            .filter((n) => !!n);
+            .map((layerName) => {
+            const drawable = cell.layers.data[layerName];
+            if (!drawable)
+                return null;
+            return typeof drawable.keyName === 'function'
+                ? drawable.keyName()
+                : drawable.constructor?.name;
+        })
+            .filter((name) => !!name);
     }
     commitEllipseRect(filled) {
         if (!this.origin || !this.lastTarget) {
             this.clearPreview();
             return;
         }
-        const r = this.paintingShift ? this.squareBetween(this.origin, this.lastTarget.xy)
-            : rect/* Rect */.r.between(this.origin, this.lastTarget.xy);
-        this.commitEllipse(r, filled);
+        const rect = this.paintingShift ? (0,shapes/* squareBetween */.iV)(this.origin, this.lastTarget.xy)
+            : game_rect/* Rect */.r.between(this.origin, this.lastTarget.xy);
+        this.commitEllipse(rect, filled);
     }
     commitEllipseCenter(filled) {
         if (!this.origin || !this.lastTarget) {
             this.clearPreview();
             return;
         }
-        const r = this.toRectFromCenter(this.origin, this.lastTarget.xy, this.paintingShift);
-        this.commitEllipse(r, filled);
+        const rect = (0,shapes/* rectFromCenter */.er)(this.origin, this.lastTarget.xy, this.paintingShift);
+        this.commitEllipse(rect, filled);
     }
-    captureCopyShape(x0, y0, x1, y1) {
+    centerFragment(element) {
+        const mainElement = (0,html.d1)('#main').node();
+        const bounding = mainElement.getBoundingClientRect();
+        const elementNode = element.node();
+        const elementWidth = elementNode.offsetWidth;
+        const elementHeight = elementNode.offsetHeight;
+        const left = bounding.left + (bounding.width - elementWidth) / 2;
+        const top = bounding.top + (bounding.height - elementHeight) / 2;
+        element.style('left', `${Math.max(0, Math.round(left))}px`)
+            .style('top', `${Math.max(0, Math.round(top))}px`);
+    }
+    captureCopyShape(a, b) {
         const mode = this.paintingCtrl ? 'cells' : 'layer';
-        const a = game_xy.XY.at(x0, y0);
-        const b = game_xy.XY.at(x1, y1);
-        const t = this.panel.tool;
+        const tool = this.panel.tool;
         const add = (xy) => {
             if (mode === 'layer') {
-                const layer = this.panel.layer;
-                const d = this.map.get(xy).get(layer);
-                if (!d)
+                const layerName = this.panel.layer;
+                const drawable = this.map.get(xy).get(layerName);
+                if (!drawable)
                     return;
-                const name = d.constructor?.name;
-                if (name && cell_types/* CellTypes */.I.make(name))
-                    layers.push({ dx: xy.x - x0, dy: xy.y - y0, name });
+                const name = typeof drawable.keyName === 'function'
+                    ? drawable.keyName()
+                    : drawable.constructor?.name;
+                const symbol = drawable.char();
+                layers.push({ dx: xy.x - a.x, dy: xy.y - a.y, name, symbol });
             }
             else {
-                const names = game_layers/* CellLayers */.v.layerNames
-                    .map(l => this.map.get(xy).get(l)?.constructor?.name)
-                    .filter(n => n && cell_types/* CellTypes */.I.make(n));
-                if (names.length)
-                    cells.push({ dx: xy.x - x0, dy: xy.y - y0, names });
+                const items = game_layers/* CellLayers */.v.layerNames
+                    .filter(n => n !== 'floor')
+                    .map(layerName => this.map.get(xy).get(layerName))
+                    .filter(drawable => drawable)
+                    .map(drawable => ({
+                    name: typeof drawable.keyName === 'function'
+                        ? drawable.keyName()
+                        : drawable.constructor?.name,
+                    symbol: drawable.char()
+                }));
+                if (items.length)
+                    cells.push({ dx: xy.x - a.x, dy: xy.y - a.y, items });
             }
         };
         const layers = [];
         const cells = [];
-        const rRect = () => rect/* Rect */.r.between(a, b);
-        if (t === 'line' || t === 'draw')
+        const rectBetween = () => game_rect/* Rect */.r.between(a, b);
+        if (tool === 'line' || tool === 'draw')
             (0,shapes/* eachLine */.IM)(a, b, xy => { add(xy); return true; });
-        else if (t === 'box')
-            rRect().eachBorder(add);
-        else if (t === 'fill-box')
-            rRect().eachCell(add);
-        else if (t === 'circ-in-rect' || t === 'circ-in-rect-filled') {
-            const r = this.paintingShift ? this.squareBetween(a, b) : rRect();
-            if (t === 'circ-in-rect-filled') {
-                const { cx, cy, rx, ry } = (0,shapes/* ellipseFromRect */.Dg)(r);
+        else if (tool === 'box')
+            rectBetween().eachBorder(add);
+        else if (tool === 'fill-box')
+            rectBetween().eachCell(add);
+        else if (tool === 'circ-in-rect' || tool === 'circ-in-rect-filled') {
+            const rect = this.paintingShift ? (0,shapes/* squareBetween */.iV)(a, b) : rectBetween();
+            if (tool === 'circ-in-rect-filled') {
+                const { cx, cy, rx, ry } = (0,shapes/* ellipseFromRect */.Dg)(rect);
                 (0,shapes/* eachEllipseFill */.xh)(cx, cy, rx, ry, add);
             }
             else
-                (0,shapes/* eachEllipseBorderRect */.QI)(r.ul.x, r.ul.y, r.br.x, r.br.y, add);
+                (0,shapes/* eachEllipseBorderRect */.QI)(rect.ul.x, rect.ul.y, rect.br.x, rect.br.y, add);
         }
-        else if (t === 'circ-radius' || t === 'circ-radius-filled') {
-            const r = this.toRectFromCenter(a, b, this.paintingShift);
-            if (t === 'circ-radius-filled') {
-                const { cx, cy, rx, ry } = (0,shapes/* ellipseFromRect */.Dg)(r);
+        else if (tool === 'circ-radius' || tool === 'circ-radius-filled') {
+            const rect = (0,shapes/* rectFromCenter */.er)(a, b, this.paintingShift);
+            if (tool === 'circ-radius-filled') {
+                const { cx, cy, rx, ry } = (0,shapes/* ellipseFromRect */.Dg)(rect);
                 (0,shapes/* eachEllipseFill */.xh)(cx, cy, rx, ry, add);
             }
             else
-                (0,shapes/* eachEllipseBorderRect */.QI)(r.ul.x, r.ul.y, r.br.x, r.br.y, add);
+                (0,shapes/* eachEllipseBorderRect */.QI)(rect.ul.x, rect.ul.y, rect.br.x, rect.br.y, add);
         }
-        this.copyBuf = mode === 'layer' ? { mode, layer: this.panel.layer, layers } : { mode, cells };
+        this.copyBuf = mode === 'layer'
+            ? { mode, layer: this.panel.layer, layers }
+            : { mode, cells };
         this.updateCopyInfo();
     }
-    pasteCopyAt(x0, y0) {
+    pasteCopyAt(origin) {
         if (!this.copyBuf)
             return;
         const ops = [];
         const pushIfChanged = (xy, before) => {
             const after = this.recordCell(this.map.get(xy));
             if (before.length !== after.length || before.some((n, i) => n !== after[i]))
-                ops.push({ x: xy.x, y: xy.y, type: 'set', names: before });
+                ops.push({ xy, type: 'set', names: before });
         };
         if (this.copyBuf.mode === 'layer') {
             const layer = this.copyBuf.layer;
-            for (const it of this.copyBuf.layers || []) {
+            for (const item of this.copyBuf.layers || []) {
                 if (this.stuttered(this.op === 'paint'))
                     continue;
-                const xy = game_xy.XY.at(x0 + it.dx, y0 + it.dy);
+                const xy = origin.add(item.dx, item.dy);
                 if (game_xy.XY.oob(xy.x, xy.y))
                     continue;
                 const cell = this.map.get(xy);
                 const before = this.recordCell(cell);
                 if (this.op !== 'paint') {
-                    const d = cell.get(layer);
-                    if (d)
-                        cell.died(d);
+                    const drawable = cell.get(layer);
+                    if (drawable)
+                        cell.died(drawable);
                 }
                 else if (!cell.occupied(layer)) {
-                    const d = cell_types/* CellTypes */.I.make(it.name);
-                    if (d)
-                        cell.create(d);
+                    cell.create(drawable_types/* DrawableType */.Z.make(item.symbol, item.name));
                 }
                 pushIfChanged(xy, before);
             }
         }
         else {
-            // clear destination cells first if painting
             const perCell = {};
-            for (const it of this.copyBuf.cells || []) {
-                const key = `${it.dx},${it.dy}`;
-                perCell[key] = it.names;
+            for (const item of this.copyBuf.cells || []) {
+                const key = `${item.dx},${item.dy}`;
+                perCell[key] = item.items;
             }
             for (const key of Object.keys(perCell)) {
                 if (this.stuttered(this.op === 'paint'))
                     continue;
-                const [dxs, dys] = key.split(',');
-                const xy = game_xy.XY.at(x0 + parseInt(dxs, 10), y0 + parseInt(dys, 10));
+                const [dxString, dyString] = key.split(',');
+                const xy = origin.add(parseInt(dxString, 10), parseInt(dyString, 10));
                 if (game_xy.XY.oob(xy.x, xy.y))
                     continue;
                 const cell = this.map.get(xy);
                 const before = this.recordCell(cell);
-                const names = perCell[key];
+                const items = perCell[key];
                 if (this.op === 'paint') {
-                    // clear all then place
-                    cell.clearAll();
-                    names.forEach((n) => { const d = cell_types/* CellTypes */.I.make(n); if (d)
-                        cell.create(d); });
+                    game_layers/* CellLayers */.v.layerNames
+                        .filter(n => n !== 'floor')
+                        .forEach(n => cell.clear(n));
+                    items.forEach(item => {
+                        if (item.name === 'Floor')
+                            return;
+                        cell.create(drawable_types/* DrawableType */.Z.make(item.symbol, item.name));
+                    });
                 }
                 else {
-                    // erasing: clear all or current
                     if (this.op === 'erase-cell')
-                        cell.clearAll();
+                        game_layers/* CellLayers */.v.layerNames
+                            .filter(n => n !== 'floor')
+                            .forEach(n => cell.clear(n));
                     else {
                         const layer = this.panel.layer;
-                        const d = cell.get(layer);
-                        if (d)
-                            cell.died(d);
+                        const drawable = cell.get(layer);
+                        if (drawable)
+                            cell.died(drawable);
                     }
                 }
                 pushIfChanged(xy, before);
@@ -17117,17 +17509,17 @@ class Editor {
         this.pushUndo(ops);
         this.drawMap();
     }
-    previewPasteAt(x, y) {
+    previewPasteAt(at) {
         if (!this.copyBuf) {
             this.map.uiRenderer.remove(this.pasteId);
             return;
         }
         this.withStroke(this.pasteId, UI.pasteZ, () => !!this.copyBuf, s => {
             const addAt = (dx, dy) => {
-                const tx = x + dx, ty = y + dy;
-                if (game_xy.XY.oob(tx, ty))
+                const xy = at.add(dx, dy);
+                if (game_xy.XY.oob(xy.x, xy.y))
                     return;
-                const cell = this.map.get(game_xy.XY.at(tx, ty));
+                const cell = this.map.get(xy);
                 s.add(cell, '*');
             };
             if (this.copyBuf.mode === 'layer')
@@ -17139,27 +17531,53 @@ class Editor {
         });
     }
     updateCopyInfo() {
-        const cxl = document.getElementById('copy-cancel');
-        const paste = document.getElementById('paste-btn');
-        const n = this.copyBuf?.mode === 'layer' ? (this.copyBuf.layers?.length || 0) : (this.copyBuf?.cells?.length || 0);
-        if (n) {
-            cxl.textContent = this.copyBuf.mode === 'layer' ? `cxl (${n} ${this.panel.layer})` : `cxl (${n} cells)`;
-            cxl.disabled = false;
-            paste.disabled = false;
+        const cancelBtn = (0,html.d1)('#copy-cancel');
+        const pasteBtn = (0,html.d1)('#paste-btn');
+        const rotateLeftBtn = (0,html.d1)('#rotate-left');
+        const rotateRightBtn = (0,html.d1)('#rotate-right');
+        const count = this.copyBuf?.mode === 'layer'
+            ? (this.copyBuf.layers?.length || 0)
+            : (this.copyBuf?.cells?.length || 0);
+        if (count) {
+            const label = this.copyBuf.mode === 'layer'
+                ? `cxl (${count} ${this.panel.layer})`
+                : `cxl (${count} cells)`;
+            cancelBtn.text(label).disable(false);
+            pasteBtn.disable(false);
+            rotateLeftBtn.show().disable(false);
+            rotateRightBtn.show().disable(false);
         }
         else {
-            cxl.textContent = 'cxl';
-            cxl.disabled = true;
-            paste.disabled = true;
+            cancelBtn.text('cxl').disable(true);
+            pasteBtn.disable(true);
             this.map.uiRenderer.remove(this.pasteId);
+            rotateLeftBtn.hide().disable(true);
+            rotateRightBtn.hide().disable(true);
         }
-        cxl.onclick = () => { this.clearCopy(); this.drawMap(); };
-        paste.onclick = () => { if (this.hovered) {
-            this.pasteCopyAt(this.hovered.x, this.hovered.y);
-        } };
-        // Disable tool buttons while in paste mode
-        const toolRow = document.getElementById('tool-row');
-        [...toolRow.querySelectorAll('button')].forEach(b => b.disabled = !!n);
+        cancelBtn.onClick(() => { this.clearCopy(); this.drawMap(); });
+        pasteBtn.onClick(() => { if (this.hovered)
+            this.pasteCopyAt(this.hovered); });
+        rotateLeftBtn.onClick(() => this.rotateCopy('left'));
+        rotateRightBtn.onClick(() => this.rotateCopy('right'));
+        const toolRow = (0,html.d1)('#tool-row');
+        toolRow.selectAll('button').property('disabled', !!count);
+    }
+    rotateCopy(direction) {
+        if (!this.copyBuf)
+            return;
+        const rotatePair = (dx, dy) => direction === 'right' ? { dx: dy, dy: -dx } : { dx: -dy, dy: dx };
+        if (this.copyBuf.mode === 'layer')
+            this.copyBuf.layers = this.copyBuf.layers?.map(layerItem => {
+                const rotated = rotatePair(layerItem.dx, layerItem.dy);
+                return { ...layerItem, dx: rotated.dx, dy: rotated.dy };
+            });
+        else
+            this.copyBuf.cells = this.copyBuf.cells?.map(cellItem => {
+                const rotated = rotatePair(cellItem.dx, cellItem.dy);
+                return { ...cellItem, dx: rotated.dx, dy: rotated.dy };
+            });
+        if (this.hovered)
+            this.previewPasteAt(this.hovered);
     }
     clearCopy() { this.copyBuf = null; this.map.uiRenderer.remove(this.pasteId); this.updateCopyInfo(); }
     clearPreview() { this.map.uiRenderer.remove(this.shapeId); ui_renderer/* Repaint */.G2.emit(); }
@@ -17167,30 +17585,28 @@ class Editor {
         // If we have a copy, paste on mouseup; ignore shapes
         if (this.copyBuf && this.origin && this.lastTarget) {
             const at = this.lastTarget.xy;
-            this.pasteCopyAt(at.x, at.y);
+            this.pasteCopyAt(at);
             this.map.uiRenderer.remove(this.pasteId);
             this.clearPreview();
             return;
         }
-        const t = this.panel.tool;
-        // Paste on simple click if a copy buffer exists
+        const tool = this.panel.tool;
         if (this.copyBuf && this.origin && this.lastTarget &&
             game_xy.XY.matches(this.origin, this.lastTarget.xy)) {
-            this.pasteCopyAt(this.origin.x, this.origin.y);
+            this.pasteCopyAt(this.origin);
             this.map.uiRenderer.remove(this.pasteId);
             this.clearPreview();
             return;
         }
-        // Capture copy on drag with C held (left-drag only)
         if (this.op === 'paint' && window.keydownC &&
             this.origin && this.lastTarget) {
             this.clearCopy();
-            this.captureCopyShape(this.origin.x, this.origin.y, this.lastTarget.xy.x, this.lastTarget.xy.y);
+            this.captureCopyShape(this.origin, this.lastTarget.xy);
             this.updateCopyInfo();
             this.clearPreview();
             return;
         }
-        const commit = this.commitHandlers[t];
+        const commit = this.commitHandlers[tool];
         if (commit) {
             commit();
             return;
@@ -17201,12 +17617,12 @@ class Editor {
         this.panel.setCell(cell);
         this.hovered = cell.xy;
         if (this.copyBuf && this.hovered)
-            this.previewPasteAt(this.hovered.x, this.hovered.y);
+            this.previewPasteAt(this.hovered);
         if (!this.painting || !cell)
             return;
-        const t = this.panel.tool;
+        const tool = this.panel.tool;
         let target = cell;
-        if (t === 'line' && this.paintingShift && this.origin) {
+        if (tool === 'line' && this.paintingShift && this.origin) {
             const dx = cell.xy.x - this.origin.x;
             const dy = cell.xy.y - this.origin.y;
             if (!this.lock && (dx !== 0 || dy !== 0))
@@ -17217,13 +17633,11 @@ class Editor {
                 target = this.map.get(game_xy.XY.at(this.origin.x, cell.xy.y));
         }
         this.lastTarget = target;
-        if (window.keydownC)
-            return;
         if (this.copyBuf)
             return; // suppress shape previews while copy loaded
-        const prev = this.previewHandlers[t];
-        if (prev)
-            prev(target);
+        const preview = this.previewHandlers[tool];
+        if (preview)
+            preview(target);
     }
     stroke(cell) {
         if (window.keydownC)
@@ -17252,8 +17666,22 @@ class Editor {
         this.drawMap();
     }
     eraseCell(cell) {
-        cell.clearAll();
+        game_layers/* CellLayers */.v.layerNames
+            .filter(n => n !== 'floor')
+            .forEach(n => cell.clear(n));
         this.drawMap();
+    }
+    updateLightingEnabled() {
+        if (this.showLighting || this.showDarkness) {
+            this.map.lighting.enable();
+            this.map.eachCell(cell => {
+                if (cell.layers.lit())
+                    this.map.lighting.add(cell);
+            });
+            this.map.lighting.redraw();
+        }
+        else
+            this.map.lighting.disable();
     }
     init() {
         this.map.fill(() => new floor/* Floor */.Z());
@@ -17264,74 +17692,64 @@ class Editor {
         this.hide('#help-button');
         this.hide('#save-group');
         this.hide('#step-info');
-        const dbg = document.getElementById('debug-controls');
-        if (dbg)
-            dbg.classList.remove('hidden');
-        const btn = document.getElementById('copy-cancel');
-        if (btn)
-            btn.addEventListener('click', () => { this.copyBuf = null; this.updateCopyInfo(); });
-        const undoBtn = document.getElementById('undo-btn');
-        if (undoBtn)
-            undoBtn.addEventListener('click', this.undo);
-        const copyFrag = document.getElementById('copy-fragment');
-        if (copyFrag)
-            copyFrag.addEventListener('click', async () => {
-                const txt = this.renderCroppedFragment();
-                try {
-                    await navigator.clipboard.writeText(txt);
-                }
-                catch { }
-            });
-        const submitFrag = document.getElementById('submit-fragment');
-        if (submitFrag)
-            submitFrag.addEventListener('click', () => {
-                const txt = this.renderCroppedFragment();
-                const title = 'Editor: map fragment';
-                const body = `\n\n\`\`\`\n${txt}\n\`\`\``;
-                this.feedback.show();
-                this.feedback.prefill(title, body);
-            });
-        const showFrag = document.getElementById('show-fragment');
-        if (showFrag)
-            showFrag.addEventListener('click', () => {
-                const txt = this.renderCroppedFragment();
-                const pre = document.getElementById('fragment-text');
-                if (pre)
-                    pre.textContent = txt;
-                const v = document.getElementById('fragment-preview');
-                if (v) {
-                    v.classList.remove('hidden');
-                    requestAnimationFrame(() => this.centerFragment(v));
-                }
-            });
-        const closeFrag = document.getElementById('fragment-close');
-        if (closeFrag)
-            closeFrag.addEventListener('click', () => {
-                const v = document.getElementById('fragment-preview');
-                if (v) {
-                    v.classList.add('hidden');
-                    v.style.left = '';
-                    v.style.top = '';
-                }
-            });
+        (0,html.d1)('#debug-controls').show();
+        (0,html.d1)('#game-button').show();
+        (0,html.d1)('#game-button').onClick(() => { location.href = location.pathname; });
+        (0,html.d1)('#copy-cancel').onClick(() => { this.copyBuf = null; this.updateCopyInfo(); });
+        (0,html.d1)('#undo-btn').onClick(this.undo);
+        (0,html.d1)('#copy-fragment').onClick(async () => {
+            const txt = this.renderCroppedFragment();
+            try {
+                await navigator.clipboard.writeText(txt);
+            }
+            catch { }
+        });
+        (0,html.d1)('#submit-fragment').onClick(() => {
+            const txt = this.renderCroppedFragment();
+            const title = 'Editor: map fragment';
+            const body = `\n\n\`\`\`\n${txt}\n\`\`\``;
+            this.feedback.show();
+            this.feedback.prefill(title, body);
+        });
+        (0,html.d1)('#show-fragment').onClick(() => {
+            const txt = this.renderCroppedFragment();
+            (0,html.d1)('#fragment-text').text(txt);
+            const v = (0,html.d1)('#fragment-preview');
+            v.show();
+            requestAnimationFrame(() => this.centerFragment(v));
+        });
+        (0,html.d1)('#fragment-close').onClick(() => {
+            (0,html.d1)('#fragment-preview').hide().style('left', '').style('top', '');
+        });
+        (0,html.d1)('#load-fragment').onClick(() => {
+            this.showFragmentLoader();
+        });
+        (0,html.d1)('#fragment-loader-close').onClick(() => {
+            (0,html.d1)('#fragment-loader').hide();
+        });
+        (0,html.d1)('#lighting-toggle').onClick(this.toggleLighting);
+        (0,html.d1)('#darkness-toggle').onClick(this.toggleDarkness);
+        (0,html.d1)('#clear-map').onClick(this.clearMap);
         window.keydownC = false;
         window.addEventListener('keydown', this.onKeyDown);
         window.addEventListener('keyup', this.onKeyUp);
         this.updateCopyInfo();
     }
     setupLayerControls() {
-        (0,utils/* onClick */.Af)((0,utils.$1)('debug-toggle'), () => (0,utils/* toggleHidden */.N2)((0,utils.$1)('debug-controls')));
-        (0,utils/* onClick */.Af)((0,utils.$1)('layer-on'), () => this.turnOnAll());
-        (0,utils/* onClick */.Af)((0,utils.$1)('layer-off'), () => this.turnOffAll());
-        const grp = (0,utils.$1)('layer-group');
-        const abbr = (0,utils/* toMap */.J9)(game_layers/* CellLayers */.v.layerNames, n => n.slice(0, 3));
-        game_layers/* CellLayers */.v.layerNames.forEach(n => {
-            const b = document.createElement('button');
-            b.id = `layer-${n}`;
-            b.className = 'button-secondary';
-            b.textContent = abbr[n] || n.slice(0, 3);
-            grp.appendChild(b);
-            (0,utils/* onClick */.Af)(b, () => this.toggleLayer(n));
+        (0,html.d1)('#debug-toggle').onClick(() => {
+            const dbg = (0,html.d1)('#debug-controls');
+            dbg.showing() ? dbg.hide() : dbg.show();
+        });
+        (0,html.d1)('#layer-on').onClick(() => this.turnOnAll());
+        (0,html.d1)('#layer-off').onClick(() => this.turnOffAll());
+        const group = (0,html.d1)('#layer-group');
+        const abbreviations = (0,utils/* toMap */.J9)(game_layers/* CellLayers */.v.layerNames, layer => layer.slice(0, 3));
+        game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
+            const button = group.append('button')
+                .attr('id', `layer-${layerName}`)
+                .classed('button-secondary', true)
+                .text(abbreviations[layerName] || layerName.slice(0, 3));
+            button.on('click', () => this.toggleLayer(layerName));
         });
     }
     getVisible() {
@@ -17341,45 +17759,96 @@ class Editor {
             return new Set();
         return new Set(game_layers/* CellLayers */.v.layerNames.filter(l => !this.muted.has(l)));
     }
-    toggleLayer(n) {
-        const b = (0,utils.$1)(`layer-${n}`);
-        if (this.solo === n) {
+    toggleLayer(layerName) {
+        const button = (0,html.d1)(`#layer-${layerName}`);
+        if (this.solo === layerName) {
             this.solo = null;
-            b.classList.remove('solo');
+            button.classed('solo', false);
         }
         else if (this.solo) {
-            const old = (0,utils.$1)(`layer-${this.solo}`);
-            old.classList.remove('solo');
-            this.solo = n;
-            b.classList.add('solo');
+            (0,html.d1)(`#layer-${this.solo}`).classed('solo', false);
+            this.solo = layerName;
+            button.classed('solo', true);
         }
-        else if (this.muted.has(n)) {
-            this.muted.delete(n);
-            b.classList.remove('muted');
+        else if (this.muted.has(layerName)) {
+            this.muted.delete(layerName);
+            button.classed('muted', false);
         }
         else {
-            this.muted.add(n);
-            b.classList.add('muted');
+            this.muted.add(layerName);
+            button.classed('muted', true);
         }
         this.drawMap();
     }
     turnOnAll() {
         this.muted.clear();
         this.solo = null;
-        game_layers/* CellLayers */.v.layerNames.forEach(n => (0,utils.$1)(`layer-${n}`).classList.remove('muted', 'solo'));
+        game_layers/* CellLayers */.v.layerNames.forEach(n => (0,html.d1)(`#layer-${n}`).classed('muted', false).classed('solo', false));
         this.drawMap();
     }
     turnOffAll() {
         this.solo = null;
         this.muted = new Set(game_layers/* CellLayers */.v.layerNames);
-        game_layers/* CellLayers */.v.layerNames.forEach(n => { const b = (0,utils.$1)(`layer-${n}`); b.classList.remove('solo'); b.classList.add('muted'); });
+        game_layers/* CellLayers */.v.layerNames.forEach(n => {
+            const b = (0,html.d1)(`#layer-${n}`);
+            b.classed('solo', false).classed('muted', true);
+        });
         this.drawMap();
     }
     drawMap() {
-        const v = this.getVisible();
+        this.map.lighting.redraw();
+        const visible = this.getVisible();
         const showNothing = this.muted.size === game_layers/* CellLayers */.v.layerNames.length;
         const debug = this.muted.size > 0 || this.solo !== null;
-        this.map.draw(false, v, showNothing, debug, false);
+        this.map.draw(this.showLighting, visible, showNothing, debug, this.showDarkness);
+    }
+    async showFragmentLoader() {
+        const loader = (0,html.d1)('#fragment-loader');
+        const list = (0,html.d1)('#fragment-list');
+        const fragmentContext = __webpack_require__(612);
+        const fragmentFiles = fragmentContext.keys();
+        const fragmentData = fragmentFiles.map((path) => ({
+            name: path.replace('./', '').replace('.txt', ''),
+            path: path,
+            content: fragmentContext(path).default || fragmentContext(path)
+        }));
+        list.dList('.fragment-file').updateFrom(fragmentData, (btn, fragment) => {
+            btn.text(fragment.name);
+            btn.onClick(async () => {
+                this.loadFragmentToCopyBuffer(fragment.content);
+                loader.hide();
+            });
+        });
+        loader.show();
+        requestAnimationFrame(() => this.centerFragment(loader));
+    }
+    loadFragmentToCopyBuffer(text) {
+        const parsed = fragment/* Fragment */.F.parse(text);
+        const cells = [];
+        // Check for unknown types and add them as editor items
+        Object.entries(parsed.key).forEach(([symbol, typeName]) => {
+            if (typeName === 'Floor')
+                return;
+            if (!drawable_types/* DrawableType */.Z.registry[typeName])
+                this.defs.register({ symbol, name: typeName });
+        });
+        if (this.defs.extraDefs().length > 0)
+            this.panel.setEditorItems(this.defs.extraDefs());
+        // Parse the fragment and convert to copy buffer format
+        parsed.grid.forEach((row, y) => {
+            for (let x = 0; x < row.length; x++) {
+                const symbol = row[x];
+                if (symbol && symbol !== '.') {
+                    const typeName = parsed.key[symbol];
+                    if (typeName && typeName !== 'Floor')
+                        cells.push({ dx: x, dy: y, items: [{ name: typeName, symbol }] });
+                }
+            }
+        });
+        // Set the copy buffer
+        this.copyBuf = { mode: 'cells', cells };
+        this.origin = game_xy.XY.at(0, 0);
+        this.updateCopyInfo();
     }
 }
 
@@ -17443,6 +17912,8 @@ async function init() {
     }
 }
 window.addEventListener('DOMContentLoaded', init);
+
+})();
 
 /******/ })()
 ;
