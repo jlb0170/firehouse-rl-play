@@ -1,10 +1,10 @@
 /******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 88:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   XY: () => (/* binding */ XY)
@@ -76,7 +76,6 @@ XY.at = (x, y) => new XY(x, y);
 /***/ 225:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   z: () => (/* binding */ Lamp)
 /* harmony export */ });
@@ -118,7 +117,6 @@ class Lamp extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
 /***/ 239:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   j: () => (/* binding */ Wall)
 /* harmony export */ });
@@ -152,7 +150,6 @@ class Wall extends _drawable__WEBPACK_IMPORTED_MODULE_1__/* .Drawable */ .h {
 /***/ 334:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   H: () => (/* binding */ Signal),
 /* harmony export */   Y: () => (/* binding */ SignalWithCurrent)
@@ -203,92 +200,45 @@ class SignalWithCurrent extends Signal {
 
 /***/ }),
 
-/***/ 467:
+/***/ 452:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   d1: () => (/* binding */ d1)
 /* harmony export */ });
-/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9447);
+/* unused harmony export dListFor */
+/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9273);
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(8227);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6185);
 
 
+
+const S = d3_selection__WEBPACK_IMPORTED_MODULE_2__/* ["default"] */ .Ay;
+S.prototype.updateFrom = function (d, on, miss) { d == null ? miss() : on(d); return this; };
+S.prototype.d1 = function (sel) { const c = this.select(sel); (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(c.node(), `Child element not found: ${sel}`); return c; };
+S.prototype.dList = function (sel) { return dListFor(this, sel); };
+S.prototype.focus = function () { const n = this.node(); (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(n?.focus, 'Node or focus not found'); n.focus(); };
+S.prototype.show = function () { const n = this.node(); if (n)
+    n.classList.remove('hidden'); return this; };
+S.prototype.hide = function () { const n = this.node(); if (n)
+    n.classList.add('hidden'); return this; };
+S.prototype.showing = function () { const n = this.node(); return n ? !n.classList.contains('hidden') : false; };
+S.prototype.getVal = function () { const n = this.node(); return n?.value || ''; };
+S.prototype.setVal = function (v) { const n = this.node(); if (n)
+    n.value = v; return this; };
+S.prototype.trimmed = function () { return this.getVal().trim(); };
+S.prototype.disable = function (b) { const n = this.node(); if (n && 'disabled' in n)
+    n.disabled = b; return this; };
+S.prototype.enable = function (b) { const n = this.node(); if (n && 'disabled' in n)
+    n.disabled = !b; return this; };
+S.prototype.onClick = function (h) { this.on('click', h); return this; };
+S.prototype.onInput = function (h) { this.on('input', h); return this; };
+S.prototype.onKeyDown = function (h) { this.on('keydown', h); return this; };
+S.prototype.href = function (u) { this.attr('href', u); return this; };
+S.prototype.htmlData = function (n) { const el = this.node(); return el ? el.getAttribute(`data-${n}`) : null; };
+S.prototype.bounds = function () { const el = this.node(); (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(el, 'Node not found for bounds()'); return el.getBoundingClientRect(); };
 const templateCache = new Map();
 let templateIdCounter = 0;
-function addMethodsToTypedSel(typedSel) {
-    const enhanced = typedSel;
-    enhanced.updateFrom = function (data, onExisting, onMissing) {
-        return data === null ? onMissing() : onExisting(data);
-    };
-    enhanced.d1 = function (selector) {
-        const childSel = this.select(selector);
-        (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(childSel.node(), `Child element not found: ${selector}`);
-        return addMethodsToTypedSel(childSel);
-    };
-    enhanced.dList = function (selector) { return dListFor(this, selector); };
-    enhanced.focus = function () {
-        const node = this.node();
-        (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(node && typeof node.focus === 'function', 'Node or focus not found');
-        node.focus();
-    };
-    enhanced.show = function () {
-        const node = this.node();
-        if (node)
-            node.classList.remove('hidden');
-        return this;
-    };
-    enhanced.hide = function () {
-        const node = this.node();
-        if (node)
-            node.classList.add('hidden');
-        return this;
-    };
-    enhanced.showing = function () {
-        const node = this.node();
-        return node ? !node.classList.contains('hidden') : false;
-    };
-    enhanced.getVal = function () {
-        const node = this.node();
-        return node?.value || '';
-    };
-    enhanced.trimmed = function () { return this.getVal().trim(); };
-    enhanced.setVal = function (value) {
-        const node = this.node();
-        if (node)
-            node.value = value;
-        return this;
-    };
-    enhanced.disable = function (disabled) {
-        const node = this.node();
-        if (node && 'disabled' in node)
-            node.disabled = disabled;
-        return this;
-    };
-    enhanced.enable = function (enabled) {
-        const node = this.node();
-        if (node && 'disabled' in node)
-            node.disabled = !enabled;
-        return this;
-    };
-    enhanced.onClick = function (handler) { this.on('click', handler); return this; };
-    enhanced.onInput = function (handler) { this.on('input', handler); return this; };
-    enhanced.onKeyDown = function (handler) {
-        this.on('keydown', handler);
-        return this;
-    };
-    enhanced.href = function (url) { this.attr('href', url); return this; };
-    enhanced.htmlData = function (n) {
-        const node = this.node();
-        return node ? node.getAttribute(`data-${n}`) : null;
-    };
-    enhanced.bounds = function () {
-        const node = this.node();
-        (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(node, 'Node not found for bounds()');
-        return node.getBoundingClientRect();
-    };
-    return enhanced;
-}
 function dListFor(parent, selector) {
     const parentNode = parent.node();
     (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(parentNode, 'Parent node missing for dList');
@@ -306,8 +256,9 @@ function dListFor(parent, selector) {
         templateCache.set(templateId, template);
         parentNode.setAttribute(templateAttr, templateId);
     }
-    else
+    else {
         template = templateCache.get(templateId);
+    }
     return {
         updateFrom(data, onNodeAndDatum) {
             const items = parent.selectAll(selector).data(data);
@@ -315,7 +266,7 @@ function dListFor(parent, selector) {
             const enterItems = items.enter().append(() => template.cloneNode(true));
             const allItems = enterItems.merge(items);
             allItems.each(function (datum) {
-                const itemSel = addMethodsToTypedSel(d3__WEBPACK_IMPORTED_MODULE_0__/* .select */ .Ltv(this));
+                const itemSel = d3__WEBPACK_IMPORTED_MODULE_0__/* .select */ .Ltv(this);
                 onNodeAndDatum(itemSel, datum);
             });
         }
@@ -324,71 +275,17 @@ function dListFor(parent, selector) {
 const d1 = (selector) => {
     const sel = d3__WEBPACK_IMPORTED_MODULE_0__/* .select */ .Ltv(selector);
     (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(sel.node(), `Element not found: ${selector}`);
-    const enhanced = sel;
-    enhanced.appendFileHtml = function (htmlContent) {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlContent, 'text/html');
+    const x = sel;
+    x.appendFileHtml = function (htmlContent) {
+        const doc = new DOMParser().parseFromString(htmlContent, 'text/html');
         const fileDiv = doc.body.firstElementChild;
         (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(fileDiv && fileDiv.tagName === 'DIV' && fileDiv.id, 'Template must start with a div element with an id');
-        const targetNode = this.node();
-        (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(targetNode, 'Target div not found');
-        (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(targetNode.id === fileDiv.id, `ID mismatch: target=${targetNode.id}, file=${fileDiv.id}`);
-        targetNode.innerHTML = fileDiv.innerHTML;
+        const target = this.node();
+        (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(target, 'Target div not found');
+        (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(target.id === fileDiv.id, `ID mismatch: target=${target.id}, file=${fileDiv.id}`);
+        target.innerHTML = fileDiv.innerHTML;
     };
-    enhanced.d1 = function (selector) {
-        const childSel = this.select(selector);
-        (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(childSel.node(), `Child element not found: ${selector}`);
-        return addMethodsToTypedSel(childSel);
-    };
-    enhanced.dList = function (selector) { return dListFor(this, selector); };
-    enhanced.show = function () { const n = this.node(); if (n)
-        n.classList.remove('hidden'); return this; };
-    enhanced.hide = function () { const n = this.node(); if (n)
-        n.classList.add('hidden'); return this; };
-    enhanced.showing = function () {
-        const node = this.node();
-        return node ? !node.classList.contains('hidden') : false;
-    };
-    enhanced.getVal = function () {
-        const node = this.node();
-        return node?.value || '';
-    };
-    enhanced.trimmed = function () { return this.getVal().trim(); };
-    enhanced.setVal = function (value) {
-        const node = this.node();
-        if (node)
-            node.value = value;
-        return this;
-    };
-    enhanced.disable = function (disabled) {
-        const node = this.node();
-        if (node && 'disabled' in node)
-            node.disabled = disabled;
-        return this;
-    };
-    enhanced.enable = function (enabled) {
-        const node = this.node();
-        if (node && 'disabled' in node)
-            node.disabled = !enabled;
-        return this;
-    };
-    enhanced.onClick = function (handler) { this.on('click', handler); return this; };
-    enhanced.onInput = function (handler) { this.on('input', handler); return this; };
-    enhanced.onKeyDown = function (handler) {
-        this.on('keydown', handler);
-        return this;
-    };
-    enhanced.href = function (url) { this.attr('href', url); return this; };
-    enhanced.htmlData = function (n) {
-        const node = this.node();
-        return node ? node.getAttribute(`data-${n}`) : null;
-    };
-    enhanced.bounds = function () {
-        const node = this.node();
-        (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bombUnless */ .Nb)(node, 'Node not found for bounds()');
-        return node.getBoundingClientRect();
-    };
-    return enhanced;
+    return x;
 };
 
 
@@ -397,7 +294,6 @@ const d1 = (selector) => {
 /***/ 540:
 /***/ ((module) => {
 
-"use strict";
 
 
 /* istanbul ignore next  */
@@ -411,44 +307,45 @@ module.exports = insertStyleElement;
 
 /***/ }),
 
-/***/ 612:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ 574:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-var map = {
-	"./apartment-big.txt": 4806,
-	"./apartment-complex.txt": 9620,
-	"./house.txt": 5833,
-	"./intro-barracks.txt": 4461,
-	"./level1.txt": 4648,
-	"./test-editor-items.txt": 9444
-};
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+function none() {}
 
-
-function webpackContext(req) {
-	var id = webpackContextResolve(req);
-	return __webpack_require__(id);
+/* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(selector) {
+  return selector == null ? none : function() {
+    return this.querySelector(selector);
+  };
 }
-function webpackContextResolve(req) {
-	if(!__webpack_require__.o(map, req)) {
-		var e = new Error("Cannot find module '" + req + "'");
-		e.code = 'MODULE_NOT_FOUND';
-		throw e;
-	}
-	return map[req];
+
+
+/***/ }),
+
+/***/ 747:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+function empty() {
+  return [];
 }
-webpackContext.keys = function webpackContextKeys() {
-	return Object.keys(map);
-};
-webpackContext.resolve = webpackContextResolve;
-module.exports = webpackContext;
-webpackContext.id = 612;
+
+/* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(selector) {
+  return selector == null ? empty : function() {
+    return this.querySelectorAll(selector);
+  };
+}
+
 
 /***/ }),
 
 /***/ 891:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   t: () => (/* binding */ Stroke)
 /* harmony export */ });
@@ -474,7 +371,6 @@ class Stroke {
 /***/ 1073:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -525,10 +421,7 @@ class PropItem extends drawable/* Drawable */.h {
     }
 }
 
-// EXTERNAL MODULE: ./src/utils.ts
-var utils = __webpack_require__(6185);
 ;// ./src/game/drawable-types.ts
-
 
 
 
@@ -566,12 +459,7 @@ DrawableType.registry = {
 };
 DrawableType.make = (symbol, name) => {
     const f = DrawableType.registry[name];
-    if (f) {
-        const drawable = f();
-        (0,utils/* bombUnless */.Nb)(drawable.char() === symbol, `Symbol mismatch: expected '${symbol}' but ${name} has char '${drawable.char()}'`);
-        return drawable;
-    }
-    return new editor_item/* EditorItem */.R(symbol, name);
+    return f ? f() : new editor_item/* EditorItem */.R(symbol, name);
 };
 
 
@@ -580,7 +468,6 @@ DrawableType.make = (symbol, name) => {
 /***/ 1113:
 /***/ ((module) => {
 
-"use strict";
 
 
 /* istanbul ignore next  */
@@ -601,7 +488,6 @@ module.exports = styleTagTransform;
 /***/ 1208:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
@@ -1192,7 +1078,6 @@ body {
 /***/ 1267:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   v: () => (/* binding */ Fire)
 /* harmony export */ });
@@ -1247,7 +1132,6 @@ class Fire extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
 /***/ 1364:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -6779,7 +6663,6 @@ const Text = (/* unused pure expression or super */ null && (text));
 /***/ 1485:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   m: () => (/* binding */ TextStroke)
 /* harmony export */ });
@@ -6819,7 +6702,6 @@ class TextStroke {
 /***/ 1601:
 /***/ ((module) => {
 
-"use strict";
 
 
 module.exports = function (i) {
@@ -6831,7 +6713,6 @@ module.exports = function (i) {
 /***/ 1721:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   h: () => (/* binding */ Drawable)
 /* harmony export */ });
@@ -6926,7 +6807,6 @@ Drawable.nextId = 0;
 /***/ 1877:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   YZ: () => (/* binding */ Task),
 /* harmony export */   k$: () => (/* binding */ TASK_COLOR),
@@ -6965,7 +6845,6 @@ class Task {
 /***/ 1919:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Jy: () => (/* binding */ Colors),
 /* harmony export */   LS: () => (/* binding */ BONE),
@@ -7025,7 +6904,6 @@ const LAMP = new Colors(['#ccffff', '#99ddff', '#66ccff']);
 /***/ 2483:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   $: () => (/* binding */ Door)
 /* harmony export */ });
@@ -7062,7 +6940,6 @@ class Door extends _drawable__WEBPACK_IMPORTED_MODULE_1__/* .Drawable */ .h {
 /***/ 2615:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   R: () => (/* binding */ Lighting),
 /* harmony export */   c: () => (/* binding */ COLOR_INTENSITY)
@@ -7251,7 +7128,6 @@ class Lighting {
 /***/ 2705:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -7462,7 +7338,6 @@ Pawn.HOVER_PATH_COLOR = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy([
 /***/ 2994:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   G5: () => (/* binding */ PLANT),
 /* harmony export */   SN: () => (/* binding */ MEAT),
@@ -7582,10 +7457,56 @@ class Material {
 
 /***/ }),
 
+/***/ 3683:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
+/* harmony export */   j: () => (/* binding */ styleValue)
+/* harmony export */ });
+/* harmony import */ var _window_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6747);
+
+
+function styleRemove(name) {
+  return function() {
+    this.style.removeProperty(name);
+  };
+}
+
+function styleConstant(name, value, priority) {
+  return function() {
+    this.style.setProperty(name, value, priority);
+  };
+}
+
+function styleFunction(name, value, priority) {
+  return function() {
+    var v = value.apply(this, arguments);
+    if (v == null) this.style.removeProperty(name);
+    else this.style.setProperty(name, v, priority);
+  };
+}
+
+/* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(name, value, priority) {
+  return arguments.length > 1
+      ? this.each((value == null
+            ? styleRemove : typeof value === "function"
+            ? styleFunction
+            : styleConstant)(name, value, priority == null ? "" : priority))
+      : styleValue(this.node(), name);
+}
+
+function styleValue(node, name) {
+  return node.style.getPropertyValue(name)
+      || (0,_window_js__WEBPACK_IMPORTED_MODULE_0__/* ["default"] */ .A)(node).getComputedStyle(node, null).getPropertyValue(name);
+}
+
+
+/***/ }),
+
 /***/ 3720:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Dg: () => (/* binding */ ellipseFromRect),
 /* harmony export */   IM: () => (/* binding */ eachLine),
@@ -7755,7 +7676,6 @@ const rectFromCenter = (c, p, square) => {
 /***/ 3793:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   FD: () => (/* binding */ Capabilities),
 /* harmony export */   Xk: () => (/* binding */ NAMES),
@@ -7808,7 +7728,6 @@ const capabilityEntries = (caps) => NAMES.map(n => [n, caps[n]]);
 /***/ 4461:
 /***/ ((module) => {
 
-"use strict";
 module.exports = ".#########\n.#.......#\n.#.*...*.#\n*#.......#\n.+.......#\n*#.......#\n.#.*...*.#\n.#.......#\n.#########\nKEY\n# = Wall\n* = Lamp\n+ = Door ";
 
 /***/ }),
@@ -7816,7 +7735,6 @@ module.exports = ".#########\n.#.......#\n.#.*...*.#\n*#.......#\n.+.......#\n*#
 /***/ 4502:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   _: () => (/* binding */ Smoke)
 /* harmony export */ });
@@ -7884,18 +7802,9 @@ class Smoke extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
 
 /***/ }),
 
-/***/ 4648:
-/***/ ((module) => {
-
-"use strict";
-module.exports = ".....................................................................\n.............###++#####................*.............................\n.............#........#..............................................\n..+##++###++##+##.....#..............................................\n.#...........#.*#.*...#..............................########........\n.+..............#.....+.............................#.....*.#........\n.+............*.+.....#.........................*...#.......#....*...\n.#...........#..#.....#.....................*.......#.......+........\n.#......###+############+.+####..............*......#.......#....*...\n.+......#....#..+.....#........#....................#.......#........\n.#...........#..#.....#........#....................#.......+........\n.#......#....#..#.....#........#....................#.......#........\n.+###+########..#.....#.......####+#................#.......#........\n.##.....#....##+#####+#.......##...#........####+##+#####+####.......\n.##.....#..*.#..#.............##...#........#.......#.......##.......\n.##.....#....#..#.......*...*.##...#........#..*....#.......##.......\n.#+.....+.#+#####+#####+###....#...#.......####.....#.......##.......\n.+......#.#..#............#...##...#.......##.#.....#.......##.......\n..###+###+#######.....*...#....+...........##.#.....#.......##.......\n..#.....#.#..#.........######+##...######+#.##......+.......##.......\n..#.....#.#..#.......#+...+...##*..#.......####....*#.......##.......\n..#.....#.#*.#.......#....#....+...#........###.....#........#.......\n..#....*#.#.*#.......#....#...##...#.......########.#####+####.......\n..#+#+########...*...#....#...#######+#+#+####.####+#####.##..+###+#.\n........#.#..........+....#....#..*+.......#..#.....+.......#......#.\n........#.#*.........#....+....#...#.......####.....#.......#......+.\n........#.#..........#####.##+#.#..###########......#.......#......#.\n........#.#........########.#..######.........*.....#.......#......#.\n........#.#........#......#*..*+...##...........#+#######...#..*.*.#.\n........#.#........#......#....#...++...........+...#.*.#...#......#.\n........#.#........#..*...#....#...##...........#...#...+...#......#.\n........#.#........+......#....#...#.######################+###+###..\n........#.###.+###+###+####....+....#...........#...#...#...#........\n...*....#..........#...........#....#...........#...###+##*.#........\n........#..........+...........#....#...........+.......+............\n........#..........#...........#....#...........#.......#....*.......\n........#..........#...........#....#...........###+#+###............\n........#..........######++##########................................\n........#.................+....#...*.................................\n........#.....................+......................................\n........#...................................................*........\n........##########+############........**............................\n.....................................................................\nKEY\n# = Wall\n+ = Door\n* = Lamp\n";
-
-/***/ }),
-
 /***/ 4732:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   E: () => (/* binding */ submitIssue)
 /* harmony export */ });
@@ -7916,18 +7825,9 @@ const submitIssue = async (title, body, image) => {
 
 /***/ }),
 
-/***/ 4806:
-/***/ ((module) => {
-
-"use strict";
-module.exports = "..............\n..............\n..##########..\n..#.==.#*f↻#..\n..#.==.#...#..\n..#.==.#...#..\n..#*...#.._#..\n..#..◘h#.._#..\n..#..h###+##..\n..##+##*..✰#..\n..#........+..\n..#*.......#..\n..#▭.▭....✰#..\n..#[.▭.*h.]#..\n..#[.▭.h◘.]#..\n..#▭.▭.h◘.]#..\n..#◉.▭..h.]#..\n..#ff▭*...✰#..\n..######..*#..\n.......#####..\n..............\n..............\nKEY\n# = Wall\n= = Bed\n* = Lamp\nf = sink\n↻ = toilet\n_ = tub\n◘ = Table\nh = Chair\n+ = Door\n✰ = Bush\n▭ = counter\n[ = refrigerator\n] = TV\n◉ = oven\n";
-
-/***/ }),
-
 /***/ 4873:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -7937,8 +7837,8 @@ __webpack_require__.d(__webpack_exports__, {
 
 // EXTERNAL MODULE: ./src/utils.ts
 var utils = __webpack_require__(6185);
-// EXTERNAL MODULE: ./src/html/html.ts
-var html = __webpack_require__(467);
+// EXTERNAL MODULE: ./src/d3-extend.ts
+var d3_extend = __webpack_require__(452);
 // EXTERNAL MODULE: ./src/compress.ts
 var compress = __webpack_require__(5074);
 // EXTERNAL MODULE: ./src/game/map.ts + 2 modules
@@ -7965,7 +7865,7 @@ class Terminal {
     constructor() {
         this.currentCell = null;
         this.setCurrent = (cell) => this.currentCell = cell;
-        this.div = (0,html.d1)('#terminal');
+        this.div = (0,d3_extend.d1)('#terminal');
         this.div.appendFileHtml(terminal);
         this.repaintSelectedPawn();
         ui_renderer/* Repaint */.G2.on(() => this.draw());
@@ -9281,7 +9181,7 @@ class Game {
                 this.stepTimer.restartInMillis(this.delay(), this.tick);
         };
         this.showSpeeds = () => {
-            const m = (0,html.d1)('#speed-buttons');
+            const m = (0,d3_extend.d1)('#speed-buttons');
             m.show();
             const h = (e) => {
                 m.hide();
@@ -9396,7 +9296,7 @@ class Game {
         this.setupControls();
         if ((0,utils/* isLocal */.IX)() && !(0,utils/* isBranchRunner */.ZL)()) {
             this.branchRunner = new BranchRunnerUI();
-            (0,html.d1)('#branch-runner').show();
+            (0,d3_extend.d1)('#branch-runner').show();
         }
         void this.showBranchInfo();
         this.setupDebugControls();
@@ -9693,7 +9593,7 @@ class Game {
         button.textContent = this.showDarkness ? 'DK*' : 'DK';
     }
     async showBranchInfo() {
-        const d = (0,html.d1)('#branch-info');
+        const d = (0,d3_extend.d1)('#branch-info');
         if ((0,utils/* isLocal */.IX)()) {
             try {
                 const { branch, hasChanges } = await git.getBranchInfo();
@@ -9739,7 +9639,6 @@ class Game {
 /***/ 5056:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-"use strict";
 
 
 /* istanbul ignore next  */
@@ -9756,7 +9655,6 @@ module.exports = setAttributesWithoutAttributes;
 /***/ 5072:
 /***/ ((module) => {
 
-"use strict";
 
 
 var stylesInDOM = [];
@@ -9847,7 +9745,6 @@ module.exports = function (list, options) {
 /***/ 5074:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   F8: () => (/* binding */ gzSize),
 /* harmony export */   ZI: () => (/* binding */ gzip),
@@ -9883,123 +9780,9 @@ const gzSize = async (s) => gzBytes(await gzip(s));
 
 /***/ }),
 
-/***/ 5164:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1601);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, `#editor-panel .label { color: #0a0; margin-right: 6px }
-
-#editor-panel button {
-  background: #000;
-  color: #0a0;
-  border: 1px solid #0a0;
-  border-radius: 2px;
-  font-family: monospace;
-  font-size: 12px;
-  padding: 2px 6px;
-}
-
-#editor-panel button.selected {
-  background: #060;
-  color: #000;
-  border-color: #0c0;
-}
-
-#editor-panel .option { margin-left: 4px }
-
-#fragment-preview {
-  position: absolute;
-  z-index: 1000;
-  background: #000;
-  border: 1px solid #0a0;
-  padding: 8px;
-}
-
-#fragment-preview > .row { margin-bottom: 6px }
-
-#fragment-preview pre {
-  max-width: 80vw;
-  max-height: 70vh;
-  overflow: auto;
-  border: 1px solid #0a0;
-  padding: 8px;
-}
-
-#symbol-picker {
-  position: absolute;
-  z-index: 1000;
-  background: #000;
-  border: 1px solid #0a0;
-  padding: 8px;
-  max-width: calc(var(--map-width, 80vw));
-  max-height: 70vh;
-  overflow: auto;
-}
-
-#symbol-picker .symbols {
-  display: grid;
-  grid-template-columns: repeat(120, 1ch);
-  gap: 2px;
-}
-
-#symbol-picker .sym {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1ch;
-  height: 1.25em;
-  border: 1px solid #0a0;
-  cursor: pointer;
-  font-family: monospace;
-}
-
-#symbol-picker .sym.selected { background: #060; color: #000 }
-
-#symbol-picker .actions {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-#layer-choices .choices .choice { position: relative; display: inline-flex; align-items: center; gap: 4px }
-#layer-choices .choices .choice .close-button { margin-left: 4px; pointer-events: auto; position: static; width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center } 
-
-#editor-panel #layer-choices .layer .editor-item .close-button {
-  width: 14px;
-  height: 14px;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #f44;
-  border-color: #f44;
-  background: #000;
-} 
-
-`, ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
 /***/ 5264:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -10247,12 +10030,11 @@ class Feedback extends modal/* Modal */.a {
 /***/ 5382:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   a: () => (/* binding */ Modal),
 /* harmony export */   r: () => (/* binding */ ModalShowing)
 /* harmony export */ });
-/* harmony import */ var _html_html__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(467);
+/* harmony import */ var _d3_extend__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(452);
 /* harmony import */ var _signal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(334);
 
 
@@ -10266,13 +10048,13 @@ class Modal {
             e.stopPropagation();
         };
         this.keyUp = (e) => e.stopPropagation();
-        this.div = (0,_html_html__WEBPACK_IMPORTED_MODULE_0__.d1)(id);
+        this.div = (0,_d3_extend__WEBPACK_IMPORTED_MODULE_0__.d1)(id);
         Modal.list.push(this);
     }
     show() {
         Modal.list.forEach(m => { if (m !== this)
             m.hide(); });
-        const r = (0,_html_html__WEBPACK_IMPORTED_MODULE_0__.d1)('#game-container').bounds();
+        const r = (0,_d3_extend__WEBPACK_IMPORTED_MODULE_0__.d1)('#game-container').bounds();
         this.div.style('left', `${r.left + 50}px`).style('top', `${r.top + 50}px`);
         this.div.show();
         ModalShowing.emit(true);
@@ -10298,7 +10080,6 @@ Modal.list = [];
 /***/ 5633:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   v: () => (/* binding */ CellLayers)
 /* harmony export */ });
@@ -10365,18 +10146,9 @@ CellLayers.materialLayers = ['walls', 'items', 'pawn'];
 
 /***/ }),
 
-/***/ 5833:
-/***/ ((module) => {
-
-"use strict";
-module.exports = "...........................\n...........................\n...............✰✰..✰.......\n...........✰✰.....✰...✰....\n............✰.✰..✰...T.....\n...✰T.✰.........✰...✰......\n....✰................✰✰....\n..........#########.✰✰.....\n....✰.....#...*.hh#........\n..........#....h◘◘#..✰.....\n..✰✰......#....h◘◘#........\n...✰...#######....#.....✰..\n....T..#*.#..#...*#........\n.......#=.#..#....#..T.....\n.......#=.#..#....#........\n.....✰.#..#..+....#.....✰..\n.......#..##+####+#....T...\n.......#.....#*...#✰....✰..\n.......#.....+....#✰...✰...\n.......#######....#✰...✰...\n.............#....#✰.......\n.....✰.....###....#✰.✰..✰..\n..........##.+....#✰..✰....\n..........#..####+#........\n.......✰✰.#..#✰✰.....✰✰.✰..\n..........#..#✰............\n.....T.✰✰.####✰............\n.......✰✰.......T.T........\n...........................\n...........................\nKEY\n✰ = bush\nT = tree\n# = Wall\n* = Lamp\nh = chair\n◘ = table\n= = bed\n+ = Door\n";
-
-/***/ }),
-
 /***/ 6185:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   $1: () => (/* binding */ $1),
 /* harmony export */   A7: () => (/* binding */ oneIn),
@@ -10394,6 +10166,7 @@ module.exports = "...........................\n...........................\n....
 /* harmony export */   MX: () => (/* binding */ half),
 /* harmony export */   N2: () => (/* binding */ toggleHidden),
 /* harmony export */   Nb: () => (/* binding */ bombUnless),
+/* harmony export */   Ur: () => (/* binding */ normalizeIndentedText),
 /* harmony export */   Wh: () => (/* binding */ positiveMod),
 /* harmony export */   Wo: () => (/* binding */ toEntries),
 /* harmony export */   ZL: () => (/* binding */ isBranchRunner),
@@ -10549,6 +10322,17 @@ const pushMap = (m, k, v) => {
 };
 const isLocal = () => window.location.hostname === 'localhost';
 const isBranchRunner = () => window.location.port === '8081';
+function normalizeIndentedText(text) {
+    const lines = text.split('\n').map(line => line.replace(/\r$/, ''));
+    const firstContentLine = lines.find(line => line.trim().length > 0);
+    const initialIndent = firstContentLine ? firstContentLine.match(/^\s*/)?.[0] || '' : '';
+    return lines.map(line => {
+        if (line.startsWith(initialIndent)) {
+            return line.slice(initialIndent.length);
+        }
+        return line.replace(/^\s*/, ''); // fallback for lines with less indent
+    }).join('\n');
+}
 
 
 /***/ }),
@@ -10556,7 +10340,6 @@ const isBranchRunner = () => window.location.port === '8081';
 /***/ 6314:
 /***/ ((module) => {
 
-"use strict";
 
 
 /*
@@ -10648,7 +10431,6 @@ module.exports = function (cssWithMappingToString) {
 /***/ 6372:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   R: () => (/* binding */ EditorItem)
 /* harmony export */ });
@@ -10674,7 +10456,6 @@ class EditorItem extends _drawable__WEBPACK_IMPORTED_MODULE_0__/* .Drawable */ .
 /***/ 6457:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   T: () => (/* binding */ Config)
 /* harmony export */ });
@@ -10707,10 +10488,47 @@ Config.createTransparentDisplay = (width, height) => _a.display(width, height, '
 
 /***/ }),
 
+/***/ 6541:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
+/* harmony export */   j: () => (/* binding */ childMatcher)
+/* harmony export */ });
+/* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(selector) {
+  return function() {
+    return this.matches(selector);
+  };
+}
+
+function childMatcher(selector) {
+  return function(node) {
+    return node.matches(selector);
+  };
+}
+
+
+
+/***/ }),
+
+/***/ 6747:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(node) {
+  return (node.ownerDocument && node.ownerDocument.defaultView) // node is a Node
+      || (node.document && node) // node is a Window
+      || node.defaultView; // node is a Document
+}
+
+
+/***/ }),
+
 /***/ 6830:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Y: () => (/* binding */ XYL)
 /* harmony export */ });
@@ -10749,7 +10567,6 @@ XYL._cache = new Map();
 /***/ 6893:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   r: () => (/* binding */ Rect)
 /* harmony export */ });
@@ -10830,10 +10647,27 @@ Rect.between = (start, end) => {
 
 /***/ }),
 
+/***/ 7268:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _namespaces_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7947);
+
+
+/* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(name) {
+  var prefix = name += "", i = prefix.indexOf(":");
+  if (i >= 0 && (prefix = name.slice(0, i)) !== "xmlns") name = name.slice(i + 1);
+  return _namespaces_js__WEBPACK_IMPORTED_MODULE_0__/* ["default"] */ .A.hasOwnProperty(prefix) ? {space: _namespaces_js__WEBPACK_IMPORTED_MODULE_0__/* ["default"] */ .A[prefix], local: name} : name; // eslint-disable-line no-prototype-builtins
+}
+
+
+/***/ }),
+
 /***/ 7283:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -11113,7 +10947,6 @@ map_Map.active = new Set();
 /***/ 7328:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -11213,7 +11046,6 @@ class Display {
 /***/ 7349:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 // ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
 
@@ -11502,7 +11334,6 @@ class Initializer {
 /***/ 7659:
 /***/ ((module) => {
 
-"use strict";
 
 
 var memo = {};
@@ -11543,7 +11374,6 @@ module.exports = insertBySelector;
 /***/ 7825:
 /***/ ((module) => {
 
-"use strict";
 
 
 /* istanbul ignore next  */
@@ -11608,10 +11438,1004 @@ module.exports = domAPI;
 
 /***/ }),
 
+/***/ 7947:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__),
+/* harmony export */   g: () => (/* binding */ xhtml)
+/* harmony export */ });
+var xhtml = "http://www.w3.org/1999/xhtml";
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  svg: "http://www.w3.org/2000/svg",
+  xhtml: xhtml,
+  xlink: "http://www.w3.org/1999/xlink",
+  xml: "http://www.w3.org/XML/1998/namespace",
+  xmlns: "http://www.w3.org/2000/xmlns/"
+});
+
+
+/***/ }),
+
+/***/ 8227:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  LN: () => (/* binding */ Selection),
+  Ay: () => (/* binding */ src_selection),
+  zr: () => (/* binding */ root)
+});
+
+// EXTERNAL MODULE: ./node_modules/d3-selection/src/selector.js
+var selector = __webpack_require__(574);
+;// ./node_modules/d3-selection/src/selection/select.js
+
+
+
+/* harmony default export */ function selection_select(select) {
+  if (typeof select !== "function") select = (0,selector/* default */.A)(select);
+
+  for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
+    for (var group = groups[j], n = group.length, subgroup = subgroups[j] = new Array(n), node, subnode, i = 0; i < n; ++i) {
+      if ((node = group[i]) && (subnode = select.call(node, node.__data__, i, group))) {
+        if ("__data__" in node) subnode.__data__ = node.__data__;
+        subgroup[i] = subnode;
+      }
+    }
+  }
+
+  return new Selection(subgroups, this._parents);
+}
+
+;// ./node_modules/d3-selection/src/array.js
+// Given something array like (or null), returns something that is strictly an
+// array. This is used to ensure that array-like objects passed to d3.selectAll
+// or selection.selectAll are converted into proper arrays when creating a
+// selection; we don’t ever want to create a selection backed by a live
+// HTMLCollection or NodeList. However, note that selection.selectAll will use a
+// static NodeList as a group, since it safely derived from querySelectorAll.
+function array(x) {
+  return x == null ? [] : Array.isArray(x) ? x : Array.from(x);
+}
+
+// EXTERNAL MODULE: ./node_modules/d3-selection/src/selectorAll.js
+var selectorAll = __webpack_require__(747);
+;// ./node_modules/d3-selection/src/selection/selectAll.js
+
+
+
+
+function arrayAll(select) {
+  return function() {
+    return array(select.apply(this, arguments));
+  };
+}
+
+/* harmony default export */ function selectAll(select) {
+  if (typeof select === "function") select = arrayAll(select);
+  else select = (0,selectorAll/* default */.A)(select);
+
+  for (var groups = this._groups, m = groups.length, subgroups = [], parents = [], j = 0; j < m; ++j) {
+    for (var group = groups[j], n = group.length, node, i = 0; i < n; ++i) {
+      if (node = group[i]) {
+        subgroups.push(select.call(node, node.__data__, i, group));
+        parents.push(node);
+      }
+    }
+  }
+
+  return new Selection(subgroups, parents);
+}
+
+// EXTERNAL MODULE: ./node_modules/d3-selection/src/matcher.js
+var matcher = __webpack_require__(6541);
+;// ./node_modules/d3-selection/src/selection/selectChild.js
+
+
+var find = Array.prototype.find;
+
+function childFind(match) {
+  return function() {
+    return find.call(this.children, match);
+  };
+}
+
+function childFirst() {
+  return this.firstElementChild;
+}
+
+/* harmony default export */ function selectChild(match) {
+  return this.select(match == null ? childFirst
+      : childFind(typeof match === "function" ? match : (0,matcher/* childMatcher */.j)(match)));
+}
+
+;// ./node_modules/d3-selection/src/selection/selectChildren.js
+
+
+var filter = Array.prototype.filter;
+
+function children() {
+  return Array.from(this.children);
+}
+
+function childrenFilter(match) {
+  return function() {
+    return filter.call(this.children, match);
+  };
+}
+
+/* harmony default export */ function selectChildren(match) {
+  return this.selectAll(match == null ? children
+      : childrenFilter(typeof match === "function" ? match : (0,matcher/* childMatcher */.j)(match)));
+}
+
+;// ./node_modules/d3-selection/src/selection/filter.js
+
+
+
+/* harmony default export */ function selection_filter(match) {
+  if (typeof match !== "function") match = (0,matcher/* default */.A)(match);
+
+  for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
+    for (var group = groups[j], n = group.length, subgroup = subgroups[j] = [], node, i = 0; i < n; ++i) {
+      if ((node = group[i]) && match.call(node, node.__data__, i, group)) {
+        subgroup.push(node);
+      }
+    }
+  }
+
+  return new Selection(subgroups, this._parents);
+}
+
+;// ./node_modules/d3-selection/src/selection/sparse.js
+/* harmony default export */ function sparse(update) {
+  return new Array(update.length);
+}
+
+;// ./node_modules/d3-selection/src/selection/enter.js
+
+
+
+/* harmony default export */ function enter() {
+  return new Selection(this._enter || this._groups.map(sparse), this._parents);
+}
+
+function EnterNode(parent, datum) {
+  this.ownerDocument = parent.ownerDocument;
+  this.namespaceURI = parent.namespaceURI;
+  this._next = null;
+  this._parent = parent;
+  this.__data__ = datum;
+}
+
+EnterNode.prototype = {
+  constructor: EnterNode,
+  appendChild: function(child) { return this._parent.insertBefore(child, this._next); },
+  insertBefore: function(child, next) { return this._parent.insertBefore(child, next); },
+  querySelector: function(selector) { return this._parent.querySelector(selector); },
+  querySelectorAll: function(selector) { return this._parent.querySelectorAll(selector); }
+};
+
+;// ./node_modules/d3-selection/src/constant.js
+/* harmony default export */ function constant(x) {
+  return function() {
+    return x;
+  };
+}
+
+;// ./node_modules/d3-selection/src/selection/data.js
+
+
+
+
+function bindIndex(parent, group, enter, update, exit, data) {
+  var i = 0,
+      node,
+      groupLength = group.length,
+      dataLength = data.length;
+
+  // Put any non-null nodes that fit into update.
+  // Put any null nodes into enter.
+  // Put any remaining data into enter.
+  for (; i < dataLength; ++i) {
+    if (node = group[i]) {
+      node.__data__ = data[i];
+      update[i] = node;
+    } else {
+      enter[i] = new EnterNode(parent, data[i]);
+    }
+  }
+
+  // Put any non-null nodes that don’t fit into exit.
+  for (; i < groupLength; ++i) {
+    if (node = group[i]) {
+      exit[i] = node;
+    }
+  }
+}
+
+function bindKey(parent, group, enter, update, exit, data, key) {
+  var i,
+      node,
+      nodeByKeyValue = new Map,
+      groupLength = group.length,
+      dataLength = data.length,
+      keyValues = new Array(groupLength),
+      keyValue;
+
+  // Compute the key for each node.
+  // If multiple nodes have the same key, the duplicates are added to exit.
+  for (i = 0; i < groupLength; ++i) {
+    if (node = group[i]) {
+      keyValues[i] = keyValue = key.call(node, node.__data__, i, group) + "";
+      if (nodeByKeyValue.has(keyValue)) {
+        exit[i] = node;
+      } else {
+        nodeByKeyValue.set(keyValue, node);
+      }
+    }
+  }
+
+  // Compute the key for each datum.
+  // If there a node associated with this key, join and add it to update.
+  // If there is not (or the key is a duplicate), add it to enter.
+  for (i = 0; i < dataLength; ++i) {
+    keyValue = key.call(parent, data[i], i, data) + "";
+    if (node = nodeByKeyValue.get(keyValue)) {
+      update[i] = node;
+      node.__data__ = data[i];
+      nodeByKeyValue.delete(keyValue);
+    } else {
+      enter[i] = new EnterNode(parent, data[i]);
+    }
+  }
+
+  // Add any remaining nodes that were not bound to data to exit.
+  for (i = 0; i < groupLength; ++i) {
+    if ((node = group[i]) && (nodeByKeyValue.get(keyValues[i]) === node)) {
+      exit[i] = node;
+    }
+  }
+}
+
+function datum(node) {
+  return node.__data__;
+}
+
+/* harmony default export */ function data(value, key) {
+  if (!arguments.length) return Array.from(this, datum);
+
+  var bind = key ? bindKey : bindIndex,
+      parents = this._parents,
+      groups = this._groups;
+
+  if (typeof value !== "function") value = constant(value);
+
+  for (var m = groups.length, update = new Array(m), enter = new Array(m), exit = new Array(m), j = 0; j < m; ++j) {
+    var parent = parents[j],
+        group = groups[j],
+        groupLength = group.length,
+        data = arraylike(value.call(parent, parent && parent.__data__, j, parents)),
+        dataLength = data.length,
+        enterGroup = enter[j] = new Array(dataLength),
+        updateGroup = update[j] = new Array(dataLength),
+        exitGroup = exit[j] = new Array(groupLength);
+
+    bind(parent, group, enterGroup, updateGroup, exitGroup, data, key);
+
+    // Now connect the enter nodes to their following update node, such that
+    // appendChild can insert the materialized enter node before this node,
+    // rather than at the end of the parent node.
+    for (var i0 = 0, i1 = 0, previous, next; i0 < dataLength; ++i0) {
+      if (previous = enterGroup[i0]) {
+        if (i0 >= i1) i1 = i0 + 1;
+        while (!(next = updateGroup[i1]) && ++i1 < dataLength);
+        previous._next = next || null;
+      }
+    }
+  }
+
+  update = new Selection(update, parents);
+  update._enter = enter;
+  update._exit = exit;
+  return update;
+}
+
+// Given some data, this returns an array-like view of it: an object that
+// exposes a length property and allows numeric indexing. Note that unlike
+// selectAll, this isn’t worried about “live” collections because the resulting
+// array will only be used briefly while data is being bound. (It is possible to
+// cause the data to change while iterating by using a key function, but please
+// don’t; we’d rather avoid a gratuitous copy.)
+function arraylike(data) {
+  return typeof data === "object" && "length" in data
+    ? data // Array, TypedArray, NodeList, array-like
+    : Array.from(data); // Map, Set, iterable, string, or anything else
+}
+
+;// ./node_modules/d3-selection/src/selection/exit.js
+
+
+
+/* harmony default export */ function exit() {
+  return new Selection(this._exit || this._groups.map(sparse), this._parents);
+}
+
+;// ./node_modules/d3-selection/src/selection/join.js
+/* harmony default export */ function join(onenter, onupdate, onexit) {
+  var enter = this.enter(), update = this, exit = this.exit();
+  if (typeof onenter === "function") {
+    enter = onenter(enter);
+    if (enter) enter = enter.selection();
+  } else {
+    enter = enter.append(onenter + "");
+  }
+  if (onupdate != null) {
+    update = onupdate(update);
+    if (update) update = update.selection();
+  }
+  if (onexit == null) exit.remove(); else onexit(exit);
+  return enter && update ? enter.merge(update).order() : update;
+}
+
+;// ./node_modules/d3-selection/src/selection/merge.js
+
+
+/* harmony default export */ function merge(context) {
+  var selection = context.selection ? context.selection() : context;
+
+  for (var groups0 = this._groups, groups1 = selection._groups, m0 = groups0.length, m1 = groups1.length, m = Math.min(m0, m1), merges = new Array(m0), j = 0; j < m; ++j) {
+    for (var group0 = groups0[j], group1 = groups1[j], n = group0.length, merge = merges[j] = new Array(n), node, i = 0; i < n; ++i) {
+      if (node = group0[i] || group1[i]) {
+        merge[i] = node;
+      }
+    }
+  }
+
+  for (; j < m0; ++j) {
+    merges[j] = groups0[j];
+  }
+
+  return new Selection(merges, this._parents);
+}
+
+;// ./node_modules/d3-selection/src/selection/order.js
+/* harmony default export */ function order() {
+
+  for (var groups = this._groups, j = -1, m = groups.length; ++j < m;) {
+    for (var group = groups[j], i = group.length - 1, next = group[i], node; --i >= 0;) {
+      if (node = group[i]) {
+        if (next && node.compareDocumentPosition(next) ^ 4) next.parentNode.insertBefore(node, next);
+        next = node;
+      }
+    }
+  }
+
+  return this;
+}
+
+;// ./node_modules/d3-selection/src/selection/sort.js
+
+
+/* harmony default export */ function sort(compare) {
+  if (!compare) compare = ascending;
+
+  function compareNode(a, b) {
+    return a && b ? compare(a.__data__, b.__data__) : !a - !b;
+  }
+
+  for (var groups = this._groups, m = groups.length, sortgroups = new Array(m), j = 0; j < m; ++j) {
+    for (var group = groups[j], n = group.length, sortgroup = sortgroups[j] = new Array(n), node, i = 0; i < n; ++i) {
+      if (node = group[i]) {
+        sortgroup[i] = node;
+      }
+    }
+    sortgroup.sort(compareNode);
+  }
+
+  return new Selection(sortgroups, this._parents).order();
+}
+
+function ascending(a, b) {
+  return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
+}
+
+;// ./node_modules/d3-selection/src/selection/call.js
+/* harmony default export */ function call() {
+  var callback = arguments[0];
+  arguments[0] = this;
+  callback.apply(null, arguments);
+  return this;
+}
+
+;// ./node_modules/d3-selection/src/selection/nodes.js
+/* harmony default export */ function nodes() {
+  return Array.from(this);
+}
+
+;// ./node_modules/d3-selection/src/selection/node.js
+/* harmony default export */ function node() {
+
+  for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
+    for (var group = groups[j], i = 0, n = group.length; i < n; ++i) {
+      var node = group[i];
+      if (node) return node;
+    }
+  }
+
+  return null;
+}
+
+;// ./node_modules/d3-selection/src/selection/size.js
+/* harmony default export */ function size() {
+  let size = 0;
+  for (const node of this) ++size; // eslint-disable-line no-unused-vars
+  return size;
+}
+
+;// ./node_modules/d3-selection/src/selection/empty.js
+/* harmony default export */ function empty() {
+  return !this.node();
+}
+
+;// ./node_modules/d3-selection/src/selection/each.js
+/* harmony default export */ function each(callback) {
+
+  for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
+    for (var group = groups[j], i = 0, n = group.length, node; i < n; ++i) {
+      if (node = group[i]) callback.call(node, node.__data__, i, group);
+    }
+  }
+
+  return this;
+}
+
+// EXTERNAL MODULE: ./node_modules/d3-selection/src/namespace.js
+var namespace = __webpack_require__(7268);
+;// ./node_modules/d3-selection/src/selection/attr.js
+
+
+function attrRemove(name) {
+  return function() {
+    this.removeAttribute(name);
+  };
+}
+
+function attrRemoveNS(fullname) {
+  return function() {
+    this.removeAttributeNS(fullname.space, fullname.local);
+  };
+}
+
+function attrConstant(name, value) {
+  return function() {
+    this.setAttribute(name, value);
+  };
+}
+
+function attrConstantNS(fullname, value) {
+  return function() {
+    this.setAttributeNS(fullname.space, fullname.local, value);
+  };
+}
+
+function attrFunction(name, value) {
+  return function() {
+    var v = value.apply(this, arguments);
+    if (v == null) this.removeAttribute(name);
+    else this.setAttribute(name, v);
+  };
+}
+
+function attrFunctionNS(fullname, value) {
+  return function() {
+    var v = value.apply(this, arguments);
+    if (v == null) this.removeAttributeNS(fullname.space, fullname.local);
+    else this.setAttributeNS(fullname.space, fullname.local, v);
+  };
+}
+
+/* harmony default export */ function attr(name, value) {
+  var fullname = (0,namespace/* default */.A)(name);
+
+  if (arguments.length < 2) {
+    var node = this.node();
+    return fullname.local
+        ? node.getAttributeNS(fullname.space, fullname.local)
+        : node.getAttribute(fullname);
+  }
+
+  return this.each((value == null
+      ? (fullname.local ? attrRemoveNS : attrRemove) : (typeof value === "function"
+      ? (fullname.local ? attrFunctionNS : attrFunction)
+      : (fullname.local ? attrConstantNS : attrConstant)))(fullname, value));
+}
+
+// EXTERNAL MODULE: ./node_modules/d3-selection/src/selection/style.js
+var style = __webpack_require__(3683);
+;// ./node_modules/d3-selection/src/selection/property.js
+function propertyRemove(name) {
+  return function() {
+    delete this[name];
+  };
+}
+
+function propertyConstant(name, value) {
+  return function() {
+    this[name] = value;
+  };
+}
+
+function propertyFunction(name, value) {
+  return function() {
+    var v = value.apply(this, arguments);
+    if (v == null) delete this[name];
+    else this[name] = v;
+  };
+}
+
+/* harmony default export */ function property(name, value) {
+  return arguments.length > 1
+      ? this.each((value == null
+          ? propertyRemove : typeof value === "function"
+          ? propertyFunction
+          : propertyConstant)(name, value))
+      : this.node()[name];
+}
+
+;// ./node_modules/d3-selection/src/selection/classed.js
+function classArray(string) {
+  return string.trim().split(/^|\s+/);
+}
+
+function classList(node) {
+  return node.classList || new ClassList(node);
+}
+
+function ClassList(node) {
+  this._node = node;
+  this._names = classArray(node.getAttribute("class") || "");
+}
+
+ClassList.prototype = {
+  add: function(name) {
+    var i = this._names.indexOf(name);
+    if (i < 0) {
+      this._names.push(name);
+      this._node.setAttribute("class", this._names.join(" "));
+    }
+  },
+  remove: function(name) {
+    var i = this._names.indexOf(name);
+    if (i >= 0) {
+      this._names.splice(i, 1);
+      this._node.setAttribute("class", this._names.join(" "));
+    }
+  },
+  contains: function(name) {
+    return this._names.indexOf(name) >= 0;
+  }
+};
+
+function classedAdd(node, names) {
+  var list = classList(node), i = -1, n = names.length;
+  while (++i < n) list.add(names[i]);
+}
+
+function classedRemove(node, names) {
+  var list = classList(node), i = -1, n = names.length;
+  while (++i < n) list.remove(names[i]);
+}
+
+function classedTrue(names) {
+  return function() {
+    classedAdd(this, names);
+  };
+}
+
+function classedFalse(names) {
+  return function() {
+    classedRemove(this, names);
+  };
+}
+
+function classedFunction(names, value) {
+  return function() {
+    (value.apply(this, arguments) ? classedAdd : classedRemove)(this, names);
+  };
+}
+
+/* harmony default export */ function classed(name, value) {
+  var names = classArray(name + "");
+
+  if (arguments.length < 2) {
+    var list = classList(this.node()), i = -1, n = names.length;
+    while (++i < n) if (!list.contains(names[i])) return false;
+    return true;
+  }
+
+  return this.each((typeof value === "function"
+      ? classedFunction : value
+      ? classedTrue
+      : classedFalse)(names, value));
+}
+
+;// ./node_modules/d3-selection/src/selection/text.js
+function textRemove() {
+  this.textContent = "";
+}
+
+function textConstant(value) {
+  return function() {
+    this.textContent = value;
+  };
+}
+
+function textFunction(value) {
+  return function() {
+    var v = value.apply(this, arguments);
+    this.textContent = v == null ? "" : v;
+  };
+}
+
+/* harmony default export */ function selection_text(value) {
+  return arguments.length
+      ? this.each(value == null
+          ? textRemove : (typeof value === "function"
+          ? textFunction
+          : textConstant)(value))
+      : this.node().textContent;
+}
+
+;// ./node_modules/d3-selection/src/selection/html.js
+function htmlRemove() {
+  this.innerHTML = "";
+}
+
+function htmlConstant(value) {
+  return function() {
+    this.innerHTML = value;
+  };
+}
+
+function htmlFunction(value) {
+  return function() {
+    var v = value.apply(this, arguments);
+    this.innerHTML = v == null ? "" : v;
+  };
+}
+
+/* harmony default export */ function html(value) {
+  return arguments.length
+      ? this.each(value == null
+          ? htmlRemove : (typeof value === "function"
+          ? htmlFunction
+          : htmlConstant)(value))
+      : this.node().innerHTML;
+}
+
+;// ./node_modules/d3-selection/src/selection/raise.js
+function raise() {
+  if (this.nextSibling) this.parentNode.appendChild(this);
+}
+
+/* harmony default export */ function selection_raise() {
+  return this.each(raise);
+}
+
+;// ./node_modules/d3-selection/src/selection/lower.js
+function lower() {
+  if (this.previousSibling) this.parentNode.insertBefore(this, this.parentNode.firstChild);
+}
+
+/* harmony default export */ function selection_lower() {
+  return this.each(lower);
+}
+
+// EXTERNAL MODULE: ./node_modules/d3-selection/src/namespaces.js
+var namespaces = __webpack_require__(7947);
+;// ./node_modules/d3-selection/src/creator.js
+
+
+
+function creatorInherit(name) {
+  return function() {
+    var document = this.ownerDocument,
+        uri = this.namespaceURI;
+    return uri === namespaces/* xhtml */.g && document.documentElement.namespaceURI === namespaces/* xhtml */.g
+        ? document.createElement(name)
+        : document.createElementNS(uri, name);
+  };
+}
+
+function creatorFixed(fullname) {
+  return function() {
+    return this.ownerDocument.createElementNS(fullname.space, fullname.local);
+  };
+}
+
+/* harmony default export */ function creator(name) {
+  var fullname = (0,namespace/* default */.A)(name);
+  return (fullname.local
+      ? creatorFixed
+      : creatorInherit)(fullname);
+}
+
+;// ./node_modules/d3-selection/src/selection/append.js
+
+
+/* harmony default export */ function append(name) {
+  var create = typeof name === "function" ? name : creator(name);
+  return this.select(function() {
+    return this.appendChild(create.apply(this, arguments));
+  });
+}
+
+;// ./node_modules/d3-selection/src/selection/insert.js
+
+
+
+function constantNull() {
+  return null;
+}
+
+/* harmony default export */ function insert(name, before) {
+  var create = typeof name === "function" ? name : creator(name),
+      select = before == null ? constantNull : typeof before === "function" ? before : (0,selector/* default */.A)(before);
+  return this.select(function() {
+    return this.insertBefore(create.apply(this, arguments), select.apply(this, arguments) || null);
+  });
+}
+
+;// ./node_modules/d3-selection/src/selection/remove.js
+function remove() {
+  var parent = this.parentNode;
+  if (parent) parent.removeChild(this);
+}
+
+/* harmony default export */ function selection_remove() {
+  return this.each(remove);
+}
+
+;// ./node_modules/d3-selection/src/selection/clone.js
+function selection_cloneShallow() {
+  var clone = this.cloneNode(false), parent = this.parentNode;
+  return parent ? parent.insertBefore(clone, this.nextSibling) : clone;
+}
+
+function selection_cloneDeep() {
+  var clone = this.cloneNode(true), parent = this.parentNode;
+  return parent ? parent.insertBefore(clone, this.nextSibling) : clone;
+}
+
+/* harmony default export */ function clone(deep) {
+  return this.select(deep ? selection_cloneDeep : selection_cloneShallow);
+}
+
+;// ./node_modules/d3-selection/src/selection/datum.js
+/* harmony default export */ function selection_datum(value) {
+  return arguments.length
+      ? this.property("__data__", value)
+      : this.node().__data__;
+}
+
+;// ./node_modules/d3-selection/src/selection/on.js
+function contextListener(listener) {
+  return function(event) {
+    listener.call(this, event, this.__data__);
+  };
+}
+
+function parseTypenames(typenames) {
+  return typenames.trim().split(/^|\s+/).map(function(t) {
+    var name = "", i = t.indexOf(".");
+    if (i >= 0) name = t.slice(i + 1), t = t.slice(0, i);
+    return {type: t, name: name};
+  });
+}
+
+function onRemove(typename) {
+  return function() {
+    var on = this.__on;
+    if (!on) return;
+    for (var j = 0, i = -1, m = on.length, o; j < m; ++j) {
+      if (o = on[j], (!typename.type || o.type === typename.type) && o.name === typename.name) {
+        this.removeEventListener(o.type, o.listener, o.options);
+      } else {
+        on[++i] = o;
+      }
+    }
+    if (++i) on.length = i;
+    else delete this.__on;
+  };
+}
+
+function onAdd(typename, value, options) {
+  return function() {
+    var on = this.__on, o, listener = contextListener(value);
+    if (on) for (var j = 0, m = on.length; j < m; ++j) {
+      if ((o = on[j]).type === typename.type && o.name === typename.name) {
+        this.removeEventListener(o.type, o.listener, o.options);
+        this.addEventListener(o.type, o.listener = listener, o.options = options);
+        o.value = value;
+        return;
+      }
+    }
+    this.addEventListener(typename.type, listener, options);
+    o = {type: typename.type, name: typename.name, value: value, listener: listener, options: options};
+    if (!on) this.__on = [o];
+    else on.push(o);
+  };
+}
+
+/* harmony default export */ function on(typename, value, options) {
+  var typenames = parseTypenames(typename + ""), i, n = typenames.length, t;
+
+  if (arguments.length < 2) {
+    var on = this.node().__on;
+    if (on) for (var j = 0, m = on.length, o; j < m; ++j) {
+      for (i = 0, o = on[j]; i < n; ++i) {
+        if ((t = typenames[i]).type === o.type && t.name === o.name) {
+          return o.value;
+        }
+      }
+    }
+    return;
+  }
+
+  on = value ? onAdd : onRemove;
+  for (i = 0; i < n; ++i) this.each(on(typenames[i], value, options));
+  return this;
+}
+
+// EXTERNAL MODULE: ./node_modules/d3-selection/src/window.js
+var src_window = __webpack_require__(6747);
+;// ./node_modules/d3-selection/src/selection/dispatch.js
+
+
+function dispatchEvent(node, type, params) {
+  var window = (0,src_window/* default */.A)(node),
+      event = window.CustomEvent;
+
+  if (typeof event === "function") {
+    event = new event(type, params);
+  } else {
+    event = window.document.createEvent("Event");
+    if (params) event.initEvent(type, params.bubbles, params.cancelable), event.detail = params.detail;
+    else event.initEvent(type, false, false);
+  }
+
+  node.dispatchEvent(event);
+}
+
+function dispatchConstant(type, params) {
+  return function() {
+    return dispatchEvent(this, type, params);
+  };
+}
+
+function dispatchFunction(type, params) {
+  return function() {
+    return dispatchEvent(this, type, params.apply(this, arguments));
+  };
+}
+
+/* harmony default export */ function dispatch(type, params) {
+  return this.each((typeof params === "function"
+      ? dispatchFunction
+      : dispatchConstant)(type, params));
+}
+
+;// ./node_modules/d3-selection/src/selection/iterator.js
+/* harmony default export */ function* iterator() {
+  for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
+    for (var group = groups[j], i = 0, n = group.length, node; i < n; ++i) {
+      if (node = group[i]) yield node;
+    }
+  }
+}
+
+;// ./node_modules/d3-selection/src/selection/index.js
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var root = [null];
+
+function Selection(groups, parents) {
+  this._groups = groups;
+  this._parents = parents;
+}
+
+function selection() {
+  return new Selection([[document.documentElement]], root);
+}
+
+function selection_selection() {
+  return this;
+}
+
+Selection.prototype = selection.prototype = {
+  constructor: Selection,
+  select: selection_select,
+  selectAll: selectAll,
+  selectChild: selectChild,
+  selectChildren: selectChildren,
+  filter: selection_filter,
+  data: data,
+  enter: enter,
+  exit: exit,
+  join: join,
+  merge: merge,
+  selection: selection_selection,
+  order: order,
+  sort: sort,
+  call: call,
+  nodes: nodes,
+  node: node,
+  size: size,
+  empty: empty,
+  each: each,
+  attr: attr,
+  style: style/* default */.A,
+  property: property,
+  classed: classed,
+  text: selection_text,
+  html: html,
+  raise: selection_raise,
+  lower: selection_lower,
+  append: append,
+  insert: insert,
+  remove: selection_remove,
+  clone: clone,
+  datum: selection_datum,
+  on: on,
+  dispatch: dispatch,
+  [Symbol.iterator]: iterator
+};
+
+/* harmony default export */ const src_selection = (selection);
+
+
+/***/ }),
+
 /***/ 8421:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   I: () => (/* binding */ storage)
 /* harmony export */ });
@@ -11631,7 +12455,6 @@ const storage = new Storage();
 /***/ 8535:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   F: () => (/* binding */ Fragment)
 /* harmony export */ });
@@ -11655,7 +12478,8 @@ class Fragment {
     }
     static load(text) { return Fragment.fromText(text); }
     static parse(text) {
-        const lines = text.split('\n').map(line => line.replace(/\r$/, ''));
+        const normalizedText = (0,_utils__WEBPACK_IMPORTED_MODULE_2__/* .normalizeIndentedText */ .Ur)(text);
+        const lines = normalizedText.split('\n');
         const keyIndex = lines.findIndex(line => /^\s*key\b/i.test(line));
         const bodyLines = lines.slice(0, keyIndex);
         const keyLines = lines.slice(keyIndex + 1);
@@ -11718,7 +12542,6 @@ const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 /***/ 8646:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   A: () => (/* binding */ PawnModel),
 /* harmony export */   o: () => (/* binding */ FirehouseModel)
@@ -11751,7 +12574,6 @@ class FirehouseModel {
 /***/ 8668:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -11946,7 +12768,6 @@ class Cell {
 /***/ 8846:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -12023,7 +12844,6 @@ class FirehouseModal extends modal/* Modal */.a {
 /***/ 9177:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Z: () => (/* binding */ Floor)
 /* harmony export */ });
@@ -12044,138 +12864,9 @@ class Floor extends _drawable__WEBPACK_IMPORTED_MODULE_1__/* .Drawable */ .h {
 
 /***/ }),
 
-/***/ 9308:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  M: () => (/* binding */ FirehouseMode),
-  m: () => (/* binding */ GameState)
-});
-
-// EXTERNAL MODULE: ./src/utils.ts
-var utils = __webpack_require__(6185);
-// EXTERNAL MODULE: ./src/ui/text-stroke.ts
-var text_stroke = __webpack_require__(1485);
-// EXTERNAL MODULE: ./src/ui/colors.ts
-var colors = __webpack_require__(1919);
-// EXTERNAL MODULE: ./src/signal.ts
-var signal = __webpack_require__(334);
-// EXTERNAL MODULE: ./src/storage.ts
-var storage = __webpack_require__(8421);
-// EXTERNAL MODULE: ./src/game/capabilities.ts
-var capabilities = __webpack_require__(3793);
-// EXTERNAL MODULE: ./src/game/models/firehouse.ts
-var firehouse = __webpack_require__(8646);
-;// ./src/game/FirehouseStorage.ts
-
-
-const capabilitiesToJson = (c) => {
-    const o = {};
-    c.eachPair((n, skills) => { o[n] = skills.map(s => ({ name: s.name, level: s.level })); });
-    return o;
-};
-const capabilitiesFromJson = (j) => capabilities/* Capabilities */.FD.fromJSON(j);
-const FirehouseStorage = {
-    newGame: () => new firehouse/* FirehouseModel */.o(),
-    parse: (s) => FirehouseStorage.from(JSON.parse(s)),
-    from: (o) => {
-        const pawns = o.pawns.map(p => new firehouse/* PawnModel */.A(p.name, capabilitiesFromJson(p.capabilities)));
-        return new firehouse/* FirehouseModel */.o(pawns, o.equipment, o.upgrades, o.firehouseNum, o.name);
-    },
-    save: (m) => ({
-        pawns: m.pawns.map(p => ({ name: p.name, capabilities: capabilitiesToJson(p.capabilities) })),
-        equipment: m.equipment,
-        upgrades: m.upgrades,
-        firehouseNum: m.firehouseNum,
-        name: m.name,
-        capabilityNames: [...capabilities/* NAMES */.Xk]
-    })
-};
-
-;// ./src/game/state.ts
-
-
-
-
-
-
-class GameState {
-    constructor(map) {
-        this.map = map;
-        this.introSucceeded = false;
-        this.firehouse = FirehouseStorage.newGame();
-        this.data = () => ({
-            introSucceeded: this.introSucceeded,
-            firehouse: FirehouseStorage.save(this.firehouse)
-        });
-        this.loadData = (d) => {
-            this.introSucceeded = d.introSucceeded;
-            this.firehouse = FirehouseStorage.from(d.firehouse);
-        };
-        this.reset = () => {
-            this.introSucceeded = false;
-            this.firehouse = FirehouseStorage.newGame();
-        };
-        FirehouseMode.on(pawns => {
-            this.introSucceeded = true;
-            this.firehouse.pawns = pawns;
-            if (!this.firehouse.firehouseNum)
-                this.firehouse.firehouseNum = (0,utils/* randTo */.JD)(97) + 3;
-            this.save();
-        });
-    }
-    save() {
-        storage/* storage */.I.set('gameState', JSON.stringify(this.data()));
-        text_stroke/* TextStroke */.m.centered(this.map, 'GAME SAVED', this.map.h - 2, 'saved', colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy([colors/* WHITE */.UE, colors/* FOREGROUND */.u6])), 500);
-    }
-    load() {
-        const saveJson = storage/* storage */.I.get('gameState');
-        if (!saveJson)
-            return;
-        try {
-            this.loadData(JSON.parse(saveJson));
-            if (this.introSucceeded)
-                FirehouseMode.emit(this.firehouse.pawns);
-        }
-        catch (e) {
-            const key = `badSaves_gameState_${Date.now()}`;
-            storage/* storage */.I.set(key, saveJson);
-            storage/* storage */.I.remove('gameState');
-            console.error('Archived bad gameState at', key, e);
-        }
-    }
-    restartIntro() {
-        this.reset();
-        this.map.killAll();
-        this.map.display.clear();
-        this.map.smokeDisplay.clear();
-        this.map.uiRenderer.clearStrokes();
-        const { Initializer } = __webpack_require__(7349);
-        const initializer = new Initializer(this.map);
-        initializer.initialize();
-        this.map.lighting.redraw();
-    }
-}
-const FirehouseMode = new signal/* Signal */.H();
-
-
-/***/ }),
-
-/***/ 9444:
-/***/ ((module) => {
-
-"use strict";
-module.exports = ".#.\n#U#\n.u.\nKEY\n# = Wall\n* = Lamp\n+ = Door\nU = Unknown\nu = little unknown\n";
-
-/***/ }),
-
-/***/ 9447:
+/***/ 9273:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -12184,1051 +12875,8 @@ __webpack_require__.d(__webpack_exports__, {
 
 // UNUSED EXPORTS: Adder, Delaunay, FormatSpecifier, InternMap, InternSet, Node, Path, Voronoi, ZoomTransform, active, arc, area, areaRadial, ascending, autoType, axisBottom, axisLeft, axisRight, axisTop, bin, bisect, bisectCenter, bisectLeft, bisectRight, bisector, blob, blur, blur2, blurImage, brush, brushSelection, brushX, brushY, buffer, chord, chordDirected, chordTranspose, cluster, color, contourDensity, contours, count, create, creator, cross, csv, csvFormat, csvFormatBody, csvFormatRow, csvFormatRows, csvFormatValue, csvParse, csvParseRows, cubehelix, cumsum, curveBasis, curveBasisClosed, curveBasisOpen, curveBumpX, curveBumpY, curveBundle, curveCardinal, curveCardinalClosed, curveCardinalOpen, curveCatmullRom, curveCatmullRomClosed, curveCatmullRomOpen, curveLinear, curveLinearClosed, curveMonotoneX, curveMonotoneY, curveNatural, curveStep, curveStepAfter, curveStepBefore, descending, deviation, difference, disjoint, dispatch, drag, dragDisable, dragEnable, dsv, dsvFormat, easeBack, easeBackIn, easeBackInOut, easeBackOut, easeBounce, easeBounceIn, easeBounceInOut, easeBounceOut, easeCircle, easeCircleIn, easeCircleInOut, easeCircleOut, easeCubic, easeCubicIn, easeCubicInOut, easeCubicOut, easeElastic, easeElasticIn, easeElasticInOut, easeElasticOut, easeExp, easeExpIn, easeExpInOut, easeExpOut, easeLinear, easePoly, easePolyIn, easePolyInOut, easePolyOut, easeQuad, easeQuadIn, easeQuadInOut, easeQuadOut, easeSin, easeSinIn, easeSinInOut, easeSinOut, every, extent, fcumsum, filter, flatGroup, flatRollup, forceCenter, forceCollide, forceLink, forceManyBody, forceRadial, forceSimulation, forceX, forceY, format, formatDefaultLocale, formatLocale, formatPrefix, formatSpecifier, fsum, geoAlbers, geoAlbersUsa, geoArea, geoAzimuthalEqualArea, geoAzimuthalEqualAreaRaw, geoAzimuthalEquidistant, geoAzimuthalEquidistantRaw, geoBounds, geoCentroid, geoCircle, geoClipAntimeridian, geoClipCircle, geoClipExtent, geoClipRectangle, geoConicConformal, geoConicConformalRaw, geoConicEqualArea, geoConicEqualAreaRaw, geoConicEquidistant, geoConicEquidistantRaw, geoContains, geoDistance, geoEqualEarth, geoEqualEarthRaw, geoEquirectangular, geoEquirectangularRaw, geoGnomonic, geoGnomonicRaw, geoGraticule, geoGraticule10, geoIdentity, geoInterpolate, geoLength, geoMercator, geoMercatorRaw, geoNaturalEarth1, geoNaturalEarth1Raw, geoOrthographic, geoOrthographicRaw, geoPath, geoProjection, geoProjectionMutator, geoRotation, geoStereographic, geoStereographicRaw, geoStream, geoTransform, geoTransverseMercator, geoTransverseMercatorRaw, gray, greatest, greatestIndex, group, groupSort, groups, hcl, hierarchy, histogram, hsl, html, image, index, indexes, interpolate, interpolateArray, interpolateBasis, interpolateBasisClosed, interpolateBlues, interpolateBrBG, interpolateBuGn, interpolateBuPu, interpolateCividis, interpolateCool, interpolateCubehelix, interpolateCubehelixDefault, interpolateCubehelixLong, interpolateDate, interpolateDiscrete, interpolateGnBu, interpolateGreens, interpolateGreys, interpolateHcl, interpolateHclLong, interpolateHsl, interpolateHslLong, interpolateHue, interpolateInferno, interpolateLab, interpolateMagma, interpolateNumber, interpolateNumberArray, interpolateObject, interpolateOrRd, interpolateOranges, interpolatePRGn, interpolatePiYG, interpolatePlasma, interpolatePuBu, interpolatePuBuGn, interpolatePuOr, interpolatePuRd, interpolatePurples, interpolateRainbow, interpolateRdBu, interpolateRdGy, interpolateRdPu, interpolateRdYlBu, interpolateRdYlGn, interpolateReds, interpolateRgb, interpolateRgbBasis, interpolateRgbBasisClosed, interpolateRound, interpolateSinebow, interpolateSpectral, interpolateString, interpolateTransformCss, interpolateTransformSvg, interpolateTurbo, interpolateViridis, interpolateWarm, interpolateYlGn, interpolateYlGnBu, interpolateYlOrBr, interpolateYlOrRd, interpolateZoom, interrupt, intersection, interval, isoFormat, isoParse, json, lab, lch, least, leastIndex, line, lineRadial, link, linkHorizontal, linkRadial, linkVertical, local, map, matcher, max, maxIndex, mean, median, medianIndex, merge, min, minIndex, mode, namespace, namespaces, nice, now, pack, packEnclose, packSiblings, pairs, partition, path, pathRound, permute, pie, piecewise, pointRadial, pointer, pointers, polygonArea, polygonCentroid, polygonContains, polygonHull, polygonLength, precisionFixed, precisionPrefix, precisionRound, quadtree, quantile, quantileIndex, quantileSorted, quantize, quickselect, radialArea, radialLine, randomBates, randomBernoulli, randomBeta, randomBinomial, randomCauchy, randomExponential, randomGamma, randomGeometric, randomInt, randomIrwinHall, randomLcg, randomLogNormal, randomLogistic, randomNormal, randomPareto, randomPoisson, randomUniform, randomWeibull, range, rank, reduce, reverse, rgb, ribbon, ribbonArrow, rollup, rollups, scaleBand, scaleDiverging, scaleDivergingLog, scaleDivergingPow, scaleDivergingSqrt, scaleDivergingSymlog, scaleIdentity, scaleImplicit, scaleLinear, scaleLog, scaleOrdinal, scalePoint, scalePow, scaleQuantile, scaleQuantize, scaleRadial, scaleSequential, scaleSequentialLog, scaleSequentialPow, scaleSequentialQuantile, scaleSequentialSqrt, scaleSequentialSymlog, scaleSqrt, scaleSymlog, scaleThreshold, scaleTime, scaleUtc, scan, schemeAccent, schemeBlues, schemeBrBG, schemeBuGn, schemeBuPu, schemeCategory10, schemeDark2, schemeGnBu, schemeGreens, schemeGreys, schemeObservable10, schemeOrRd, schemeOranges, schemePRGn, schemePaired, schemePastel1, schemePastel2, schemePiYG, schemePuBu, schemePuBuGn, schemePuOr, schemePuRd, schemePurples, schemeRdBu, schemeRdGy, schemeRdPu, schemeRdYlBu, schemeRdYlGn, schemeReds, schemeSet1, schemeSet2, schemeSet3, schemeSpectral, schemeTableau10, schemeYlGn, schemeYlGnBu, schemeYlOrBr, schemeYlOrRd, selectAll, selection, selector, selectorAll, shuffle, shuffler, some, sort, stack, stackOffsetDiverging, stackOffsetExpand, stackOffsetNone, stackOffsetSilhouette, stackOffsetWiggle, stackOrderAppearance, stackOrderAscending, stackOrderDescending, stackOrderInsideOut, stackOrderNone, stackOrderReverse, stratify, style, subset, sum, superset, svg, symbol, symbolAsterisk, symbolCircle, symbolCross, symbolDiamond, symbolDiamond2, symbolPlus, symbolSquare, symbolSquare2, symbolStar, symbolTimes, symbolTriangle, symbolTriangle2, symbolWye, symbolX, symbols, symbolsFill, symbolsStroke, text, thresholdFreedmanDiaconis, thresholdScott, thresholdSturges, tickFormat, tickIncrement, tickStep, ticks, timeDay, timeDays, timeFormat, timeFormatDefaultLocale, timeFormatLocale, timeFriday, timeFridays, timeHour, timeHours, timeInterval, timeMillisecond, timeMilliseconds, timeMinute, timeMinutes, timeMonday, timeMondays, timeMonth, timeMonths, timeParse, timeSaturday, timeSaturdays, timeSecond, timeSeconds, timeSunday, timeSundays, timeThursday, timeThursdays, timeTickInterval, timeTicks, timeTuesday, timeTuesdays, timeWednesday, timeWednesdays, timeWeek, timeWeeks, timeYear, timeYears, timeout, timer, timerFlush, transition, transpose, tree, treemap, treemapBinary, treemapDice, treemapResquarify, treemapSlice, treemapSliceDice, treemapSquarify, tsv, tsvFormat, tsvFormatBody, tsvFormatRow, tsvFormatRows, tsvFormatValue, tsvParse, tsvParseRows, union, unixDay, unixDays, utcDay, utcDays, utcFormat, utcFriday, utcFridays, utcHour, utcHours, utcMillisecond, utcMilliseconds, utcMinute, utcMinutes, utcMonday, utcMondays, utcMonth, utcMonths, utcParse, utcSaturday, utcSaturdays, utcSecond, utcSeconds, utcSunday, utcSundays, utcThursday, utcThursdays, utcTickInterval, utcTicks, utcTuesday, utcTuesdays, utcWednesday, utcWednesdays, utcWeek, utcWeeks, utcYear, utcYears, variance, window, xml, zip, zoom, zoomIdentity, zoomTransform
 
-;// ./node_modules/d3-selection/src/selector.js
-function none() {}
-
-/* harmony default export */ function selector(selector) {
-  return selector == null ? none : function() {
-    return this.querySelector(selector);
-  };
-}
-
-;// ./node_modules/d3-selection/src/selection/select.js
-
-
-
-/* harmony default export */ function selection_select(select) {
-  if (typeof select !== "function") select = selector(select);
-
-  for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
-    for (var group = groups[j], n = group.length, subgroup = subgroups[j] = new Array(n), node, subnode, i = 0; i < n; ++i) {
-      if ((node = group[i]) && (subnode = select.call(node, node.__data__, i, group))) {
-        if ("__data__" in node) subnode.__data__ = node.__data__;
-        subgroup[i] = subnode;
-      }
-    }
-  }
-
-  return new Selection(subgroups, this._parents);
-}
-
-;// ./node_modules/d3-selection/src/array.js
-// Given something array like (or null), returns something that is strictly an
-// array. This is used to ensure that array-like objects passed to d3.selectAll
-// or selection.selectAll are converted into proper arrays when creating a
-// selection; we don’t ever want to create a selection backed by a live
-// HTMLCollection or NodeList. However, note that selection.selectAll will use a
-// static NodeList as a group, since it safely derived from querySelectorAll.
-function array(x) {
-  return x == null ? [] : Array.isArray(x) ? x : Array.from(x);
-}
-
-;// ./node_modules/d3-selection/src/selectorAll.js
-function empty() {
-  return [];
-}
-
-/* harmony default export */ function selectorAll(selector) {
-  return selector == null ? empty : function() {
-    return this.querySelectorAll(selector);
-  };
-}
-
-;// ./node_modules/d3-selection/src/selection/selectAll.js
-
-
-
-
-function arrayAll(select) {
-  return function() {
-    return array(select.apply(this, arguments));
-  };
-}
-
-/* harmony default export */ function selectAll(select) {
-  if (typeof select === "function") select = arrayAll(select);
-  else select = selectorAll(select);
-
-  for (var groups = this._groups, m = groups.length, subgroups = [], parents = [], j = 0; j < m; ++j) {
-    for (var group = groups[j], n = group.length, node, i = 0; i < n; ++i) {
-      if (node = group[i]) {
-        subgroups.push(select.call(node, node.__data__, i, group));
-        parents.push(node);
-      }
-    }
-  }
-
-  return new Selection(subgroups, parents);
-}
-
-;// ./node_modules/d3-selection/src/matcher.js
-/* harmony default export */ function matcher(selector) {
-  return function() {
-    return this.matches(selector);
-  };
-}
-
-function childMatcher(selector) {
-  return function(node) {
-    return node.matches(selector);
-  };
-}
-
-
-;// ./node_modules/d3-selection/src/selection/selectChild.js
-
-
-var find = Array.prototype.find;
-
-function childFind(match) {
-  return function() {
-    return find.call(this.children, match);
-  };
-}
-
-function childFirst() {
-  return this.firstElementChild;
-}
-
-/* harmony default export */ function selectChild(match) {
-  return this.select(match == null ? childFirst
-      : childFind(typeof match === "function" ? match : childMatcher(match)));
-}
-
-;// ./node_modules/d3-selection/src/selection/selectChildren.js
-
-
-var filter = Array.prototype.filter;
-
-function children() {
-  return Array.from(this.children);
-}
-
-function childrenFilter(match) {
-  return function() {
-    return filter.call(this.children, match);
-  };
-}
-
-/* harmony default export */ function selectChildren(match) {
-  return this.selectAll(match == null ? children
-      : childrenFilter(typeof match === "function" ? match : childMatcher(match)));
-}
-
-;// ./node_modules/d3-selection/src/selection/filter.js
-
-
-
-/* harmony default export */ function selection_filter(match) {
-  if (typeof match !== "function") match = matcher(match);
-
-  for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
-    for (var group = groups[j], n = group.length, subgroup = subgroups[j] = [], node, i = 0; i < n; ++i) {
-      if ((node = group[i]) && match.call(node, node.__data__, i, group)) {
-        subgroup.push(node);
-      }
-    }
-  }
-
-  return new Selection(subgroups, this._parents);
-}
-
-;// ./node_modules/d3-selection/src/selection/sparse.js
-/* harmony default export */ function sparse(update) {
-  return new Array(update.length);
-}
-
-;// ./node_modules/d3-selection/src/selection/enter.js
-
-
-
-/* harmony default export */ function enter() {
-  return new Selection(this._enter || this._groups.map(sparse), this._parents);
-}
-
-function EnterNode(parent, datum) {
-  this.ownerDocument = parent.ownerDocument;
-  this.namespaceURI = parent.namespaceURI;
-  this._next = null;
-  this._parent = parent;
-  this.__data__ = datum;
-}
-
-EnterNode.prototype = {
-  constructor: EnterNode,
-  appendChild: function(child) { return this._parent.insertBefore(child, this._next); },
-  insertBefore: function(child, next) { return this._parent.insertBefore(child, next); },
-  querySelector: function(selector) { return this._parent.querySelector(selector); },
-  querySelectorAll: function(selector) { return this._parent.querySelectorAll(selector); }
-};
-
-;// ./node_modules/d3-selection/src/constant.js
-/* harmony default export */ function src_constant(x) {
-  return function() {
-    return x;
-  };
-}
-
-;// ./node_modules/d3-selection/src/selection/data.js
-
-
-
-
-function bindIndex(parent, group, enter, update, exit, data) {
-  var i = 0,
-      node,
-      groupLength = group.length,
-      dataLength = data.length;
-
-  // Put any non-null nodes that fit into update.
-  // Put any null nodes into enter.
-  // Put any remaining data into enter.
-  for (; i < dataLength; ++i) {
-    if (node = group[i]) {
-      node.__data__ = data[i];
-      update[i] = node;
-    } else {
-      enter[i] = new EnterNode(parent, data[i]);
-    }
-  }
-
-  // Put any non-null nodes that don’t fit into exit.
-  for (; i < groupLength; ++i) {
-    if (node = group[i]) {
-      exit[i] = node;
-    }
-  }
-}
-
-function bindKey(parent, group, enter, update, exit, data, key) {
-  var i,
-      node,
-      nodeByKeyValue = new Map,
-      groupLength = group.length,
-      dataLength = data.length,
-      keyValues = new Array(groupLength),
-      keyValue;
-
-  // Compute the key for each node.
-  // If multiple nodes have the same key, the duplicates are added to exit.
-  for (i = 0; i < groupLength; ++i) {
-    if (node = group[i]) {
-      keyValues[i] = keyValue = key.call(node, node.__data__, i, group) + "";
-      if (nodeByKeyValue.has(keyValue)) {
-        exit[i] = node;
-      } else {
-        nodeByKeyValue.set(keyValue, node);
-      }
-    }
-  }
-
-  // Compute the key for each datum.
-  // If there a node associated with this key, join and add it to update.
-  // If there is not (or the key is a duplicate), add it to enter.
-  for (i = 0; i < dataLength; ++i) {
-    keyValue = key.call(parent, data[i], i, data) + "";
-    if (node = nodeByKeyValue.get(keyValue)) {
-      update[i] = node;
-      node.__data__ = data[i];
-      nodeByKeyValue.delete(keyValue);
-    } else {
-      enter[i] = new EnterNode(parent, data[i]);
-    }
-  }
-
-  // Add any remaining nodes that were not bound to data to exit.
-  for (i = 0; i < groupLength; ++i) {
-    if ((node = group[i]) && (nodeByKeyValue.get(keyValues[i]) === node)) {
-      exit[i] = node;
-    }
-  }
-}
-
-function datum(node) {
-  return node.__data__;
-}
-
-/* harmony default export */ function data(value, key) {
-  if (!arguments.length) return Array.from(this, datum);
-
-  var bind = key ? bindKey : bindIndex,
-      parents = this._parents,
-      groups = this._groups;
-
-  if (typeof value !== "function") value = src_constant(value);
-
-  for (var m = groups.length, update = new Array(m), enter = new Array(m), exit = new Array(m), j = 0; j < m; ++j) {
-    var parent = parents[j],
-        group = groups[j],
-        groupLength = group.length,
-        data = arraylike(value.call(parent, parent && parent.__data__, j, parents)),
-        dataLength = data.length,
-        enterGroup = enter[j] = new Array(dataLength),
-        updateGroup = update[j] = new Array(dataLength),
-        exitGroup = exit[j] = new Array(groupLength);
-
-    bind(parent, group, enterGroup, updateGroup, exitGroup, data, key);
-
-    // Now connect the enter nodes to their following update node, such that
-    // appendChild can insert the materialized enter node before this node,
-    // rather than at the end of the parent node.
-    for (var i0 = 0, i1 = 0, previous, next; i0 < dataLength; ++i0) {
-      if (previous = enterGroup[i0]) {
-        if (i0 >= i1) i1 = i0 + 1;
-        while (!(next = updateGroup[i1]) && ++i1 < dataLength);
-        previous._next = next || null;
-      }
-    }
-  }
-
-  update = new Selection(update, parents);
-  update._enter = enter;
-  update._exit = exit;
-  return update;
-}
-
-// Given some data, this returns an array-like view of it: an object that
-// exposes a length property and allows numeric indexing. Note that unlike
-// selectAll, this isn’t worried about “live” collections because the resulting
-// array will only be used briefly while data is being bound. (It is possible to
-// cause the data to change while iterating by using a key function, but please
-// don’t; we’d rather avoid a gratuitous copy.)
-function arraylike(data) {
-  return typeof data === "object" && "length" in data
-    ? data // Array, TypedArray, NodeList, array-like
-    : Array.from(data); // Map, Set, iterable, string, or anything else
-}
-
-;// ./node_modules/d3-selection/src/selection/exit.js
-
-
-
-/* harmony default export */ function exit() {
-  return new Selection(this._exit || this._groups.map(sparse), this._parents);
-}
-
-;// ./node_modules/d3-selection/src/selection/join.js
-/* harmony default export */ function join(onenter, onupdate, onexit) {
-  var enter = this.enter(), update = this, exit = this.exit();
-  if (typeof onenter === "function") {
-    enter = onenter(enter);
-    if (enter) enter = enter.selection();
-  } else {
-    enter = enter.append(onenter + "");
-  }
-  if (onupdate != null) {
-    update = onupdate(update);
-    if (update) update = update.selection();
-  }
-  if (onexit == null) exit.remove(); else onexit(exit);
-  return enter && update ? enter.merge(update).order() : update;
-}
-
-;// ./node_modules/d3-selection/src/selection/merge.js
-
-
-/* harmony default export */ function merge(context) {
-  var selection = context.selection ? context.selection() : context;
-
-  for (var groups0 = this._groups, groups1 = selection._groups, m0 = groups0.length, m1 = groups1.length, m = Math.min(m0, m1), merges = new Array(m0), j = 0; j < m; ++j) {
-    for (var group0 = groups0[j], group1 = groups1[j], n = group0.length, merge = merges[j] = new Array(n), node, i = 0; i < n; ++i) {
-      if (node = group0[i] || group1[i]) {
-        merge[i] = node;
-      }
-    }
-  }
-
-  for (; j < m0; ++j) {
-    merges[j] = groups0[j];
-  }
-
-  return new Selection(merges, this._parents);
-}
-
-;// ./node_modules/d3-selection/src/selection/order.js
-/* harmony default export */ function order() {
-
-  for (var groups = this._groups, j = -1, m = groups.length; ++j < m;) {
-    for (var group = groups[j], i = group.length - 1, next = group[i], node; --i >= 0;) {
-      if (node = group[i]) {
-        if (next && node.compareDocumentPosition(next) ^ 4) next.parentNode.insertBefore(node, next);
-        next = node;
-      }
-    }
-  }
-
-  return this;
-}
-
-;// ./node_modules/d3-selection/src/selection/sort.js
-
-
-/* harmony default export */ function sort(compare) {
-  if (!compare) compare = ascending;
-
-  function compareNode(a, b) {
-    return a && b ? compare(a.__data__, b.__data__) : !a - !b;
-  }
-
-  for (var groups = this._groups, m = groups.length, sortgroups = new Array(m), j = 0; j < m; ++j) {
-    for (var group = groups[j], n = group.length, sortgroup = sortgroups[j] = new Array(n), node, i = 0; i < n; ++i) {
-      if (node = group[i]) {
-        sortgroup[i] = node;
-      }
-    }
-    sortgroup.sort(compareNode);
-  }
-
-  return new Selection(sortgroups, this._parents).order();
-}
-
-function ascending(a, b) {
-  return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
-}
-
-;// ./node_modules/d3-selection/src/selection/call.js
-/* harmony default export */ function call() {
-  var callback = arguments[0];
-  arguments[0] = this;
-  callback.apply(null, arguments);
-  return this;
-}
-
-;// ./node_modules/d3-selection/src/selection/nodes.js
-/* harmony default export */ function nodes() {
-  return Array.from(this);
-}
-
-;// ./node_modules/d3-selection/src/selection/node.js
-/* harmony default export */ function node() {
-
-  for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
-    for (var group = groups[j], i = 0, n = group.length; i < n; ++i) {
-      var node = group[i];
-      if (node) return node;
-    }
-  }
-
-  return null;
-}
-
-;// ./node_modules/d3-selection/src/selection/size.js
-/* harmony default export */ function size() {
-  let size = 0;
-  for (const node of this) ++size; // eslint-disable-line no-unused-vars
-  return size;
-}
-
-;// ./node_modules/d3-selection/src/selection/empty.js
-/* harmony default export */ function selection_empty() {
-  return !this.node();
-}
-
-;// ./node_modules/d3-selection/src/selection/each.js
-/* harmony default export */ function each(callback) {
-
-  for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
-    for (var group = groups[j], i = 0, n = group.length, node; i < n; ++i) {
-      if (node = group[i]) callback.call(node, node.__data__, i, group);
-    }
-  }
-
-  return this;
-}
-
-;// ./node_modules/d3-selection/src/namespaces.js
-var xhtml = "http://www.w3.org/1999/xhtml";
-
-/* harmony default export */ const namespaces = ({
-  svg: "http://www.w3.org/2000/svg",
-  xhtml: xhtml,
-  xlink: "http://www.w3.org/1999/xlink",
-  xml: "http://www.w3.org/XML/1998/namespace",
-  xmlns: "http://www.w3.org/2000/xmlns/"
-});
-
-;// ./node_modules/d3-selection/src/namespace.js
-
-
-/* harmony default export */ function namespace(name) {
-  var prefix = name += "", i = prefix.indexOf(":");
-  if (i >= 0 && (prefix = name.slice(0, i)) !== "xmlns") name = name.slice(i + 1);
-  return namespaces.hasOwnProperty(prefix) ? {space: namespaces[prefix], local: name} : name; // eslint-disable-line no-prototype-builtins
-}
-
-;// ./node_modules/d3-selection/src/selection/attr.js
-
-
-function attrRemove(name) {
-  return function() {
-    this.removeAttribute(name);
-  };
-}
-
-function attrRemoveNS(fullname) {
-  return function() {
-    this.removeAttributeNS(fullname.space, fullname.local);
-  };
-}
-
-function attrConstant(name, value) {
-  return function() {
-    this.setAttribute(name, value);
-  };
-}
-
-function attrConstantNS(fullname, value) {
-  return function() {
-    this.setAttributeNS(fullname.space, fullname.local, value);
-  };
-}
-
-function attrFunction(name, value) {
-  return function() {
-    var v = value.apply(this, arguments);
-    if (v == null) this.removeAttribute(name);
-    else this.setAttribute(name, v);
-  };
-}
-
-function attrFunctionNS(fullname, value) {
-  return function() {
-    var v = value.apply(this, arguments);
-    if (v == null) this.removeAttributeNS(fullname.space, fullname.local);
-    else this.setAttributeNS(fullname.space, fullname.local, v);
-  };
-}
-
-/* harmony default export */ function attr(name, value) {
-  var fullname = namespace(name);
-
-  if (arguments.length < 2) {
-    var node = this.node();
-    return fullname.local
-        ? node.getAttributeNS(fullname.space, fullname.local)
-        : node.getAttribute(fullname);
-  }
-
-  return this.each((value == null
-      ? (fullname.local ? attrRemoveNS : attrRemove) : (typeof value === "function"
-      ? (fullname.local ? attrFunctionNS : attrFunction)
-      : (fullname.local ? attrConstantNS : attrConstant)))(fullname, value));
-}
-
-;// ./node_modules/d3-selection/src/window.js
-/* harmony default export */ function src_window(node) {
-  return (node.ownerDocument && node.ownerDocument.defaultView) // node is a Node
-      || (node.document && node) // node is a Window
-      || node.defaultView; // node is a Document
-}
-
-;// ./node_modules/d3-selection/src/selection/style.js
-
-
-function styleRemove(name) {
-  return function() {
-    this.style.removeProperty(name);
-  };
-}
-
-function styleConstant(name, value, priority) {
-  return function() {
-    this.style.setProperty(name, value, priority);
-  };
-}
-
-function styleFunction(name, value, priority) {
-  return function() {
-    var v = value.apply(this, arguments);
-    if (v == null) this.style.removeProperty(name);
-    else this.style.setProperty(name, v, priority);
-  };
-}
-
-/* harmony default export */ function style(name, value, priority) {
-  return arguments.length > 1
-      ? this.each((value == null
-            ? styleRemove : typeof value === "function"
-            ? styleFunction
-            : styleConstant)(name, value, priority == null ? "" : priority))
-      : styleValue(this.node(), name);
-}
-
-function styleValue(node, name) {
-  return node.style.getPropertyValue(name)
-      || src_window(node).getComputedStyle(node, null).getPropertyValue(name);
-}
-
-;// ./node_modules/d3-selection/src/selection/property.js
-function propertyRemove(name) {
-  return function() {
-    delete this[name];
-  };
-}
-
-function propertyConstant(name, value) {
-  return function() {
-    this[name] = value;
-  };
-}
-
-function propertyFunction(name, value) {
-  return function() {
-    var v = value.apply(this, arguments);
-    if (v == null) delete this[name];
-    else this[name] = v;
-  };
-}
-
-/* harmony default export */ function property(name, value) {
-  return arguments.length > 1
-      ? this.each((value == null
-          ? propertyRemove : typeof value === "function"
-          ? propertyFunction
-          : propertyConstant)(name, value))
-      : this.node()[name];
-}
-
-;// ./node_modules/d3-selection/src/selection/classed.js
-function classArray(string) {
-  return string.trim().split(/^|\s+/);
-}
-
-function classList(node) {
-  return node.classList || new ClassList(node);
-}
-
-function ClassList(node) {
-  this._node = node;
-  this._names = classArray(node.getAttribute("class") || "");
-}
-
-ClassList.prototype = {
-  add: function(name) {
-    var i = this._names.indexOf(name);
-    if (i < 0) {
-      this._names.push(name);
-      this._node.setAttribute("class", this._names.join(" "));
-    }
-  },
-  remove: function(name) {
-    var i = this._names.indexOf(name);
-    if (i >= 0) {
-      this._names.splice(i, 1);
-      this._node.setAttribute("class", this._names.join(" "));
-    }
-  },
-  contains: function(name) {
-    return this._names.indexOf(name) >= 0;
-  }
-};
-
-function classedAdd(node, names) {
-  var list = classList(node), i = -1, n = names.length;
-  while (++i < n) list.add(names[i]);
-}
-
-function classedRemove(node, names) {
-  var list = classList(node), i = -1, n = names.length;
-  while (++i < n) list.remove(names[i]);
-}
-
-function classedTrue(names) {
-  return function() {
-    classedAdd(this, names);
-  };
-}
-
-function classedFalse(names) {
-  return function() {
-    classedRemove(this, names);
-  };
-}
-
-function classedFunction(names, value) {
-  return function() {
-    (value.apply(this, arguments) ? classedAdd : classedRemove)(this, names);
-  };
-}
-
-/* harmony default export */ function classed(name, value) {
-  var names = classArray(name + "");
-
-  if (arguments.length < 2) {
-    var list = classList(this.node()), i = -1, n = names.length;
-    while (++i < n) if (!list.contains(names[i])) return false;
-    return true;
-  }
-
-  return this.each((typeof value === "function"
-      ? classedFunction : value
-      ? classedTrue
-      : classedFalse)(names, value));
-}
-
-;// ./node_modules/d3-selection/src/selection/text.js
-function textRemove() {
-  this.textContent = "";
-}
-
-function textConstant(value) {
-  return function() {
-    this.textContent = value;
-  };
-}
-
-function textFunction(value) {
-  return function() {
-    var v = value.apply(this, arguments);
-    this.textContent = v == null ? "" : v;
-  };
-}
-
-/* harmony default export */ function selection_text(value) {
-  return arguments.length
-      ? this.each(value == null
-          ? textRemove : (typeof value === "function"
-          ? textFunction
-          : textConstant)(value))
-      : this.node().textContent;
-}
-
-;// ./node_modules/d3-selection/src/selection/html.js
-function htmlRemove() {
-  this.innerHTML = "";
-}
-
-function htmlConstant(value) {
-  return function() {
-    this.innerHTML = value;
-  };
-}
-
-function htmlFunction(value) {
-  return function() {
-    var v = value.apply(this, arguments);
-    this.innerHTML = v == null ? "" : v;
-  };
-}
-
-/* harmony default export */ function html(value) {
-  return arguments.length
-      ? this.each(value == null
-          ? htmlRemove : (typeof value === "function"
-          ? htmlFunction
-          : htmlConstant)(value))
-      : this.node().innerHTML;
-}
-
-;// ./node_modules/d3-selection/src/selection/raise.js
-function raise() {
-  if (this.nextSibling) this.parentNode.appendChild(this);
-}
-
-/* harmony default export */ function selection_raise() {
-  return this.each(raise);
-}
-
-;// ./node_modules/d3-selection/src/selection/lower.js
-function lower() {
-  if (this.previousSibling) this.parentNode.insertBefore(this, this.parentNode.firstChild);
-}
-
-/* harmony default export */ function selection_lower() {
-  return this.each(lower);
-}
-
-;// ./node_modules/d3-selection/src/creator.js
-
-
-
-function creatorInherit(name) {
-  return function() {
-    var document = this.ownerDocument,
-        uri = this.namespaceURI;
-    return uri === xhtml && document.documentElement.namespaceURI === xhtml
-        ? document.createElement(name)
-        : document.createElementNS(uri, name);
-  };
-}
-
-function creatorFixed(fullname) {
-  return function() {
-    return this.ownerDocument.createElementNS(fullname.space, fullname.local);
-  };
-}
-
-/* harmony default export */ function creator(name) {
-  var fullname = namespace(name);
-  return (fullname.local
-      ? creatorFixed
-      : creatorInherit)(fullname);
-}
-
-;// ./node_modules/d3-selection/src/selection/append.js
-
-
-/* harmony default export */ function append(name) {
-  var create = typeof name === "function" ? name : creator(name);
-  return this.select(function() {
-    return this.appendChild(create.apply(this, arguments));
-  });
-}
-
-;// ./node_modules/d3-selection/src/selection/insert.js
-
-
-
-function constantNull() {
-  return null;
-}
-
-/* harmony default export */ function insert(name, before) {
-  var create = typeof name === "function" ? name : creator(name),
-      select = before == null ? constantNull : typeof before === "function" ? before : selector(before);
-  return this.select(function() {
-    return this.insertBefore(create.apply(this, arguments), select.apply(this, arguments) || null);
-  });
-}
-
-;// ./node_modules/d3-selection/src/selection/remove.js
-function remove() {
-  var parent = this.parentNode;
-  if (parent) parent.removeChild(this);
-}
-
-/* harmony default export */ function selection_remove() {
-  return this.each(remove);
-}
-
-;// ./node_modules/d3-selection/src/selection/clone.js
-function selection_cloneShallow() {
-  var clone = this.cloneNode(false), parent = this.parentNode;
-  return parent ? parent.insertBefore(clone, this.nextSibling) : clone;
-}
-
-function selection_cloneDeep() {
-  var clone = this.cloneNode(true), parent = this.parentNode;
-  return parent ? parent.insertBefore(clone, this.nextSibling) : clone;
-}
-
-/* harmony default export */ function clone(deep) {
-  return this.select(deep ? selection_cloneDeep : selection_cloneShallow);
-}
-
-;// ./node_modules/d3-selection/src/selection/datum.js
-/* harmony default export */ function selection_datum(value) {
-  return arguments.length
-      ? this.property("__data__", value)
-      : this.node().__data__;
-}
-
-;// ./node_modules/d3-selection/src/selection/on.js
-function contextListener(listener) {
-  return function(event) {
-    listener.call(this, event, this.__data__);
-  };
-}
-
-function parseTypenames(typenames) {
-  return typenames.trim().split(/^|\s+/).map(function(t) {
-    var name = "", i = t.indexOf(".");
-    if (i >= 0) name = t.slice(i + 1), t = t.slice(0, i);
-    return {type: t, name: name};
-  });
-}
-
-function onRemove(typename) {
-  return function() {
-    var on = this.__on;
-    if (!on) return;
-    for (var j = 0, i = -1, m = on.length, o; j < m; ++j) {
-      if (o = on[j], (!typename.type || o.type === typename.type) && o.name === typename.name) {
-        this.removeEventListener(o.type, o.listener, o.options);
-      } else {
-        on[++i] = o;
-      }
-    }
-    if (++i) on.length = i;
-    else delete this.__on;
-  };
-}
-
-function onAdd(typename, value, options) {
-  return function() {
-    var on = this.__on, o, listener = contextListener(value);
-    if (on) for (var j = 0, m = on.length; j < m; ++j) {
-      if ((o = on[j]).type === typename.type && o.name === typename.name) {
-        this.removeEventListener(o.type, o.listener, o.options);
-        this.addEventListener(o.type, o.listener = listener, o.options = options);
-        o.value = value;
-        return;
-      }
-    }
-    this.addEventListener(typename.type, listener, options);
-    o = {type: typename.type, name: typename.name, value: value, listener: listener, options: options};
-    if (!on) this.__on = [o];
-    else on.push(o);
-  };
-}
-
-/* harmony default export */ function on(typename, value, options) {
-  var typenames = parseTypenames(typename + ""), i, n = typenames.length, t;
-
-  if (arguments.length < 2) {
-    var on = this.node().__on;
-    if (on) for (var j = 0, m = on.length, o; j < m; ++j) {
-      for (i = 0, o = on[j]; i < n; ++i) {
-        if ((t = typenames[i]).type === o.type && t.name === o.name) {
-          return o.value;
-        }
-      }
-    }
-    return;
-  }
-
-  on = value ? onAdd : onRemove;
-  for (i = 0; i < n; ++i) this.each(on(typenames[i], value, options));
-  return this;
-}
-
-;// ./node_modules/d3-selection/src/selection/dispatch.js
-
-
-function dispatchEvent(node, type, params) {
-  var window = src_window(node),
-      event = window.CustomEvent;
-
-  if (typeof event === "function") {
-    event = new event(type, params);
-  } else {
-    event = window.document.createEvent("Event");
-    if (params) event.initEvent(type, params.bubbles, params.cancelable), event.detail = params.detail;
-    else event.initEvent(type, false, false);
-  }
-
-  node.dispatchEvent(event);
-}
-
-function dispatchConstant(type, params) {
-  return function() {
-    return dispatchEvent(this, type, params);
-  };
-}
-
-function dispatchFunction(type, params) {
-  return function() {
-    return dispatchEvent(this, type, params.apply(this, arguments));
-  };
-}
-
-/* harmony default export */ function selection_dispatch(type, params) {
-  return this.each((typeof params === "function"
-      ? dispatchFunction
-      : dispatchConstant)(type, params));
-}
-
-;// ./node_modules/d3-selection/src/selection/iterator.js
-/* harmony default export */ function* iterator() {
-  for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
-    for (var group = groups[j], i = 0, n = group.length, node; i < n; ++i) {
-      if (node = group[i]) yield node;
-    }
-  }
-}
-
-;// ./node_modules/d3-selection/src/selection/index.js
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var root = [null];
-
-function Selection(groups, parents) {
-  this._groups = groups;
-  this._parents = parents;
-}
-
-function selection() {
-  return new Selection([[document.documentElement]], root);
-}
-
-function selection_selection() {
-  return this;
-}
-
-Selection.prototype = selection.prototype = {
-  constructor: Selection,
-  select: selection_select,
-  selectAll: selectAll,
-  selectChild: selectChild,
-  selectChildren: selectChildren,
-  filter: selection_filter,
-  data: data,
-  enter: enter,
-  exit: exit,
-  join: join,
-  merge: merge,
-  selection: selection_selection,
-  order: order,
-  sort: sort,
-  call: call,
-  nodes: nodes,
-  node: node,
-  size: size,
-  empty: selection_empty,
-  each: each,
-  attr: attr,
-  style: style,
-  property: property,
-  classed: classed,
-  text: selection_text,
-  html: html,
-  raise: selection_raise,
-  lower: selection_lower,
-  append: append,
-  insert: insert,
-  remove: selection_remove,
-  clone: clone,
-  datum: selection_datum,
-  on: on,
-  dispatch: selection_dispatch,
-  [Symbol.iterator]: iterator
-};
-
-/* harmony default export */ const src_selection = (selection);
-
+// EXTERNAL MODULE: ./node_modules/d3-selection/src/selection/index.js + 37 modules
+var selection = __webpack_require__(8227);
 ;// ./node_modules/d3-dispatch/src/dispatch.js
 var noop = {value: () => {}};
 
@@ -13244,7 +12892,7 @@ function Dispatch(_) {
   this._ = _;
 }
 
-function dispatch_parseTypenames(typenames, types) {
+function parseTypenames(typenames, types) {
   return typenames.trim().split(/^|\s+/).map(function(t) {
     var name = "", i = t.indexOf(".");
     if (i >= 0) name = t.slice(i + 1), t = t.slice(0, i);
@@ -13257,7 +12905,7 @@ Dispatch.prototype = dispatch_dispatch.prototype = {
   constructor: Dispatch,
   on: function(typename, callback) {
     var _ = this._,
-        T = dispatch_parseTypenames(typename + "", _),
+        T = parseTypenames(typename + "", _),
         t,
         i = -1,
         n = T.length;
@@ -13750,6 +13398,8 @@ function interpolateTransform(parse, pxComma, pxParen, degParen) {
 var interpolateTransformCss = interpolateTransform(parseCss, "px, ", "px)", "deg)");
 var interpolateTransformSvg = interpolateTransform(parseSvg, ", ", ")", ")");
 
+// EXTERNAL MODULE: ./node_modules/d3-selection/src/namespace.js
+var namespace = __webpack_require__(7268);
 ;// ./node_modules/d3-transition/src/transition/tween.js
 
 
@@ -14280,7 +13930,7 @@ function basis(t1, v0, v1, v2, v3) {
 }
 
 ;// ./node_modules/d3-interpolate/src/constant.js
-/* harmony default export */ const d3_interpolate_src_constant = (x => () => x);
+/* harmony default export */ const src_constant = (x => () => x);
 
 ;// ./node_modules/d3-interpolate/src/color.js
 
@@ -14304,13 +13954,13 @@ function hue(a, b) {
 
 function gamma(y) {
   return (y = +y) === 1 ? nogamma : function(a, b) {
-    return b - a ? exponential(a, b, y) : d3_interpolate_src_constant(isNaN(a) ? b : a);
+    return b - a ? exponential(a, b, y) : src_constant(isNaN(a) ? b : a);
   };
 }
 
 function nogamma(a, b) {
   var d = b - a;
-  return d ? linear(a, d) : d3_interpolate_src_constant(isNaN(a) ? b : a);
+  return d ? linear(a, d) : src_constant(isNaN(a) ? b : a);
 }
 
 ;// ./node_modules/d3-interpolate/src/rgb.js
@@ -14454,19 +14104,19 @@ function one(b) {
 
 
 
-function attr_attrRemove(name) {
+function attrRemove(name) {
   return function() {
     this.removeAttribute(name);
   };
 }
 
-function attr_attrRemoveNS(fullname) {
+function attrRemoveNS(fullname) {
   return function() {
     this.removeAttributeNS(fullname.space, fullname.local);
   };
 }
 
-function attr_attrConstant(name, interpolate, value1) {
+function attrConstant(name, interpolate, value1) {
   var string00,
       string1 = value1 + "",
       interpolate0;
@@ -14478,7 +14128,7 @@ function attr_attrConstant(name, interpolate, value1) {
   };
 }
 
-function attr_attrConstantNS(fullname, interpolate, value1) {
+function attrConstantNS(fullname, interpolate, value1) {
   var string00,
       string1 = value1 + "",
       interpolate0;
@@ -14490,7 +14140,7 @@ function attr_attrConstantNS(fullname, interpolate, value1) {
   };
 }
 
-function attr_attrFunction(name, interpolate, value) {
+function attrFunction(name, interpolate, value) {
   var string00,
       string10,
       interpolate0;
@@ -14505,7 +14155,7 @@ function attr_attrFunction(name, interpolate, value) {
   };
 }
 
-function attr_attrFunctionNS(fullname, interpolate, value) {
+function attrFunctionNS(fullname, interpolate, value) {
   var string00,
       string10,
       interpolate0;
@@ -14520,12 +14170,12 @@ function attr_attrFunctionNS(fullname, interpolate, value) {
   };
 }
 
-/* harmony default export */ function transition_attr(name, value) {
-  var fullname = namespace(name), i = fullname === "transform" ? interpolateTransformSvg : transition_interpolate;
+/* harmony default export */ function attr(name, value) {
+  var fullname = (0,namespace/* default */.A)(name), i = fullname === "transform" ? interpolateTransformSvg : transition_interpolate;
   return this.attrTween(name, typeof value === "function"
-      ? (fullname.local ? attr_attrFunctionNS : attr_attrFunction)(fullname, i, tweenValue(this, "attr." + name, value))
-      : value == null ? (fullname.local ? attr_attrRemoveNS : attr_attrRemove)(fullname)
-      : (fullname.local ? attr_attrConstantNS : attr_attrConstant)(fullname, i, value));
+      ? (fullname.local ? attrFunctionNS : attrFunction)(fullname, i, tweenValue(this, "attr." + name, value))
+      : value == null ? (fullname.local ? attrRemoveNS : attrRemove)(fullname)
+      : (fullname.local ? attrConstantNS : attrConstant)(fullname, i, value));
 }
 
 ;// ./node_modules/d3-transition/src/transition/attrTween.js
@@ -14570,7 +14220,7 @@ function attrTween(name, value) {
   if (arguments.length < 2) return (key = this.tween(key)) && key._value;
   if (value == null) return this.tween(key, null);
   if (typeof value !== "function") throw new Error;
-  var fullname = namespace(name);
+  var fullname = (0,namespace/* default */.A)(name);
   return this.tween(key, (fullname.local ? attrTweenNS : attrTween)(fullname, value));
 }
 
@@ -14658,12 +14308,14 @@ function easeVarying(id, value) {
   return this.each(easeVarying(this._id, value));
 }
 
+// EXTERNAL MODULE: ./node_modules/d3-selection/src/matcher.js
+var matcher = __webpack_require__(6541);
 ;// ./node_modules/d3-transition/src/transition/filter.js
 
 
 
-/* harmony default export */ function transition_filter(match) {
-  if (typeof match !== "function") match = matcher(match);
+/* harmony default export */ function filter(match) {
+  if (typeof match !== "function") match = (0,matcher/* default */.A)(match);
 
   for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
     for (var group = groups[j], n = group.length, subgroup = subgroups[j] = [], node, i = 0; i < n; ++i) {
@@ -14679,7 +14331,7 @@ function easeVarying(id, value) {
 ;// ./node_modules/d3-transition/src/transition/merge.js
 
 
-/* harmony default export */ function transition_merge(transition) {
+/* harmony default export */ function merge(transition) {
   if (transition._id !== this._id) throw new Error;
 
   for (var groups0 = this._groups, groups1 = transition._groups, m0 = groups0.length, m1 = groups1.length, m = Math.min(m0, m1), merges = new Array(m0), j = 0; j < m; ++j) {
@@ -14723,7 +14375,7 @@ function onFunction(id, name, listener) {
   };
 }
 
-/* harmony default export */ function transition_on(name, listener) {
+/* harmony default export */ function on(name, listener) {
   var id = this._id;
 
   return arguments.length < 2
@@ -14740,10 +14392,12 @@ function removeFunction(id) {
   };
 }
 
-/* harmony default export */ function transition_remove() {
+/* harmony default export */ function remove() {
   return this.on("end.remove", removeFunction(this._id));
 }
 
+// EXTERNAL MODULE: ./node_modules/d3-selection/src/selector.js
+var selector = __webpack_require__(574);
 ;// ./node_modules/d3-transition/src/transition/select.js
 
 
@@ -14753,7 +14407,7 @@ function removeFunction(id) {
   var name = this._name,
       id = this._id;
 
-  if (typeof select !== "function") select = selector(select);
+  if (typeof select !== "function") select = (0,selector/* default */.A)(select);
 
   for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
     for (var group = groups[j], n = group.length, subgroup = subgroups[j] = new Array(n), node, subnode, i = 0; i < n; ++i) {
@@ -14768,16 +14422,18 @@ function removeFunction(id) {
   return new Transition(subgroups, this._parents, name, id);
 }
 
+// EXTERNAL MODULE: ./node_modules/d3-selection/src/selectorAll.js
+var selectorAll = __webpack_require__(747);
 ;// ./node_modules/d3-transition/src/transition/selectAll.js
 
 
 
 
-/* harmony default export */ function transition_selectAll(select) {
+/* harmony default export */ function selectAll(select) {
   var name = this._name,
       id = this._id;
 
-  if (typeof select !== "function") select = selectorAll(select);
+  if (typeof select !== "function") select = (0,selectorAll/* default */.A)(select);
 
   for (var groups = this._groups, m = groups.length, subgroups = [], parents = [], j = 0; j < m; ++j) {
     for (var group = groups[j], n = group.length, node, i = 0; i < n; ++i) {
@@ -14799,12 +14455,14 @@ function removeFunction(id) {
 ;// ./node_modules/d3-transition/src/transition/selection.js
 
 
-var selection_Selection = src_selection.prototype.constructor;
+var Selection = selection/* default */.Ay.prototype.constructor;
 
 /* harmony default export */ function transition_selection() {
-  return new selection_Selection(this._groups, this._parents);
+  return new Selection(this._groups, this._parents);
 }
 
+// EXTERNAL MODULE: ./node_modules/d3-selection/src/selection/style.js
+var style = __webpack_require__(3683);
 ;// ./node_modules/d3-transition/src/transition/style.js
 
 
@@ -14817,41 +14475,41 @@ function styleNull(name, interpolate) {
       string10,
       interpolate0;
   return function() {
-    var string0 = styleValue(this, name),
-        string1 = (this.style.removeProperty(name), styleValue(this, name));
+    var string0 = (0,style/* styleValue */.j)(this, name),
+        string1 = (this.style.removeProperty(name), (0,style/* styleValue */.j)(this, name));
     return string0 === string1 ? null
         : string0 === string00 && string1 === string10 ? interpolate0
         : interpolate0 = interpolate(string00 = string0, string10 = string1);
   };
 }
 
-function style_styleRemove(name) {
+function styleRemove(name) {
   return function() {
     this.style.removeProperty(name);
   };
 }
 
-function style_styleConstant(name, interpolate, value1) {
+function styleConstant(name, interpolate, value1) {
   var string00,
       string1 = value1 + "",
       interpolate0;
   return function() {
-    var string0 = styleValue(this, name);
+    var string0 = (0,style/* styleValue */.j)(this, name);
     return string0 === string1 ? null
         : string0 === string00 ? interpolate0
         : interpolate0 = interpolate(string00 = string0, value1);
   };
 }
 
-function style_styleFunction(name, interpolate, value) {
+function styleFunction(name, interpolate, value) {
   var string00,
       string10,
       interpolate0;
   return function() {
-    var string0 = styleValue(this, name),
+    var string0 = (0,style/* styleValue */.j)(this, name),
         value1 = value(this),
         string1 = value1 + "";
-    if (value1 == null) string1 = value1 = (this.style.removeProperty(name), styleValue(this, name));
+    if (value1 == null) string1 = value1 = (this.style.removeProperty(name), (0,style/* styleValue */.j)(this, name));
     return string0 === string1 ? null
         : string0 === string00 && string1 === string10 ? interpolate0
         : (string10 = string1, interpolate0 = interpolate(string00 = string0, value1));
@@ -14863,7 +14521,7 @@ function styleMaybeRemove(id, name) {
   return function() {
     var schedule = schedule_set(this, id),
         on = schedule.on,
-        listener = schedule.value[key] == null ? remove || (remove = style_styleRemove(name)) : undefined;
+        listener = schedule.value[key] == null ? remove || (remove = styleRemove(name)) : undefined;
 
     // If this node shared a dispatch with the previous node,
     // just assign the updated shared dispatch and we’re done!
@@ -14878,12 +14536,12 @@ function styleMaybeRemove(id, name) {
   var i = (name += "") === "transform" ? interpolateTransformCss : transition_interpolate;
   return value == null ? this
       .styleTween(name, styleNull(name, i))
-      .on("end.style." + name, style_styleRemove(name))
+      .on("end.style." + name, styleRemove(name))
     : typeof value === "function" ? this
-      .styleTween(name, style_styleFunction(name, i, tweenValue(this, "style." + name, value)))
+      .styleTween(name, styleFunction(name, i, tweenValue(this, "style." + name, value)))
       .each(styleMaybeRemove(this._id, name))
     : this
-      .styleTween(name, style_styleConstant(name, i, value), priority)
+      .styleTween(name, styleConstant(name, i, value), priority)
       .on("end.style." + name, null);
 }
 
@@ -14916,13 +14574,13 @@ function styleTween(name, value, priority) {
 ;// ./node_modules/d3-transition/src/transition/text.js
 
 
-function text_textConstant(value) {
+function textConstant(value) {
   return function() {
     this.textContent = value;
   };
 }
 
-function text_textFunction(value) {
+function textFunction(value) {
   return function() {
     var value1 = value(this);
     this.textContent = value1 == null ? "" : value1;
@@ -14931,8 +14589,8 @@ function text_textFunction(value) {
 
 /* harmony default export */ function transition_text(value) {
   return this.tween("text", typeof value === "function"
-      ? text_textFunction(tweenValue(this, "text", value))
-      : text_textConstant(value == null ? "" : value + ""));
+      ? textFunction(tweenValue(this, "text", value))
+      : textConstant(value == null ? "" : value + ""));
 }
 
 ;// ./node_modules/d3-transition/src/transition/textTween.js
@@ -15051,23 +14709,23 @@ function Transition(groups, parents, name, id) {
 }
 
 function transition_transition(name) {
-  return src_selection().transition(name);
+  return (0,selection/* default */.Ay)().transition(name);
 }
 
 function newId() {
   return ++id;
 }
 
-var selection_prototype = src_selection.prototype;
+var selection_prototype = selection/* default */.Ay.prototype;
 
 Transition.prototype = transition_transition.prototype = {
   constructor: Transition,
   select: transition_select,
-  selectAll: transition_selectAll,
+  selectAll: selectAll,
   selectChild: selection_prototype.selectChild,
   selectChildren: selection_prototype.selectChildren,
-  filter: transition_filter,
-  merge: transition_merge,
+  filter: filter,
+  merge: merge,
   selection: transition_selection,
   transition: transition,
   call: selection_prototype.call,
@@ -15076,14 +14734,14 @@ Transition.prototype = transition_transition.prototype = {
   size: selection_prototype.size,
   empty: selection_prototype.empty,
   each: selection_prototype.each,
-  on: transition_on,
-  attr: transition_attr,
+  on: on,
+  attr: attr,
   attrTween: transition_attrTween,
   style: transition_style,
   styleTween: transition_styleTween,
   text: transition_text,
   textTween: transition_textTween,
-  remove: transition_remove,
+  remove: remove,
   tween: tween,
   delay: delay,
   duration: duration,
@@ -15155,8 +14813,8 @@ function inherit(node, id) {
 
 
 
-src_selection.prototype.interrupt = selection_interrupt;
-src_selection.prototype.transition = selection_transition;
+selection/* default */.Ay.prototype.interrupt = selection_interrupt;
+selection/* default */.Ay.prototype.transition = selection_transition;
 
 ;// ./node_modules/d3-transition/src/index.js
 
@@ -15295,7 +14953,7 @@ function local(node) {
   return node.__brush;
 }
 
-function brush_empty(extent) {
+function empty(extent) {
   return extent[0][0] === extent[1][0]
       || extent[0][1] === extent[1][1];
 }
@@ -15670,7 +15328,7 @@ function brush_brush(dim) {
       group.attr("pointer-events", "all");
       overlay.attr("cursor", cursors.overlay);
       if (state.selection) selection = state.selection; // May be set by brush.move (on start)!
-      if (brush_empty(selection)) state.selection = null, redraw.call(that);
+      if (empty(selection)) state.selection = null, redraw.call(that);
       emit.end(event, mode.name);
     }
 
@@ -15795,8 +15453,8 @@ function brush_brush(dim) {
 
 /* harmony default export */ function src_select(selector) {
   return typeof selector === "string"
-      ? new Selection([[document.querySelector(selector)]], [document.documentElement])
-      : new Selection([[selector]], root);
+      ? new selection/* Selection */.LN([[document.querySelector(selector)]], [document.documentElement])
+      : new selection/* Selection */.LN([[selector]], selection/* root */.zr);
 }
 
 ;// ./node_modules/d3-selection/src/index.js
@@ -16357,10 +16015,128 @@ function defaultConstrain(transform, extent, translateExtent) {
 
 /***/ }),
 
+/***/ 9308:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  M: () => (/* binding */ FirehouseMode),
+  m: () => (/* binding */ GameState)
+});
+
+// EXTERNAL MODULE: ./src/utils.ts
+var utils = __webpack_require__(6185);
+// EXTERNAL MODULE: ./src/ui/text-stroke.ts
+var text_stroke = __webpack_require__(1485);
+// EXTERNAL MODULE: ./src/ui/colors.ts
+var colors = __webpack_require__(1919);
+// EXTERNAL MODULE: ./src/signal.ts
+var signal = __webpack_require__(334);
+// EXTERNAL MODULE: ./src/storage.ts
+var storage = __webpack_require__(8421);
+// EXTERNAL MODULE: ./src/game/capabilities.ts
+var capabilities = __webpack_require__(3793);
+// EXTERNAL MODULE: ./src/game/models/firehouse.ts
+var firehouse = __webpack_require__(8646);
+;// ./src/game/FirehouseStorage.ts
+
+
+const capabilitiesToJson = (c) => {
+    const o = {};
+    c.eachPair((n, skills) => { o[n] = skills.map(s => ({ name: s.name, level: s.level })); });
+    return o;
+};
+const capabilitiesFromJson = (j) => capabilities/* Capabilities */.FD.fromJSON(j);
+const FirehouseStorage = {
+    newGame: () => new firehouse/* FirehouseModel */.o(),
+    parse: (s) => FirehouseStorage.from(JSON.parse(s)),
+    from: (o) => {
+        const pawns = o.pawns.map(p => new firehouse/* PawnModel */.A(p.name, capabilitiesFromJson(p.capabilities)));
+        return new firehouse/* FirehouseModel */.o(pawns, o.equipment, o.upgrades, o.firehouseNum, o.name);
+    },
+    save: (m) => ({
+        pawns: m.pawns.map(p => ({ name: p.name, capabilities: capabilitiesToJson(p.capabilities) })),
+        equipment: m.equipment,
+        upgrades: m.upgrades,
+        firehouseNum: m.firehouseNum,
+        name: m.name,
+        capabilityNames: [...capabilities/* NAMES */.Xk]
+    })
+};
+
+;// ./src/game/state.ts
+
+
+
+
+
+
+class GameState {
+    constructor(map) {
+        this.map = map;
+        this.introSucceeded = false;
+        this.firehouse = FirehouseStorage.newGame();
+        this.data = () => ({
+            introSucceeded: this.introSucceeded,
+            firehouse: FirehouseStorage.save(this.firehouse)
+        });
+        this.loadData = (d) => {
+            this.introSucceeded = d.introSucceeded;
+            this.firehouse = FirehouseStorage.from(d.firehouse);
+        };
+        this.reset = () => {
+            this.introSucceeded = false;
+            this.firehouse = FirehouseStorage.newGame();
+        };
+        FirehouseMode.on(pawns => {
+            this.introSucceeded = true;
+            this.firehouse.pawns = pawns;
+            if (!this.firehouse.firehouseNum)
+                this.firehouse.firehouseNum = (0,utils/* randTo */.JD)(97) + 3;
+            this.save();
+        });
+    }
+    save() {
+        storage/* storage */.I.set('gameState', JSON.stringify(this.data()));
+        text_stroke/* TextStroke */.m.centered(this.map, 'GAME SAVED', this.map.h - 2, 'saved', colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy([colors/* WHITE */.UE, colors/* FOREGROUND */.u6])), 500);
+    }
+    load() {
+        const saveJson = storage/* storage */.I.get('gameState');
+        if (!saveJson)
+            return;
+        try {
+            this.loadData(JSON.parse(saveJson));
+            if (this.introSucceeded)
+                FirehouseMode.emit(this.firehouse.pawns);
+        }
+        catch (e) {
+            const key = `badSaves_gameState_${Date.now()}`;
+            storage/* storage */.I.set(key, saveJson);
+            storage/* storage */.I.remove('gameState');
+            console.error('Archived bad gameState at', key, e);
+        }
+    }
+    restartIntro() {
+        this.reset();
+        this.map.killAll();
+        this.map.display.clear();
+        this.map.smokeDisplay.clear();
+        this.map.uiRenderer.clearStrokes();
+        const { Initializer } = __webpack_require__(7349);
+        const initializer = new Initializer(this.map);
+        initializer.initialize();
+        this.map.lighting.redraw();
+    }
+}
+const FirehouseMode = new signal/* Signal */.H();
+
+
+/***/ }),
+
 /***/ 9620:
 /***/ ((module) => {
 
-"use strict";
 module.exports = ".........................................................\n.........................................................\n...........##+##.........................................\n...........#*..######....................................\n..#####....#✰...*░ff#....................................\n..#*..######].h..░.◉#....................................\n..#✰...*░ff#].◘h.░.░#....................................\n..#].h..░.◉#].◘h.░.[#....................................\n..#].◘h.░.░#].h*.░.[#....................................\n..#].◘h.░.[#✰....░.░#....................................\n..#].h*.░.[#.......*###################################..\n..#✰....░.░#.........#f◉░[[░*.#..*....#f◉░[[░*.#..*...#..\n..#.......*#✰..*##+###f.......+...===.#f.......+...===#..\n..+........##+###h...#░░░░░░..#h◘.===##░░░░░░..#h◘.===#..\n..#✰..*##+##_..#h◘...#*.......##h....#.*.......##h....#..\n..##+###h..#_..#...*##..hh*...*#######...hh*...*#######..\n..#_..#h◘..#...#.==.#..h◘◘h....#....*#..h◘◘h....#....*#..\n..#_..#...*#...#.==.#..........+....f#..........+....f#..\n..#...#.==.#↻f*#.==.#*✰]]]]✰..✰#__..↻#*✰]]]]✰..✰#__..↻#..\n..#...#.==.##################+################+########..\n..#↻f*#.==.#..........................................#..\n..##########..........................................+..\n........+............................................##..\n........+............................................#...\n....###+###+#....###+#....###+#....###+#....###+#....+...\n....#...#*..######*..######*..######*..######*..######...\n....#◛.◛#✰...*░ff#✰...*░ff#✰...*░ff#✰...*░ff#✰...*░ff#...\n....#...#].h..░.◉#].h..░.◉#].h..░.◉#].h..░.◉#].h..░.◉#...\n....#◛.❱#].◘h.░.░#].◘h.░.░#].◘h.░.░#].◘h.░.░#].◘h.░.░#...\n....#..◛#].◘h.░.[#].◘h.░.[#].◘h.░.[#].◘h.░.[#].◘h.░.[#...\n....#◛..#].h*.░.[#].h*.░.[#].h*.░.[#].h*.░.[#].h*.░.[#...\n....#..◛#✰....░.░#✰....░.░#✰....░.░#✰....░.░#✰....░.░#...\n....#####.......*#.......*#.......*#.......*#.......*#...\n........#........#........#........#........#........#...\n........#✰..*##+##✰..*##+##✰..*##+##✰..*##+##✰..*##+##...\n........##+###h..##+###h..##+###h..##+###h..##+###h..#...\n........#_..#h◘..#_..#h◘..#_..#h◘..#_..#h◘..#_..#h◘..#...\n........#_..#...*#_..#...*#_..#...*#_..#...*#_..#...*#...\n........#...#.==.#...#.==.#...#.==.#...#.==.#...#.==.#...\n........#...#.==.#...#.==.#...#.==.#...#.==.#...#.==.#...\n........#↻f*#.==.#↻f*#.==.#↻f*#.==.#↻f*#.==.#↻f*#.==.#...\n........##############################################...\n.........................................................\n.........................................................\nKEY\n# = Wall\n+ = Door\n* = Lamp\n✰ = Bush\n░ = Counter\nf = Sink\n] = Tv\nh = Chair\n◉ = Oven\n◘ = Table\n[ = Refrigerator\n= = Bed\n_ = Tub\n↻ = Toilet\n◛ = washer/dryer\n❱ = coin machine\n";
 
 /***/ }),
@@ -16368,7 +16144,6 @@ module.exports = ".........................................................\n...
 /***/ 9889:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   G2: () => (/* binding */ Repaint),
 /* harmony export */   HO: () => (/* binding */ FrameRendered),
@@ -16483,6 +16258,9 @@ class UIRenderer {
 /******/ 		return module.exports;
 /******/ 	}
 /******/ 	
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = __webpack_modules__;
+/******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat get default export */
 /******/ 	(() => {
@@ -16508,9 +16286,89 @@ class UIRenderer {
 /******/ 		};
 /******/ 	})();
 /******/ 	
+/******/ 	/* webpack/runtime/ensure chunk */
+/******/ 	(() => {
+/******/ 		__webpack_require__.f = {};
+/******/ 		// This file contains only the entry chunk.
+/******/ 		// The chunk loading function for additional chunks
+/******/ 		__webpack_require__.e = (chunkId) => {
+/******/ 			return Promise.all(Object.keys(__webpack_require__.f).reduce((promises, key) => {
+/******/ 				__webpack_require__.f[key](chunkId, promises);
+/******/ 				return promises;
+/******/ 			}, []));
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/get javascript chunk filename */
+/******/ 	(() => {
+/******/ 		// This function allow to reference async chunks
+/******/ 		__webpack_require__.u = (chunkId) => {
+/******/ 			// return url for filenames based on template
+/******/ 			return "" + chunkId + ".bundle." + "1bd42d09" + ".js";
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/global */
+/******/ 	(() => {
+/******/ 		__webpack_require__.g = (function() {
+/******/ 			if (typeof globalThis === 'object') return globalThis;
+/******/ 			try {
+/******/ 				return this || new Function('return this')();
+/******/ 			} catch (e) {
+/******/ 				if (typeof window === 'object') return window;
+/******/ 			}
+/******/ 		})();
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/load script */
+/******/ 	(() => {
+/******/ 		var inProgress = {};
+/******/ 		var dataWebpackPrefix = "fire-house-rl:";
+/******/ 		// loadScript function to load a script via script tag
+/******/ 		__webpack_require__.l = (url, done, key, chunkId) => {
+/******/ 			if(inProgress[url]) { inProgress[url].push(done); return; }
+/******/ 			var script, needAttach;
+/******/ 			if(key !== undefined) {
+/******/ 				var scripts = document.getElementsByTagName("script");
+/******/ 				for(var i = 0; i < scripts.length; i++) {
+/******/ 					var s = scripts[i];
+/******/ 					if(s.getAttribute("src") == url || s.getAttribute("data-webpack") == dataWebpackPrefix + key) { script = s; break; }
+/******/ 				}
+/******/ 			}
+/******/ 			if(!script) {
+/******/ 				needAttach = true;
+/******/ 				script = document.createElement('script');
+/******/ 		
+/******/ 				script.charset = 'utf-8';
+/******/ 				script.timeout = 120;
+/******/ 				if (__webpack_require__.nc) {
+/******/ 					script.setAttribute("nonce", __webpack_require__.nc);
+/******/ 				}
+/******/ 				script.setAttribute("data-webpack", dataWebpackPrefix + key);
+/******/ 		
+/******/ 				script.src = url;
+/******/ 			}
+/******/ 			inProgress[url] = [done];
+/******/ 			var onScriptComplete = (prev, event) => {
+/******/ 				// avoid mem leaks in IE.
+/******/ 				script.onerror = script.onload = null;
+/******/ 				clearTimeout(timeout);
+/******/ 				var doneFns = inProgress[url];
+/******/ 				delete inProgress[url];
+/******/ 				script.parentNode && script.parentNode.removeChild(script);
+/******/ 				doneFns && doneFns.forEach((fn) => (fn(event)));
+/******/ 				if(prev) return prev(event);
+/******/ 			}
+/******/ 			var timeout = setTimeout(onScriptComplete.bind(null, undefined, { type: 'timeout', target: script }), 120000);
+/******/ 			script.onerror = onScriptComplete.bind(null, script.onerror);
+/******/ 			script.onload = onScriptComplete.bind(null, script.onload);
+/******/ 			needAttach && document.head.appendChild(script);
+/******/ 		};
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
@@ -16524,6 +16382,119 @@ class UIRenderer {
 /******/ 		};
 /******/ 	})();
 /******/ 	
+/******/ 	/* webpack/runtime/publicPath */
+/******/ 	(() => {
+/******/ 		var scriptUrl;
+/******/ 		if (__webpack_require__.g.importScripts) scriptUrl = __webpack_require__.g.location + "";
+/******/ 		var document = __webpack_require__.g.document;
+/******/ 		if (!scriptUrl && document) {
+/******/ 			if (document.currentScript && document.currentScript.tagName.toUpperCase() === 'SCRIPT')
+/******/ 				scriptUrl = document.currentScript.src;
+/******/ 			if (!scriptUrl) {
+/******/ 				var scripts = document.getElementsByTagName("script");
+/******/ 				if(scripts.length) {
+/******/ 					var i = scripts.length - 1;
+/******/ 					while (i > -1 && (!scriptUrl || !/^http(s?):/.test(scriptUrl))) scriptUrl = scripts[i--].src;
+/******/ 				}
+/******/ 			}
+/******/ 		}
+/******/ 		// When supporting browsers where an automatic publicPath is not supported you must specify an output.publicPath manually via configuration
+/******/ 		// or pass an empty string ("") and set the __webpack_public_path__ variable from your code to use your own logic.
+/******/ 		if (!scriptUrl) throw new Error("Automatic publicPath is not supported in this browser");
+/******/ 		scriptUrl = scriptUrl.replace(/^blob:/, "").replace(/#.*$/, "").replace(/\?.*$/, "").replace(/\/[^\/]+$/, "/");
+/******/ 		__webpack_require__.p = scriptUrl;
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/jsonp chunk loading */
+/******/ 	(() => {
+/******/ 		// no baseURI
+/******/ 		
+/******/ 		// object to store loaded and loading chunks
+/******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
+/******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
+/******/ 		var installedChunks = {
+/******/ 			792: 0
+/******/ 		};
+/******/ 		
+/******/ 		__webpack_require__.f.j = (chunkId, promises) => {
+/******/ 				// JSONP chunk loading for javascript
+/******/ 				var installedChunkData = __webpack_require__.o(installedChunks, chunkId) ? installedChunks[chunkId] : undefined;
+/******/ 				if(installedChunkData !== 0) { // 0 means "already installed".
+/******/ 		
+/******/ 					// a Promise means "currently loading".
+/******/ 					if(installedChunkData) {
+/******/ 						promises.push(installedChunkData[2]);
+/******/ 					} else {
+/******/ 						if(true) { // all chunks have JS
+/******/ 							// setup Promise in chunk cache
+/******/ 							var promise = new Promise((resolve, reject) => (installedChunkData = installedChunks[chunkId] = [resolve, reject]));
+/******/ 							promises.push(installedChunkData[2] = promise);
+/******/ 		
+/******/ 							// start chunk loading
+/******/ 							var url = __webpack_require__.p + __webpack_require__.u(chunkId);
+/******/ 							// create error before stack unwound to get useful stacktrace later
+/******/ 							var error = new Error();
+/******/ 							var loadingEnded = (event) => {
+/******/ 								if(__webpack_require__.o(installedChunks, chunkId)) {
+/******/ 									installedChunkData = installedChunks[chunkId];
+/******/ 									if(installedChunkData !== 0) installedChunks[chunkId] = undefined;
+/******/ 									if(installedChunkData) {
+/******/ 										var errorType = event && (event.type === 'load' ? 'missing' : event.type);
+/******/ 										var realSrc = event && event.target && event.target.src;
+/******/ 										error.message = 'Loading chunk ' + chunkId + ' failed.\n(' + errorType + ': ' + realSrc + ')';
+/******/ 										error.name = 'ChunkLoadError';
+/******/ 										error.type = errorType;
+/******/ 										error.request = realSrc;
+/******/ 										installedChunkData[1](error);
+/******/ 									}
+/******/ 								}
+/******/ 							};
+/******/ 							__webpack_require__.l(url, loadingEnded, "chunk-" + chunkId, chunkId);
+/******/ 						}
+/******/ 					}
+/******/ 				}
+/******/ 		};
+/******/ 		
+/******/ 		// no prefetching
+/******/ 		
+/******/ 		// no preloaded
+/******/ 		
+/******/ 		// no HMR
+/******/ 		
+/******/ 		// no HMR manifest
+/******/ 		
+/******/ 		// no on chunks loaded
+/******/ 		
+/******/ 		// install a JSONP callback for chunk loading
+/******/ 		var webpackJsonpCallback = (parentChunkLoadingFunction, data) => {
+/******/ 			var [chunkIds, moreModules, runtime] = data;
+/******/ 			// add "moreModules" to the modules object,
+/******/ 			// then flag all "chunkIds" as loaded and fire callback
+/******/ 			var moduleId, chunkId, i = 0;
+/******/ 			if(chunkIds.some((id) => (installedChunks[id] !== 0))) {
+/******/ 				for(moduleId in moreModules) {
+/******/ 					if(__webpack_require__.o(moreModules, moduleId)) {
+/******/ 						__webpack_require__.m[moduleId] = moreModules[moduleId];
+/******/ 					}
+/******/ 				}
+/******/ 				if(runtime) var result = runtime(__webpack_require__);
+/******/ 			}
+/******/ 			if(parentChunkLoadingFunction) parentChunkLoadingFunction(data);
+/******/ 			for(;i < chunkIds.length; i++) {
+/******/ 				chunkId = chunkIds[i];
+/******/ 				if(__webpack_require__.o(installedChunks, chunkId) && installedChunks[chunkId]) {
+/******/ 					installedChunks[chunkId][0]();
+/******/ 				}
+/******/ 				installedChunks[chunkId] = 0;
+/******/ 			}
+/******/ 		
+/******/ 		}
+/******/ 		
+/******/ 		var chunkLoadingGlobal = self["webpackChunkfire_house_rl"] = self["webpackChunkfire_house_rl"] || [];
+/******/ 		chunkLoadingGlobal.forEach(webpackJsonpCallback.bind(null, 0));
+/******/ 		chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/nonce */
 /******/ 	(() => {
 /******/ 		__webpack_require__.nc = undefined;
@@ -16531,12 +16502,11 @@ class UIRenderer {
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
-(() => {
-"use strict";
 
 // UNUSED EXPORTS: generateError
 
+// EXTERNAL MODULE: ./src/d3-extend.ts
+var d3_extend = __webpack_require__(452);
 // EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
 var injectStylesIntoStyleTag = __webpack_require__(5072);
 var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
@@ -16596,8 +16566,8 @@ var utils = __webpack_require__(6185);
 var state = __webpack_require__(9308);
 // EXTERNAL MODULE: ./src/ui/firehouse.ts + 1 modules
 var firehouse = __webpack_require__(8846);
-// EXTERNAL MODULE: ./node_modules/d3/src/index.js + 96 modules
-var src = __webpack_require__(9447);
+// EXTERNAL MODULE: ./node_modules/d3/src/index.js + 51 modules
+var src = __webpack_require__(9273);
 ;// ./src/html/error.html
 /* harmony default export */ const error = ("<div id=\"error-modal\" class=\"modal-window error-overlay column gap-controls hidden\">\n    <pre id=\"error-text\"></pre>\n    <div class=\"row gap-buttons\">\n        <button id=\"error-issue\" class=\"submit-button\">Create Issue</button>\n        <button id=\"error-copy\" class=\"submit-button\">Copy Error</button>\n    </div>\n    <div id=\"error-status\"></div>\n    <button id=\"error-close\" class=\"error-close\">×</button>\n</div>\n");
 // EXTERNAL MODULE: ./src/ui/issue.ts
@@ -16649,1209 +16619,6 @@ class Err extends modal/* Modal */.a {
 const err = new Err();
 const showError = (m, s) => err.open(m, s);
 
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./src/editor.css
-var editor = __webpack_require__(5164);
-;// ./src/editor.css
-
-      
-      
-      
-      
-      
-      
-      
-      
-      
-
-var editor_options = {};
-
-editor_options.styleTagTransform = (styleTagTransform_default());
-editor_options.setAttributes = (setAttributesWithoutAttributes_default());
-editor_options.insert = insertBySelector_default().bind(null, "head");
-editor_options.domAPI = (styleDomAPI_default());
-editor_options.insertStyleElement = (insertStyleElement_default());
-
-var editor_update = injectStylesIntoStyleTag_default()(editor/* default */.A, editor_options);
-
-
-
-
-       /* harmony default export */ const src_editor = (editor/* default */.A && editor/* default */.A.locals ? editor/* default */.A.locals : undefined);
-
-// EXTERNAL MODULE: ./src/game/map.ts + 2 modules
-var map = __webpack_require__(7283);
-// EXTERNAL MODULE: ./src/ui/feedback.ts + 1 modules
-var feedback = __webpack_require__(5264);
-// EXTERNAL MODULE: ./src/game/config.ts
-var config = __webpack_require__(6457);
-// EXTERNAL MODULE: ./src/draw/floor.ts
-var floor = __webpack_require__(9177);
-// EXTERNAL MODULE: ./src/html/html.ts
-var html = __webpack_require__(467);
-;// ./src/html/editor-panel.html
-/* harmony default export */ const editor_panel = ("<div id=\"terminal\">\n  <div id=\"editor-panel\" class=\"column gap-body\">\n    <div class=\"top column gap-controls\">\n      <div class=\"row fit-container cross-aligned-center gap-button-group\">\n        <div class=\"label\"></div>\n        <div id=\"layer-choices\" class=\"column fit-container gap-controls\">\n          <div class=\"layer template\">\n            <div class=\"row fit-container gap-buttons\">\n              <div class=\"name\"></div>\n              <div class=\"column fit-container\">\n                <div class=\"choices gap-buttons\">\n                  <button class=\"choice template\"></button>\n                </div>\n                <div class=\"editor-items column gap-buttons\">\n                  <div class=\"editor-item row\">\n                    <button id=\"add-item\" class=\"button-secondary\">Add</button>\n                  </div>\n                  <div class=\"editor-item-buttons\">\n                    <div class=\"editor-item row template\">\n                      <button class=\"choice\"></button>\n                      <button class=\"button-secondary close-button\">×</button>\n                    </div>\n                  </div>\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"bottom column gap-controls\">\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Paint</div>\n        <div class=\"char\"></div>\n        <div class=\"cell-coord\"></div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Stutter</div>\n        <input id=\"stutter\" type=\"range\" min=\"0\" max=\"100\" value=\"0\" />\n        <div id=\"stutter-val\">0%</div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"undo-btn\" class=\"button-secondary\">undo</button>\n        <button id=\"paste-btn\" class=\"button-secondary\" disabled>paste</button>\n        <button id=\"rotate-left\" class=\"button-secondary hidden\" disabled>⟲</button>\n        <button id=\"rotate-right\" class=\"button-secondary hidden\" disabled>⟳</button>\n        <button id=\"copy-cancel\" class=\"button-secondary\" disabled>cxl</button>\n      </div>\n      <div id=\"tool-row\" class=\"column gap-buttons\">\n        <button class=\"tool template\" data-tool=\"\"></button>\n      </div>\n      <div id=\"fragment-preview\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">Fragment</div>\n          <button id=\"fragment-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <pre id=\"fragment-text\"></pre>\n      </div>\n      <div id=\"symbol-picker\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">New Item</div>\n          <button id=\"symbol-picker-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div id=\"symbol-grid\" class=\"symbols\">\n          <div class=\"sym template\"></div>\n        </div>\n        <div class=\"actions\">\n          <input id=\"editor-item-name\" type=\"text\" placeholder=\"name\" />\n          <button id=\"editor-item-add\" class=\"button-secondary\" disabled>Add</button>\n        </div>\n      </div>\n      <div id=\"fragment-loader\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">Load Fragment</div>\n          <button id=\"fragment-loader-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div id=\"fragment-list\" class=\"column gap-buttons\">\n          <button class=\"fragment-file template\" data-file=\"\"></button>\n        </div>\n      </div>\n      <div class=\"fill\"></div>\n      <div id=\"controls-help\" class=\"text-subtle\">\n        L/R: paint/erase · Shift: constrain · Ctrl: all layers · Hold C: copy · ←/→ or L/R: rotate\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"load-fragment\" class=\"button-secondary\">load fragment</button>\n        <button id=\"copy-fragment\" class=\"button-secondary\">cc clipboard</button>\n        <button id=\"submit-fragment\" class=\"button-secondary\">submit issue</button>\n        <button id=\"show-fragment\" class=\"button-secondary\">show fragment</button>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"clear-map\" class=\"button-secondary\">clear</button>\n      </div>\n    </div>\n  </div>\n</div>");
-// EXTERNAL MODULE: ./src/game/layers.ts
-var game_layers = __webpack_require__(5633);
-// EXTERNAL MODULE: ./src/game/drawable-types.ts + 1 modules
-var drawable_types = __webpack_require__(1073);
-// EXTERNAL MODULE: ./src/draw/editor-item.ts
-var editor_item = __webpack_require__(6372);
-;// ./src/ui/editor-panel.ts
-
-
-
-
-
-const buildLayerChoices = () => {
-    const choices = {
-        pawn: [],
-        smoke: [],
-        fire: [],
-        walls: [],
-        items: [],
-        floor: []
-    };
-    // Populate from DrawableType registry
-    Object.entries(drawable_types/* DrawableType */.Z.registry).forEach(([name, factory]) => {
-        const drawable = factory();
-        const char = drawable.char();
-        const choice = { label: name, char, make: () => drawable_types/* DrawableType */.Z.make(char, name) };
-        // Skip Floor, Fire, and Smoke as requested
-        if (name === 'Floor' || name === 'Fire' || name === 'Smoke')
-            return;
-        // Use the drawable's layer property to categorize
-        const layer = drawable.layer;
-        if (choices[layer]) {
-            choices[layer].push(choice);
-        }
-    });
-    return choices;
-};
-const layerChoices = buildLayerChoices();
-const TOOL_LABELS = {
-    'draw': 'draw',
-    'line': 'line',
-    'box': 'box',
-    'fill-box': 'fbox',
-    'circ-in-rect': 'ellipse rect',
-    'circ-in-rect-filled': 'ellipse rect f',
-    'circ-radius': 'ellipse r',
-    'circ-radius-filled': 'ellipse r f'
-};
-class EditorPanel {
-    constructor() {
-        this.cell = null;
-        this.tool = 'draw';
-        this.layer = 'walls';
-        this.choice = null;
-        this.stutter = 0;
-        this.extraItems = [];
-        this.setCell = (c) => { this.cell = c; this.updateCell(); };
-        this.setEditorItems = (items) => {
-            this.extraItems = items.map(it => ({
-                label: it.name,
-                char: it.symbol,
-                make: () => new editor_item/* EditorItem */.R(it.symbol, it.name),
-                editor: true
-            }));
-            this.render();
-        };
-        this.refresh = () => this.render();
-        this.div = (0,html.d1)('#terminal');
-        this.div.appendFileHtml(editor_panel);
-        this.choice = layerChoices['walls'][0] || null;
-        this.render();
-    }
-    render() {
-        const lc = this.div.d1('#layer-choices');
-        const visible = (game_layers/* CellLayers */.v.layerNames.filter(n => n !== 'smoke' && n !== 'fire' && n !== 'floor'));
-        lc.dList('.layer').updateFrom(visible, (row, n) => {
-            row.d1('.name').text(n);
-            const choices = layerChoices[n];
-            const choicesDiv = row.d1('.choices');
-            choicesDiv.dList('button').updateFrom(choices, (b, ch) => {
-                b.text(`${ch.char} ${ch.label}`);
-                b.classed('selected', this.layer === n && !!this.choice &&
-                    this.choice.label === ch.label && this.choice.char === ch.char);
-                b.onClick(() => { this.layer = n; this.choice = ch; this.updatePaintInfo(); this.render(); });
-            });
-            const editorItems = row.d1('.editor-items');
-            const editorChoices = n === 'items' ? this.extraItems : [];
-            n === 'items' ? editorItems.show() : editorItems.hide();
-            editorItems.d1('.editor-item-buttons').dList('.editor-item').updateFrom(editorChoices, (r, ch) => {
-                const btn = r.d1('button.choice');
-                btn.text(`${ch.char} ${ch.label}`);
-                btn.classed('selected', this.layer === n && !!this.choice &&
-                    this.choice.label === ch.label && this.choice.char === ch.char);
-                btn.onClick(() => { this.layer = n; this.choice = ch; this.updatePaintInfo(); this.render(); });
-                const x = r.d1('button.close-button');
-                x.onClick(() => this.onDeleteEditorItem?.(ch.char));
-            });
-            if (n === 'items') {
-                editorItems.d1('#add-item').onClick(() => this.onAddItem?.());
-            }
-        });
-        const tools = ['draw', 'line', 'box', 'fill-box', 'circ-in-rect', 'circ-in-rect-filled', 'circ-radius', 'circ-radius-filled'];
-        this.div.d1('#tool-row').dList('.tool').updateFrom(tools, (b, t) => {
-            b.text(TOOL_LABELS[t]);
-            b.attr('data-tool', t);
-            b.classed('selected', this.tool === t);
-            b.onClick(() => { this.tool = t; this.updatePaintInfo(); this.render(); });
-        });
-        const slider = this.div.d1('#stutter');
-        const label = this.div.d1('#stutter-val');
-        slider.node().value = String(this.stutter);
-        label.text(`${this.stutter}%`);
-        slider.onInput(() => {
-            const v = parseInt(slider.node().value, 10);
-            this.stutter = isNaN(v) ? 0 : Math.max(0, Math.min(100, v));
-            label.text(`${this.stutter}%`);
-        });
-        this.updatePaintInfo();
-        this.updateCell();
-    }
-    updatePaintInfo() {
-        this.div.d1('.char').text(this.choice ? this.choice.char : '-');
-    }
-    updateCell() {
-        this.div.d1('.cell-coord').text(this.cell ? `${this.cell.xy.x}, ${this.cell.xy.y}` : 'no cell selected');
-    }
-}
-
-// EXTERNAL MODULE: ./src/game/xy.ts
-var game_xy = __webpack_require__(88);
-// EXTERNAL MODULE: ./src/shapes.ts
-var shapes = __webpack_require__(3720);
-// EXTERNAL MODULE: ./src/ui/stroke.ts
-var stroke = __webpack_require__(891);
-// EXTERNAL MODULE: ./src/ui/ui-renderer.ts
-var ui_renderer = __webpack_require__(9889);
-// EXTERNAL MODULE: ./src/game/rect.ts
-var game_rect = __webpack_require__(6893);
-// EXTERNAL MODULE: ./src/game/fragment.ts
-var fragment = __webpack_require__(8535);
-;// ./src/editor-defs.ts
-const BUILTIN_DRAWABLES = [
-    { symbol: '#', name: 'Wall' },
-    { symbol: '+', name: 'Door' },
-    { symbol: '*', name: 'Lamp' },
-    { symbol: '.', name: 'Floor' },
-    { symbol: '+', name: 'Smoke' },
-    { symbol: '▲', name: 'Fire' },
-    { symbol: '@', name: 'Pawn' }
-];
-class EditorDefs {
-    constructor() {
-        this.extra = [];
-        this.all = () => [...BUILTIN_DRAWABLES, ...this.extra];
-        this.register = (definition) => {
-            if (this.extra.some(existing => existing.symbol === definition.symbol && existing.name === definition.name))
-                return;
-            this.extra.push(definition);
-        };
-        this.remove = (symbol) => {
-            this.extra = this.extra.filter(definition => definition.symbol !== symbol);
-        };
-        this.symbolFor = (typeName) => {
-            const definition = this.all().find(d => d.name === typeName);
-            return definition ? definition.symbol : typeName[0];
-        };
-        this.extraDefs = () => this.extra;
-    }
-}
-
-;// ./src/editor.ts
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const UI = {
-    shapeId: 'editor-shape',
-    pasteId: 'editor-paste',
-    strokeZ: 10,
-    pasteZ: 9,
-    color: '#0a0'
-};
-class Editor {
-    constructor() {
-        this.feedback = new feedback/* Feedback */.G();
-        this.muted = new Set();
-        this.solo = null;
-        this.showLighting = false;
-        this.showDarkness = false;
-        this.painting = false;
-        this.paintingShift = false;
-        this.paintingCtrl = false;
-        this.origin = null;
-        this.lock = null;
-        this.op = 'paint';
-        this.shapeId = UI.shapeId;
-        this.lastTarget = null;
-        this.copyBuf = null;
-        this.undoStack = [];
-        this.hovered = null;
-        this.pasteId = UI.pasteId;
-        this.defs = new EditorDefs();
-        this.symbolSel = null;
-        this.withStroke = (id, z, visible, draw) => {
-            const s = new stroke/* Stroke */.t([], () => UI.color, visible, z);
-            draw(s);
-            this.map.uiRenderer.replace(id, s);
-            ui_renderer/* Repaint */.G2.emit();
-        };
-        this.previewEllipse = (rect, filled) => {
-            const ul = rect.ul, br = rect.br;
-            this.withStroke(this.shapeId, UI.strokeZ, () => this.painting && (this.panel.tool === 'circ-in-rect' || this.panel.tool === 'circ-in-rect-filled' ||
-                this.panel.tool === 'circ-radius' || this.panel.tool === 'circ-radius-filled'), s => {
-                const add = (xy) => s.add(this.map.get(xy), this.panel.choice?.char || '#');
-                if (filled) {
-                    const { cx, cy, rx, ry } = (0,shapes/* ellipseFromRect */.Dg)(rect);
-                    (0,shapes/* eachEllipseFill */.xh)(cx, cy, rx, ry, add);
-                }
-                else
-                    (0,shapes/* eachEllipseBorderRect */.QI)(ul.x, ul.y, br.x, br.y, add);
-            });
-        };
-        this.commitEllipse = (rect, filled) => {
-            const ul = rect.ul, br = rect.br;
-            const ops = [];
-            const apply = (xy) => { this.applyXY(xy, ops); return true; };
-            if (filled) {
-                const { cx, cy, rx, ry } = (0,shapes/* ellipseFromRect */.Dg)(rect);
-                (0,shapes/* eachEllipseFill */.xh)(cx, cy, rx, ry, apply);
-            }
-            else
-                (0,shapes/* eachEllipseBorderRect */.QI)(ul.x, ul.y, br.x, br.y, apply);
-            this.pushUndo(ops);
-            this.clearPreview();
-        };
-        // Centralized gating + optional undo capture
-        this.applyXY = (xy, ops) => {
-            if (this.copyBuf)
-                return;
-            if (this.stuttered(this.op === 'paint'))
-                return;
-            const cell = this.map.get(xy);
-            const before = ops ? this.recordCell(cell) : null;
-            this.opOn(cell);
-            if (ops && before)
-                ops.push({ xy, type: 'set', names: before });
-        };
-        this.opOn = (cell) => {
-            if (this.op === 'paint')
-                this.paint(cell);
-            else if (this.op === 'erase-current')
-                this.eraseCurrent(cell);
-            else
-                this.eraseCell(cell);
-        };
-        this.stuttered = (paint) => {
-            const s = this.panel.stutter;
-            return paint ? (0,utils/* randTo */.JD)(100) < s : s > 0 && (0,utils/* randTo */.JD)(100) >= s;
-        };
-        this.undo = () => {
-            const ops = this.undoStack.pop();
-            if (!ops)
-                return;
-            // Apply inverse ops
-            const inverse = [];
-            ops.forEach(op => {
-                const cell = this.map.get(op.xy);
-                if (op.type === 'set') {
-                    const prev = [];
-                    game_layers/* CellLayers */.v.layerNames.forEach((layerName) => {
-                        const drawable = cell.layers.data[layerName];
-                        if (drawable) {
-                            prev.push(drawable.constructor?.name);
-                            cell.died(drawable);
-                        }
-                    });
-                    op.names.forEach(name => {
-                        const symbol = this.defs.symbolFor(name);
-                        cell.create(drawable_types/* DrawableType */.Z.make(symbol, name));
-                    });
-                    inverse.push({ xy: op.xy, type: 'set', names: prev });
-                }
-                else {
-                    const prev = [];
-                    game_layers/* CellLayers */.v.layerNames.forEach((layerName) => {
-                        const drawable = cell.layers.data[layerName];
-                        if (drawable) {
-                            prev.push(drawable.constructor?.name);
-                            cell.died(drawable);
-                        }
-                    });
-                    inverse.push({ xy: op.xy, type: 'set', names: prev });
-                }
-            });
-            this.pushUndo(inverse);
-            this.drawMap();
-        };
-        this.renderCroppedFragment = () => {
-            const w = this.map.w, h = this.map.h;
-            const chars = [];
-            const key = new globalThis.Map();
-            for (let y = 0; y < h; y++) {
-                chars[y] = [];
-                for (let x = 0; x < w; x++)
-                    chars[y][x] = '.';
-            }
-            const order = ['pawn', 'fire', 'walls', 'items', 'floor'];
-            for (let y = 0; y < h; y++)
-                for (let x = 0; x < w; x++) {
-                    const cell = this.map.grid[y][x];
-                    for (const layerName of order) {
-                        const drawable = cell.layers.data[layerName];
-                        if (!drawable)
-                            continue;
-                        const symbol = drawable.char();
-                        chars[y][x] = symbol;
-                        const name = typeof drawable.keyName === 'function' ? drawable.keyName() : drawable.constructor?.name;
-                        if (name && symbol !== '.')
-                            key.set(symbol, name);
-                        break;
-                    }
-                }
-            let minX = w, minY = h, maxX = -1, maxY = -1;
-            for (let y = 0; y < h; y++)
-                for (let x = 0; x < w; x++) {
-                    if (chars[y][x] !== '.') {
-                        if (x < minX)
-                            minX = x;
-                        if (y < minY)
-                            minY = y;
-                        if (x > maxX)
-                            maxX = x;
-                        if (y > maxY)
-                            maxY = y;
-                    }
-                }
-            if (maxX < minX || maxY < minY) { // no content
-                const lines = ['.', 'KEY'];
-                return lines.join('\n');
-            }
-            const m = 2;
-            minX = Math.max(0, minX - m);
-            minY = Math.max(0, minY - m);
-            maxX = Math.min(w - 1, maxX + m);
-            maxY = Math.min(h - 1, maxY + m);
-            const rows = [];
-            for (let y = minY; y <= maxY; y++) {
-                let row = '';
-                for (let x = minX; x <= maxX; x++)
-                    row += chars[y][x];
-                rows.push(row);
-            }
-            const lines = [...rows, 'KEY'];
-            for (const [ch, tn] of key.entries())
-                lines.push(`${ch} = ${tn}`);
-            return lines.join('\n');
-        };
-        this.toggleLighting = () => {
-            this.showLighting = !this.showLighting;
-            (0,html.d1)('#lighting-toggle').text(this.showLighting ? 'LT*' : 'LT');
-            this.updateLightingEnabled();
-            this.drawMap();
-        };
-        this.toggleDarkness = () => {
-            this.showDarkness = !this.showDarkness;
-            (0,html.d1)('#darkness-toggle').text(this.showDarkness ? 'DK*' : 'DK');
-            this.updateLightingEnabled();
-            this.drawMap();
-        };
-        this.clearMap = () => {
-            this.painting = false;
-            this.origin = null;
-            this.lock = null;
-            this.clearPreview();
-            this.clearCopy();
-            this.undoStack = [];
-            this.map.killAll();
-            this.map.fill(() => new floor/* Floor */.Z());
-            this.updateLightingEnabled();
-            this.drawMap();
-        };
-        this.onKeyDown = (e) => {
-            if (e.key === 'c' || e.key === 'C')
-                window.keydownC = true;
-            if (e.key === 'Escape' && this.copyBuf)
-                this.clearCopy();
-            if (!this.copyBuf)
-                return;
-            if (e.key === 'l' || e.key === 'L' || e.key === 'ArrowLeft') {
-                e.preventDefault();
-                this.rotateCopy('left');
-            }
-            else if (e.key === 'r' || e.key === 'R' || e.key === 'ArrowRight') {
-                e.preventDefault();
-                this.rotateCopy('right');
-            }
-        };
-        this.onKeyUp = (e) => {
-            if (e.key === 'c' || e.key === 'C')
-                window.keydownC = false;
-        };
-        this.hide = (sel) => { (0,html.d1)(sel).hide(); };
-        this.map = new map/* Map */.T(config/* Config */.T.WIDTH, config/* Config */.T.HEIGHT);
-        this.panel = new EditorPanel();
-        this.panel.onAddItem = () => this.openSymbolPicker();
-        this.panel.onDeleteEditorItem = s => this.deleteEditorItem(s);
-        this.attach();
-        this.init();
-        this.previewHandlers = {
-            'draw': c => this.stroke(c),
-            'line': c => this.previewLine(c),
-            'box': c => this.previewRect(c, false),
-            'fill-box': c => this.previewRect(c, true),
-            'circ-in-rect': c => this.previewEllipseRect(c, false),
-            'circ-in-rect-filled': c => this.previewEllipseRect(c, true),
-            'circ-radius': c => this.previewEllipseCenter(c, false),
-            'circ-radius-filled': c => this.previewEllipseCenter(c, true)
-        };
-        this.commitHandlers = {
-            'draw': () => this.clearPreview(),
-            'line': () => this.commitLine(),
-            'box': () => this.commitRect(false),
-            'fill-box': () => this.commitRect(true),
-            'circ-in-rect': () => this.commitEllipseRect(false),
-            'circ-in-rect-filled': () => this.commitEllipseRect(true),
-            'circ-radius': () => this.commitEllipseCenter(false),
-            'circ-radius-filled': () => this.commitEllipseCenter(true)
-        };
-        this.setupLayerControls();
-        this.drawMap();
-    }
-    openSymbolPicker() {
-        const picker = (0,html.d1)('#symbol-picker');
-        const grid = picker.d1('#symbol-grid');
-        const used = this.usedSymbols();
-        const symbols = this.buildSymbols().filter(symbol => !used.has(symbol));
-        grid.dList('.sym').updateFrom(symbols, (node, symbol) => {
-            node.text(symbol).onClick(() => {
-                this.symbolSel = symbol;
-                grid.selectAll('.sym').classed('selected', false);
-                node.classed('selected', true);
-                this.updateAddEnabled();
-            });
-        });
-        const nameInput = (0,html.d1)('#editor-item-name');
-        nameInput.setVal('').onInput(() => this.updateAddEnabled());
-        nameInput.onKeyDown(event => {
-            if (event.key === 'Enter')
-                this.addEditorItem();
-        });
-        (0,html.d1)('#editor-item-add').onClick(() => this.addEditorItem());
-        (0,html.d1)('#symbol-picker-close').onClick(() => picker.hide());
-        this.symbolSel = null;
-        this.updateAddEnabled();
-        picker.show();
-        requestAnimationFrame(() => this.centerFragment(picker));
-    }
-    updateAddEnabled() {
-        const name = (0,html.d1)('#editor-item-name').trimmed();
-        const isEnabled = this.symbolSel && name.length > 0;
-        (0,html.d1)('#editor-item-add')
-            .enable(!!isEnabled)
-            .text(this.symbolSel ? `Add ${this.symbolSel}` : 'Add');
-    }
-    addEditorItem() {
-        if (!this.symbolSel)
-            return;
-        const name = (0,html.d1)('#editor-item-name').trimmed();
-        if (!name)
-            return;
-        const symbol = this.symbolSel;
-        if (this.defs.extraDefs().some(item => item.symbol === symbol))
-            return;
-        this.defs.register({ symbol, name });
-        this.panel.setEditorItems(this.defs.extraDefs());
-        this.panel.layer = 'items';
-        this.panel.choice = { label: name, char: symbol, make: () => new editor_item/* EditorItem */.R(symbol, name), editor: true };
-        this.panel.refresh();
-        (0,html.d1)('#symbol-picker').hide();
-        this.symbolSel = null;
-    }
-    deleteEditorItem(symbol) {
-        if (!confirm('Remove this item and all instances?'))
-            return;
-        this.defs.remove(symbol);
-        this.panel.setEditorItems(this.defs.extraDefs());
-        this.map.eachCell(cell => {
-            const drawable = cell.layers.data['items'];
-            if (drawable && typeof drawable.char === 'function' && drawable.char() === symbol && drawable instanceof editor_item/* EditorItem */.R)
-                cell.died(drawable);
-        });
-        this.drawMap();
-    }
-    usedSymbols() {
-        const symbols = new Set();
-        const order = ['pawn', 'fire', 'walls', 'items', 'floor'];
-        this.map.eachCell(cell => {
-            const layer = order.find(name => cell.layers.data[name]);
-            if (!layer)
-                return;
-            const drawable = cell.layers.data[layer];
-            const symbol = drawable?.char();
-            if (symbol)
-                symbols.add(symbol);
-        });
-        return symbols;
-    }
-    buildSymbols() {
-        const symbols = [];
-        const pushRange = (start, end) => (0,utils/* times */.Hn)(start, end + 1, index => symbols.push(String.fromCharCode(index)));
-        pushRange(33, 126);
-        const ranges = [
-            [0x2190, 0x21FF],
-            [0x2580, 0x259F],
-            [0x25A0, 0x25FF],
-            [0x2700, 0x27BF]
-        ];
-        (0,utils/* each */.__)(ranges, ([start, end]) => pushRange(start, end));
-        return symbols.filter(symbol => symbol !== '.');
-    }
-    attach() {
-        const container = (0,html.d1)('#game-container');
-        container.style('position', 'relative');
-        const root = document.documentElement;
-        root.style.setProperty('--map-width', `${this.map.w}ch`);
-        const node = container.node();
-        this.map.display.attachTo(node, { display: 'block', zIndex: '1' });
-        this.map.smokeDisplay.attachTo(node, { position: 'absolute', top: '0', left: '0', zIndex: '2', pointerEvents: 'none' });
-        this.map.uiRenderer.attachTo(node, { position: 'absolute', top: '0', left: '0', zIndex: '3', pointerEvents: 'none' });
-        this.map.onMousemove(cell => this.onMove(cell));
-        this.map.onMousedown((cell, click) => this.onDown(cell, click));
-    }
-    onDown(cell, c) {
-        if (!cell)
-            return;
-        if (this.copyBuf && c.button === 'RIGHT') {
-            this.clearCopy();
-            this.drawMap();
-            return;
-        }
-        if (window.keydownC)
-            this.clearCopy();
-        // Opposite button cancels mid-shape
-        if (this.painting) {
-            const currentErase = this.op !== 'paint';
-            const incomingErase = c.button === 'RIGHT';
-            if (currentErase !== incomingErase) {
-                this.clearPreview();
-                this.painting = false;
-                this.paintingShift = false;
-                this.origin = null;
-                this.lock = null;
-                this.lastTarget = null;
-                return;
-            }
-        }
-        this.painting = true;
-        this.paintingShift = c.shift;
-        this.paintingCtrl = c.ctrl;
-        this.origin = cell.xy;
-        this.lock = null;
-        this.op = c.button === 'RIGHT' ? (c.ctrl ? 'erase-cell' : 'erase-current') : 'paint';
-        this.onMove(cell);
-        const stop = () => { this.commitIfNeeded(); this.painting = false; this.paintingShift = false; this.origin = null; this.lock = null; this.lastTarget = null; document.removeEventListener('mouseup', stop); };
-        document.addEventListener('mouseup', stop);
-    }
-    commitLine() {
-        if (!this.origin || !this.lastTarget) {
-            this.clearPreview();
-            return;
-        }
-        const a = this.map.get(this.origin);
-        const b = this.lastTarget;
-        const ops = [];
-        (0,shapes/* eachLine */.IM)(a.xy, b.xy, xy => { this.applyXY(xy, ops); return true; });
-        this.pushUndo(ops);
-        this.clearPreview();
-    }
-    commitRect(filled) {
-        if (!this.origin || !this.lastTarget) {
-            this.clearPreview();
-            return;
-        }
-        const rect = game_rect/* Rect */.r.between(this.origin, this.lastTarget.xy);
-        const ops = [];
-        const on = (xy) => this.applyXY(xy, ops);
-        filled ? rect.eachCell(on) : rect.eachBorder(on);
-        this.pushUndo(ops);
-        this.clearPreview();
-    }
-    previewLine(toCell) {
-        if (!this.origin)
-            return;
-        const start = this.map.get(this.origin);
-        const end = toCell;
-        this.withStroke(this.shapeId, UI.strokeZ, () => this.painting && this.panel.tool === 'line', s => {
-            (0,shapes/* eachLine */.IM)(start.xy, end.xy, xy => {
-                s.add(this.map.get(xy), this.panel.choice?.char || '#');
-                return true;
-            });
-        });
-    }
-    previewRect(toCell, filled) {
-        if (!this.origin)
-            return;
-        const rect = game_rect/* Rect */.r.between(this.origin, toCell.xy);
-        this.withStroke(this.shapeId, UI.strokeZ, () => this.painting && (this.panel.tool === (filled ? 'fill-box' : 'box')), s => {
-            const add = (xy) => s.add(this.map.get(xy), this.panel.choice?.char || '#');
-            if (filled)
-                rect.eachCell(add);
-            else
-                rect.eachBorder(add);
-        });
-    }
-    previewEllipseRect(toCell, filled) {
-        if (!this.origin)
-            return;
-        const rect = this.paintingShift ? (0,shapes/* squareBetween */.iV)(this.origin, toCell.xy)
-            : game_rect/* Rect */.r.between(this.origin, toCell.xy);
-        this.previewEllipse(rect, filled);
-    }
-    previewEllipseCenter(toCell, filled) {
-        if (!this.origin)
-            return;
-        const rect = (0,shapes/* rectFromCenter */.er)(this.origin, toCell.xy, this.paintingShift);
-        this.previewEllipse(rect, filled);
-    }
-    pushUndo(ops) { if (ops.length)
-        this.undoStack.push(ops); }
-    recordCell(cell) {
-        return game_layers/* CellLayers */.v.layerNames
-            .map((layerName) => {
-            const drawable = cell.layers.data[layerName];
-            if (!drawable)
-                return null;
-            return typeof drawable.keyName === 'function'
-                ? drawable.keyName()
-                : drawable.constructor?.name;
-        })
-            .filter((name) => !!name);
-    }
-    commitEllipseRect(filled) {
-        if (!this.origin || !this.lastTarget) {
-            this.clearPreview();
-            return;
-        }
-        const rect = this.paintingShift ? (0,shapes/* squareBetween */.iV)(this.origin, this.lastTarget.xy)
-            : game_rect/* Rect */.r.between(this.origin, this.lastTarget.xy);
-        this.commitEllipse(rect, filled);
-    }
-    commitEllipseCenter(filled) {
-        if (!this.origin || !this.lastTarget) {
-            this.clearPreview();
-            return;
-        }
-        const rect = (0,shapes/* rectFromCenter */.er)(this.origin, this.lastTarget.xy, this.paintingShift);
-        this.commitEllipse(rect, filled);
-    }
-    centerFragment(element) {
-        const mainElement = (0,html.d1)('#main').node();
-        const bounding = mainElement.getBoundingClientRect();
-        const elementNode = element.node();
-        const elementWidth = elementNode.offsetWidth;
-        const elementHeight = elementNode.offsetHeight;
-        const left = bounding.left + (bounding.width - elementWidth) / 2;
-        const top = bounding.top + (bounding.height - elementHeight) / 2;
-        element.style('left', `${Math.max(0, Math.round(left))}px`)
-            .style('top', `${Math.max(0, Math.round(top))}px`);
-    }
-    captureCopyShape(a, b) {
-        const mode = this.paintingCtrl ? 'cells' : 'layer';
-        const tool = this.panel.tool;
-        const add = (xy) => {
-            if (mode === 'layer') {
-                const layerName = this.panel.layer;
-                const drawable = this.map.get(xy).get(layerName);
-                if (!drawable)
-                    return;
-                const name = typeof drawable.keyName === 'function'
-                    ? drawable.keyName()
-                    : drawable.constructor?.name;
-                const symbol = drawable.char();
-                layers.push({ dx: xy.x - a.x, dy: xy.y - a.y, name, symbol });
-            }
-            else {
-                const items = game_layers/* CellLayers */.v.layerNames
-                    .filter(n => n !== 'floor')
-                    .map(layerName => this.map.get(xy).get(layerName))
-                    .filter(drawable => drawable)
-                    .map(drawable => ({
-                    name: typeof drawable.keyName === 'function'
-                        ? drawable.keyName()
-                        : drawable.constructor?.name,
-                    symbol: drawable.char()
-                }));
-                if (items.length)
-                    cells.push({ dx: xy.x - a.x, dy: xy.y - a.y, items });
-            }
-        };
-        const layers = [];
-        const cells = [];
-        const rectBetween = () => game_rect/* Rect */.r.between(a, b);
-        if (tool === 'line' || tool === 'draw')
-            (0,shapes/* eachLine */.IM)(a, b, xy => { add(xy); return true; });
-        else if (tool === 'box')
-            rectBetween().eachBorder(add);
-        else if (tool === 'fill-box')
-            rectBetween().eachCell(add);
-        else if (tool === 'circ-in-rect' || tool === 'circ-in-rect-filled') {
-            const rect = this.paintingShift ? (0,shapes/* squareBetween */.iV)(a, b) : rectBetween();
-            if (tool === 'circ-in-rect-filled') {
-                const { cx, cy, rx, ry } = (0,shapes/* ellipseFromRect */.Dg)(rect);
-                (0,shapes/* eachEllipseFill */.xh)(cx, cy, rx, ry, add);
-            }
-            else
-                (0,shapes/* eachEllipseBorderRect */.QI)(rect.ul.x, rect.ul.y, rect.br.x, rect.br.y, add);
-        }
-        else if (tool === 'circ-radius' || tool === 'circ-radius-filled') {
-            const rect = (0,shapes/* rectFromCenter */.er)(a, b, this.paintingShift);
-            if (tool === 'circ-radius-filled') {
-                const { cx, cy, rx, ry } = (0,shapes/* ellipseFromRect */.Dg)(rect);
-                (0,shapes/* eachEllipseFill */.xh)(cx, cy, rx, ry, add);
-            }
-            else
-                (0,shapes/* eachEllipseBorderRect */.QI)(rect.ul.x, rect.ul.y, rect.br.x, rect.br.y, add);
-        }
-        this.copyBuf = mode === 'layer'
-            ? { mode, layer: this.panel.layer, layers }
-            : { mode, cells };
-        this.updateCopyInfo();
-    }
-    pasteCopyAt(origin) {
-        if (!this.copyBuf)
-            return;
-        const ops = [];
-        const pushIfChanged = (xy, before) => {
-            const after = this.recordCell(this.map.get(xy));
-            if (before.length !== after.length || before.some((n, i) => n !== after[i]))
-                ops.push({ xy, type: 'set', names: before });
-        };
-        if (this.copyBuf.mode === 'layer') {
-            const layer = this.copyBuf.layer;
-            for (const item of this.copyBuf.layers || []) {
-                if (this.stuttered(this.op === 'paint'))
-                    continue;
-                const xy = origin.add(item.dx, item.dy);
-                if (game_xy.XY.oob(xy.x, xy.y))
-                    continue;
-                const cell = this.map.get(xy);
-                const before = this.recordCell(cell);
-                if (this.op !== 'paint') {
-                    const drawable = cell.get(layer);
-                    if (drawable)
-                        cell.died(drawable);
-                }
-                else if (!cell.occupied(layer)) {
-                    cell.create(drawable_types/* DrawableType */.Z.make(item.symbol, item.name));
-                }
-                pushIfChanged(xy, before);
-            }
-        }
-        else {
-            const perCell = {};
-            for (const item of this.copyBuf.cells || []) {
-                const key = `${item.dx},${item.dy}`;
-                perCell[key] = item.items;
-            }
-            for (const key of Object.keys(perCell)) {
-                if (this.stuttered(this.op === 'paint'))
-                    continue;
-                const [dxString, dyString] = key.split(',');
-                const xy = origin.add(parseInt(dxString, 10), parseInt(dyString, 10));
-                if (game_xy.XY.oob(xy.x, xy.y))
-                    continue;
-                const cell = this.map.get(xy);
-                const before = this.recordCell(cell);
-                const items = perCell[key];
-                if (this.op === 'paint') {
-                    game_layers/* CellLayers */.v.layerNames
-                        .filter(n => n !== 'floor')
-                        .forEach(n => cell.clear(n));
-                    items.forEach(item => {
-                        if (item.name === 'Floor')
-                            return;
-                        cell.create(drawable_types/* DrawableType */.Z.make(item.symbol, item.name));
-                    });
-                }
-                else {
-                    if (this.op === 'erase-cell')
-                        game_layers/* CellLayers */.v.layerNames
-                            .filter(n => n !== 'floor')
-                            .forEach(n => cell.clear(n));
-                    else {
-                        const layer = this.panel.layer;
-                        const drawable = cell.get(layer);
-                        if (drawable)
-                            cell.died(drawable);
-                    }
-                }
-                pushIfChanged(xy, before);
-            }
-        }
-        this.pushUndo(ops);
-        this.drawMap();
-    }
-    previewPasteAt(at) {
-        if (!this.copyBuf) {
-            this.map.uiRenderer.remove(this.pasteId);
-            return;
-        }
-        this.withStroke(this.pasteId, UI.pasteZ, () => !!this.copyBuf, s => {
-            const addAt = (dx, dy) => {
-                const xy = at.add(dx, dy);
-                if (game_xy.XY.oob(xy.x, xy.y))
-                    return;
-                const cell = this.map.get(xy);
-                s.add(cell, '*');
-            };
-            if (this.copyBuf.mode === 'layer')
-                for (const it of this.copyBuf.layers || [])
-                    addAt(it.dx, it.dy);
-            else
-                for (const it of this.copyBuf.cells || [])
-                    addAt(it.dx, it.dy);
-        });
-    }
-    updateCopyInfo() {
-        const cancelBtn = (0,html.d1)('#copy-cancel');
-        const pasteBtn = (0,html.d1)('#paste-btn');
-        const rotateLeftBtn = (0,html.d1)('#rotate-left');
-        const rotateRightBtn = (0,html.d1)('#rotate-right');
-        const count = this.copyBuf?.mode === 'layer'
-            ? (this.copyBuf.layers?.length || 0)
-            : (this.copyBuf?.cells?.length || 0);
-        if (count) {
-            const label = this.copyBuf.mode === 'layer'
-                ? `cxl (${count} ${this.panel.layer})`
-                : `cxl (${count} cells)`;
-            cancelBtn.text(label).disable(false);
-            pasteBtn.disable(false);
-            rotateLeftBtn.show().disable(false);
-            rotateRightBtn.show().disable(false);
-        }
-        else {
-            cancelBtn.text('cxl').disable(true);
-            pasteBtn.disable(true);
-            this.map.uiRenderer.remove(this.pasteId);
-            rotateLeftBtn.hide().disable(true);
-            rotateRightBtn.hide().disable(true);
-        }
-        cancelBtn.onClick(() => { this.clearCopy(); this.drawMap(); });
-        pasteBtn.onClick(() => { if (this.hovered)
-            this.pasteCopyAt(this.hovered); });
-        rotateLeftBtn.onClick(() => this.rotateCopy('left'));
-        rotateRightBtn.onClick(() => this.rotateCopy('right'));
-        const toolRow = (0,html.d1)('#tool-row');
-        toolRow.selectAll('button').property('disabled', !!count);
-    }
-    rotateCopy(direction) {
-        if (!this.copyBuf)
-            return;
-        const rotatePair = (dx, dy) => direction === 'right' ? { dx: dy, dy: -dx } : { dx: -dy, dy: dx };
-        if (this.copyBuf.mode === 'layer')
-            this.copyBuf.layers = this.copyBuf.layers?.map(layerItem => {
-                const rotated = rotatePair(layerItem.dx, layerItem.dy);
-                return { ...layerItem, dx: rotated.dx, dy: rotated.dy };
-            });
-        else
-            this.copyBuf.cells = this.copyBuf.cells?.map(cellItem => {
-                const rotated = rotatePair(cellItem.dx, cellItem.dy);
-                return { ...cellItem, dx: rotated.dx, dy: rotated.dy };
-            });
-        if (this.hovered)
-            this.previewPasteAt(this.hovered);
-    }
-    clearCopy() { this.copyBuf = null; this.map.uiRenderer.remove(this.pasteId); this.updateCopyInfo(); }
-    clearPreview() { this.map.uiRenderer.remove(this.shapeId); ui_renderer/* Repaint */.G2.emit(); }
-    commitIfNeeded() {
-        // If we have a copy, paste on mouseup; ignore shapes
-        if (this.copyBuf && this.origin && this.lastTarget) {
-            const at = this.lastTarget.xy;
-            this.pasteCopyAt(at);
-            this.map.uiRenderer.remove(this.pasteId);
-            this.clearPreview();
-            return;
-        }
-        const tool = this.panel.tool;
-        if (this.copyBuf && this.origin && this.lastTarget &&
-            game_xy.XY.matches(this.origin, this.lastTarget.xy)) {
-            this.pasteCopyAt(this.origin);
-            this.map.uiRenderer.remove(this.pasteId);
-            this.clearPreview();
-            return;
-        }
-        if (this.op === 'paint' && window.keydownC &&
-            this.origin && this.lastTarget) {
-            this.clearCopy();
-            this.captureCopyShape(this.origin, this.lastTarget.xy);
-            this.updateCopyInfo();
-            this.clearPreview();
-            return;
-        }
-        const commit = this.commitHandlers[tool];
-        if (commit) {
-            commit();
-            return;
-        }
-        this.clearPreview();
-    }
-    onMove(cell) {
-        this.panel.setCell(cell);
-        this.hovered = cell.xy;
-        if (this.copyBuf && this.hovered)
-            this.previewPasteAt(this.hovered);
-        if (!this.painting || !cell)
-            return;
-        const tool = this.panel.tool;
-        let target = cell;
-        if (tool === 'line' && this.paintingShift && this.origin) {
-            const dx = cell.xy.x - this.origin.x;
-            const dy = cell.xy.y - this.origin.y;
-            if (!this.lock && (dx !== 0 || dy !== 0))
-                this.lock = Math.abs(dx) >= Math.abs(dy) ? 'h' : 'v';
-            if (this.lock === 'h')
-                target = this.map.get(game_xy.XY.at(cell.xy.x, this.origin.y));
-            if (this.lock === 'v')
-                target = this.map.get(game_xy.XY.at(this.origin.x, cell.xy.y));
-        }
-        this.lastTarget = target;
-        if (this.copyBuf)
-            return; // suppress shape previews while copy loaded
-        const preview = this.previewHandlers[tool];
-        if (preview)
-            preview(target);
-    }
-    stroke(cell) {
-        if (window.keydownC)
-            return;
-        this.applyXY(cell.xy);
-    }
-    paint(cell) {
-        const ch = this.panel.choice;
-        if (!ch)
-            return;
-        const layer = this.panel.layer;
-        if (cell.occupied(layer))
-            return;
-        const d = ch.make();
-        if (!d)
-            return;
-        cell.create(d);
-        this.drawMap();
-    }
-    eraseCurrent(cell) {
-        const layer = this.panel.layer;
-        const d = cell.get(layer);
-        if (!d)
-            return;
-        cell.died(d);
-        this.drawMap();
-    }
-    eraseCell(cell) {
-        game_layers/* CellLayers */.v.layerNames
-            .filter(n => n !== 'floor')
-            .forEach(n => cell.clear(n));
-        this.drawMap();
-    }
-    updateLightingEnabled() {
-        if (this.showLighting || this.showDarkness) {
-            this.map.lighting.enable();
-            this.map.eachCell(cell => {
-                if (cell.layers.lit())
-                    this.map.lighting.add(cell);
-            });
-            this.map.lighting.redraw();
-        }
-        else
-            this.map.lighting.disable();
-    }
-    init() {
-        this.map.fill(() => new floor/* Floor */.Z());
-        this.map.lighting.disable();
-        this.hide('#play-controls');
-        this.hide('#next-button');
-        this.hide('#freeze-button');
-        this.hide('#help-button');
-        this.hide('#save-group');
-        this.hide('#step-info');
-        (0,html.d1)('#debug-controls').show();
-        (0,html.d1)('#game-button').show();
-        (0,html.d1)('#game-button').onClick(() => { location.href = location.pathname; });
-        (0,html.d1)('#copy-cancel').onClick(() => { this.copyBuf = null; this.updateCopyInfo(); });
-        (0,html.d1)('#undo-btn').onClick(this.undo);
-        (0,html.d1)('#copy-fragment').onClick(async () => {
-            const txt = this.renderCroppedFragment();
-            try {
-                await navigator.clipboard.writeText(txt);
-            }
-            catch { }
-        });
-        (0,html.d1)('#submit-fragment').onClick(() => {
-            const txt = this.renderCroppedFragment();
-            const title = 'Editor: map fragment';
-            const body = `\n\n\`\`\`\n${txt}\n\`\`\``;
-            this.feedback.show();
-            this.feedback.prefill(title, body);
-        });
-        (0,html.d1)('#show-fragment').onClick(() => {
-            const txt = this.renderCroppedFragment();
-            (0,html.d1)('#fragment-text').text(txt);
-            const v = (0,html.d1)('#fragment-preview');
-            v.show();
-            requestAnimationFrame(() => this.centerFragment(v));
-        });
-        (0,html.d1)('#fragment-close').onClick(() => {
-            (0,html.d1)('#fragment-preview').hide().style('left', '').style('top', '');
-        });
-        (0,html.d1)('#load-fragment').onClick(() => {
-            this.showFragmentLoader();
-        });
-        (0,html.d1)('#fragment-loader-close').onClick(() => {
-            (0,html.d1)('#fragment-loader').hide();
-        });
-        (0,html.d1)('#lighting-toggle').onClick(this.toggleLighting);
-        (0,html.d1)('#darkness-toggle').onClick(this.toggleDarkness);
-        (0,html.d1)('#clear-map').onClick(this.clearMap);
-        window.keydownC = false;
-        window.addEventListener('keydown', this.onKeyDown);
-        window.addEventListener('keyup', this.onKeyUp);
-        this.updateCopyInfo();
-    }
-    setupLayerControls() {
-        (0,html.d1)('#debug-toggle').onClick(() => {
-            const dbg = (0,html.d1)('#debug-controls');
-            dbg.showing() ? dbg.hide() : dbg.show();
-        });
-        (0,html.d1)('#layer-on').onClick(() => this.turnOnAll());
-        (0,html.d1)('#layer-off').onClick(() => this.turnOffAll());
-        const group = (0,html.d1)('#layer-group');
-        const abbreviations = (0,utils/* toMap */.J9)(game_layers/* CellLayers */.v.layerNames, layer => layer.slice(0, 3));
-        game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
-            const button = group.append('button')
-                .attr('id', `layer-${layerName}`)
-                .classed('button-secondary', true)
-                .text(abbreviations[layerName] || layerName.slice(0, 3));
-            button.on('click', () => this.toggleLayer(layerName));
-        });
-    }
-    getVisible() {
-        if (this.solo)
-            return new Set([this.solo]);
-        if (this.muted.size === 0)
-            return new Set();
-        return new Set(game_layers/* CellLayers */.v.layerNames.filter(l => !this.muted.has(l)));
-    }
-    toggleLayer(layerName) {
-        const button = (0,html.d1)(`#layer-${layerName}`);
-        if (this.solo === layerName) {
-            this.solo = null;
-            button.classed('solo', false);
-        }
-        else if (this.solo) {
-            (0,html.d1)(`#layer-${this.solo}`).classed('solo', false);
-            this.solo = layerName;
-            button.classed('solo', true);
-        }
-        else if (this.muted.has(layerName)) {
-            this.muted.delete(layerName);
-            button.classed('muted', false);
-        }
-        else {
-            this.muted.add(layerName);
-            button.classed('muted', true);
-        }
-        this.drawMap();
-    }
-    turnOnAll() {
-        this.muted.clear();
-        this.solo = null;
-        game_layers/* CellLayers */.v.layerNames.forEach(n => (0,html.d1)(`#layer-${n}`).classed('muted', false).classed('solo', false));
-        this.drawMap();
-    }
-    turnOffAll() {
-        this.solo = null;
-        this.muted = new Set(game_layers/* CellLayers */.v.layerNames);
-        game_layers/* CellLayers */.v.layerNames.forEach(n => {
-            const b = (0,html.d1)(`#layer-${n}`);
-            b.classed('solo', false).classed('muted', true);
-        });
-        this.drawMap();
-    }
-    drawMap() {
-        this.map.lighting.redraw();
-        const visible = this.getVisible();
-        const showNothing = this.muted.size === game_layers/* CellLayers */.v.layerNames.length;
-        const debug = this.muted.size > 0 || this.solo !== null;
-        this.map.draw(this.showLighting, visible, showNothing, debug, this.showDarkness);
-    }
-    async showFragmentLoader() {
-        const loader = (0,html.d1)('#fragment-loader');
-        const list = (0,html.d1)('#fragment-list');
-        const fragmentContext = __webpack_require__(612);
-        const fragmentFiles = fragmentContext.keys();
-        const fragmentData = fragmentFiles.map((path) => ({
-            name: path.replace('./', '').replace('.txt', ''),
-            path: path,
-            content: fragmentContext(path).default || fragmentContext(path)
-        }));
-        list.dList('.fragment-file').updateFrom(fragmentData, (btn, fragment) => {
-            btn.text(fragment.name);
-            btn.onClick(async () => {
-                this.loadFragmentToCopyBuffer(fragment.content);
-                loader.hide();
-            });
-        });
-        loader.show();
-        requestAnimationFrame(() => this.centerFragment(loader));
-    }
-    loadFragmentToCopyBuffer(text) {
-        const parsed = fragment/* Fragment */.F.parse(text);
-        const cells = [];
-        // Check for unknown types and add them as editor items
-        Object.entries(parsed.key).forEach(([symbol, typeName]) => {
-            if (typeName === 'Floor')
-                return;
-            if (!drawable_types/* DrawableType */.Z.registry[typeName])
-                this.defs.register({ symbol, name: typeName });
-        });
-        if (this.defs.extraDefs().length > 0)
-            this.panel.setEditorItems(this.defs.extraDefs());
-        // Parse the fragment and convert to copy buffer format
-        parsed.grid.forEach((row, y) => {
-            for (let x = 0; x < row.length; x++) {
-                const symbol = row[x];
-                if (symbol && symbol !== '.') {
-                    const typeName = parsed.key[symbol];
-                    if (typeName && typeName !== 'Floor')
-                        cells.push({ dx: x, dy: y, items: [{ name: typeName, symbol }] });
-                }
-            }
-        });
-        // Set the copy buffer
-        this.copyBuf = { mode: 'cells', cells };
-        this.origin = game_xy.XY.at(0, 0);
-        this.updateCopyInfo();
-    }
-}
-
 ;// ./src/index.ts
 
 
@@ -17900,8 +16667,12 @@ async function init() {
         setTitle();
         state/* FirehouseMode */.M.on(() => setTitle());
         firehouse/* FirehouseClosed */.F.on(() => setTitle());
-        if (mode === 'editor')
+        if (mode === 'editor') {
+            // lazy load editor so we don't do editor stuff at module load time
+            // DO NOT REMOVE THIS COMMENT
+            const { Editor } = await __webpack_require__.e(/* import() */ 457).then(__webpack_require__.bind(__webpack_require__, 4457));
             new Editor();
+        }
         else
             new game/* Game */.Z();
     }
@@ -17912,8 +16683,6 @@ async function init() {
     }
 }
 window.addEventListener('DOMContentLoaded', init);
-
-})();
 
 /******/ })()
 ;
