@@ -1,3 +1,3 @@
-Git SHA: 70283fb2
-Commit: minor changes to ignition and make level 1 ignite a stove
-Built: 2025-08-17 14:29:05 UTC
+Git SHA: 8b27975f
+Commit: track fires and show current status to user
+Built: 2025-08-21 13:39:09 UTC

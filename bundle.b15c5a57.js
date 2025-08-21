@@ -413,6 +413,7 @@ class PropItem extends drawable/* Drawable */.h {
         this.char = () => this.symbol;
         this.color = () => this.material.color(this.materialType.color);
         this.desc = () => this.material.desc(this.name);
+        this.keyName = () => this.name;
         this.passable = passable;
         this.material = new material/* Material */.im(this, materialType);
     }
@@ -880,6 +881,17 @@ body {
     line-height: 1.4;
 }
 
+.help-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+.help-table th, .help-table td {
+    border: 1px solid #0f0;
+    padding: 4px;
+    text-align: left;
+}
+
 .popup-title {
     margin: 0 0 20px 0;
     color: #0a0;
@@ -1062,9 +1074,9 @@ body {
     margin-top: 10px;
 }
 
-#play-wrapper { position: relative }
-#speed-buttons { position: absolute; top: 100% }
-#speed-buttons button { width: 100% }
+.play-controls-wrapper { position: relative }
+.speed-buttons { position: absolute; top: 100% }
+.speed-buttons button { width: 100% }
 
 #terminal .row { }
 
@@ -1085,17 +1097,20 @@ body {
 /* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1919);
 /* harmony import */ var _drawable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1721);
 /* harmony import */ var _smoke__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4502);
+/* harmony import */ var _game_fires__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(6746);
+
 
 
 
 
 class Fire extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
     constructor() {
-        super(...arguments);
+        super();
         this.layer = 'fire';
         this.light = () => 3;
-        this.char = () => "▲"; // "🔥"
+        this.char = () => Fire.CHAR;
         this.color = () => _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .FIRE */ .ZK.random();
+        _game_fires__WEBPACK_IMPORTED_MODULE_4__/* .Fires */ .UQ.increment(this);
     }
     step() {
         if (!(0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(this.age)) {
@@ -1118,7 +1133,12 @@ class Fire extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
         (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .bombUnless */ .Nb)(other instanceof Fire, 'merge mismatch');
         return other.olderThan(this) ? 'replace' : 'kill';
     }
+    dying() {
+        _game_fires__WEBPACK_IMPORTED_MODULE_4__/* .Fires */ .UQ.decrement(this);
+        super.dying();
+    }
 }
+Fire.CHAR = "▲";
 
 
 /***/ }),
@@ -6728,6 +6748,7 @@ class Drawable {
     }
     step() { }
     desc() { return `${this.constructor.name}`; }
+    keyName() { return this.constructor.name; }
     draw(_debug, illumination) {
         const fg = this.applyIllumination(this.color(), illumination);
         this.cell.map.drawAt(this.cell.xy.x, this.cell.xy.y, this.char(), fg, _ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .BACKGROUND */ .h4);
@@ -6792,7 +6813,15 @@ class Drawable {
         if (material?.ignite)
             material.ignite();
     }
-    diedAndAlreadyRemovedFromCell() { Drawable.alive.delete(this); }
+    extinguish() {
+        const material = this.material;
+        if (material?.extinguish)
+            material.extinguish();
+    }
+    died() { this.cell.died(this); }
+    diedAndAlreadyRemovedFromCell() {
+        Drawable.alive.delete(this);
+    }
     dying() {
         this.cell.map.lighting.update(this.cell);
     }
@@ -7350,6 +7379,8 @@ Pawn.HOVER_PATH_COLOR = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy([
 /* harmony import */ var _smoke__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4502);
 /* harmony import */ var _fire__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1267);
 /* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(1919);
+/* harmony import */ var _game_fires__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(6746);
+
 
 
 
@@ -7359,6 +7390,7 @@ class MaterialType {
         this.flammable = true;
         this.light = 0;
         this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .BORDER */ .XE;
+        this.note = '';
     }
 }
 class Wood extends MaterialType {
@@ -7366,6 +7398,7 @@ class Wood extends MaterialType {
         super(...arguments);
         this.hits = 40;
         this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .COLOR_WOOD */ .sX;
+        this.note = 'flammable';
     }
     step(owner) {
         if (!_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo && (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(2))
@@ -7379,6 +7412,7 @@ class Meat extends MaterialType {
     constructor() {
         super(...arguments);
         this.hits = 20;
+        this.note = 'flammable';
     }
     step(_owner) { }
 }
@@ -7388,6 +7422,7 @@ class Plant extends MaterialType {
         super(...arguments);
         this.hits = 10;
         this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .COLOR_PLANT */ .yv;
+        this.note = "extra smokey but don't burn hot";
     }
     step(owner) {
         owner.cell.reborn(new _smoke__WEBPACK_IMPORTED_MODULE_1__/* .Smoke */ ._());
@@ -7402,6 +7437,7 @@ class Metal extends MaterialType {
         this.flammable = false;
         this.hits = 50;
         this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .COLOR_METAL */ .SK;
+        this.note = 'non-flammable';
     }
     step(_owner) { }
 }
@@ -7412,6 +7448,7 @@ class Brick extends MaterialType {
         this.flammable = false;
         this.hits = 20;
         this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .COLOR_BRICK */ .Ui;
+        this.note = 'non-flammable';
     }
     step(_owner) { }
 }
@@ -7429,10 +7466,17 @@ class Material {
         this.ignite = () => {
             if (!this.type.flammable)
                 return;
-            if (this.burn === null)
+            if (this.burn === null) {
                 this.burn = this.type.hits;
+                _game_fires__WEBPACK_IMPORTED_MODULE_4__/* .Fires */ .UQ.increment(this.owner);
+            }
         };
-        this.extinguish = () => { this.burn = null; };
+        this.extinguish = () => {
+            if (this.burn !== null) {
+                this.burn = null;
+                _game_fires__WEBPACK_IMPORTED_MODULE_4__/* .Fires */ .UQ.decrement(this.owner);
+            }
+        };
         this.isBurning = () => this.burn !== null;
         this.light = (base) => this.isBurning() ? base + 1 : base;
         this.color = (base) => this.isBurning() && !_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo && (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(3) ? _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .FIRE */ .ZK.random() : base;
@@ -7445,6 +7489,7 @@ class Material {
         const cell = this.owner.cell;
         this.type.step(this.owner);
         if (this.burn <= 0) {
+            _game_fires__WEBPACK_IMPORTED_MODULE_4__/* .Fires */ .UQ.decrement(this.owner);
             cell.died(this.owner);
             return;
         }
@@ -7830,8 +7875,9 @@ const submitIssue = async (title, body, image) => {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  Z: () => (/* binding */ Game),
-  K: () => (/* binding */ GameStepped)
+  Zt: () => (/* binding */ Game),
+  K5: () => (/* binding */ GameStepped),
+  X_: () => (/* binding */ LevelWon)
 });
 
 // EXTERNAL MODULE: ./src/utils.ts
@@ -8040,23 +8086,113 @@ class DestinationTask extends task/* Task */.YZ {
     }
 }
 
+;// ./src/game/tasks/wait-task.ts
+
+class WaitTask extends task/* Task */.YZ {
+    isDone() { return false; }
+    step() { }
+    desc() { return 'wait'; }
+    strokeAndNext(start) { return start; }
+}
+
+// EXTERNAL MODULE: ./src/ui/colors.ts
+var colors = __webpack_require__(1919);
+// EXTERNAL MODULE: ./src/ui/stroke.ts
+var ui_stroke = __webpack_require__(891);
+;// ./src/game/tasks/extinguish-task.ts
+
+
+
+class ExtinguishTask extends task/* Task */.YZ {
+    constructor(pawn) {
+        super(pawn);
+        this.done = false;
+        this.id = `extinguish-${Date.now()}-${Math.random()}`;
+        this.color = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy(['#f00', '#00f']));
+        this.isDone = () => this.done;
+        this.desc = () => `extinguish ${this.stepsRemaining}`;
+        this.stepsRemaining = pawn.material.isBurning() ? 5 : 1;
+    }
+    step() {
+        if (this.done)
+            return;
+        if (--this.stepsRemaining <= 0) {
+            if (this.pawn.material.isBurning()) {
+                this.pawn.material.extinguish();
+            }
+            else {
+                const neighbors = this.pawn.cell.neighbors();
+                const fireNeighbors = neighbors.filter(cell => cell.fire());
+                neighbors.forEach(cell => cell.onFire(fire => fire.died()));
+                if (fireNeighbors.length < 4) {
+                    this.pawn.cell.cardinals().forEach(cell => cell.extinguish());
+                }
+            }
+            this.done = true;
+        }
+    }
+    strokeAndNext(start) {
+        start.map.uiRenderer.replace(this.id, new ui_stroke/* Stroke */.t([{ cell: start, char: 'e' }], this.color, () => !this.done, 1));
+        return start;
+    }
+    cleanup() { this.pawn.cell.map.uiRenderer.remove(this.id); }
+}
+
 ;// ./src/ui/states/destination-state.ts
 
 
 
 
+
+
+
 class DestinationState {
+    menuAction(key) {
+        if (key === 'x')
+            this.ui.setState('select');
+        else if (key === 'd')
+            this.debug();
+        else if (key === 'r')
+            this.removeLastTask();
+        else if (key === 'g' || key === 'w' || key === 'e')
+            this.locatedAction(key);
+    }
+    locatedAction(key) {
+        if (!this.hoveredCell)
+            return;
+        const start = this.selected.tipCell;
+        const fixedRay = this.shift ? this.buildFixedRay(start, this.hoveredCell) : null;
+        this.selected.addTask(new DestinationTask(this.selected, this.hoveredCell, fixedRay));
+        if (key === 'w')
+            this.selected.addTask(new WaitTask(this.selected));
+        else if (key === 'e')
+            this.selected.addTask(new ExtinguishTask(this.selected));
+        this.ui.setState('destination', this.selected);
+    }
+    debug() {
+        window.pawn = this.selected;
+        console.log('Pawn assigned to window.pawn:', this.selected);
+        ui_renderer/* Repaint */.G2.emit();
+    }
+    removeLastTask() {
+        (0,utils/* onLastMaybe */.iw)(this.selected.tasks, task => task.remove());
+        if (this.hoveredCell)
+            this.onMouseMove(this.hoveredCell);
+        ui_renderer/* Repaint */.G2.emit();
+    }
     constructor(ui) {
         this.ui = ui;
         this.shift = false;
-        this.keyDown = (e) => {
-            if (e.key === 'Escape')
+        this.keyDown = (event) => {
+            if (event.key === 'Escape')
                 this.ui.setState('menu', this.selected);
-            if (e.key === 'Shift')
+            else if (event.key === 'Shift')
                 this.shift = true;
+            else
+                this.menuAction(event.key);
         };
-        this.keyUp = (e) => {
-            if (e.key === 'Shift')
+        this.keyUp = (event) => {
+            if (event.key === 'Shift')
                 this.shift = false;
         };
         this.outside = (e) => {
@@ -8089,6 +8225,7 @@ class DestinationState {
         return ray;
     }
     onMouseMove(cell) {
+        this.hoveredCell = cell;
         this.ui.terminal.setCurrent(cell);
         const start = this.selected.tipCell;
         if (!start)
@@ -8135,55 +8272,14 @@ class DestinationState {
         this.unsubDied();
         this.ui.map.uiRenderer.remove(draw_pawn/* Pawn */.vc.HOVER_PATH_STROKE);
         this.selected.selected = false;
+        this.hoveredCell = undefined;
         ui_renderer/* Repaint */.G2.emit();
         draw_pawn/* PawnSelected */.Ei.emit(null);
     }
 }
 
-// EXTERNAL MODULE: ./src/ui/stroke.ts
-var ui_stroke = __webpack_require__(891);
 // EXTERNAL MODULE: ./src/ui/text-stroke.ts
 var text_stroke = __webpack_require__(1485);
-// EXTERNAL MODULE: ./src/ui/colors.ts
-var colors = __webpack_require__(1919);
-;// ./src/game/tasks/wait-task.ts
-
-class WaitTask extends task/* Task */.YZ {
-    isDone() { return false; }
-    step() { }
-    desc() { return 'wait'; }
-    strokeAndNext(start) { return start; }
-}
-
-;// ./src/game/tasks/extinguish-task.ts
-
-
-
-class ExtinguishTask extends task/* Task */.YZ {
-    constructor() {
-        super(...arguments);
-        this.t = 5;
-        this.done = false;
-        this.id = `extinguish-${Date.now()}-${Math.random()}`;
-        this.color = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy(['#f00', '#00f']));
-        this.isDone = () => this.done;
-        this.desc = () => `extinguish ${this.t}`;
-    }
-    step() {
-        if (this.done)
-            return;
-        if (--this.t <= 0) {
-            this.pawn.material.extinguish();
-            this.done = true;
-        }
-    }
-    strokeAndNext(start) {
-        start.map.uiRenderer.replace(this.id, new ui_stroke/* Stroke */.t([{ cell: start, char: 'e' }], this.color, () => !this.done, 1));
-        return start;
-    }
-    cleanup() { this.pawn.cell.map.uiRenderer.remove(this.id); }
-}
-
 ;// ./src/ui/menu.ts
 
 
@@ -8197,7 +8293,13 @@ const MENU_ITEMS = [
     { key: 'r', desc: "Remove last task from firefighter's queue", action: (ui, p) => { (0,utils/* onLastMaybe */.iw)(p.tasks, t => t.remove()); ui.setState('menu', p); } }
 ];
 
+// EXTERNAL MODULE: ./src/game/drawable-types.ts + 1 modules
+var drawable_types = __webpack_require__(1073);
+// EXTERNAL MODULE: ./src/draw/material.ts
+var material = __webpack_require__(2994);
 ;// ./src/ui/help.ts
+
+
 
 
 
@@ -8236,7 +8338,7 @@ class HelpSystem {
         const layerInfo = {
             'floor': { char: '.', desc: 'Floor tiles and terrain', color: '#666' },
             'walls': { char: '#', desc: 'Walls and doors (+)', color: '#666' },
-            'items': { char: '*', desc: 'Items like lamps and equipment', color: '#ff0' },
+            'items': { char: '*', desc: 'Lamps, equipment, and other things laying around', color: '#ff0' },
             'fire': { char: '▲', desc: 'Active fires that spread and create smoke', color: '#f44' },
             'smoke': { char: '+', desc: 'Smoke that drifts and blocks vision', color: '#999' },
             'pawn': { char: '@', desc: 'Firefighters under your command', color: '#0f0' }
@@ -8248,8 +8350,34 @@ class HelpSystem {
             }
             return `• <strong>${layerName}</strong> - Layer type`;
         }).join('<br/>');
-        const menuSection = menuItems.map(m => `• <strong>${m.key}</strong> - ${m.desc}`).join('<br/>');
+        const menuSection = menuItems
+            .map(item => `• <strong>${item.key}</strong> - ${item.desc}`)
+            .join('<br/>');
         const layerButtons = game_layers/* CellLayers */.v.layerNames.map(name => name.slice(0, 3)).join(', ');
+        const drawableNotes = { Oven: 'Can spark fires' };
+        const drawableRows = Object.entries(drawable_types/* DrawableType */.Z.registry)
+            .map(([name, create]) => {
+            const drawable = create();
+            const row = `<tr><td style="text-align:center;color:${drawable.color()}">${drawable.char()}</td>` +
+                `<td>${name}</td><td>${drawableNotes[name] ?? ''}</td></tr>`;
+            drawable.diedAndAlreadyRemovedFromCell();
+            return row;
+        })
+            .join('');
+        const drawableTable = `<table class="help-table">` +
+            `<tr><th>Symbol</th><th>Object</th><th>Notes</th></tr>${drawableRows}</table>`;
+        const materials = [
+            ['Meat', material/* MEAT */.SN],
+            ['Wood', material/* WOOD */.wB],
+            ['Plant', material/* PLANT */.G5],
+            ['Metal', material/* METAL */.cJ],
+            ['Brick', material/* BRICK */.qv],
+        ];
+        const materialRows = materials
+            .map(([name, type]) => `<tr><td style="color:${type.color}">${name}</td><td>${type.flammable ? 'Yes' : 'No'}</td><td>${type.note}</td></tr>`)
+            .join('');
+        const materialTable = `<table class="help-table">` +
+            `<tr><th>Material</th><th>Flammable</th><th>Notes</th></tr>${materialRows}</table>`;
         this.pages = [
             // Page 1: Overview and Controls
             `<div class="help-text">
@@ -8269,13 +8397,14 @@ Control a squad of firefighters (@) in a tactical roguelike. Give orders, then w
 <strong>MOUSE CONTROLS:</strong><br/>
 • <strong>Click @</strong> - Select firefighter<br/>
 • <strong>Hover</strong> - Inspect cells in terminal<br/>
-• <strong>Right-click</strong> - Context menu<br/>
+• <strong>Right-click</strong> - Cancel selection<br/>
 <br/>
 <strong>GETTING STARTED:</strong><br/>
+Hold the space bar to play, tap to step, release to halt.<br/>
+You can slow or speed up time under the play/pause button.<br/>
 1. Click the <strong>@</strong> symbol to select a firefighter<br/>
 2. Choose an action from the menu that appears<br/>
-3. Press <strong>SPACE</strong> to start the simulation<br/>
-4. Watch your firefighters carry out their orders!<br/>
+3. Watch your firefighters carry out their orders!<br/>
 </div>`,
             // Page 2: Firefighter Menu
             `<div class="help-text">
@@ -8353,7 +8482,11 @@ ${layerSections}<br/>
 • Muted layers appear grayed out<br/>
 • Solo mode shows only one layer<br/>
 • Useful for debugging complex scenarios<br/>
-</div>`
+</div>`,
+            // Page 5: Symbols
+            `<div class="help-text"><strong>🔣 SYMBOLS 🔣</strong><br/><br/>${drawableTable}</div>`,
+            // Page 6: Materials
+            `<div class="help-text"><strong>🔩 MATERIALS 🔩</strong><br/><br/>${materialTable}</div>`
         ];
     }
 }
@@ -9133,8 +9266,12 @@ class BranchRunnerUI extends modal/* Modal */.a {
     getRepoPath() { return 'jlb0170/firehouse-rl'; }
 }
 
+// EXTERNAL MODULE: ./src/ui/play-controls.ts
+var play_controls = __webpack_require__(6488);
 // EXTERNAL MODULE: ./src/draw/fire.ts
 var fire = __webpack_require__(1267);
+// EXTERNAL MODULE: ./src/game/fires.ts
+var fires = __webpack_require__(6746);
 ;// ./src/game/game.ts
 
 
@@ -9160,7 +9297,10 @@ var fire = __webpack_require__(1267);
 
 
 
+
+
 const GameStepped = new signal/* SignalWithCurrent */.Y();
+const LevelWon = new signal/* SignalWithCurrent */.Y();
 class Game {
     constructor() {
         this.running = false;
@@ -9179,25 +9319,19 @@ class Game {
             if (this.running)
                 this.stepTimer.restartInMillis(this.delay(), this.tick);
         };
-        this.showSpeeds = () => {
-            const m = (0,d3_extend.d1)('#speed-buttons');
-            m.show();
-            const h = (e) => {
-                m.hide();
-                const s = e.target.getAttribute('data-speed');
-                if (s)
-                    this.setSpeed(parseFloat(s));
-                document.removeEventListener('mouseup', h);
-            };
-            document.addEventListener('mouseup', h);
-        };
         this.delay = () => 350 / this.speed;
         this.updateStepInfo = () => {
             if (!GameStepped.current)
                 return;
             const { frame, stepMs } = GameStepped.current;
             const r = ui_renderer/* FrameRendered */.HO.current ?? 0;
-            (0,utils.$1)('step-info').textContent = `${frame} ${stepMs}ms r${r}`;
+            (0,utils.$1)('step-frame').textContent = `${frame}`;
+            (0,utils.$1)('step-timing').textContent = `${stepMs}ms r${r}`;
+        };
+        this.updateFireCount = () => {
+            fires/* Fires */.UQ.decorate('fires');
+            fires/* Fires */.UQ.decorate('items');
+            fires/* Fires */.UQ.decorate('people');
         };
         this.keyDown = (e) => {
             if (e.key === ' ') {
@@ -9205,6 +9339,10 @@ class Game {
                 if (this.holding)
                     return;
                 this.holding = true;
+                if (LevelWon.current) {
+                    LevelWon.current = false;
+                    return;
+                }
                 if (this.map.uiRenderer.frozen())
                     this.toggleFreeze();
                 if (!this.running)
@@ -9292,6 +9430,7 @@ class Game {
         this.terminal = new Terminal();
         this.ui = new UI(this.terminal, this.map);
         this.attachToDOM();
+        this.setupPlayControls();
         this.setupControls();
         if ((0,utils/* isLocal */.IX)() && !(0,utils/* isBranchRunner */.ZL)()) {
             this.branchRunner = new BranchRunnerUI();
@@ -9307,10 +9446,12 @@ class Game {
         this.updatePlayPauseButton();
         this.updateFreezeButton();
         this.updateStepInfo();
+        this.updateFireCount();
         document.addEventListener('keydown', this.keyDown);
         document.addEventListener('keyup', this.keyUp);
         ui_renderer/* RedrawMap */.iQ.on(() => this.drawMap());
         ui_renderer/* FrameRendered */.HO.on(() => this.updateStepInfo());
+        fires/* BurningCountersUpdated */.EZ.on(() => this.updateFireCount());
         this.state = new state/* GameState */.m(this.map);
         modal/* ModalShowing */.r.on(s => {
             if (s) {
@@ -9349,10 +9490,14 @@ class Game {
         this.map.onMousemove(this.ui.onMouseMove);
         this.map.onClick(this.ui.onClick);
     }
+    setupPlayControls() {
+        this.playControls = new play_controls/* PlayControls */.j('#play-wrapper', {
+            onPlayPause: () => this.togglePlayPause(),
+            onSpeedChange: (speed) => this.setSpeed(speed),
+            getIsRunning: () => this.running
+        });
+    }
     setupControls() {
-        const play = (0,utils.$1)('playpause-button');
-        (0,utils/* onClick */.Af)(play, () => this.togglePlayPause());
-        play.addEventListener('mousedown', this.showSpeeds);
         (0,utils/* onClick */.Af)((0,utils.$1)('next-button'), () => this.step());
         (0,utils/* onClick */.Af)((0,utils.$1)('freeze-button'), () => this.toggleFreeze());
         (0,utils/* onClick */.Af)((0,utils.$1)('help-button'), e => {
@@ -9384,12 +9529,14 @@ class Game {
         });
     }
     updatePlayPauseButton() {
-        const button = (0,utils.$1)('playpause-button');
-        button.textContent = this.running ? '⏸️' : '▶️';
+        this.playControls.updatePlayPauseButton();
     }
     updateFreezeButton() {
         const button = (0,utils.$1)('freeze-button');
         button.textContent = this.map.uiRenderer.frozen() ? '🧊' : '❄️';
+    }
+    resetFrameCounter() {
+        GameStepped.emit({ frame: 0, stepMs: 0 });
     }
     togglePlayPause() {
         if (this.map.uiRenderer.frozen()) {
@@ -10487,6 +10634,64 @@ Config.createTransparentDisplay = (width, height) => _a.display(width, height, '
 
 /***/ }),
 
+/***/ 6488:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   j: () => (/* binding */ PlayControls)
+/* harmony export */ });
+/* harmony import */ var _d3_extend__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(452);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6185);
+
+
+class PlayControls {
+    constructor(container, callbacks) {
+        this.speed = 1;
+        this.showSpeeds = () => {
+            const speedButtons = this.div.d1('.speed-buttons');
+            speedButtons.show();
+            const handler = (e) => {
+                speedButtons.hide();
+                const speed = e.target.getAttribute('data-speed');
+                if (speed) {
+                    this.speed = parseFloat(speed);
+                    this.callbacks.onSpeedChange(this.speed);
+                }
+                document.removeEventListener('mouseup', handler);
+            };
+            document.addEventListener('mouseup', handler);
+        };
+        this.getSpeed = () => this.speed;
+        this.callbacks = callbacks;
+        this.div = (0,_d3_extend__WEBPACK_IMPORTED_MODULE_0__.d1)(container);
+        this.createHTML();
+        this.setupControls();
+    }
+    createHTML() {
+        this.div.html(`
+      <button class="playpause-button button-secondary button-large">▶️</button>
+      <div class="speed-buttons column hidden">
+        <button class="button-secondary button-large speed-button" data-speed="0.25">¼x</button>
+        <button class="button-secondary button-large speed-button" data-speed="0.5">½x</button>
+        <button class="button-secondary button-large speed-button" data-speed="1">1x</button>
+        <button class="button-secondary button-large speed-button" data-speed="2">2x</button>
+      </div>
+    `);
+    }
+    setupControls() {
+        const playButton = this.div.d1('.playpause-button');
+        (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .onClick */ .Af)(playButton.node(), () => this.callbacks.onPlayPause());
+        playButton.on('mousedown', this.showSpeeds);
+    }
+    updatePlayPauseButton() {
+        const button = this.div.d1('.playpause-button');
+        button.text(this.callbacks.getIsRunning() ? '⏸️' : '▶️');
+    }
+}
+
+
+/***/ }),
+
 /***/ 6541:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
@@ -10506,6 +10711,94 @@ function childMatcher(selector) {
   };
 }
 
+
+
+/***/ }),
+
+/***/ 6746:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   EZ: () => (/* binding */ BurningCountersUpdated),
+/* harmony export */   UQ: () => (/* binding */ Fires)
+/* harmony export */ });
+/* unused harmony exports BurningNew, BurningOut */
+/* harmony import */ var _signal__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(334);
+/* harmony import */ var _draw_fire__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1267);
+/* harmony import */ var _draw_pawn__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2705);
+/* harmony import */ var _d3_extend__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(452);
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(1919);
+
+
+
+
+
+const BurningNew = new _signal__WEBPACK_IMPORTED_MODULE_0__/* .SignalWithCurrent */ .Y();
+const BurningOut = new _signal__WEBPACK_IMPORTED_MODULE_0__/* .SignalWithCurrent */ .Y();
+const BurningCountersUpdated = new _signal__WEBPACK_IMPORTED_MODULE_0__/* .SignalWithCurrent */ .Y();
+class Fires {
+    static get burningCount() {
+        return this.fires + this.items + this.people;
+    }
+    static increment(obj) {
+        if (obj instanceof _draw_fire__WEBPACK_IMPORTED_MODULE_1__/* .Fire */ .v) {
+            this.fires++;
+        }
+        else if (obj instanceof _draw_pawn__WEBPACK_IMPORTED_MODULE_2__/* .Pawn */ .vc) {
+            this.people++;
+        }
+        else {
+            this.items++;
+        }
+        BurningNew.emit();
+        this.updateCounters();
+    }
+    static decrement(obj) {
+        if (obj instanceof _draw_fire__WEBPACK_IMPORTED_MODULE_1__/* .Fire */ .v) {
+            if (this.fires > 0)
+                this.fires--;
+        }
+        else if (obj instanceof _draw_pawn__WEBPACK_IMPORTED_MODULE_2__/* .Pawn */ .vc) {
+            if (this.people > 0)
+                this.people--;
+        }
+        else {
+            if (this.items > 0)
+                this.items--;
+        }
+        BurningOut.emit();
+        this.updateCounters();
+    }
+    static reset() {
+        this.fires = 0;
+        this.items = 0;
+        this.people = 0;
+        this.updateCounters();
+    }
+    static decorate(name) {
+        const count = this[name];
+        const icon = (0,_d3_extend__WEBPACK_IMPORTED_MODULE_3__.d1)(`#${name}-icon`);
+        const countEl = (0,_d3_extend__WEBPACK_IMPORTED_MODULE_3__.d1)(`#${name}-count`);
+        const color = count > 0 ? _ui_colors__WEBPACK_IMPORTED_MODULE_4__/* .FIRE */ .ZK.random() : _ui_colors__WEBPACK_IMPORTED_MODULE_4__/* .COLOR_METAL */ .SK;
+        if (name === 'fires') {
+            icon.text(_draw_fire__WEBPACK_IMPORTED_MODULE_1__/* .Fire */ .v.CHAR).style('color', color);
+        }
+        else {
+            icon.style('color', color);
+        }
+        countEl.text(`${count}`).style('color', color);
+    }
+    static updateCounters() {
+        BurningCountersUpdated.emit({
+            fireCount: this.fires,
+            itemCount: this.items,
+            peopleCount: this.people
+        });
+    }
+}
+Fires.fires = 0;
+Fires.items = 0;
+Fires.people = 0;
 
 
 /***/ }),
@@ -10746,14 +11039,19 @@ var drawable = __webpack_require__(1721);
 ;// ./src/game/leaks.ts
 
 
+
 const assertNoLeaks = (map) => {
     const alive = new Set();
-    map.eachLocation(xyl => {
-        const d = map.get(xyl.xy).layers.data[xyl.layer];
-        if (d)
-            alive.add(d);
+    map.eachCell(cell => {
+        game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
+            const drawable = cell.layers.data[layerName];
+            if (drawable)
+                alive.add(drawable);
+        });
     });
-    const leaks = [...drawable/* Drawable */.h.alive].filter(d => !alive.has(d));
+    // Only check drawables that belong to this map
+    const mapDrawables = [...drawable/* Drawable */.h.alive].filter(d => d.cell?.map === map);
+    const leaks = mapDrawables.filter(d => !alive.has(d));
     if (leaks.length) {
         (0,utils/* each */.__)(leaks, l => drawable/* Drawable */.h.alive.delete(l));
         (0,utils/* bomb */.fv)(`drawable leaked ${leaks.map(l => `${l.constructor.name}:${!!l.cell}`).join(', ')}`);
@@ -10766,7 +11064,10 @@ var shapes = __webpack_require__(3720);
 var display = __webpack_require__(7328);
 // EXTERNAL MODULE: ./src/ui/ui-renderer.ts
 var ui_renderer = __webpack_require__(9889);
+// EXTERNAL MODULE: ./src/game/drawable-types.ts + 1 modules
+var drawable_types = __webpack_require__(1073);
 ;// ./src/game/map.ts
+
 
 
 
@@ -10937,6 +11238,23 @@ class map_Map {
                 cell.died(d);
         }));
     }
+    clone() {
+        const cloned = new map_Map(this.w, this.h);
+        this.eachCell(cell => {
+            game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
+                const drawable = cell.layers.data[layerName];
+                if (drawable) {
+                    const symbol = drawable.char();
+                    const name = drawable.keyName();
+                    if (name) {
+                        const targetCell = cloned.get(cell.xy);
+                        targetCell.create(drawable_types/* DrawableType */.Z.make(symbol, name));
+                    }
+                }
+            });
+        });
+        return cloned;
+    }
 }
 map_Map.active = new Set();
 
@@ -11054,7 +11372,7 @@ __webpack_require__.d(__webpack_exports__, {
 });
 
 // EXTERNAL MODULE: ./src/game/xy.ts
-var game_xy = __webpack_require__(88);
+var xy = __webpack_require__(88);
 // EXTERNAL MODULE: ./src/game/rect.ts
 var rect = __webpack_require__(6893);
 // EXTERNAL MODULE: ./src/draw/wall.ts
@@ -11120,7 +11438,7 @@ const randomName = Names.randomName;
 // EXTERNAL MODULE: ./src/maps/fragments/intro-barracks.txt
 var intro_barracks = __webpack_require__(4461);
 // EXTERNAL MODULE: ./src/game/fragment.ts
-var fragment = __webpack_require__(8535);
+var game_fragment = __webpack_require__(8535);
 // EXTERNAL MODULE: ./src/game/models/firehouse.ts
 var firehouse = __webpack_require__(8646);
 ;// ./src/game/levels/intro.ts
@@ -11164,7 +11482,7 @@ class Intro {
         const h = TITLE.length;
         const startX = (0,utils/* centeredStart */.jw)(this.map.w, TITLE[0]);
         const startY = Math.floor((this.map.h - h) / 2);
-        const start = game_xy.XY.at(startX, startY);
+        const start = xy.XY.at(startX, startY);
         this.initializer.addRoom(rect/* Rect */.r.xyWH(start.add(-1, -1), w + 2, h + 2));
         (0,utils/* each */.__)(TITLE, (line, y) => {
             (0,utils/* each */.__)(line, (c, x) => {
@@ -11176,7 +11494,7 @@ class Intro {
     addWelcomeText() {
         text_stroke/* TextStroke */.m.centeredPlusY(this.map, "Welcome to Fire House RL", -13, 'welcome');
         text_stroke/* TextStroke */.m.centeredPlusY(this.map, "press space to unpause", 13, 'instructions');
-        const endWelcome = game/* GameStepped */.K.on(step => {
+        const endWelcome = game/* GameStepped */.K5.on(step => {
             if (step.frame <= 0)
                 return;
             this.map.uiRenderer.remove('welcome');
@@ -11189,7 +11507,7 @@ class Intro {
             const usedNames = this.pawnModels.map(m => m.name);
             const model = new firehouse/* PawnModel */.A(randomName(usedNames), capabilities/* Capabilities */.FD.basic());
             const pawn = model.toPawn();
-            this.map.createAt(game_xy.XY.at(x, y), pawn);
+            this.map.createAt(xy.XY.at(x, y), pawn);
             this.pawns.push(pawn);
             this.pawnModels.push(model);
             return model;
@@ -11198,16 +11516,16 @@ class Intro {
         add(39, 24);
     }
     addBarracksWin() {
-        const base = fragment/* Fragment */.F.load(intro_barracks);
+        const base = game_fragment/* Fragment */.F.load(intro_barracks);
         const rotated = base.rotate((0,utils/* randTo */.JD)(4));
-        const upperLeft = game_xy.XY.at(59, 8);
+        const upperLeft = xy.XY.at(59, 8);
         const rect = rotated.place(this.map, upperLeft);
         const label = '<-- GET INSIDE';
         const labelY = (0,utils/* half */.MX)(this.map.h) - 13;
         const labelX = Math.max(0, this.map.w - label.length);
-        text_stroke/* TextStroke */.m.render(this.map, label, game_xy.XY.at(labelX, labelY), 'barracks-label');
+        text_stroke/* TextStroke */.m.render(this.map, label, xy.XY.at(labelX, labelY), 'barracks-label');
         const ends = [
-            game/* GameStepped */.K.on(() => {
+            game/* GameStepped */.K5.on(() => {
                 const unrescued = this.pawns.filter(p => !rect.contains(p));
                 if (unrescued.length > 0)
                     return;
@@ -11218,7 +11536,7 @@ class Intro {
             }),
             pawn/* PawnDied */.hq.on(_dead => {
                 this.map.uiRenderer.remove('barracks-label');
-                text_stroke/* TextStroke */.m.render(this.map, 'YOU LOSE', game_xy.XY.at(labelX, labelY), 'lose-text');
+                text_stroke/* TextStroke */.m.render(this.map, 'YOU LOSE', xy.XY.at(labelX, labelY), 'lose-text');
                 ends.forEach(end => end());
             })
         ];
@@ -11226,7 +11544,7 @@ class Intro {
     addUserSuggestion() {
         let show = true;
         const suggest = () => {
-            const step = game/* GameStepped */.K.current;
+            const step = game/* GameStepped */.K5.current;
             if (!step || step.frame % 5 !== 0)
                 return;
             show = !show;
@@ -11236,14 +11554,24 @@ class Intro {
                 this.map.uiRenderer.remove('suggestion');
         };
         suggest();
-        const stop = game/* GameStepped */.K.on(suggest);
+        const stop = game/* GameStepped */.K5.on(suggest);
         pawn/* PawnSelected */.Ei.on(_pawn => { this.map.uiRenderer.remove('suggestion'); stop(); });
     }
 }
 
 // EXTERNAL MODULE: ./src/maps/fragments/apartment-complex.txt
 var apartment_complex = __webpack_require__(9620);
+// EXTERNAL MODULE: ./src/game/fires.ts
+var fires = __webpack_require__(6746);
+// EXTERNAL MODULE: ./src/ui/colors.ts
+var colors = __webpack_require__(1919);
 ;// ./src/game/levels/level1.ts
+
+
+
+
+
+
 
 
 
@@ -11254,33 +11582,55 @@ class Level1 {
         this.map = map;
         this.pawns = pawns;
         this.showDarkness = true;
-        this.randomXY = () => game_xy.XY.at((0,utils/* randTo */.JD)(this.map.w), (0,utils/* randTo */.JD)(this.map.h));
+        this.hasWon = false;
+        this.randomXY = () => xy.XY.at((0,utils/* randTo */.JD)(this.map.w), (0,utils/* randTo */.JD)(this.map.h));
+    }
+    pawnsToModels() {
+        return this.pawns.map(pawn => new firehouse/* PawnModel */.A(pawn.name, pawn.capabilities));
     }
     setup() {
-        const f = fragment/* Fragment */.F.fromText(apartment_complex);
-        f.place(this.map, game_xy.XY.at(0, 0));
+        const fragment = game_fragment/* Fragment */.F.fromText(apartment_complex);
+        fragment.place(this.map, xy.XY.at(0, 0));
         this.igniteRandomStoves(1);
         this.spawnPawns();
+        game/* GameStepped */.K5.on(stepInfo => this.checkWinCondition(stepInfo));
+        game/* LevelWon */.X_.on(() => this.handleContinue());
     }
-    igniteRandomStoves(n) {
-        let k = 0;
-        for (let i = 0; i < 1000 && k < n; i++) {
-            const xy = this.randomXY();
-            this.map.get(xy).onItem(/Oven/, stove => {
-                stove.cell.neighbors().forEach(cell => cell.ignite());
-                k++;
+    igniteRandomStoves(count) {
+        let ignited = 0;
+        for (let attempt = 0; attempt < 1000 && ignited < count; attempt++) {
+            const location = this.randomXY();
+            this.map.get(location).onItem(/Oven/, stove => {
+                const targetWall = stove.cell.cardinals().find(cell => cell.wall())?.wall();
+                targetWall?.ignite();
+                ignited++;
             });
         }
     }
     spawnPawns() {
-        (0,utils/* each */.__)(this.pawns, (pawn, i) => {
-            const xy = game_xy.XY.at(0, (0,utils/* half */.MX)(this.map.h) + i);
-            this.map.createAt(xy, pawn);
+        (0,utils/* each */.__)(this.pawns, (pawn, index) => {
+            const location = xy.XY.at(0, (0,utils/* half */.MX)(this.map.h) + index);
+            this.map.createAt(location, pawn);
         });
+    }
+    checkWinCondition(stepInfo) {
+        if (fires/* Fires */.UQ.burningCount !== 0 || this.hasWon)
+            return;
+        this.hasWon = true;
+        this.map.display.clear();
+        this.map.smokeDisplay.clear();
+        this.map.uiRenderer.clearStrokes();
+        text_stroke/* TextStroke */.m.centered(this.map, `YOU WIN, ${stepInfo.frame} TURNS - PRESS SPACE TO CONTINUE`, this.map.h / 2, 'win-message', () => colors/* WHITE */.UE);
+        game/* LevelWon */.X_.emit(true);
+    }
+    handleContinue() {
+        state/* FirehouseMode */.M.emit(this.pawnsToModels());
     }
 }
 
 ;// ./src/game/initializer.ts
+
+
 
 
 
@@ -11298,6 +11648,7 @@ class Initializer {
     start(level) {
         this.reset();
         this.addField();
+        game/* GameStepped */.K5.emit({ frame: 0, stepMs: 0 });
         level.setup();
         return { showDarkness: level.showDarkness };
     }
@@ -11309,9 +11660,10 @@ class Initializer {
         this.map.display.clear();
         this.map.smokeDisplay.clear();
         this.map.uiRenderer.clearStrokes();
+        fires/* Fires */.UQ.reset();
     }
     addField() {
-        rect/* Rect */.r.xyWH(game_xy.XY.at(0, 0), this.map.w, this.map.h).eachCell(xy => {
+        rect/* Rect */.r.xyWH(xy.XY.at(0, 0), this.map.w, this.map.h).eachCell(xy => {
             this.map.createAt(xy, new floor/* Floor */.Z());
         });
     }
@@ -12759,9 +13111,19 @@ class Cell {
             onFoundItem(item);
         }
     }
+    onFire(onFoundFire) {
+        const fire = this.fire();
+        if (fire)
+            onFoundFire(fire);
+    }
     ignite() {
         game_layers/* CellLayers */.v.materialLayers.forEach(l => {
             this.layers.data[l]?.ignite();
+        });
+    }
+    extinguish() {
+        game_layers/* CellLayers */.v.materialLayers.forEach(l => {
+            this.layers.data[l]?.extinguish();
         });
     }
     create(drawable) { return this.map.create(this, drawable); }
@@ -16176,7 +16538,7 @@ class UIRenderer {
         this.frozen = () => !this.intervalId;
         this.display = new _display__WEBPACK_IMPORTED_MODULE_1__/* .Display */ .n(map.w, map.h, true);
         this.intervalId = this.start();
-        _game_game__WEBPACK_IMPORTED_MODULE_2__/* .GameStepped */ .K.on(() => this.render());
+        _game_game__WEBPACK_IMPORTED_MODULE_2__/* .GameStepped */ .K5.on(() => this.render());
         Repaint.on(() => this.render());
     }
     unfreeze() {
@@ -16312,7 +16674,7 @@ class UIRenderer {
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames based on template
-/******/ 			return "" + chunkId + ".bundle." + "1bd42d09" + ".js";
+/******/ 			return "" + chunkId + ".bundle." + "19bc88e7" + ".js";
 /******/ 		};
 /******/ 	})();
 /******/ 	
@@ -16643,7 +17005,7 @@ window.addEventListener('error', e => {
     showError(e.error?.message || 'Unknown error', e.error?.stack);
 });
 const generateError = () => {
-    const off = game/* GameStepped */.K.on(() => {
+    const off = game/* GameStepped */.K5.on(() => {
         off();
         throw new Error('generated');
     });
@@ -16682,7 +17044,7 @@ async function init() {
             new Editor();
         }
         else
-            new game/* Game */.Z();
+            new game/* Game */.Zt();
     }
     catch (e) {
         const m = e instanceof Error ? e.message : 'Unknown error';

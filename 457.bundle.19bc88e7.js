@@ -104,7 +104,7 @@ var floor = __webpack_require__(9177);
 // EXTERNAL MODULE: ./src/d3-extend.ts
 var d3_extend = __webpack_require__(452);
 ;// ./src/html/editor-panel.html
-/* harmony default export */ const editor_panel = ("<div id=\"terminal\">\n  <div id=\"editor-panel\" class=\"column gap-body\">\n    <div class=\"top column gap-controls\">\n      <div class=\"row fit-container cross-aligned-center gap-button-group\">\n        <div class=\"label\"></div>\n        <div id=\"layer-choices\" class=\"column fit-container gap-controls\">\n          <div class=\"layer template\">\n            <div class=\"row fit-container gap-buttons\">\n              <div class=\"name\"></div>\n              <div class=\"column fit-container\">\n                <div class=\"choices gap-buttons\">\n                  <button class=\"choice template\"></button>\n                </div>\n                <div class=\"editor-items column gap-buttons\">\n                  <div class=\"editor-item row\">\n                    <button id=\"add-item\" class=\"button-secondary\">Add</button>\n                  </div>\n                  <div class=\"editor-item-buttons\">\n                    <div class=\"editor-item row template\">\n                      <button class=\"choice\"></button>\n                      <button class=\"button-secondary close-button\">×</button>\n                    </div>\n                  </div>\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"bottom column gap-controls\">\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Paint</div>\n        <div class=\"char\"></div>\n        <div class=\"cell-coord\"></div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Stutter</div>\n        <input id=\"stutter\" type=\"range\" min=\"0\" max=\"100\" value=\"0\" />\n        <div id=\"stutter-val\">0%</div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"undo-btn\" class=\"button-secondary\">undo</button>\n        <button id=\"paste-btn\" class=\"button-secondary\" disabled>paste</button>\n        <button id=\"rotate-left\" class=\"button-secondary hidden\" disabled>⟲</button>\n        <button id=\"rotate-right\" class=\"button-secondary hidden\" disabled>⟳</button>\n        <button id=\"copy-cancel\" class=\"button-secondary\" disabled>cxl</button>\n      </div>\n      <div id=\"tool-row\" class=\"column gap-buttons\">\n        <button class=\"tool template\" data-tool=\"\"></button>\n      </div>\n      <div id=\"fragment-preview\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">Fragment</div>\n          <button id=\"fragment-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <pre id=\"fragment-text\"></pre>\n      </div>\n      <div id=\"symbol-picker\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">New Item</div>\n          <button id=\"symbol-picker-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div id=\"symbol-grid\" class=\"symbols\">\n          <div class=\"sym template\"></div>\n        </div>\n        <div class=\"actions\">\n          <input id=\"editor-item-name\" type=\"text\" placeholder=\"name\" />\n          <button id=\"editor-item-add\" class=\"button-secondary\" disabled>Add</button>\n        </div>\n      </div>\n      <div id=\"fragment-loader\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">Load Fragment</div>\n          <button id=\"fragment-loader-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div id=\"fragment-list\" class=\"column gap-buttons\">\n          <button class=\"fragment-file template\" data-file=\"\"></button>\n        </div>\n      </div>\n      <div class=\"fill\"></div>\n      <div id=\"controls-help\" class=\"text-subtle\">\n        L/R: paint/erase · Shift: constrain · Ctrl: all layers · Hold C: copy · ←/→ or L/R: rotate\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"load-fragment\" class=\"button-secondary\">load fragment</button>\n        <button id=\"copy-fragment\" class=\"button-secondary\">cc clipboard</button>\n        <button id=\"submit-fragment\" class=\"button-secondary\">submit issue</button>\n        <button id=\"show-fragment\" class=\"button-secondary\">show fragment</button>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"clear-map\" class=\"button-secondary\">clear</button>\n      </div>\n    </div>\n  </div>\n</div>");
+/* harmony default export */ const editor_panel = ("<div id=\"terminal\">\n  <div id=\"editor-panel\" class=\"column gap-body\">\n    <div class=\"top column gap-controls\">\n      <div class=\"row fit-container cross-aligned-center gap-button-group\">\n        <div class=\"label\"></div>\n        <div id=\"layer-choices\" class=\"column fit-container gap-controls\">\n          <div class=\"layer template\">\n            <div class=\"row fit-container gap-buttons\">\n              <div class=\"name\"></div>\n              <div class=\"column fit-container\">\n                <div class=\"choices gap-buttons\">\n                  <button class=\"choice template\"></button>\n                </div>\n                <div class=\"editor-items column gap-buttons\">\n                  <div class=\"editor-item row\">\n                    <button id=\"add-item\" class=\"button-secondary\">Add</button>\n                  </div>\n                  <div class=\"editor-item-buttons\">\n                    <div class=\"editor-item row template\">\n                      <button class=\"choice\"></button>\n                      <button class=\"button-secondary close-button\">×</button>\n                    </div>\n                  </div>\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"bottom column gap-controls\">\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Paint</div>\n        <div class=\"char\"></div>\n        <div class=\"cell-coord\"></div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Stutter</div>\n        <input id=\"stutter\" type=\"range\" min=\"0\" max=\"100\" value=\"0\" />\n        <div id=\"stutter-val\">0%</div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"undo-btn\" class=\"button-secondary\">undo</button>\n        <button id=\"paste-btn\" class=\"button-secondary\" disabled>paste</button>\n        <button id=\"rotate-left\" class=\"button-secondary hidden\" disabled>⟲</button>\n        <button id=\"rotate-right\" class=\"button-secondary hidden\" disabled>⟳</button>\n        <button id=\"copy-cancel\" class=\"button-secondary\" disabled>cxl</button>\n      </div>\n      <div id=\"tool-row\" class=\"column gap-buttons\">\n        <button class=\"tool template\" data-tool=\"\"></button>\n      </div>\n      <div id=\"fragment-preview\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">Fragment</div>\n          <button id=\"fragment-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <pre id=\"fragment-text\"></pre>\n      </div>\n      <div id=\"symbol-picker\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">New Item</div>\n          <button id=\"symbol-picker-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div id=\"symbol-grid\" class=\"symbols\">\n          <div class=\"sym template\"></div>\n        </div>\n        <div class=\"actions\">\n          <input id=\"editor-item-name\" type=\"text\" placeholder=\"name\" />\n          <button id=\"editor-item-add\" class=\"button-secondary\" disabled>Add</button>\n        </div>\n      </div>\n      <div id=\"fragment-loader\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">Load Fragment</div>\n          <button id=\"fragment-loader-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div id=\"fragment-list\" class=\"column gap-buttons\">\n          <button class=\"fragment-file template\" data-file=\"\"></button>\n        </div>\n      </div>\n      <div class=\"fill\"></div>\n      <div id=\"controls-help\" class=\"text-subtle\">\n        L/R: paint/erase · Shift: constrain · Ctrl: all layers · Hold C: copy · ←/→ or L/R: rotate\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"load-fragment\" class=\"button-secondary\">load fragment</button>\n        <button id=\"copy-fragment\" class=\"button-secondary\">cc clipboard</button>\n        <button id=\"submit-fragment\" class=\"button-secondary\">submit issue</button>\n        <button id=\"show-fragment\" class=\"button-secondary\">show fragment</button>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"clear-map\" class=\"button-secondary\">clear</button>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"simulate-button\" class=\"button-secondary\">simulate</button>\n        <div id=\"simulate-play-wrapper\" class=\"play-controls-wrapper\"></div>\n        <button id=\"simulate-step\" class=\"button-secondary hidden\">⏭️</button>\n        <button id=\"simulate-return\" class=\"button-secondary hidden\">return</button>\n      </div>\n    </div>\n  </div>\n</div>");
 // EXTERNAL MODULE: ./src/game/layers.ts
 var game_layers = __webpack_require__(5633);
 // EXTERNAL MODULE: ./src/game/drawable-types.ts + 1 modules
@@ -131,8 +131,8 @@ const buildLayerChoices = () => {
         const drawable = factory();
         const char = drawable.char();
         const choice = { label: name, char, make: () => drawable_types/* DrawableType */.Z.make(char, name) };
-        // Skip Floor, Fire, and Smoke as requested
-        if (name === 'Floor' || name === 'Fire' || name === 'Smoke')
+        // Skip Floor as requested
+        if (name === 'Floor')
             return;
         // Use the drawable's layer property to categorize
         const layer = drawable.layer;
@@ -180,7 +180,7 @@ class EditorPanel {
     }
     render() {
         const lc = this.div.d1('#layer-choices');
-        const visible = (game_layers/* CellLayers */.v.layerNames.filter(n => n !== 'smoke' && n !== 'fire' && n !== 'floor'));
+        const visible = (game_layers/* CellLayers */.v.layerNames.filter(n => n !== 'smoke' && n !== 'floor'));
         lc.dList('.layer').updateFrom(visible, (row, n) => {
             row.d1('.name').text(n);
             const choices = layerChoices[n];
@@ -276,7 +276,10 @@ class EditorDefs {
     }
 }
 
+// EXTERNAL MODULE: ./src/ui/play-controls.ts
+var play_controls = __webpack_require__(6488);
 ;// ./src/editor.ts
+
 
 
 
@@ -323,6 +326,11 @@ class Editor {
         this.pasteId = UI.pasteId;
         this.defs = new EditorDefs();
         this.symbolSel = null;
+        this.simulating = false;
+        this.runningMap = null;
+        this.originalMap = null;
+        this.simulationRunning = false;
+        this.stepTimer = null;
         this.withStroke = (id, z, visible, draw) => {
             const s = new stroke/* Stroke */.t([], () => UI.color, visible, z);
             draw(s);
@@ -436,7 +444,7 @@ class Editor {
                             continue;
                         const symbol = drawable.char();
                         chars[y][x] = symbol;
-                        const name = typeof drawable.keyName === 'function' ? drawable.keyName() : drawable.constructor?.name;
+                        const name = drawable.keyName();
                         if (name && symbol !== '.')
                             key.set(symbol, name);
                         break;
@@ -522,6 +530,111 @@ class Editor {
                 window.keydownC = false;
         };
         this.hide = (sel) => { (0,d3_extend.d1)(sel).hide(); };
+        this.startSimulation = () => {
+            if (this.simulating)
+                return;
+            this.simulating = true;
+            this.originalMap = this.map;
+            this.runningMap = this.map.clone();
+            // Clear the container and switch to the running map
+            const container = (0,d3_extend.d1)('#game-container');
+            const node = container.node();
+            node.innerHTML = ''; // Clear existing canvases
+            this.map = this.runningMap;
+            // Attach running map displays to DOM
+            this.map.display.attachTo(node, { display: 'block', zIndex: '1' });
+            this.map.smokeDisplay.attachTo(node, { position: 'absolute', top: '0', left: '0', zIndex: '2', pointerEvents: 'none' });
+            this.map.uiRenderer.attachTo(node, { position: 'absolute', top: '0', left: '0', zIndex: '3', pointerEvents: 'none' });
+            this.map.onMousemove(cell => this.onMove(cell));
+            this.map.onMousedown((cell, click) => this.onDown(cell, click));
+            // Update UI
+            this.simulatePlayControls = new play_controls/* PlayControls */.j('#simulate-play-wrapper', {
+                onPlayPause: () => this.toggleSimulation(),
+                onSpeedChange: (speed) => this.setSimulationSpeed(speed),
+                getIsRunning: () => this.simulationRunning
+            });
+            (0,d3_extend.d1)('#simulate-step').show();
+            (0,d3_extend.d1)('#simulate-return').show();
+            (0,d3_extend.d1)('#simulate-button').hide();
+            this.drawMap();
+        };
+        this.toggleSimulation = () => {
+            if (!this.simulating)
+                return;
+            if (this.simulationRunning) {
+                this.pauseSimulation();
+            }
+            else {
+                this.playSimulation();
+            }
+        };
+        this.setSimulationSpeed = (speed) => {
+            if (this.stepTimer) {
+                clearInterval(this.stepTimer);
+                this.stepTimer = setInterval(() => {
+                    this.stepSimulation();
+                }, 350 / speed);
+            }
+        };
+        this.playSimulation = () => {
+            if (!this.simulating || this.simulationRunning)
+                return;
+            this.simulationRunning = true;
+            this.simulatePlayControls?.updatePlayPauseButton();
+            this.stepTimer = setInterval(() => {
+                this.stepSimulation();
+            }, 350 / (this.simulatePlayControls?.getSpeed() || 1));
+        };
+        this.pauseSimulation = () => {
+            if (!this.simulationRunning)
+                return;
+            this.simulationRunning = false;
+            this.simulatePlayControls?.updatePlayPauseButton();
+            if (this.stepTimer) {
+                clearInterval(this.stepTimer);
+                this.stepTimer = null;
+            }
+        };
+        this.stepSimulation = () => {
+            if (!this.simulating || !this.runningMap)
+                return;
+            this.runningMap.step();
+            this.runningMap.lighting.redraw();
+            this.drawMap();
+        };
+        this.returnToEditor = () => {
+            if (!this.simulating || !this.originalMap)
+                return;
+            // Stop simulation
+            this.pauseSimulation();
+            // Kill everything on the running map
+            if (this.runningMap) {
+                this.runningMap.killAll();
+            }
+            // Switch back to original map
+            this.map = this.originalMap;
+            // Clear the container and reattach original map displays to DOM
+            const container = (0,d3_extend.d1)('#game-container');
+            const node = container.node();
+            node.innerHTML = ''; // Clear existing canvases
+            this.map.display.attachTo(node, { display: 'block', zIndex: '1' });
+            this.map.smokeDisplay.attachTo(node, { position: 'absolute', top: '0', left: '0', zIndex: '2', pointerEvents: 'none' });
+            this.map.uiRenderer.attachTo(node, { position: 'absolute', top: '0', left: '0', zIndex: '3', pointerEvents: 'none' });
+            this.map.onMousemove(cell => this.onMove(cell));
+            this.map.onMousedown((cell, click) => this.onDown(cell, click));
+            // Reset state
+            this.simulating = false;
+            this.runningMap = null;
+            this.originalMap = null;
+            this.simulationRunning = false;
+            this.stepTimer = null;
+            // Update UI
+            this.simulatePlayControls = undefined;
+            (0,d3_extend.d1)('#simulate-step').hide();
+            (0,d3_extend.d1)('#simulate-return').hide();
+            (0,d3_extend.d1)('#simulate-button').show();
+            this.drawMap();
+        };
         this.map = new map/* Map */.T(config/* Config */.T.WIDTH, config/* Config */.T.HEIGHT);
         this.panel = new EditorPanel();
         this.panel.onAddItem = () => this.openSymbolPicker();
@@ -755,9 +868,7 @@ class Editor {
             const drawable = cell.layers.data[layerName];
             if (!drawable)
                 return null;
-            return typeof drawable.keyName === 'function'
-                ? drawable.keyName()
-                : drawable.constructor?.name;
+            return drawable.keyName();
         })
             .filter((name) => !!name);
     }
@@ -798,9 +909,7 @@ class Editor {
                 const drawable = this.map.get(xy).get(layerName);
                 if (!drawable)
                     return;
-                const name = typeof drawable.keyName === 'function'
-                    ? drawable.keyName()
-                    : drawable.constructor?.name;
+                const name = drawable.keyName();
                 const symbol = drawable.char();
                 layers.push({ dx: xy.x - a.x, dy: xy.y - a.y, name, symbol });
             }
@@ -810,9 +919,7 @@ class Editor {
                     .map(layerName => this.map.get(xy).get(layerName))
                     .filter(drawable => drawable)
                     .map(drawable => ({
-                    name: typeof drawable.keyName === 'function'
-                        ? drawable.keyName()
-                        : drawable.constructor?.name,
+                    name: drawable.keyName(),
                     symbol: drawable.char()
                 }));
                 if (items.length)
@@ -1146,6 +1253,9 @@ class Editor {
         (0,d3_extend.d1)('#lighting-toggle').onClick(this.toggleLighting);
         (0,d3_extend.d1)('#darkness-toggle').onClick(this.toggleDarkness);
         (0,d3_extend.d1)('#clear-map').onClick(this.clearMap);
+        (0,d3_extend.d1)('#simulate-button').onClick(this.startSimulation);
+        (0,d3_extend.d1)('#simulate-step').onClick(this.stepSimulation);
+        (0,d3_extend.d1)('#simulate-return').onClick(this.returnToEditor);
         window.keydownC = false;
         window.addEventListener('keydown', this.onKeyDown);
         window.addEventListener('keyup', this.onKeyUp);
@@ -1404,7 +1514,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `#editor-panel .label { color: #0a0; ma
 /***/ ((module) => {
 
 "use strict";
-module.exports = "...........................\n...........................\n...............✰✰..✰.......\n...........✰✰.....✰...✰....\n............✰.✰..✰...T.....\n...✰T.✰.........✰...✰......\n....✰................✰✰....\n..........#########.✰✰.....\n....✰.....#...*.hh#........\n..........#....h◘◘#..✰.....\n..✰✰......#....h◘◘#........\n...✰...#######....#.....✰..\n....T..#*.#..#...*#........\n.......#=.#..#....#..T.....\n.......#=.#..#....#........\n.....✰.#..#..+....#.....✰..\n.......#..##+####+#....T...\n.......#.....#*...#✰....✰..\n.......#.....+....#✰...✰...\n.......#######....#✰...✰...\n.............#....#✰.......\n.....✰.....###....#✰.✰..✰..\n..........##.+....#✰..✰....\n..........#..####+#........\n.......✰✰.#..#✰✰.....✰✰.✰..\n..........#..#✰............\n.....T.✰✰.####✰............\n.......✰✰.......T.T........\n...........................\n...........................\nKEY\n✰ = bush\nT = tree\n# = Wall\n* = Lamp\nh = chair\n◘ = table\n= = bed\n+ = Door\n";
+module.exports = "...........................\n...........................\n...............✰✰..✰.......\n...........✰✰.....✰...✰....\n............✰.✰..✰...T.....\n...✰T.✰.........✰...✰......\n....✰................✰✰....\n..........#########.✰✰.....\n....✰.....#[..*.hh#........\n..........#◉.░.h◘◘#..✰.....\n..✰✰......#░.░.h◘◘#........\n...✰...#######....#.....✰..\n....T..#*.#__#...*#........\n.......#=.#..#..h]#..T.....\n.......#=.#f.#..h]#........\n.....✰.#..#↻.+....#.....✰..\n.......#..##+####+#....T...\n.......#.....#*...#✰....✰..\n.......#.....+....#✰...✰...\n.......#######....#✰...✰...\n.............#....#✰.......\n.....✰.....###....#✰.✰..✰..\n..........##.+....#✰..✰....\n..........#◛.####+#........\n.......✰✰.#◛.#✰✰.....✰✰.✰..\n..........#..#✰............\n.....T.✰✰.####✰............\n.......✰✰.......T.T........\n...........................\n...........................\nKEY\n✰ = Bush\nT = Tree\n# = Wall\n[ = Refrigerator\n* = Lamp\nh = Chair\n◉ = Oven\n░ = Counter\n◘ = Table\n_ = Tub\n= = Bed\n] = Tv\nf = Sink\n↻ = Toilet\n+ = Door\n◛ = Washer/dryer\n";
 
 /***/ }),
 
