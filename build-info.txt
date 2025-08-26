@@ -1,3 +1,3 @@
-Git SHA: 8b27975f
-Commit: track fires and show current status to user
-Built: 2025-08-21 13:39:09 UTC
+Git SHA: e27d4860
+Commit: fix a small glitch with the . pawn cycling
+Built: 2025-08-26 20:37:07 UTC

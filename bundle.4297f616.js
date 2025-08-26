@@ -368,104 +368,6 @@ class Stroke {
 
 /***/ }),
 
-/***/ 1073:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  Z: () => (/* binding */ DrawableType)
-});
-
-// EXTERNAL MODULE: ./src/draw/door.ts
-var door = __webpack_require__(2483);
-// EXTERNAL MODULE: ./src/draw/lamp.ts
-var lamp = __webpack_require__(225);
-// EXTERNAL MODULE: ./src/draw/wall.ts
-var wall = __webpack_require__(239);
-// EXTERNAL MODULE: ./src/draw/floor.ts
-var floor = __webpack_require__(9177);
-// EXTERNAL MODULE: ./src/draw/smoke.ts
-var smoke = __webpack_require__(4502);
-// EXTERNAL MODULE: ./src/draw/fire.ts
-var fire = __webpack_require__(1267);
-// EXTERNAL MODULE: ./src/draw/pawn.ts + 1 modules
-var pawn = __webpack_require__(2705);
-// EXTERNAL MODULE: ./src/game/capabilities.ts
-var capabilities = __webpack_require__(3793);
-// EXTERNAL MODULE: ./src/draw/editor-item.ts
-var editor_item = __webpack_require__(6372);
-// EXTERNAL MODULE: ./src/draw/drawable.ts
-var drawable = __webpack_require__(1721);
-// EXTERNAL MODULE: ./src/draw/material.ts
-var material = __webpack_require__(2994);
-;// ./src/draw/prop-item.ts
-
-
-class PropItem extends drawable/* Drawable */.h {
-    constructor(symbol, name, materialType, passable = true) {
-        super();
-        this.symbol = symbol;
-        this.name = name;
-        this.materialType = materialType;
-        this.layer = 'items';
-        this.light = () => this.material.light(this.materialType.light);
-        this.char = () => this.symbol;
-        this.color = () => this.material.color(this.materialType.color);
-        this.desc = () => this.material.desc(this.name);
-        this.keyName = () => this.name;
-        this.passable = passable;
-        this.material = new material/* Material */.im(this, materialType);
-    }
-    step() {
-        this.material.step(() => { });
-    }
-}
-
-;// ./src/game/drawable-types.ts
-
-
-
-
-
-
-
-
-
-
-
-class DrawableType {
-}
-DrawableType.registry = {
-    'Wall': () => new wall/* Wall */.j(),
-    'Door': () => new door/* Door */.$(),
-    'Lamp': () => new lamp/* Lamp */.z(),
-    'Floor': () => new floor/* Floor */.Z(),
-    'Smoke': () => new smoke/* Smoke */._(),
-    'Fire': () => new fire/* Fire */.v(),
-    'Pawn': () => new pawn/* Pawn */.vc('firefighter', capabilities/* Capabilities */.FD.basic()),
-    'Bush': () => new PropItem('✰', 'Bush', material/* PLANT */.G5),
-    'Counter': () => new PropItem('░', 'Counter', material/* BRICK */.qv),
-    'Sink': () => new PropItem('f', 'Sink', material/* METAL */.cJ),
-    'Tv': () => new PropItem(']', 'Tv', material/* METAL */.cJ),
-    'Chair': () => new PropItem('h', 'Chair', material/* WOOD */.wB),
-    'Oven': () => new PropItem('◉', 'Oven', material/* METAL */.cJ),
-    'Table': () => new PropItem('◘', 'Table', material/* WOOD */.wB),
-    'Refrigerator': () => new PropItem('[', 'Refrigerator', material/* METAL */.cJ, false),
-    'Bed': () => new PropItem('=', 'Bed', material/* WOOD */.wB),
-    'Tub': () => new PropItem('_', 'Tub', material/* METAL */.cJ),
-    'Toilet': () => new PropItem('↻', 'Toilet', material/* METAL */.cJ),
-    'Washer/dryer': () => new PropItem('◛', 'Washer/dryer', material/* METAL */.cJ),
-    'Coin machine': () => new PropItem('❱', 'Coin machine', material/* METAL */.cJ, false),
-};
-DrawableType.make = (symbol, name) => {
-    const f = DrawableType.registry[name];
-    return f ? f() : new editor_item/* EditorItem */.R(symbol, name);
-};
-
-
-/***/ }),
-
 /***/ 1113:
 /***/ ((module) => {
 
@@ -1139,6 +1041,139 @@ class Fire extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
     }
 }
 Fire.CHAR = "▲";
+
+
+/***/ }),
+
+/***/ 1363:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  Z: () => (/* binding */ DrawableType)
+});
+
+// EXTERNAL MODULE: ./src/draw/door.ts
+var door = __webpack_require__(2483);
+// EXTERNAL MODULE: ./src/draw/lamp.ts
+var lamp = __webpack_require__(225);
+// EXTERNAL MODULE: ./src/draw/wall.ts
+var wall = __webpack_require__(239);
+// EXTERNAL MODULE: ./src/ui/colors.ts
+var colors = __webpack_require__(1919);
+;// ./src/draw/wall-light.ts
+
+
+class WallLight extends wall/* Wall */.j {
+    constructor() {
+        super(...arguments);
+        this.char = () => '¤';
+        this.color = () => this.material.color(colors/* LAMP */.zu.random());
+        this.light = () => this.material.light(3);
+        this.desc = () => this.material.desc('Wall light');
+    }
+}
+
+// EXTERNAL MODULE: ./src/draw/material.ts
+var material = __webpack_require__(2994);
+;// ./src/draw/window.ts
+
+
+
+class Window extends wall/* Wall */.j {
+    constructor() {
+        super(...arguments);
+        this.transparency = 1;
+        this.material = new material/* Material */.im(this, material/* GLASS */.fk);
+        this.char = () => '□';
+        this.color = () => this.material.color(colors/* COLOR_GLASS */.zC);
+        this.desc = () => this.material.desc('Window');
+    }
+}
+
+// EXTERNAL MODULE: ./src/draw/floor.ts
+var floor = __webpack_require__(9177);
+// EXTERNAL MODULE: ./src/draw/smoke.ts
+var smoke = __webpack_require__(4502);
+// EXTERNAL MODULE: ./src/draw/fire.ts
+var fire = __webpack_require__(1267);
+// EXTERNAL MODULE: ./src/draw/pawn.ts + 1 modules
+var pawn = __webpack_require__(2705);
+// EXTERNAL MODULE: ./src/game/capabilities.ts
+var capabilities = __webpack_require__(3793);
+// EXTERNAL MODULE: ./src/draw/editor-item.ts
+var editor_item = __webpack_require__(6372);
+// EXTERNAL MODULE: ./src/draw/drawable.ts
+var drawable = __webpack_require__(1721);
+;// ./src/draw/prop-item.ts
+
+
+class PropItem extends drawable/* Drawable */.h {
+    constructor(symbol, name, materialType, passable = true) {
+        super();
+        this.symbol = symbol;
+        this.name = name;
+        this.materialType = materialType;
+        this.layer = 'items';
+        this.light = () => this.material.light(this.materialType.light);
+        this.char = () => this.symbol;
+        this.color = () => this.material.color(this.materialType.color);
+        this.desc = () => this.material.desc(this.name);
+        this.keyName = () => this.name;
+        this.passable = passable;
+        this.material = new material/* Material */.im(this, materialType);
+    }
+    step() {
+        this.material.step(() => { });
+    }
+}
+
+;// ./src/game/drawable-types.ts
+
+
+
+
+
+
+
+
+
+
+
+
+
+class DrawableType {
+}
+DrawableType.registry = {
+    'Wall': () => new wall/* Wall */.j(),
+    'Door': () => new door/* Door */.$(),
+    'Wall light': () => new WallLight(),
+    'Window': () => new Window(),
+    'Lamp': () => new lamp/* Lamp */.z(),
+    'Floor': () => new floor/* Floor */.Z(),
+    'Smoke': () => new smoke/* Smoke */._(),
+    'Fire': () => new fire/* Fire */.v(),
+    'Pawn': () => new pawn/* Pawn */.vc('firefighter', capabilities/* Capabilities */.FD.basic()),
+    'Bush': () => new PropItem('✰', 'Bush', material/* PLANT */.G5),
+    'Tree': () => new PropItem('T', 'Tree', material/* PLANT */.G5),
+    'Counter': () => new PropItem('░', 'Counter', material/* BRICK */.qv),
+    'Sink': () => new PropItem('f', 'Sink', material/* METAL */.cJ),
+    'Tv': () => new PropItem(']', 'Tv', material/* METAL */.cJ),
+    'Chair': () => new PropItem('h', 'Chair', material/* WOOD */.wB),
+    'Oven': () => new PropItem('◉', 'Oven', material/* METAL */.cJ),
+    'Table': () => new PropItem('◘', 'Table', material/* WOOD */.wB),
+    'Refrigerator': () => new PropItem('[', 'Refrigerator', material/* METAL */.cJ, false),
+    'Bed': () => new PropItem('=', 'Bed', material/* WOOD */.wB),
+    'Tub': () => new PropItem('_', 'Tub', material/* METAL */.cJ),
+    'Toilet': () => new PropItem('↻', 'Toilet', material/* METAL */.cJ),
+    'Washer/dryer': () => new PropItem('◛', 'Washer/dryer', material/* METAL */.cJ),
+    'Coin machine': () => new PropItem('❱', 'Coin machine', material/* METAL */.cJ, false),
+};
+DrawableType.make = (symbol, name) => {
+    const f = DrawableType.registry[name];
+    return f ? f() : new editor_item/* EditorItem */.R(symbol, name);
+};
 
 
 /***/ }),
@@ -6836,6 +6871,7 @@ Drawable.nextId = 0;
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Gm: () => (/* binding */ TASK_COLOR_SELECTED),
 /* harmony export */   YZ: () => (/* binding */ Task),
 /* harmony export */   k$: () => (/* binding */ TASK_COLOR),
 /* harmony export */   r9: () => (/* binding */ TASK_COLOR_UNREACHABLE)
@@ -6845,6 +6881,7 @@ Drawable.nextId = 0;
 
 
 const TASK_COLOR = _ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .Colors */ .Jy.rotate(new _ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .Colors */ .Jy(['#00f', '#00f', '#00f', 'transparent', 'transparent']));
+const TASK_COLOR_SELECTED = _ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .Colors */ .Jy.rotate(new _ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .Colors */ .Jy(['#88f', '#88f', 'transparent', 'transparent']));
 const TASK_COLOR_UNREACHABLE = _ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .Colors */ .Jy.rotate(new _ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .Colors */ .Jy(['#f00', '#f00', '#f00', 'transparent', 'transparent']));
 class Task {
     static strokePathBetween(from, to, id, colorFn, condition, zIndex) {
@@ -6887,6 +6924,7 @@ class Task {
 /* harmony export */   u6: () => (/* binding */ FOREGROUND),
 /* harmony export */   wB: () => (/* binding */ WOOD),
 /* harmony export */   yv: () => (/* binding */ COLOR_PLANT),
+/* harmony export */   zC: () => (/* binding */ COLOR_GLASS),
 /* harmony export */   zu: () => (/* binding */ LAMP)
 /* harmony export */ });
 /* unused harmony export SMOLDERING */
@@ -6900,6 +6938,7 @@ const COLOR_WOOD = "#8B4513";
 const COLOR_METAL = "#808080";
 const COLOR_BRICK = "#800000";
 const COLOR_PLANT = "#008000";
+const COLOR_GLASS = "#aaddff";
 const SMOLDERING = '#6c200e';
 const BONE = "#fff";
 const WHITE = "#fff";
@@ -6925,6 +6964,360 @@ class Colors {
 const FIRE = new Colors(['#ff6600', '#ff9900', '#ffcc00', '#ff3300']);
 const SMOKE = new Colors(['rgba(51,51,51,0.6)', 'rgba(85,85,85,0.6)', 'rgba(102,102,102,0.6)', 'rgba(119,119,119,0.6)', 'rgba(136,136,136,0.6)', 'rgba(153,153,153,0.6)', 'rgba(170,170,170,0.6)', 'rgba(187,187,187,0.6)', 'rgba(204,204,204,0.6)']);
 const LAMP = new Colors(['#ccffff', '#99ddff', '#66ccff']);
+
+
+/***/ }),
+
+/***/ 2253:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  Initializer: () => (/* binding */ Initializer)
+});
+
+// EXTERNAL MODULE: ./src/game/xy.ts
+var xy = __webpack_require__(88);
+// EXTERNAL MODULE: ./src/game/rect.ts
+var rect = __webpack_require__(6893);
+// EXTERNAL MODULE: ./src/draw/wall.ts
+var wall = __webpack_require__(239);
+// EXTERNAL MODULE: ./src/draw/floor.ts
+var floor = __webpack_require__(9177);
+// EXTERNAL MODULE: ./src/draw/lamp.ts
+var lamp = __webpack_require__(225);
+// EXTERNAL MODULE: ./src/utils.ts
+var utils = __webpack_require__(6185);
+// EXTERNAL MODULE: ./src/draw/pawn.ts + 1 modules
+var pawn = __webpack_require__(2705);
+// EXTERNAL MODULE: ./src/draw/fire.ts
+var fire = __webpack_require__(1267);
+// EXTERNAL MODULE: ./src/ui/text-stroke.ts
+var text_stroke = __webpack_require__(1485);
+// EXTERNAL MODULE: ./src/game/game.ts + 19 modules
+var game = __webpack_require__(8639);
+// EXTERNAL MODULE: ./src/game/state.ts + 1 modules
+var state = __webpack_require__(9308);
+// EXTERNAL MODULE: ./src/game/capabilities.ts
+var capabilities = __webpack_require__(3793);
+;// ./src/game/names.ts
+const firsts = "Mary,Anna,Emma,Elizabeth,Minnie,Margaret,Ida,Alice,Bertha,Sarah,Annie,Clara,Ella,Florence,Cora,Martha,Laura,Nellie,Grace,Carrie,Maude,Mabel,Bessie,Jennie,Gertrude,Julia,Hattie,Edith,Mattie,Rose,Catherine,Lillian,Ada,Lillie,Helen,Jessie,Louise,Ethel,Lula,Myrtle,Eva,Frances,Lena,Lucy,Edna,Maggie,Pearl,Daisy,Fannie,Josephine,Dora,Rosa,Katherine,Agnes,Marie,Nora,May,Mamie,Blanche,Stella,Ellen,Nancy,Effie,Sallie,Nettie,Della,Lizzie,Flora,Susie,Maud,Mae,Etta,Harriet,Sadie,Caroline,Katie,Lydia,Elsie,Kate,Susan,Mollie,Alma,Addie,Georgia,Eliza,Lulu,Nannie,Lottie,Amanda,Belle,Charlotte,Rebecca,Ruth,Viola,Olive,Amelia,Hannah,Jane,Virginia,Emily,Matilda,Irene,Kathryn,Esther,Willie,Henrietta,Ollie,Amy,Rachel,Sara,Estella,Theresa,Augusta,Ora,Pauline,Josie,Lola,Sophia,Leona,Anne,Mildred,Ann,Beulah,Callie,Lou,Delia,Eleanor,Barbara,Iva,Louisa,Maria,Mayme,Evelyn,Estelle,Nina,Betty,Marion,Bettie,Dorothy,Luella,Inez,Lela,Rosie,Allie,Millie,Janie,Cornelia,Victoria,Ruby,Winifred,Alta,Celia,Christine,Beatrice,Birdie,Harriett,Mable,Myra,Sophie,Tillie,Isabel,Sylvia,Carolyn,Isabelle,Leila,Sally,Ina,Essie,Bertie,Nell,Alberta,Katharine,Lora,Rena,Mina,Rhoda,Mathilda,Abbie,Eula,Dollie,Hettie,Eunice,Fanny,Ola,Lenora,Adelaide,Christina,Lelia,Nelle,Sue,Johanna,Lilly,Lucinda,Minerva,Lettie,Roxie,Cynthia,Helena,Hilda,Hulda,Bernice,Genevieve,Jean,Cordelia,Marian,Francis,Jeanette,Adeline,Gussie,Leah,Lois,Lura,Mittie,Hallie,Isabella,Olga,Phoebe,Teresa,Hester,Lida,Lina,Winnie,Claudia,Marguerite,Vera,Cecelia,Bess,Emilie,John,Rosetta,Verna,Myrtie,Cecilia,Elva,Olivia,Ophelia,Georgie,Elnora,Violet,Adele,Lily,Linnie,Loretta,Madge,Polly,Virgie,Eugenia,Lucile,Lucille,Mabelle,Rosalie,Kittie,Meta,Angie,Dessie,Georgiana,Lila,Regina,Selma,Wilhelmina,Bridget,Lilla,Malinda,Vina,Freda,Gertie,Jeannette,Louella,Mandy,Roberta,Cassie,Corinne,Ivy,Melissa,Lyda,Naomi,Norma,Bell,Margie,Nona,Zella,Dovie,Elvira,Erma,Irma,Leota,William,Artie,Blanch,Charity,Lorena,Lucretia,Orpha,Alvina,Annette,Catharine,Elma,Geneva,Janet,Lee,Leora,Lona,Miriam,Zora,Linda,Octavia,Sudie,Zula,Adella,Alpha,Frieda,George,Joanna,Leonora,Priscilla,Tennie,Angeline,Docia,Ettie,Flossie,Hanna,Letha,Minta,Retta,Rosella,Adah,Berta,Elisabeth,Elise,Goldie,Leola,Margret,Adaline,Floy,Idella,Juanita,Lenna,Lucie,Missouri,Nola,Zoe,Eda,Isabell,James,Julie,Letitia,Madeline,Malissa,Mariah,Pattie,Vivian,Almeda,Aurelia,Claire,Dolly,Hazel,Jannie,Kathleen,Kathrine,Lavinia,Marietta,Melvina,Ona,Pinkie,Samantha,Susanna,Chloe,Donnie,Elsa,Gladys,Matie,Pearle,Vesta,Vinnie,Antoinette,Clementine,Edythe,Harriette,Libbie,Lilian,Lue,Lutie,Magdalena,Meda,Rita,Tena,Zelma,Adelia,Annetta,Antonia,Dona,Elizebeth,Georgianna,Gracie,Iona,Lessie,Leta,Liza,Mertie,Molly,Neva,Oma,Alida,Alva,Cecile,Cleo,Donna,Ellie,Ernestine,Evie,Frankie,Helene,Minna,Myrta,Prudence,Queen,Rilla,Savannah,Tessie,Tina,Agatha,America,Anita,Arminta,Dorothea,Ira,Luvenia,Marjorie,Maybelle,Mellie,Nan,Pearlie,Sidney,Velma,Clare,Constance,Dixie,Ila,Iola,Jimmie,Louvenia,Lucia,Ludie,Luna,Metta,Patsy,Phebe,Sophronia,Adda,Avis,Betsy,Bonnie,Cecil,Cordie,Emmaline,Ethelyn,Hortense,June,Louie,Lovie,Marcella,Melinda,Mona,Odessa,Veronica,Aimee,Annabel,Ava,Bella,Carolina,Cathrine,Christena,Clyde,Dena,Dolores,Eleanore,Elmira,Fay,Frank,Jenny,Kizzie,Lonnie,Loula,Magdalene,Mettie,Mintie,Peggy,Reba,Serena,Vida,Zada,Abigail,Celestine,Celina,Claudie,Clemmie,Connie,Daisie,Deborah,Dessa,Easter,Eddie,Emelia,Emmie,Imogene,India,Jeanne,Joan,Lenore,Liddie,Lotta,Mame,Nevada,Rachael,Robert,Sina,Willa,Aline,Beryl,Charles,Daisey,Dorcas,Edmonia,Effa,Eldora,Eloise,Emmer,Era,Gena,Henry,Iris,Izora,Lennie,Lissie,Mallie,Malvina,Mathilde,Mazie,Queenie,Rosina,Salome,Theodora,Therese,Vena,Wanda,Wilda,Altha,Anastasia,Besse,Bird,Birtie,Clarissa,Claude,Delilah,Diana,Emelie,Erna,Fern,Florida,Frona,Hilma,Joseph,Juliet,Leonie,Lugenia,Mammie,Manda,Manerva,Manie,Nella,Paulina,Philomena,Rae,Selina,Sena,Theodosia,Tommie,Una,Vernie,Adela,Althea,Amalia,Amber,Angelina,Annabelle,Anner,Arie,Clarice,Corda,Corrie,Dell,Dellar,Donie,Doris,Elda,Elinor,Emeline,Emilia,Esta,Estell,Etha,Fred,Hope,Indiana,Ione,Jettie,Johnnie,Josiephine,Kitty,Lavina,Leda,Letta,Mahala,Marcia,Margarette,Maudie,Maye,Norah,Oda,Patty,Paula,Permelia,Rosalia,Roxanna,Sula,Vada,Winnifred,Adline,Almira,Alvena,Arizona,Becky,Bennie,Bernadette,Camille,Cordia,Corine,Dicie,Dove,Drusilla,Elena,Elenora,Elmina,Ethyl,Evalyn,Evelina,Faye,Huldah,Idell,Inga,Irena,Jewell,Kattie,Lavenia,Leslie,Lovina,Lulie,Magnolia,Margeret,Margery,Media,Millicent,Nena,Ocie,Orilla,Osie,Pansy,Ray,Rosia,Rowena,Shirley,Tabitha,Thomas,Verdie,Walter,Zetta,Zoa,Zona,Albertina,Albina,Alyce,Amie,Angela,Annis,Carol,Carra,Clarence,Clarinda,Delphia,Dillie,Doshie,Drucilla,Etna,Eugenie,Eulalia,Eve,Felicia,Florance,Fronie,Geraldine,Gina,Glenna,Grayce,Hedwig,Jessica,Jossie,Katheryn,Katy,Lea,Leanna,Leitha,Leone,Lidie,Loma,Lular,Magdalen,Maymie,Minervia,Muriel,Neppie,Olie,Onie,Osa,Otelia,Paralee,Patience,Rella,Rillie,Rosanna,Theo,Tilda,Tishie,Tressa,Viva,Yetta,Zena,Zola,Abby,Aileen,Alba,Alda,Alla,Alverta,Ara,Ardelia,Ardella,Arrie,Arvilla,Augustine,Aurora,Bama,Bena,Byrd,Calla,Camilla,Carey,Carlotta,Celestia,Cherry,Cinda,Classie,Claudine,Clemie,Clifford,Clyda,Creola,Debbie,Dee,Dinah,Doshia,Ednah,Edyth,Eleanora,Electa,Eola,Erie,Eudora,Euphemia,Evalena,Evaline,Faith,Fidelia,Freddie,Golda,Harry,Helma,Hermine,Hessie,Ivah,Janette,Jennette,Joella,Kathryne,Lacy,Lanie,Lauretta,Leana,Leatha,Leo,Liller,Lillis,Louetta,Madie,Mai,Martina,Maryann,Melva,Mena,Mercedes,Merle,Mima,Minda,Monica,Nealie,Netta,Nolia,Nonie,Odelia,Ottilie,Phyllis,Robbie,Sabina,Sada,Sammie,Suzanne,Sybilla,Thea,Tressie,Vallie,Venie,Viney,Wilhelmine,Winona,Zelda,Zilpha,Adelle,Adina,Adrienne,Albertine,Alys,Ana,Araminta,Arthur,Birtha,Bulah,Caddie,Celie,Charlotta,Clair,Concepcion,Cordella,Corrine,Delila,Delphine,Dosha,Edgar,Elaine,Elisa,Ellar,Elmire,Elvina,Ena,Estie,Etter,Fronnie,Genie,Georgina,Glenn,Gracia,Guadalupe,Gwendolyn,Hassie,Honora,Icy,Isa,Isadora,Jesse,Jewel,Joe,Johannah,Juana,Judith,Judy,Junie,Lavonia,Lella,Lemma,Letty,Linna,Littie,Lollie,Lorene,Louis,Love,Lovisa,Lucina,Lynn,Madora,Mahalia,Manervia,Manuela,Margarett,Margaretta,Margarita,Marilla,Mignon,Mozella,Natalie,Nelia,Nolie,Omie,Opal,Ossie,Ottie,Ottilia,Parthenia,Penelope,Pinkey,Pollie,Rennie,Reta,Roena,Rosalee,Roseanna,Ruthie,Sabra,Sannie,Selena,Sibyl,Tella,Tempie,Tennessee,Teressa,Texas,Theda,Thelma,Thursa,Ula,Vannie,Verona,Vertie,Wilma,John,William,James,Charles,George,Frank,Joseph,Thomas,Henry,Robert,Edward,Harry,Walter,Arthur,Fred,Albert,Samuel,David,Louis,Joe,Charlie,Clarence,Richard,Andrew,Daniel,Ernest,Will,Jesse,Oscar,Lewis,Peter,Benjamin,Frederick,Willie,Alfred,Sam,Roy,Herbert,Jacob,Tom,Elmer,Carl,Lee,Howard,Martin,Michael,Bert,Herman,Jim,Francis,Harvey,Earl,Eugene,Ralph,Ed,Claude,Edwin,Ben,Charley,Paul,Edgar,Isaac,Otto,Luther,Lawrence,Ira,Patrick,Guy,Oliver,Theodore,Hugh,Clyde,Alexander,August,Floyd,Homer,Jack,Leonard,Horace,Marion,Philip,Allen,Archie,Stephen,Chester,Willis,Raymond,Rufus,Warren,Jessie,Milton,Alex,Leo,Julius,Ray,Sidney,Bernard,Dan,Jerry,Calvin,Perry,Dave,Anthony,Eddie,Amos,Dennis,Clifford,Leroy,Wesley,Alonzo,Garfield,Franklin,Emil,Leon,Nathan,Harold,Matthew,Levi,Moses,Everett,Lester,Winfield,Adam,Lloyd,Mack,Fredrick,Jay,Jess,Melvin,Noah,Aaron,Alvin,Norman,Gilbert,Elijah,Victor,Gus,Nelson,Jasper,Silas,Jake,Christopher,Mike,Percy,Adolph,Maurice,Cornelius,Felix,Reuben,Wallace,Claud,Roscoe,Sylvester,Earnest,Hiram,Otis,Simon,Willard,Irvin,Mark,Jose,Wilbur,Abraham,Virgil,Clinton,Elbert,Leslie,Marshall,Owen,Wiley,Anton,Morris,Manuel,Phillip,Augustus,Emmett,Eli,Nicholas,Wilson,Alva,Harley,Newton,Timothy,Marvin,Ross,Curtis,Edmund,Jeff,Elias,Harrison,Stanley,Columbus,Lon,Ora,Ollie,Pearl,Russell,Solomon,Arch,Asa,Clayton,Enoch,Irving,Mathew,Nathaniel,Scott,Hubert,Lemuel,Andy,Ellis,Emanuel,Joshua,Millard,Vernon,Wade,Cyrus,Miles,Rudolph,Sherman,Austin,Bill,Chas,Lonnie,Monroe,Byron,Edd,Emery,Grant,Jerome,Max,Mose,Steve,Gordon,Abe,Pete,Chris,Clark,Gustave,Orville,Lorenzo,Bruce,Marcus,Preston,Bob,Dock,Donald,Jackson,Cecil,Barney,Delbert,Edmond,Anderson,Christian,Glenn,Jefferson,Luke,Neal,Burt,Ike,Myron,Tony,Conrad,Joel,Matt,Riley,Vincent,Emory,Isaiah,Nick,Ezra,Green,Juan,Clifton,Lucius,Porter,Arnold,Bud,Jeremiah,Taylor,Forrest,Roland,Spencer,Burton,Don,Emmet,Gustav,Louie,Morgan,Ned,Van,Ambrose,Chauncey,Elisha,Ferdinand,General,Julian,Kenneth,Mitchell,Allie,Josh,Judson,Lyman,Napoleon,Pedro,Berry,Dewitt,Ervin,Forest,Lynn,Pink,Ruben,Sanford,Ward,Douglas,Ole,Omer,Ulysses,Walker,Wilbert,Adelbert,Benjiman,Ivan,Jonas,Major,Abner,Archibald,Caleb,Clint,Dudley,Granville,King,Mary,Merton,Antonio,Bennie,Carroll,Freeman,Josiah,Milo,Royal,Dick,Earle,Elza,Emerson,Fletcher,Judge,Laurence,Roger,Seth,Glen,Hugo,Jimmie,Johnnie,Neil,Washington,Elwood,Gust,Harmon,Jordan,Simeon,Wayne,Wilber,Clem,Evan,Frederic,Irwin,Junius,Lafayette,Loren,Madison,Mason,Orval,Abram,Aubrey,Elliott,Hans,Karl,Minor,Wash,Wilfred,Allan,Alphonse,Dallas,Dee,Isiah,Jason,Johnny,Lawson,Lew,Micheal,Orin,Addison,Cal,Erastus,Francisco,Hardy,Lucien,Randolph,Stewart,Vern,Wilmer,Zack,Adrian,Alvah,Bertram,Clay,Ephraim,Fritz,Giles,Grover,Harris,Isom,Jesus,Johnie,Jonathan,Lucian,Malcolm,Merritt,Otho,Perley,Rolla,Sandy,Tomas,Wilford,Adolphus,Angus,Arther,Carlos,Cary,Cassius,Davis,Hamilton,Harve,Israel,Leander,Melville,Merle,Murray,Pleasant,Sterling,Steven,Axel,Boyd,Bryant,Clement,Erwin,Ezekiel,Foster,Frances,Geo,Houston,Issac,Jules,Larkin,Mat,Morton,Orlando,Pierce,Prince,Rollie,Rollin,Sim,Stuart,Wilburn,Bennett,Casper,Christ,Dell,Egbert,Elmo,Fay,Gabriel,Hector,Horatio,Lige,Saul,Smith,Squire,Tobe,Tommie,Wyatt,Alford,Alma,Alton,Andres,Burl,Cicero,Dean,Dorsey,Enos,Howell,Lou,Loyd,Mahlon,Nat,Omar,Oran,Parker,Raleigh,Reginald,Rubin,Seymour,Wm,Young,Benjamine,Carey,Carlton,Eldridge,Elzie,Garrett,Isham,Johnson,Larry,Logan,Merrill,Mont,Oren,Pierre,Rex,Rodney,Ted,Webster,West,Wheeler,Willam,Al,Aloysius,Alvie,Anna,Art,Augustine,Bailey,Benjaman,Beverly,Bishop,Clair,Cloyd,Coleman,Dana,Duncan,Dwight,Emile,Evert,Henderson,Hunter,Jean,Lem,Luis,Mathias,Maynard,Miguel,Mortimer,Nels,Norris,Pat,Phil,Rush,Santiago,Sol,Sydney,Thaddeus,Thornton,Tim,Travis,Truman,Watson,Webb,Wellington,Winfred,Wylie,Alec,Basil,Baxter,Bertrand,Buford,Burr,Cleveland,Colonel,Dempsey,Early,Ellsworth,Fate,Finley,Gabe,Garland,Gerald,Herschel,Hezekiah,Justus,Lindsey,Marcellus,Olaf,Olin,Pablo,Rolland,Turner,Verne,Volney,Williams,Almon,Alois,Alonza,Anson,Authur,Benton,Billie,Cornelious,Darius,Denis,Dillard,Doctor,Elvin,Emma,Eric,Evans,Gideon,Haywood,Hilliard,Hosea,Lincoln,Lonzo,Lucious,Lum,Malachi,Newt,Noel,Orie,Palmer,Pinkney,Shirley,Sumner,Terry,Urban,Uriah,Valentine,Waldo,Warner,Wong,Zeb,Abel,Alden,Archer,Avery,Carson,Cullen,Doc,Eben,Elige,Elizabeth,Elmore,Ernst,Finis,Freddie,Godfrey,Guss,Hamp,Hermann,Isadore,Isreal,Jones,June,Lacy,Lafe,Leland,Llewellyn,Ludwig,Manford,Maxwell,Minnie,Obie,Octave,Orrin,Ossie,Oswald,Park,Parley,Ramon,Rice,Stonewall,Theo,Tillman,Addie,Aron,Ashley,Bernhard,Bertie,Berton,Buster,Butler,Carleton,Carrie,Clara,Clarance,Clare,Crawford,Danial,Dayton,Dolphus,Elder,Ephriam,Fayette,Felipe,Fernando,Flem,Florence,Ford,Harlan,Hayes,Henery,Hoy,Huston,Ida,Ivory,Jonah,Justin,Lenard,Leopold,Lionel,Manley,Marquis,Marshal,Mart,Odie,Olen,Oral,Orley,Otha,Press,Price,Quincy,Randall,Rich,Richmond,Romeo,Russel,Rutherford,Shade,Shelby,Solon,Thurman,Tilden,Troy,Woodson,Worth,Aden,Alcide,Alf,Algie,Arlie,Bart,Bedford,Benito,Billy,Bird,Birt,Bruno,Burley,Chancy,Claus,Cliff,Clovis,Connie,Creed,Delos,Duke,Eber,Eligah,Elliot,Elton,Emmitt,Gene,Golden,Hal,Hardin,Harman,Hervey,Hollis,Ivey,Jennie,Len,Lindsay,Lonie,Lyle,Mac,Mal,Math,Miller,Orson,Osborne,Percival,Pleas,Ples,Rafael,Raoul,Roderick,Rose,Shelton,Sid,Theron,Tobias,Toney,Tyler,Vance,Vivian,Walton,Watt,Weaver,Wilton,Adolf,Albin,Albion,Allison,Alpha,Alpheus,Anastacio,Andre,Annie,Arlington,Armand,Asberry,Asbury,Asher,Augustin,Auther,Author,Ballard,Blas,Caesar,Candido,Cato,Clarke,Clemente,Colin,Commodore,Cora,Coy,Cruz,Curt,Damon,Davie,Delmar,Dexter,Dora,Doss,Drew,Edson,Elam,Elihu,Eliza,Elsie,Erie,Ernie,Ethel,Ferd,Friend,Garry,Gary,Grace,Gustaf,Hallie,Hampton,Harrie,Hattie,Hence,Hillard,Hollie,Holmes,Hope,Hyman,Ishmael,Jarrett,Jessee,Joeseph,Junious,Kirk,Levy,Mervin,Michel,Milford,Mitchel,Nellie,Noble,Obed,Oda,Orren,Ottis,Rafe,Redden,Reese,Rube,Ruby,Rupert,Salomon,Sammie,Sanders,Soloman,Stacy,Stanford,Stanton,Thad,Titus,Tracy,Vernie,Wendell,Wilhelm,Willian,Yee,Zeke,Ab,Abbott,Agustus,Albertus,Almer,Alphonso,Alvia,Artie,Arvid,Ashby,Augusta,Aurthur,Babe,Baldwin,Barnett,Bartholomew,Barton,Bernie,Blaine,Boston,Brad,Bradford,Bradley,Brooks,Buck,Budd,Ceylon,Chalmers,Chesley,Chin,Cleo,Crockett,Cyril,Daisy,Denver,Dow,Duff,Edie,Edith,Elick,Elie,Eliga,Eliseo,Elroy,Ely,Ennis,Enrique,Erasmus,Esau,Everette,Firman,Fleming,Flora,Gardner,Gee,Gorge,Gottlieb,Gregorio,Gregory,Gustavus,Halsey,Handy,Hardie,Harl,Hayden,Hays,Hermon,Hershel,Holly,Hosteen,Hoyt,Hudson,Huey,Humphrey,Hunt,Hyrum,Irven,Isam,Ivy,Jabez,Jewel,Jodie,Judd,Julious,Justice,Katherine,Kelly,Kit,Knute,Lavern,Lawyer,Layton,Leonidas,Lewie,Lillie,Linwood,Loran,Lorin,Mace,Malcom,Manly,Manson,Matthias,Mattie,Merida,Miner,Montgomery,Moroni,Murdock,Myrtle,Nate,Nathanial,Nimrod,Nora,Norval,Nova,Orion,Orla,Orrie,Payton,Philo,Phineas,Presley,Ransom,Reece,Rene,Roswell,Rowland,Sampson,Samual,Santos,Schuyler,Sheppard,Spurgeon,Starling,Sylvanus,Theadore,Theophile,Tilmon,Tommy,Unknown,Vann,Wes,Winston,Wood,Woodie,Worthy,Wright,York,Zachariah".split(',');
+const lasts = "Abbott,Abel,Adams,Addison,Adkins,Agent,Aldrich,Aldridge,Alexander,Alford,Allen,Appleton,Armstrong,Arrington,Arwood,Atkins,Austin,Avery,Bailey,Baine,Baird,Baldwin,Bankston,Barker,Barnes,Barnett,Barry,Barton,Baughan,Beard,Beasley,Beck,Bell,Bennefield,Bennett,Berry,Bishop,Black,Blackwell,Blake,Blaxton,Blaylock,Blevins,Bonds,Boone,Boston,Botiler,Boyd,Bradford,Brannon,Brazeall,Brewer,Bridgeman,Brimer,Brooks,Brown,Bryant,Burdick,Burnet,Burns,Burrell,Byars,Bynum,Cagle,Cagner,Cain,Calvert,Campbell,Canada,Cantrell,Carroll,Carter,Cary,Casey,Cates,Chambers,Chappell,Chillcoat,Clark,Cline,Cole,Collman,Commens,Compton	Conly,Cooper,Cotton,Cowart,Cox,Cummings,Curtis,Davidson,Davis,Deason,Dempsey,Derrick,Dickenson,Dodd,Donough,Dougherty,Dorris,Doss,Dover,Downy,Dunahoo,Duncan,Dunlap,Dupre,Eaton,Eatton,Ellenbury,Elliott,Ellis,England,Estes,Evans,Ezell,Fair,Farley,Farris,Faught,Forester,Fowler,Freeman,Frost,Gamble,Ganes,Gardener,Garrison,Garson,Gentle,George,Gibson,Gice,Gilbert,Glenn,Godsey,Goodwin,Gosset,Grantham,Grastey,Green,Griffin,Guest,Gunter,Guthrie,Hadder,Haines,Haley,Hamilton,Hampton,Hand,Harbin,Harmon,Harper,Harris,Hatchett,Haw,Haynes,Hays,Hebster,Hefner,Henderson,Hendon,Henson,Hewitt,Hicks,Hightower	Hill,Hiller,Hilton,Hinesley,Hix,Hogg,Holden,Holloway,Holt,Hood,Hoover,Hopson,Horton,Howard,Howells,Hudson,Hughes,Hyde,Ingle,Inmon,Isabell,Ivy,Jack,Jackson,James,Jamison,Jeffries,Jenkins,Johnson,Kely),Kemp,Key,Kidd,Kiker,Kile,Kilpatrick,Kimbrell,King,Knight,Knox,Lambert,Lane,Laneford,Laramore,Lauderdale,Lawson,Lay,League,Lewis,Little,Litton,Livingston,Logan,Long,Looney,Love,Lovelady,Lovell,Lovett,Lynn,Manasco,Mann,Martin,Mathews,McClane,McClung,McClure,McColum,McCoy,McCue,McCullan,McCullar,McDaniel,McDuff,McKay,McNames,McNeil,McNutt,Mellican,Merritt,Metcalf,Miles,Miller,Mitchell,Mize,Mobley,Montgomery,Moody,Mooney,Morgan,Morris,Morrison,Motes,Mullins,Musgrove,Nelson,Nesmith,Newman,Nolen,Noles,Nortwich,Oden,Odom,O'Henry,O'Mary,O'Rear,O'Steen,Overton,Owsley,Pace,Painter,Parsons,Partain,Patek,Patterson,Payne,Peak,Pearson,Pencard,Penn,Penyl,Perkins,Perry,Peters,Pittman,Plott,Poe,Pool,Portridge,Posey,Pouder,Powell,Preston,Pugh,Pulliam,Purdy,Radford,Ramey,Ramie,Ray,Raynes,Reeves,Richardson,Riddle,Rivers,Roberts,Robinson,Roden,Rollins,Romines,Ronow,Rowe,Rush,Russell,Rutledge,Sam,Samples,Sanford,Sarun,Scogin,Segars,Setton,Sexton,Seymore,Shadix,Shain,Shank,Shelly,Shelton,Shipman,Siddens,Simmons,Simpson,Sims,Slater,Slaughter,Smathers,Smith,Sneed,South,Southern,Spain,Spane,Sparks,Staten,Steel,Stephenson,Stevens,Stewart,Stokes,Stone,Strange,Sunmers,Surin,Sutherland,Suttles,Swindle,Taberson,Tarbutton,Taylor,Teague,Tedford,Thomanson,Thomas,Thompson,Thornton,Threadgill,Tidwell,Tittle,Tubs,Tucker,Turner,Tyler,Underwood,Ussery,Wadsworth,Waid,Wakefield,Walker,Walston,Ward,Ware,Warren,Watson,Watts,Weaver,Webb,Welborn,Welsh,West,Whisenhunt,White,Whitfield,Whitman,Whitney,Whitten,Wiley,Willborn,Williams,Willis,Willson,Wilson,Wise,Woodley,Woods,Wooley,Wright,Yarborough,York,Young".split(',');
+
+const initials = (n) => n[0] + n.split(' ')[1][0];
+const firstInitial = (n) => n[0];
+const group = (ns) => ns.reduce((m, n) => {
+    var _a;
+    (m[_a = n[0]] || (m[_a] = [])).push(n);
+    return m;
+}, {});
+class Names {
+    static randomName(used) {
+        const usedPairs = new Set(used.map(initials));
+        const usedFirsts = new Set(used.map(firstInitial));
+        // prefer unused first initials, then any unused pairs
+        for (const preferNewFirst of [true, false]) {
+            const availableFirsts = preferNewFirst
+                ? Names.fiAll.filter(f => !usedFirsts.has(f))
+                : Names.fiAll;
+            for (const fi of availableFirsts) {
+                const availableLasts = Names.liAll.filter(li => !usedPairs.has(fi + li));
+                if (availableLasts.length > 0) {
+                    const li = (0,utils/* randFrom */.Kt)(availableLasts);
+                    return `${(0,utils/* randFrom */.Kt)(Names.firstBy[fi])} ${(0,utils/* randFrom */.Kt)(Names.lastBy[li])}`;
+                }
+            }
+        }
+        // fallback to any random combination
+        const fi = (0,utils/* randFrom */.Kt)(Names.fiAll);
+        const li = (0,utils/* randFrom */.Kt)(Names.liAll);
+        return `${(0,utils/* randFrom */.Kt)(Names.firstBy[fi])} ${(0,utils/* randFrom */.Kt)(Names.lastBy[li])}`;
+    }
+}
+Names.firstBy = group(firsts);
+Names.lastBy = group(lasts);
+Names.fiAll = Object.keys(Names.firstBy);
+Names.liAll = Object.keys(Names.lastBy);
+const randomName = Names.randomName;
+
+// EXTERNAL MODULE: ./src/maps/fragments/intro-barracks.txt
+var intro_barracks = __webpack_require__(4461);
+// EXTERNAL MODULE: ./src/game/fragment.ts
+var game_fragment = __webpack_require__(8535);
+// EXTERNAL MODULE: ./src/game/models/firehouse.ts
+var firehouse = __webpack_require__(8646);
+;// ./src/game/levels/intro.ts
+
+
+
+
+
+
+
+
+
+
+
+
+
+const TITLE = [
+    "#   #  ###  ####  #     ####       ###  #   #      ##### ##### ####  #####",
+    "#   # #   # #   # #     #   #     #   # ##  #      #       #   #   # #    ",
+    "# # # #   # ####  #     #   #     #   # # # #      ####    #   ####  #### ",
+    "# # # #   # #   # #     #   #     #   # #  ##      #       #   #   # #    ",
+    "## ## #   # #   # #     #   #     #   # #   #      #       #   #   # #    ",
+    "#   #  ###  #   # ##### ####       ###  #   #      #     ##### #   # #####"
+];
+class Intro {
+    constructor(initializer, map) {
+        this.initializer = initializer;
+        this.map = map;
+        this.pawns = [];
+        this.pawnModels = [];
+    }
+    setup() {
+        this.addWorldOnFireRoom();
+        this.addPawns();
+        this.addBarracksWin();
+        this.addWelcomeText();
+        this.addUserSuggestion();
+    }
+    addWorldOnFireRoom() {
+        const w = TITLE[0].length;
+        const h = TITLE.length;
+        const startX = (0,utils/* centeredStart */.jw)(this.map.w, TITLE[0]);
+        const startY = Math.floor((this.map.h - h) / 2);
+        const start = xy.XY.at(startX, startY);
+        this.initializer.addRoom(rect/* Rect */.r.xyWH(start.add(-1, -1), w + 2, h + 2));
+        (0,utils/* each */.__)(TITLE, (line, y) => {
+            (0,utils/* each */.__)(line, (c, x) => {
+                if (c === '#')
+                    this.map.createAt(start.add(x, y), new fire/* Fire */.v());
+            });
+        });
+    }
+    addWelcomeText() {
+        text_stroke/* TextStroke */.m.centeredPlusY(this.map, "Welcome to Fire House RL", -13, 'welcome');
+        text_stroke/* TextStroke */.m.centeredPlusY(this.map, "press space to unpause", 13, 'instructions');
+        const endWelcome = game/* GameStepped */.K5.on(step => {
+            if (step.frame <= 0)
+                return;
+            this.map.uiRenderer.remove('welcome');
+            this.map.uiRenderer.remove('instructions');
+            endWelcome();
+        });
+    }
+    addPawns() {
+        const add = (x, y) => {
+            const usedNames = this.pawnModels.map(m => m.name);
+            const model = new firehouse/* PawnModel */.A(randomName(usedNames), capabilities/* Capabilities */.FD.basic());
+            const pawn = model.toPawn();
+            this.map.createAt(xy.XY.at(x, y), pawn);
+            this.pawns.push(pawn);
+            this.pawnModels.push(model);
+            return model;
+        };
+        add(55, 24);
+        add(39, 24);
+    }
+    addBarracksWin() {
+        const base = game_fragment/* Fragment */.F.load(intro_barracks);
+        const rotated = base.rotate((0,utils/* randTo */.JD)(4));
+        const upperLeft = xy.XY.at(59, 8);
+        const rect = rotated.place(this.map, upperLeft);
+        const label = '<-- GET INSIDE';
+        const labelY = (0,utils/* half */.MX)(this.map.h) - 13;
+        const labelX = Math.max(0, this.map.w - label.length);
+        text_stroke/* TextStroke */.m.render(this.map, label, xy.XY.at(labelX, labelY), 'barracks-label');
+        const ends = [
+            game/* GameStepped */.K5.on(() => {
+                const unrescued = this.pawns.filter(p => !rect.contains(p));
+                if (unrescued.length > 0)
+                    return;
+                this.map.uiRenderer.remove('barracks-label');
+                this.pawnModels.forEach(m => m.initialLevelUp());
+                state/* FirehouseMode */.M.emit(this.pawnModels);
+                ends.forEach(end => end());
+            }),
+            pawn/* PawnDied */.hq.on(_dead => {
+                this.map.uiRenderer.remove('barracks-label');
+                text_stroke/* TextStroke */.m.render(this.map, 'YOU LOSE', xy.XY.at(labelX, labelY), 'lose-text');
+                ends.forEach(end => end());
+            })
+        ];
+        game/* LevelReset */.QD.on(() => {
+            this.map.uiRenderer.remove('barracks-label');
+            ends.forEach(end => end());
+        });
+    }
+    addUserSuggestion() {
+        let show = true;
+        const suggest = () => {
+            const step = game/* GameStepped */.K5.current;
+            if (!step || step.frame % 5 !== 0)
+                return;
+            show = !show;
+            if (show)
+                text_stroke/* TextStroke */.m.centered(this.map, 'click the @ symbol', this.map.h - 1, 'suggestion', () => '#ff0', () => true, 10);
+            else
+                this.map.uiRenderer.remove('suggestion');
+        };
+        suggest();
+        const stop = game/* GameStepped */.K5.on(suggest);
+        pawn/* PawnSelected */.Ei.on(_pawn => { this.map.uiRenderer.remove('suggestion'); stop(); });
+        game/* LevelReset */.QD.on(() => { this.map.uiRenderer.remove('suggestion'); stop(); });
+    }
+}
+
+// EXTERNAL MODULE: ./src/game/fires.ts
+var fires = __webpack_require__(6746);
+// EXTERNAL MODULE: ./src/ui/colors.ts
+var colors = __webpack_require__(1919);
+;// ./src/game/levels/base-level.ts
+
+
+
+
+
+
+
+
+
+class BaseLevel {
+    constructor(init, map, pawns = [], fragmentText) {
+        this.init = init;
+        this.map = map;
+        this.pawns = pawns;
+        this.fragmentText = fragmentText;
+        this.showDarkness = true;
+        this.hasWon = false;
+    }
+    pawnsToModels() {
+        return this.pawns.map(pawn => new firehouse/* PawnModel */.A(pawn.name, pawn.capabilities));
+    }
+    setup() {
+        const fragment = game_fragment/* Fragment */.F.fromText(this.fragmentText);
+        fragment.place(this.map, xy.XY.at(0, 0));
+        this.igniteRandomStoves(1);
+        this.spawnPawns();
+        game/* GameStepped */.K5.on(stepInfo => this.checkWinCondition(stepInfo));
+        game/* LevelWon */.X_.on(() => this.handleContinue());
+    }
+    igniteRandomStoves(count) {
+        const ovens = [];
+        this.map.eachCell(cell => {
+            cell.onItem(/Oven/, oven => ovens.push(oven));
+        });
+        (0,utils/* times */.Hn)(count, () => {
+            const oven = (0,utils/* randFrom */.Kt)(ovens);
+            oven.cell.cardinals().find(cell => cell.wall())?.wall()?.ignite();
+        });
+    }
+    spawnPawns() {
+        (0,utils/* each */.__)(this.pawns, (pawn, index) => {
+            const location = xy.XY.at((0,utils/* half */.MX)(this.map.w) + index, this.map.h - 1);
+            this.map.createAt(location, pawn);
+        });
+    }
+    checkWinCondition(stepInfo) {
+        if (fires/* Fires */.UQ.burningCount !== 0 || this.hasWon)
+            return;
+        this.hasWon = true;
+        this.map.display.clear();
+        this.map.smokeDisplay.clear();
+        this.map.uiRenderer.clearStrokes();
+        text_stroke/* TextStroke */.m.centered(this.map, `YOU WIN, ${stepInfo.frame} TURNS - PRESS SPACE TO CONTINUE`, this.map.h / 2, 'win-message', () => colors/* WHITE */.UE);
+        game/* LevelWon */.X_.emit(true);
+    }
+    handleContinue() {
+        state/* FirehouseMode */.M.emit(this.pawnsToModels());
+    }
+}
+
+// EXTERNAL MODULE: ./src/maps/fragments/manor.txt
+var manor = __webpack_require__(9110);
+;// ./src/game/levels/level1.ts
+
+
+class Level1 extends BaseLevel {
+    constructor(init, map, pawns = []) {
+        super(init, map, pawns, manor);
+    }
+}
+
+// EXTERNAL MODULE: ./src/maps/fragments/apartment-complex.txt
+var apartment_complex = __webpack_require__(9620);
+;// ./src/game/levels/level2.ts
+
+
+class Level2 extends BaseLevel {
+    constructor(init, map, pawns = []) {
+        super(init, map, pawns, apartment_complex);
+    }
+}
+
+;// ./src/game/initializer.ts
+
+
+
+
+
+
+
+
+
+
+class Initializer {
+    constructor(map) {
+        this.map = map;
+        this.currentLevel = 0;
+    }
+    initialize() {
+        this.currentLevel = 0;
+        this.start(new Intro(this, this.map));
+    }
+    start(level) {
+        this.reset();
+        this.addField();
+        game/* GameStepped */.K5.emit({ frame: 0, stepMs: 0 });
+        level.setup();
+        return { showDarkness: level.showDarkness };
+    }
+    startNext(pawns = []) {
+        this.currentLevel++;
+        if (this.currentLevel === 1) {
+            return this.start(new Level1(this, this.map, pawns));
+        }
+        else if (this.currentLevel === 2) {
+            return this.start(new Level2(this, this.map, pawns));
+        }
+        return this.start(new Level1(this, this.map, pawns));
+    }
+    reset() {
+        this.map.killAll();
+        this.map.display.clear();
+        this.map.smokeDisplay.clear();
+        this.map.uiRenderer.clearStrokes();
+        fires/* Fires */.UQ.reset();
+        game/* LevelReset */.QD.emit();
+    }
+    addField() {
+        rect/* Rect */.r.xyWH(xy.XY.at(0, 0), this.map.w, this.map.h).eachCell(xy => {
+            this.map.createAt(xy, new floor/* Floor */.Z());
+        });
+    }
+    addRoom(rect) {
+        rect.eachBorder(xy => {
+            this.map.createAt(xy, new wall/* Wall */.j());
+        });
+        [rect.ul.add(1, 1), rect.ur.add(-1, 1), rect.bl.add(1, -1), rect.br.add(-1, -1)].forEach(xy => {
+            this.map.createAt(xy, new lamp/* Lamp */.z());
+        });
+    }
+}
 
 
 /***/ }),
@@ -7222,6 +7615,12 @@ const PawnBurned = new signal/* Signal */.H();
 const PawnDied = new signal/* Signal */.H();
 const TaskRemoved = new signal/* Signal */.H();
 class Pawn extends drawable/* Drawable */.h {
+    static next(current) {
+        const index = Pawn.pawns.indexOf(current);
+        if (index === -1)
+            return current;
+        return Pawn.pawns[(index + 1) % Pawn.pawns.length];
+    }
     constructor(name, capabilities) {
         super();
         this.name = name;
@@ -7297,7 +7696,7 @@ class Pawn extends drawable/* Drawable */.h {
         super.dying();
         PawnDied.emit(this);
         this.cell.reborn(new Corpse(this, 'burning'));
-        (0,utils/* each */.__)(this.tasks, t => t.cleanup());
+        (0,utils/* each */.__)(this.tasks, task => task.cleanup());
     }
     squawk(text, colors) {
         if (utils/* isInTestMode */.Jo)
@@ -7358,6 +7757,15 @@ class Pawn extends drawable/* Drawable */.h {
     }
 }
 Pawn.HOVER_PATH_STROKE = 'hover-path';
+Pawn.pawns = [];
+(() => {
+    PawnBorn.on(({ pawn }) => {
+        Pawn.pawns.push(pawn);
+    });
+    PawnDied.on((pawn) => {
+        Pawn.pawns = Pawn.pawns.filter(p => p !== pawn);
+    });
+})();
 Pawn.HOVER_PATH_COLOR = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy(['#0ff', '#088']));
 
 
@@ -7370,11 +7778,12 @@ Pawn.HOVER_PATH_COLOR = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy([
 /* harmony export */   G5: () => (/* binding */ PLANT),
 /* harmony export */   SN: () => (/* binding */ MEAT),
 /* harmony export */   cJ: () => (/* binding */ METAL),
+/* harmony export */   fk: () => (/* binding */ GLASS),
 /* harmony export */   im: () => (/* binding */ Material),
 /* harmony export */   qv: () => (/* binding */ BRICK),
 /* harmony export */   wB: () => (/* binding */ WOOD)
 /* harmony export */ });
-/* unused harmony exports MaterialType, Wood, Meat, Plant, Metal, Brick */
+/* unused harmony exports MaterialType, Wood, Meat, Plant, Metal, Brick, Glass */
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6185);
 /* harmony import */ var _smoke__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4502);
 /* harmony import */ var _fire__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1267);
@@ -7420,7 +7829,7 @@ Meat.instance = new Meat();
 class Plant extends MaterialType {
     constructor() {
         super(...arguments);
-        this.hits = 10;
+        this.hits = 20;
         this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .COLOR_PLANT */ .yv;
         this.note = "extra smokey but don't burn hot";
     }
@@ -7453,11 +7862,23 @@ class Brick extends MaterialType {
     step(_owner) { }
 }
 Brick.instance = new Brick();
+class Glass extends MaterialType {
+    constructor() {
+        super(...arguments);
+        this.flammable = false;
+        this.hits = 10;
+        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .COLOR_GLASS */ .zC;
+        this.note = 'non-flammable, transparent';
+    }
+    step(_owner) { }
+}
+Glass.instance = new Glass();
 const MEAT = Meat.instance;
 const WOOD = Wood.instance;
 const PLANT = Plant.instance;
 const METAL = Metal.instance;
 const BRICK = Brick.instance;
+const GLASS = Glass.instance;
 class Material {
     constructor(owner, type) {
         this.owner = owner;
@@ -7865,1919 +8286,6 @@ const submitIssue = async (title, body, image) => {
     const n = j.issueUrl?.split('/').pop();
     return n ? +n : null;
 };
-
-
-/***/ }),
-
-/***/ 4873:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  Zt: () => (/* binding */ Game),
-  K5: () => (/* binding */ GameStepped),
-  X_: () => (/* binding */ LevelWon)
-});
-
-// EXTERNAL MODULE: ./src/utils.ts
-var utils = __webpack_require__(6185);
-// EXTERNAL MODULE: ./src/d3-extend.ts
-var d3_extend = __webpack_require__(452);
-// EXTERNAL MODULE: ./src/compress.ts
-var compress = __webpack_require__(5074);
-// EXTERNAL MODULE: ./src/game/map.ts + 2 modules
-var map = __webpack_require__(7283);
-// EXTERNAL MODULE: ./src/game/initializer.ts + 3 modules
-var initializer = __webpack_require__(7349);
-// EXTERNAL MODULE: ./src/game/config.ts
-var config = __webpack_require__(6457);
-// EXTERNAL MODULE: ./src/draw/pawn.ts + 1 modules
-var draw_pawn = __webpack_require__(2705);
-// EXTERNAL MODULE: ./src/game/capabilities.ts
-var capabilities = __webpack_require__(3793);
-;// ./src/html/terminal.html
-/* harmony default export */ const terminal = ("<div id=\"terminal\">\n    <div id=\"terminal-content\">\n        <div class=\"cell-container\">\n            <div class=\"cell-coord\"></div>\n            <div class=\"layers\">\n                <div class=\"layer template\">\n                    <span class=\"name\">floor</span>: <span class=\"description text-subtle\">Floor(4477)</span>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div id=\"selected-info\">\n        <div class=\"selected-container\">\n            <div class=\"pawn-desc\">firefighter 10</div>\n            <table class=\"capabilities\">\n                <tr class=\"capability template\">\n                    <td class=\"score\">10</td>\n                    <td class=\"name\">str</td>\n                    <td class=\"skill-score\">1</td>\n                    <td class=\"skill\">inventory</td>\n                </tr>\n            </table>\n            <div class=\"tasks\">\n                <div class=\"task-info template\">\n                    <span class=\"task-desc\">TEMPLATE go to 73, 26</span>\n                    <span class=\"clear-task clickable text-danger bold\" data-index=\"0\">[x]</span>\n                </div>\n            </div>\n            <div id=\"clear-all\" class=\"clickable text-danger bold\" title=\"clear all\">[xx]</div>\n        </div>\n    </div>\n</div>\n");
-// EXTERNAL MODULE: ./src/ui/ui-renderer.ts
-var ui_renderer = __webpack_require__(9889);
-;// ./src/ui/terminal.ts
-
-
-
-
-
-class Terminal {
-    constructor() {
-        this.currentCell = null;
-        this.setCurrent = (cell) => this.currentCell = cell;
-        this.div = (0,d3_extend.d1)('#terminal');
-        this.div.appendFileHtml(terminal);
-        this.repaintSelectedPawn();
-        ui_renderer/* Repaint */.G2.on(() => this.draw());
-        draw_pawn/* PawnSelected */.Ei.on(pawn => this.repaintSelectedPawn());
-        draw_pawn/* PawnMoved */.w.on(({ pawn }) => this.repaintSelectedPawn());
-        draw_pawn/* PawnBurned */.zW.on(pawn => this.repaintSelectedPawn());
-        draw_pawn/* TaskRemoved */.qe.on(pawn => this.repaintSelectedPawn());
-    }
-    draw() {
-        this.updateCell();
-    }
-    updateCell() {
-        const content = this.div.d1('#terminal-content');
-        content.updateFrom(this.currentCell, (cell => {
-            content.d1('.cell-coord').text(cell.xy.x + ', ' + cell.xy.y);
-            content.dList('.layer').updateFrom(cell.presentLayers(), (layer, snapshot) => {
-                layer.d1('.name').text(snapshot.name);
-                layer.d1('.description').text(snapshot.desc).style('color', snapshot.color);
-            });
-        }), () => {
-            content.d1('.cell-coord').text('no cell selected');
-            content.dList('.layer').updateFrom([], () => { });
-        });
-    }
-    repaintSelectedPawn() {
-        const pawn = draw_pawn/* PawnSelected */.Ei.current;
-        const selectedInfo = this.div.d1('#selected-info');
-        selectedInfo.updateFrom(pawn, (pawn) => {
-            const container = selectedInfo.d1('.selected-container');
-            container.d1('.pawn-desc').text(pawn.desc());
-            const rows = [];
-            pawn.capabilities.eachPair((name, skills) => {
-                const nz = skills.filter(s => s.level !== 0);
-                const head = { score: String(skills.reduce((a, s) => a + s.level, 0)), name: (0,capabilities/* capabilityAbbr */.gv)(name) };
-                if (nz.length === 0)
-                    rows.push({ ...head, skillScore: '', skill: '' });
-                else {
-                    rows.push({ ...head, skillScore: String(nz[0].level), skill: nz[0].name });
-                    nz.slice(1).forEach(s => rows.push({ skillScore: String(s.level), skill: s.name }));
-                }
-            });
-            container.d1('.capabilities').dList('.capability').updateFrom(rows, (row, d) => {
-                row.d1('.score').text(d.score || '');
-                row.d1('.name').text(d.name || '');
-                row.d1('.skill-score').text(d.skillScore || '');
-                row.d1('.skill').text(d.skill || '');
-            });
-            container.d1('.tasks').dList('.task-info').updateFrom(pawn.tasks, (taskDiv, task) => {
-                taskDiv.d1('.task-desc').text(task.desc());
-                taskDiv.d1('.clear-task').on('click', () => task.remove());
-            });
-            container.d1('#clear-all').style('display', 'block').on('click', () => pawn.clearTasks());
-        }, () => {
-            const container = selectedInfo.d1('.selected-container');
-            container.d1('.pawn-desc').text('no pawn selected');
-            container.d1('.capabilities').dList('.capability').updateFrom([], () => { });
-            container.d1('.tasks').dList('.task-info').updateFrom([], () => { });
-            container.d1('#clear-all').style('display', 'none').on('click', null);
-        });
-    }
-}
-
-// EXTERNAL MODULE: ./src/game/layers.ts
-var game_layers = __webpack_require__(5633);
-;// ./src/ui/states/select-state.ts
-class SelectState {
-    constructor(ui) {
-        this.ui = ui;
-    }
-    onClick(cell, _c) {
-        if (!cell)
-            return;
-        const pawn = cell.pawn();
-        if (pawn)
-            this.ui.setState('menu', pawn);
-    }
-    onMouseMove(cell) {
-        this.ui.terminal.setCurrent(cell);
-    }
-}
-
-// EXTERNAL MODULE: ./src/game/tasks/task.ts
-var task = __webpack_require__(1877);
-// EXTERNAL MODULE: ./src/draw/door.ts
-var draw_door = __webpack_require__(2483);
-;// ./src/game/tasks/destination-task.ts
-
-
-
-class DestinationTask extends task/* Task */.YZ {
-    constructor(pawn, destination, fixedRay = null) {
-        super(pawn);
-        this.destination = destination;
-        this.done = false;
-        this.isDone = () => this.done;
-        this.strokeId = `destination-task-${Date.now()}-${Math.random()}`;
-        this.fixedRay = fixedRay;
-    }
-    nextStepFromPath() {
-        const path = this.pawn.cell.pathTo(this.destination);
-        if (!path)
-            return null;
-        const it = path[Symbol.iterator]();
-        const { value, done } = it.next();
-        return done ? null : value;
-    }
-    buildFixedRay(from, to) {
-        const ray = [];
-        from.map.eachRay(from.xy, to.xy, c => { ray.push(c); return true; });
-        return ray;
-    }
-    nextFromFixedRay() {
-        if (!this.fixedRay)
-            return null;
-        if (this.fixedRay.length === 0)
-            return null;
-        return this.fixedRay.shift() || null;
-    }
-    nextCell() {
-        const n = this.nextFromFixedRay();
-        if (n)
-            return n;
-        const step = this.nextStepFromPath();
-        if (step)
-            return step;
-        const cur = this.pawn.cell;
-        const ray = this.buildFixedRay(cur, this.destination);
-        return ray.length === 0 ? null : ray[0];
-    }
-    advance(next) {
-        const door = next.wall();
-        if (door instanceof draw_door/* Door */.$ && !door.passable) {
-            door.toggle();
-            return;
-        }
-        if (!next.passable()) {
-            this.done = true;
-            return;
-        }
-        this.pawn.cell.queueMove(this.pawn, next.xy);
-        if (next === this.destination)
-            this.done = true;
-    }
-    step() {
-        if (this.done)
-            return;
-        const next = this.nextCell();
-        if (!next) {
-            this.done = true;
-            return;
-        }
-        this.advance(next);
-    }
-    cleanup() { this.pawn.cell.map.uiRenderer.remove(this.strokeId); }
-    desc() { return `go to ${this.destination.xy.toString()}`; }
-    strokeAndNext(start) {
-        if (this.fixedRay) {
-            const ray = this.buildFixedRay(start, this.destination);
-            this.pawn.cell.map.uiRenderer.replace(this.strokeId, task/* Task */.YZ.strokeOfCells(ray, task/* TASK_COLOR */.k$, () => !this.done, 1));
-            return this.destination;
-        }
-        else {
-            const path = start.pathTo(this.destination);
-            if (path) {
-                const cells = Array.from(path);
-                this.pawn.cell.map.uiRenderer.replace(this.strokeId, task/* Task */.YZ.strokeOfCells(cells, task/* TASK_COLOR */.k$, () => !this.done, 1));
-            }
-            else {
-                task/* Task */.YZ.strokePathBetween(start, this.destination, this.strokeId, task/* TASK_COLOR */.k$, () => !this.done, 1);
-            }
-            return this.destination;
-        }
-    }
-}
-
-;// ./src/game/tasks/wait-task.ts
-
-class WaitTask extends task/* Task */.YZ {
-    isDone() { return false; }
-    step() { }
-    desc() { return 'wait'; }
-    strokeAndNext(start) { return start; }
-}
-
-// EXTERNAL MODULE: ./src/ui/colors.ts
-var colors = __webpack_require__(1919);
-// EXTERNAL MODULE: ./src/ui/stroke.ts
-var ui_stroke = __webpack_require__(891);
-;// ./src/game/tasks/extinguish-task.ts
-
-
-
-class ExtinguishTask extends task/* Task */.YZ {
-    constructor(pawn) {
-        super(pawn);
-        this.done = false;
-        this.id = `extinguish-${Date.now()}-${Math.random()}`;
-        this.color = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy(['#f00', '#00f']));
-        this.isDone = () => this.done;
-        this.desc = () => `extinguish ${this.stepsRemaining}`;
-        this.stepsRemaining = pawn.material.isBurning() ? 5 : 1;
-    }
-    step() {
-        if (this.done)
-            return;
-        if (--this.stepsRemaining <= 0) {
-            if (this.pawn.material.isBurning()) {
-                this.pawn.material.extinguish();
-            }
-            else {
-                const neighbors = this.pawn.cell.neighbors();
-                const fireNeighbors = neighbors.filter(cell => cell.fire());
-                neighbors.forEach(cell => cell.onFire(fire => fire.died()));
-                if (fireNeighbors.length < 4) {
-                    this.pawn.cell.cardinals().forEach(cell => cell.extinguish());
-                }
-            }
-            this.done = true;
-        }
-    }
-    strokeAndNext(start) {
-        start.map.uiRenderer.replace(this.id, new ui_stroke/* Stroke */.t([{ cell: start, char: 'e' }], this.color, () => !this.done, 1));
-        return start;
-    }
-    cleanup() { this.pawn.cell.map.uiRenderer.remove(this.id); }
-}
-
-;// ./src/ui/states/destination-state.ts
-
-
-
-
-
-
-
-class DestinationState {
-    menuAction(key) {
-        if (key === 'x')
-            this.ui.setState('select');
-        else if (key === 'd')
-            this.debug();
-        else if (key === 'r')
-            this.removeLastTask();
-        else if (key === 'g' || key === 'w' || key === 'e')
-            this.locatedAction(key);
-    }
-    locatedAction(key) {
-        if (!this.hoveredCell)
-            return;
-        const start = this.selected.tipCell;
-        const fixedRay = this.shift ? this.buildFixedRay(start, this.hoveredCell) : null;
-        this.selected.addTask(new DestinationTask(this.selected, this.hoveredCell, fixedRay));
-        if (key === 'w')
-            this.selected.addTask(new WaitTask(this.selected));
-        else if (key === 'e')
-            this.selected.addTask(new ExtinguishTask(this.selected));
-        this.ui.setState('destination', this.selected);
-    }
-    debug() {
-        window.pawn = this.selected;
-        console.log('Pawn assigned to window.pawn:', this.selected);
-        ui_renderer/* Repaint */.G2.emit();
-    }
-    removeLastTask() {
-        (0,utils/* onLastMaybe */.iw)(this.selected.tasks, task => task.remove());
-        if (this.hoveredCell)
-            this.onMouseMove(this.hoveredCell);
-        ui_renderer/* Repaint */.G2.emit();
-    }
-    constructor(ui) {
-        this.ui = ui;
-        this.shift = false;
-        this.keyDown = (event) => {
-            if (event.key === 'Escape')
-                this.ui.setState('menu', this.selected);
-            else if (event.key === 'Shift')
-                this.shift = true;
-            else
-                this.menuAction(event.key);
-        };
-        this.keyUp = (event) => {
-            if (event.key === 'Shift')
-                this.shift = false;
-        };
-        this.outside = (e) => {
-            const canvas = this.ui.map.display.canvas();
-            if (!canvas.contains(e.target)) {
-                e.preventDefault();
-                this.ui.setState('menu', this.selected);
-            }
-        };
-        this.pawnDied = (pawn) => {
-            if (pawn === this.selected)
-                this.ui.setState('select');
-        };
-    }
-    onClick(cell, c) {
-        if (c.button === 'RIGHT' || !cell)
-            return this.ui.setState('menu', this.selected);
-        const pawn = cell.pawn();
-        if (pawn === this.selected)
-            return this.ui.setState('menu', this.selected);
-        if (pawn)
-            return this.ui.setState('menu', pawn);
-        const start = this.selected.tipCell;
-        const fixedRay = c.shift ? this.buildFixedRay(start, cell) : null;
-        this.selected.addTask(new DestinationTask(this.selected, cell, fixedRay));
-    }
-    buildFixedRay(from, to) {
-        const ray = [];
-        from.map.eachRay(from.xy, to.xy, c => { ray.push(c); return true; });
-        return ray;
-    }
-    onMouseMove(cell) {
-        this.hoveredCell = cell;
-        this.ui.terminal.setCurrent(cell);
-        const start = this.selected.tipCell;
-        if (!start)
-            return;
-        if (this.shift) {
-            const ray = this.buildFixedRay(start, cell);
-            this.ui.map.uiRenderer.replace(draw_pawn/* Pawn */.vc.HOVER_PATH_STROKE, task/* Task */.YZ.strokeOfCells(ray, task/* TASK_COLOR */.k$, () => true, 2));
-            ui_renderer/* Repaint */.G2.emit();
-            return;
-        }
-        const path = start.pathTo(cell);
-        if (path) {
-            const cells = Array.from(path);
-            const last = cells[cells.length - 1];
-            if (last && last === cell) {
-                this.ui.map.uiRenderer.replace(draw_pawn/* Pawn */.vc.HOVER_PATH_STROKE, task/* Task */.YZ.strokeOfCells(cells, task/* TASK_COLOR */.k$, () => true, 2));
-            }
-            else {
-                const ray = this.buildFixedRay(start, cell);
-                this.ui.map.uiRenderer.replace(draw_pawn/* Pawn */.vc.HOVER_PATH_STROKE, task/* Task */.YZ.strokeOfCells(ray, task/* TASK_COLOR_UNREACHABLE */.r9, () => true, 2));
-            }
-        }
-        else {
-            const ray = this.buildFixedRay(start, cell);
-            this.ui.map.uiRenderer.replace(draw_pawn/* Pawn */.vc.HOVER_PATH_STROKE, task/* Task */.YZ.strokeOfCells(ray, task/* TASK_COLOR_UNREACHABLE */.r9, () => true, 2));
-        }
-        ui_renderer/* Repaint */.G2.emit();
-    }
-    enter(pawn) {
-        this.selected = pawn;
-        this.selected.selected = true;
-        draw_pawn/* PawnSelected */.Ei.emit(pawn);
-        document.addEventListener('keydown', this.keyDown);
-        document.addEventListener('keyup', this.keyUp);
-        document.addEventListener('click', this.outside);
-        document.addEventListener('contextmenu', this.outside);
-        this.unsubDied = draw_pawn/* PawnDied */.hq.on(this.pawnDied);
-    }
-    exit() {
-        document.removeEventListener('keydown', this.keyDown);
-        document.removeEventListener('keyup', this.keyUp);
-        document.removeEventListener('click', this.outside);
-        document.removeEventListener('contextmenu', this.outside);
-        this.unsubDied();
-        this.ui.map.uiRenderer.remove(draw_pawn/* Pawn */.vc.HOVER_PATH_STROKE);
-        this.selected.selected = false;
-        this.hoveredCell = undefined;
-        ui_renderer/* Repaint */.G2.emit();
-        draw_pawn/* PawnSelected */.Ei.emit(null);
-    }
-}
-
-// EXTERNAL MODULE: ./src/ui/text-stroke.ts
-var text_stroke = __webpack_require__(1485);
-;// ./src/ui/menu.ts
-
-
-
-const MENU_ITEMS = [
-    { key: 'x', desc: 'Exit menu and return to selection', action: ui => ui.setState('select') },
-    { key: 'g', desc: 'Go to destination by path - shift for line', action: (ui, p) => ui.setState('destination', p) },
-    { key: 'w', desc: 'Wait - firefighter will pause and wait', action: (ui, p) => { p.addTask(new WaitTask(p)); ui.setState('menu', p); } },
-    { key: 'e', desc: 'Extinguish - put out burning firefighter', action: (ui, p) => { p.addTask(new ExtinguishTask(p)); ui.setState('menu', p); } },
-    { key: 'd', desc: 'Debug - assign pawn to window.pawn for console', action: (ui, p) => { window.pawn = p; console.log('Pawn assigned to window.pawn:', p); ui.setState('menu', p); } },
-    { key: 'r', desc: "Remove last task from firefighter's queue", action: (ui, p) => { (0,utils/* onLastMaybe */.iw)(p.tasks, t => t.remove()); ui.setState('menu', p); } }
-];
-
-// EXTERNAL MODULE: ./src/game/drawable-types.ts + 1 modules
-var drawable_types = __webpack_require__(1073);
-// EXTERNAL MODULE: ./src/draw/material.ts
-var material = __webpack_require__(2994);
-;// ./src/ui/help.ts
-
-
-
-
-
-const MENU_HELP = (0,utils/* toEntries */.Wo)(MENU_ITEMS, i => [i.key, i.desc]);
-class HelpSystem {
-    constructor() {
-        this.pages = [];
-        this.currentPage = 0;
-        this.generatePages();
-    }
-    getCurrentPage() {
-        return this.pages[this.currentPage] || this.pages[0];
-    }
-    getPageInfo() {
-        return `<div style="text-align: center; margin-bottom: 10px; color: #888;">Page ${this.currentPage + 1} of ${this.pages.length} • Use ← → keys to navigate</div>`;
-    }
-    nextPage() {
-        if (this.currentPage < this.pages.length - 1) {
-            this.currentPage++;
-            return true;
-        }
-        return false;
-    }
-    previousPage() {
-        if (this.currentPage > 0) {
-            this.currentPage--;
-            return true;
-        }
-        return false;
-    }
-    resetToFirstPage() {
-        this.currentPage = 0;
-    }
-    generatePages() {
-        const menuItems = MENU_ITEMS;
-        const layerInfo = {
-            'floor': { char: '.', desc: 'Floor tiles and terrain', color: '#666' },
-            'walls': { char: '#', desc: 'Walls and doors (+)', color: '#666' },
-            'items': { char: '*', desc: 'Lamps, equipment, and other things laying around', color: '#ff0' },
-            'fire': { char: '▲', desc: 'Active fires that spread and create smoke', color: '#f44' },
-            'smoke': { char: '+', desc: 'Smoke that drifts and blocks vision', color: '#999' },
-            'pawn': { char: '@', desc: 'Firefighters under your command', color: '#0f0' }
-        };
-        const layerSections = game_layers/* CellLayers */.v.layerNames.map(layerName => {
-            const info = layerInfo[layerName];
-            if (info) {
-                return `• <strong>${layerName}</strong> (<strong style="color: ${info.color}">${info.char}</strong>) - ${info.desc}`;
-            }
-            return `• <strong>${layerName}</strong> - Layer type`;
-        }).join('<br/>');
-        const menuSection = menuItems
-            .map(item => `• <strong>${item.key}</strong> - ${item.desc}`)
-            .join('<br/>');
-        const layerButtons = game_layers/* CellLayers */.v.layerNames.map(name => name.slice(0, 3)).join(', ');
-        const drawableNotes = { Oven: 'Can spark fires' };
-        const drawableRows = Object.entries(drawable_types/* DrawableType */.Z.registry)
-            .map(([name, create]) => {
-            const drawable = create();
-            const row = `<tr><td style="text-align:center;color:${drawable.color()}">${drawable.char()}</td>` +
-                `<td>${name}</td><td>${drawableNotes[name] ?? ''}</td></tr>`;
-            drawable.diedAndAlreadyRemovedFromCell();
-            return row;
-        })
-            .join('');
-        const drawableTable = `<table class="help-table">` +
-            `<tr><th>Symbol</th><th>Object</th><th>Notes</th></tr>${drawableRows}</table>`;
-        const materials = [
-            ['Meat', material/* MEAT */.SN],
-            ['Wood', material/* WOOD */.wB],
-            ['Plant', material/* PLANT */.G5],
-            ['Metal', material/* METAL */.cJ],
-            ['Brick', material/* BRICK */.qv],
-        ];
-        const materialRows = materials
-            .map(([name, type]) => `<tr><td style="color:${type.color}">${name}</td><td>${type.flammable ? 'Yes' : 'No'}</td><td>${type.note}</td></tr>`)
-            .join('');
-        const materialTable = `<table class="help-table">` +
-            `<tr><th>Material</th><th>Flammable</th><th>Notes</th></tr>${materialRows}</table>`;
-        this.pages = [
-            // Page 1: Overview and Controls
-            `<div class="help-text">
-<strong>🔥 FIRE HOUSE RL 🔥</strong><br/>
-<br/>
-<strong>GAME OVERVIEW:</strong><br/>
-Control a squad of firefighters (@) in a tactical roguelike. Give orders, then watch them execute in real-time or step-by-step.<br/>
-<br/>
-<strong>MAIN CONTROLS:</strong><br/>
-• <strong>▶️ Play/Pause</strong> - Start/stop game simulation<br/>
-• <strong>⏭️ Step</strong> - Advance one game step<br/>
-• <strong>❄️ Freeze</strong> - Pause rendering (game continues)<br/>
-• <strong>❓ Help</strong> - Open this help system<br/>
-• <strong>SPACE</strong> - Play/Pause game<br/>
-• <strong>ESC</strong> - Close help or menus<br/>
-<br/>
-<strong>MOUSE CONTROLS:</strong><br/>
-• <strong>Click @</strong> - Select firefighter<br/>
-• <strong>Hover</strong> - Inspect cells in terminal<br/>
-• <strong>Right-click</strong> - Cancel selection<br/>
-<br/>
-<strong>GETTING STARTED:</strong><br/>
-Hold the space bar to play, tap to step, release to halt.<br/>
-You can slow or speed up time under the play/pause button.<br/>
-1. Click the <strong>@</strong> symbol to select a firefighter<br/>
-2. Choose an action from the menu that appears<br/>
-3. Watch your firefighters carry out their orders!<br/>
-</div>`,
-            // Page 2: Firefighter Menu
-            `<div class="help-text">
-<strong>🚒 FIREFIGHTER COMMANDS 🚒</strong><br/>
-<br/>
-<strong>FIREFIGHTER MENU:</strong><br/>
-When you click a firefighter (@), a menu appears around them with these options:<br/>
-<br/>
-${menuSection}<br/>
-<br/>
-<strong>TASK SYSTEM:</strong><br/>
-• Firefighters can queue multiple tasks<br/>
-• Tasks are shown as colored paths on the map<br/>
-• Blue lines show planned movement routes<br/>
-• Tasks execute in order from first to last<br/>
-<br/>
-<strong>TERMINAL PANEL:</strong><br/>
-The right panel shows detailed info about:<br/>
-• Current cell under mouse cursor<br/>
-• Selected firefighter's active tasks<br/>
-• Layer contents and properties<br/>
-• Click <strong>[x]</strong> next to tasks to remove them<br/>
-<br/>
-<strong>SELECTION TIPS:</strong><br/>
-• Selected firefighters have inverted colors<br/>
-• Hover over destinations to see path preview<br/>
-• Right-click to cancel current selection<br/>
-</div>`,
-            // Page 3: Layers and Terrain
-            `<div class="help-text">
-<strong>🗺️ LAYERS & TERRAIN 🗺️</strong><br/>
-<br/>
-<strong>LAYER SYSTEM:</strong><br/>
-The game world is built in layers (${game_layers/* CellLayers */.v.layerNames.length} total). From bottom to top:<br/>
-<br/>
-${layerSections}<br/>
-<br/>
-<strong>TERRAIN INTERACTIONS:</strong><br/>
-• <strong>Walls</strong> block movement and vision<br/>
-• <strong>Doors</strong> (+) can be opened and closed<br/>
-• <strong>Items</strong> provide light and can be carried<br/>
-• <strong>Fires</strong> spread to adjacent flammable materials<br/>
-• <strong>Smoke</strong> reduces visibility and can harm firefighters<br/>
-<br/>
-<strong>LIGHTING SYSTEM:</strong><br/>
-• Fires and lamps provide illumination<br/>
-• Darkness affects visibility and movement<br/>
-• Smoke blocks light transmission<br/>
-• Materials cast shadows and block vision<br/>
-</div>`,
-            // Page 4: Fire Mechanics and Debug
-            `<div class="help-text">
-<strong>🔥 FIRE MECHANICS & DEBUG 🔥</strong><br/>
-<br/>
-<strong>FIRE BEHAVIOR:</strong><br/>
-• Fires spread to adjacent cells over time<br/>
-• Fires create smoke that drifts randomly<br/>
-• Materials can ignite and burn<br/>
-• Lighting affects visibility and tactics<br/>
-• Older fires burn out eventually<br/>
-<br/>
-<strong>SMOKE MECHANICS:</strong><br/>
-• Smoke reduces transparency and vision<br/>
-• Smoke drifts to adjacent cells<br/>
-• Smoke dissipates over time<br/>
-• Can harm firefighters with prolonged exposure<br/>
-<br/>
-<strong>DEBUG CONTROLS:</strong><br/>
-• <strong>LT</strong> - Toggle lighting display<br/>
-• <strong>Layer buttons</strong> - Show/hide specific layers (${layerButtons})<br/>
-• <strong>on/off</strong> - Turn all layers on/off<br/>
-<br/>
-<strong>LAYER DEBUGGING:</strong><br/>
-• Click layer buttons to toggle visibility<br/>
-• Muted layers appear grayed out<br/>
-• Solo mode shows only one layer<br/>
-• Useful for debugging complex scenarios<br/>
-</div>`,
-            // Page 5: Symbols
-            `<div class="help-text"><strong>🔣 SYMBOLS 🔣</strong><br/><br/>${drawableTable}</div>`,
-            // Page 6: Materials
-            `<div class="help-text"><strong>🔩 MATERIALS 🔩</strong><br/><br/>${materialTable}</div>`
-        ];
-    }
-}
-
-;// ./src/timer.ts
-class Timer {
-    restartInMillis(ms, f) {
-        this.stop();
-        this.id = setTimeout(() => { this.id = undefined; f(); }, ms);
-    }
-    stop() {
-        if (this.id)
-            clearTimeout(this.id);
-        this.id = undefined;
-    }
-}
-const timer = (_name) => new Timer();
-
-// EXTERNAL MODULE: ./src/game/xy.ts
-var game_xy = __webpack_require__(88);
-;// ./src/ui/states/menu-state.ts
-
-
-
-
-
-
-
-
-
-
-class Spot {
-    constructor(key, command) {
-        this.key = key;
-        this.command = command;
-    }
-}
-class MenuState {
-    constructor(ui) {
-        this.ui = ui;
-        this.itemsByXY = new Map();
-        this.key = (e) => {
-            if (e.key === 'Escape')
-                this.ui.setState('select');
-            const item = MENU_ITEMS.find(i => i.key === e.key);
-            if (!item)
-                return;
-            this.hideHelp();
-            item.action(this.ui, this.pawn);
-            ui_renderer/* Repaint */.G2.emit();
-        };
-        this.showTimer = timer('show');
-        this.hideTimer = timer('hide');
-        this.helpId = 'menu-help';
-        this.sync = () => {
-            const base = this.pawn.cell?.xy;
-            if (!base || game_xy.XY.matches(base, this.lastBase))
-                return;
-            this.lastBase = base;
-            this.hideHelp();
-            this.hideMenu();
-            this.showMenu();
-            ui_renderer/* Repaint */.G2.emit();
-        };
-        this.died = (pawn) => {
-            if (pawn === this.pawn)
-                this.ui.setState('select');
-        };
-    }
-    onClick(cell, _c) {
-        if (!cell)
-            return this.ui.setState('select');
-        const pawn = cell.pawn();
-        if (pawn && pawn !== this.pawn)
-            return this.ui.setState('menu', pawn);
-        const menuItem = this.itemsByXY.get(cell.xy.toString());
-        if (!menuItem)
-            return this.ui.setState('select');
-        this.hideHelp();
-        menuItem.command();
-    }
-    onMouseMove(cell) {
-        this.ui.terminal.setCurrent(cell);
-        const item = this.itemsByXY.get(cell.xy.toString());
-        if (item) {
-            this.hideTimer.stop();
-            if (this.hovered !== item) {
-                this.hovered = item;
-                this.showTimer.restartInMillis(700, () => this.showHelp(cell, item));
-            }
-        }
-        else {
-            this.hovered = undefined;
-            this.hideTimer.restartInMillis(300, () => this.hideHelp());
-        }
-    }
-    enter(pawn) {
-        this.pawn = pawn;
-        this.pawn.selected = true;
-        draw_pawn/* PawnSelected */.Ei.emit(pawn);
-        this.unsubMove = draw_pawn/* PawnMoved */.w.on(({ pawn }) => { if (pawn === this.pawn)
-            this.sync(); });
-        this.unsubDied = draw_pawn/* PawnDied */.hq.on(this.died);
-        this.unsubFrame = ui_renderer/* FrameRendered */.HO.on(this.sync);
-        document.addEventListener('keydown', this.key);
-        this.showMenu();
-        this.lastBase = this.pawn.cell.xy;
-    }
-    exit() {
-        this.pawn.selected = false;
-        draw_pawn/* PawnSelected */.Ei.emit(null);
-        this.hideMenu();
-        this.hideHelp();
-        this.unsubMove?.();
-        this.unsubDied?.();
-        this.unsubFrame?.();
-        document.removeEventListener('keydown', this.key);
-    }
-    showMenu() {
-        this.placeCommands(MENU_ITEMS);
-    }
-    addUnusedMenuCells() {
-        if ((0,utils/* isEmpty */.Im)(this.itemsByXY))
-            return this.pawn.cell.neighbors();
-        const result = [];
-        this.itemsByXY.forEach((_item, key) => {
-            const [x, y] = key.split(', ').map(n => parseInt(n));
-            const cell = this.ui.map.get(game_xy.XY.at(x, y));
-            result.push(...cell.neighbors().filter(neighbor => !this.itemsByXY.has(neighbor.xy.toString())));
-        });
-        return result;
-    }
-    placeCommands(commands) {
-        const cells = this.addUnusedMenuCells();
-        const placeable = commands.slice(0, cells.length);
-        const remaining = commands.slice(cells.length);
-        placeable.forEach(item => {
-            const cell = cells.shift();
-            this.itemsByXY.set(cell.xy.toString(), new Spot(item.key, () => item.action(this.ui, this.pawn)));
-            this.ui.map.uiRenderer.replace(`menu-${item.key}`, this.createMenuStroke(cell, item.key));
-        });
-        if ((0,utils/* hasContent */.ov)(remaining))
-            this.placeCommands(remaining);
-    }
-    hideMenu() {
-        this.itemsByXY.forEach(item => {
-            this.ui.map.uiRenderer.remove(`menu-${item.key}`);
-        });
-        this.itemsByXY.clear();
-    }
-    findUnobstructedMenuLocation(itemCell, text) {
-        const base = this.pawn.cell.xy;
-        const textWidth = text.length;
-        const map = this.ui.map;
-        const fitsOnMap = (xy) => {
-            if (game_xy.XY.oob(xy))
-                return false;
-            const endX = xy.x + textWidth - 1;
-            return endX < map.w;
-        };
-        const doesNotBlockMenu = (xy) => {
-            for (let i = 0; i < textWidth; i++) {
-                const checkXY = xy.add(i, 0);
-                if (this.itemsByXY.has(checkXY.toString()) ||
-                    (checkXY.x === base.x && checkXY.y === base.y)) {
-                    return false;
-                }
-            }
-            return true;
-        };
-        const tryPosition = (startXY) => {
-            let bestX = startXY.x;
-            const isRightOfPawn = startXY.x > base.x;
-            const isOnCenterLine = startXY.x === base.x;
-            const trySlideLeft = (x) => {
-                for (let i = x; i >= 0; i--) {
-                    const xy = game_xy.XY.at(i, startXY.y);
-                    if (fitsOnMap(xy) && doesNotBlockMenu(xy))
-                        return i;
-                }
-                return x;
-            };
-            const trySlideRight = (x) => {
-                for (let i = x; i + textWidth <= map.w; i++) {
-                    const xy = game_xy.XY.at(i, startXY.y);
-                    if (fitsOnMap(xy) && doesNotBlockMenu(xy))
-                        return i;
-                }
-                return x;
-            };
-            if (isRightOfPawn || isOnCenterLine) {
-                bestX = trySlideRight(startXY.x);
-                if (bestX === startXY.x)
-                    bestX = trySlideLeft(bestX);
-            }
-            else {
-                bestX = trySlideLeft(startXY.x);
-                if (bestX === startXY.x)
-                    bestX = trySlideRight(bestX);
-            }
-            const finalXY = game_xy.XY.at(bestX, startXY.y);
-            if (fitsOnMap(finalXY) && doesNotBlockMenu(finalXY)) {
-                return finalXY;
-            }
-            return null;
-        };
-        // For center line items, prefer offset Y positions first
-        const menuItemDirection = itemCell.xy.x - base.x;
-        const yPreferences = menuItemDirection === 0
-            ? [1, -1, 0, 2, -2, 3, -3, 4, -4] // center: try offset first
-            : [0, 1, -1, 2, -2, 3, -3, 4, -4]; // sides: try same row first
-        for (const yOffset of yPreferences) {
-            const y = itemCell.xy.y + yOffset;
-            if (y < 0 || y >= map.h)
-                continue;
-            const result = tryPosition(game_xy.XY.at(itemCell.xy.x, y));
-            if (result)
-                return map.get(result);
-        }
-        // Ultimate fallback
-        return itemCell;
-    }
-    showHelp(cell, item) {
-        const text = MENU_HELP[item.key];
-        if (!text)
-            return;
-        const target = this.findUnobstructedMenuLocation(cell, text);
-        text_stroke/* TextStroke */.m.render(this.ui.map, text, target.xy, this.helpId, () => colors/* WHITE */.UE, () => true, 6, colors/* BACKGROUND */.h4);
-    }
-    hideHelp() {
-        this.showTimer.stop();
-        this.hideTimer.stop();
-        this.ui.map.uiRenderer.remove(this.helpId);
-        this.hovered = undefined;
-    }
-    createMenuStroke(cell, char) {
-        const stroke = new ui_stroke/* Stroke */.t([], () => '#ff0', () => true, 5);
-        stroke.add(cell, char);
-        return stroke;
-    }
-}
-
-;// ./src/ui/states/observe-state.ts
-
-class ObservePawnState {
-    constructor(ui) {
-        this.ui = ui;
-    }
-    onClick(cell, _c) {
-        if (!cell)
-            return this.ui.setState('select');
-        const pawn = cell.pawn();
-        if (pawn)
-            this.ui.setState('menu', pawn);
-        else
-            this.ui.setState('select');
-    }
-    onMouseMove(cell) {
-        this.ui.terminal.setCurrent(cell);
-    }
-    enter(pawn) {
-        this.selected = pawn;
-        this.selected.selected = true;
-        draw_pawn/* PawnSelected */.Ei.emit(pawn);
-    }
-    exit() {
-        this.selected.selected = false;
-        draw_pawn/* PawnSelected */.Ei.emit(null);
-    }
-}
-
-;// ./src/ui/ui.ts
-
-
-
-
-
-class UI {
-    constructor(terminal, map) {
-        this.terminal = terminal;
-        this.map = map;
-        this.state = 'select';
-        this.onClick = (cell, c) => {
-            this.states[this.state].onClick(cell, c);
-            ui_renderer/* Repaint */.G2.emit();
-        };
-        this.onMouseMove = (cell) => {
-            this.states[this.state].onMouseMove(cell);
-            this.terminal.draw();
-        };
-        this.states = {
-            select: new SelectState(this),
-            destination: new DestinationState(this),
-            menu: new MenuState(this),
-            observe: new ObservePawnState(this)
-        };
-    }
-    setState(newState, data) {
-        this.states[this.state].exit?.();
-        this.state = newState;
-        this.states[this.state].enter?.(data);
-    }
-}
-
-// EXTERNAL MODULE: ./src/signal.ts
-var signal = __webpack_require__(334);
-// EXTERNAL MODULE: ./src/ui/firehouse.ts + 1 modules
-var firehouse = __webpack_require__(8846);
-// EXTERNAL MODULE: ./src/game/state.ts + 1 modules
-var state = __webpack_require__(9308);
-// EXTERNAL MODULE: ./src/ui/feedback.ts + 1 modules
-var feedback = __webpack_require__(5264);
-;// ./src/html/switch-env.html
-/* harmony default export */ const switch_env = ("<div id=\"env-switch-modal\" class=\"modal-window column gap-form\">\n    <div class=\"row items-between cross-aligned-center gap-modal-header border-bottom\">\n        <h3>SWITCH ENVIRONMENT</h3>\n        <button id=\"env-switch-close\" class=\"button-secondary close-button\">×</button>\n    </div>\n    <div id=\"env-switch-message\"></div>\n    <div class=\"row aligned-end gap-buttons\">\n        <button id=\"env-switch-cancel\" class=\"button-secondary\">Cancel</button>\n        <button id=\"env-switch-save-push\" class=\"button-primary\">Save &amp; Push</button>\n        <button id=\"env-switch-save\" class=\"button-primary\">Save Here &amp; Switch</button>\n        <button id=\"env-switch-switch\" class=\"button-primary\">Switch Only</button>\n    </div>\n</div>\n");
-// EXTERNAL MODULE: ./src/ui/modal.ts
-var modal = __webpack_require__(5382);
-// EXTERNAL MODULE: ./src/storage.ts
-var storage = __webpack_require__(8421);
-;// ./src/ui/env-switch.ts
-
-
-
-
-class EnvSwitch extends modal/* Modal */.a {
-    constructor() {
-        super('#env-switch-modal');
-        this.div.appendFileHtml(switch_env);
-        const close = () => this.choose('cancel');
-        this.div.d1('#env-switch-close').onClick(close);
-        this.div.d1('#env-switch-cancel').onClick(close);
-        this.div.d1('#env-switch-save-push').onClick(() => this.choose('push'));
-        this.div.d1('#env-switch-save').onClick(() => this.choose('save'));
-        this.div.d1('#env-switch-switch').onClick(() => this.choose('switch'));
-    }
-    async show() {
-        const s = storage/* storage */.I.get('gameState');
-        const bytes = s ? await (0,compress/* gzSize */.F8)(s) : 0;
-        this.div.d1('#env-switch-message').text(`Save is ${bytes}b`);
-        super.show();
-        return new Promise(r => (this.resolve = r));
-    }
-    choose(a) {
-        super.hide();
-        this.resolve?.(a);
-    }
-    modalKeyHandled(e) {
-        if (e.key === 'Escape') {
-            e.preventDefault();
-            this.choose('cancel');
-            return true;
-        }
-        return false;
-    }
-}
-
-;// ./src/html/save-slots.html
-/* harmony default export */ const save_slots = ("<div id=\"save-slots-modal\" class=\"modal-window column gap-form\">\n    <h3 id=\"save-title\" class=\"popup-title border-bottom\">SAVE GAME - SELECT SLOT</h3>\n    <div class=\"imported-save-section border-bottom\">\n        <div class=\"imported-save template save-slot panel\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">Imported</div>\n                <button class=\"slot-delete button-secondary close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Imported Save</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"exported-save-section\">\n        <div class=\"exported-save template save-slot panel\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">Exported</div>\n                <button class=\"slot-delete button-secondary close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Exported Save</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"slots\">\n        <div class=\"slot template save-slot panel\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">1</div>\n                <button class=\"slot-delete button-secondary close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Empty Slot</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"save-actions row aligned-end\">\n        <button id=\"save-cancel\" class=\"button-secondary\">Cancel</button>\n    </div>\n    <div class=\"popup-help-text\">\n        Click a slot to select • ESC to cancel\n    </div>\n</div>\n");
-;// ./src/ui/save-slots.ts
-
-
-
-
-
-class SaveSlots extends modal/* Modal */.a {
-    constructor(gameState) {
-        super('#save-slots-modal');
-        this.gameState = gameState;
-        this.currentAction = 'save';
-        this.isAutoLoadAtStartup = false;
-        this.div.appendFileHtml(save_slots);
-        this.div.d1('#save-cancel').onClick(() => this.hide());
-    }
-    async showSaveDialog() {
-        this.currentAction = 'save';
-        this.div.d1('#save-title').text('SAVE GAME - SELECT SLOT');
-        await this.renderSlots();
-        this.show();
-    }
-    async showLoadDialog() {
-        this.currentAction = 'load';
-        this.isAutoLoadAtStartup = false;
-        this.div.d1('#save-title').text('LOAD GAME - SELECT SLOT');
-        await this.renderSlots();
-        this.show();
-    }
-    async showAutoLoadDialog() {
-        this.currentAction = 'load';
-        this.isAutoLoadAtStartup = true;
-        this.div.d1('#save-title').text('LOAD GAME - SELECT SLOT');
-        await this.renderSlots();
-        this.show();
-    }
-    async renderSlots() {
-        await this.renderEphemeralSave('imported', 'importedSave', 'Imported');
-        await this.renderEphemeralSave('exported', 'exportedSave', 'Exported');
-        const slots = await this.getSlotData();
-        this.div.d1('.slots').dList('.slot').updateFrom(slots, (slotDiv, slotData) => {
-            const index = slots.indexOf(slotData);
-            const slotNum = index + 1;
-            slotDiv.d1('.slot-number').text(slotNum.toString());
-            if (slotData.exists) {
-                slotDiv.d1('.slot-status').text(`Firehouse #${slotData.firehouseNum}`);
-                slotDiv.d1('.slot-details').text(`${slotData.count} firefighters - ${slotData.bytes}b`);
-                slotDiv.classed('slot-exists', true).classed('slot-empty', false);
-            }
-            else {
-                slotDiv.d1('.slot-status').text('Empty Slot');
-                slotDiv.d1('.slot-details').text('');
-                slotDiv.classed('slot-exists', false).classed('slot-empty', true);
-            }
-            slotDiv.onClick(() => this.selectSlot(slotNum));
-            slotDiv.d1('.slot-delete').on('click', async (event) => {
-                event.stopPropagation();
-                this.deleteSlot(slotNum);
-                await this.renderSlots();
-            });
-        });
-    }
-    async renderEphemeralSave(type, storageKey, displayName) {
-        const section = this.div.d1(`.${type}-save-section`);
-        if (this.currentAction === 'save') {
-            section.style('display', 'none');
-            return;
-        }
-        const data = this.getSaveData(storageKey);
-        if (!data) {
-            section.style('display', 'none');
-            return;
-        }
-        section.style('display', 'block');
-        const saveDiv = section.d1(`.${type}-save`);
-        const bytes = await (0,compress/* gzSize */.F8)(JSON.stringify(data));
-        const info = this.extractInfo(data);
-        saveDiv.d1('.slot-status').text(`Firehouse #${info.firehouseNum}`);
-        saveDiv.d1('.slot-details').text(`${info.count} firefighters - ${bytes}b`);
-        saveDiv.classed('slot-exists', true).classed('slot-empty', false);
-        saveDiv.onClick(() => this.loadEphemeralSave(storageKey, displayName));
-        saveDiv.d1('.slot-delete').on('click', async (event) => {
-            event.stopPropagation();
-            this.deleteEphemeralSave(storageKey, displayName);
-            await this.renderSlots();
-        });
-    }
-    extractInfo(data) {
-        if (data && data.firehouse) {
-            const fh = data.firehouse;
-            return { count: (fh.pawns || []).length, firehouseNum: fh.firehouseNum || 0 };
-        }
-        return { count: (data?.pawns || []).length, firehouseNum: data?.firehouseNum || 0 };
-    }
-    loadEphemeralSave(storageKey, displayName) {
-        const raw = storage/* storage */.I.get(storageKey);
-        if (!raw)
-            return;
-        try {
-            const parsed = JSON.parse(raw);
-            this.gameState.loadData(parsed);
-            storage/* storage */.I.remove(storageKey);
-            if (this.gameState.introSucceeded)
-                state/* FirehouseMode */.M.emit(this.gameState.firehouse.pawns);
-            this.isAutoLoadAtStartup = false;
-            this.hide();
-            console.log(`${displayName} save loaded`);
-        }
-        catch (e) {
-            console.error(`Failed to load ${displayName} save`, e);
-            console.error('Save JSON:', raw);
-            const archiveKey = `badSaves_${Date.now()}`;
-            storage/* storage */.I.set(archiveKey, raw);
-            storage/* storage */.I.remove(storageKey);
-            const err = new Error(`Failed to load ${displayName} save\narchived at ${archiveKey}`);
-            err.cause = e;
-            throw err;
-        }
-    }
-    deleteEphemeralSave(storageKey, displayName) {
-        storage/* storage */.I.remove(storageKey);
-        console.log(`${displayName} save deleted`);
-    }
-    getSaveData(storageKey) {
-        const data = storage/* storage */.I.get(storageKey);
-        if (!data)
-            return null;
-        try {
-            return JSON.parse(data);
-        }
-        catch {
-            return null;
-        }
-    }
-    selectSlot(slotNum) {
-        if (this.currentAction === 'save') {
-            this.saveToSlot(slotNum);
-        }
-        else {
-            this.loadFromSlot(slotNum);
-        }
-        this.isAutoLoadAtStartup = false;
-        this.hide();
-    }
-    saveToSlot(slotNum) {
-        const key = `gameState_${slotNum}`;
-        storage/* storage */.I.set(key, JSON.stringify(this.gameState.data()));
-        console.log(`Game saved to slot ${slotNum}`);
-    }
-    loadFromSlot(slotNum) {
-        const key = `gameState_${slotNum}`;
-        const raw = storage/* storage */.I.get(key);
-        if (!raw) {
-            console.log(`Starting fresh game (empty slot ${slotNum})`);
-            this.startFreshGame();
-            return;
-        }
-        try {
-            const parsed = JSON.parse(raw);
-            this.gameState.loadData(parsed);
-            if (this.gameState.introSucceeded)
-                state/* FirehouseMode */.M.emit(this.gameState.firehouse.pawns);
-            console.log(`Game loaded from slot ${slotNum}`);
-        }
-        catch (e) {
-            console.error(`Failed to load slot ${slotNum}`, e);
-            console.error('Save JSON:', raw);
-            const archiveKey = `badSaves_${slotNum}_${Date.now()}`;
-            storage/* storage */.I.set(archiveKey, raw);
-            storage/* storage */.I.remove(key);
-            const err = new Error(`Failed to load slot ${slotNum}\narchived at ${archiveKey}`);
-            err.cause = e;
-            throw err;
-        }
-    }
-    deleteSlot(slotNum) {
-        const key = `gameState_${slotNum}`;
-        storage/* storage */.I.remove(key);
-        console.log(`Deleted save slot ${slotNum}`);
-    }
-    startFreshGame() {
-        this.gameState.restartIntro();
-    }
-    hasSavedGames() {
-        return [1, 2, 3].some(slotNum => {
-            const key = `gameState_${slotNum}`;
-            return storage/* storage */.I.get(key) !== null;
-        }) || this.hasEphemeralSave('importedSave') || this.hasEphemeralSave('exportedSave');
-    }
-    hasEphemeralSave(storageKey) {
-        return storage/* storage */.I.get(storageKey) !== null;
-    }
-    async getSlotData() {
-        return Promise.all([1, 2, 3].map(async (slotNum) => {
-            const key = `gameState_${slotNum}`;
-            const raw = storage/* storage */.I.get(key);
-            if (!raw)
-                return { exists: false, count: 0, firehouseNum: 0, bytes: 0 };
-            const parsed = JSON.parse(raw);
-            const bytes = await (0,compress/* gzSize */.F8)(raw);
-            const info = this.extractInfo(parsed);
-            return {
-                exists: true,
-                count: info.count,
-                firehouseNum: info.firehouseNum,
-                bytes
-            };
-        }));
-    }
-    hide() {
-        super.hide();
-        this.isAutoLoadAtStartup = false;
-    }
-    modalKeyHandled(e) {
-        if (e.key >= '1' && e.key <= '3') {
-            this.selectSlot(parseInt(e.key));
-            return true;
-        }
-        return false;
-    }
-}
-
-;// ./src/html/branch-runner.html
-/* harmony default export */ const branch_runner = ("<div id=\"branch-runner-modal\" class=\"modal-window column gap-form\">\n    <h3 class=\"popup-title border-bottom\">BRANCH RUNNER</h3>\n    <div class=\"branch-actions\">\n        <button id=\"refresh-branches\" class=\"button-link\">Refresh</button>\n    </div>\n    <div class=\"branches\">\n        <div class=\"branch template branch-item\">\n            <div class=\"branch-info\">\n                <div class=\"branch-name\"></div>\n                <div class=\"branch-title\"></div>\n            </div>\n            <div class=\"branch-actions\">\n                <a class=\"button-link pr-link\" href=\"#\" target=\"_blank\">PR</a>\n                <button class=\"button-primary branch-run\">Run</button>\n            </div>\n        </div>\n    </div>\n    <div class=\"popup-actions\">\n        <button id=\"branch-cancel\" class=\"button-secondary\">Cancel</button>\n    </div>\n    <div class=\"progress-messages hidden\">\n        <div class=\"progress-title\">Running branch...</div>\n        <div class=\"progress-log\"></div>\n    </div>\n    <div class=\"popup-help-text\">\n        Click Run to test branch • Refresh to update list • ESC to cancel\n    </div>\n</div>\n");
-;// ./src/git.ts
-
-const apiCall = async (endpoint, data) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', `/api/git/${endpoint}`, true); // asynchronous
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    return new Promise((resolve, reject) => {
-        xhr.onload = () => {
-            if (xhr.status === 200) {
-                try {
-                    resolve(JSON.parse(xhr.responseText));
-                }
-                catch (e) {
-                    reject(new Error(`Failed to parse response: ${e}`));
-                }
-            }
-            else {
-                reject(new Error(`API call failed: ${xhr.statusText}`));
-            }
-        };
-        xhr.onerror = () => reject(new Error('Network error'));
-        xhr.ontimeout = () => reject(new Error('Request timeout'));
-        xhr.timeout = 30000; // 30 second timeout
-        try {
-            xhr.send(JSON.stringify(data || {}));
-        }
-        catch (error) {
-            reject(new Error(`Git API call failed: ${endpoint}\n${error.message}`));
-        }
-    });
-};
-const git = {
-    async fetchBranches() {
-        try {
-            await apiCall('fetch');
-        }
-        catch (error) {
-            (0,utils/* bomb */.fv)(`Failed to fetch branches: ${error.message}`);
-        }
-    },
-    async listCodexBranches() {
-        try {
-            const result = await apiCall('list-branches');
-            return result || { branches: [] };
-        }
-        catch (error) {
-            (0,utils/* bomb */.fv)(`Failed to list branches: ${error.message}`);
-            return { branches: [] };
-        }
-    },
-    async cloneRepo(targetDir) {
-        try {
-            await apiCall('clone', { targetDir });
-        }
-        catch (error) {
-            (0,utils/* bomb */.fv)(`Failed to clone repo: ${error.message}`);
-        }
-    },
-    async checkoutBranch(repoDir, branch) {
-        try {
-            await apiCall('checkout', { repoDir, branch });
-        }
-        catch (error) {
-            (0,utils/* bomb */.fv)(`Failed to checkout branch: ${error.message}`);
-        }
-    },
-    async startBranchServer(repoDir) {
-        try {
-            await apiCall('start-server', { repoDir });
-        }
-        catch (error) {
-            (0,utils/* bomb */.fv)(`Failed to start server: ${error.message}`);
-        }
-    },
-    async getBranchInfo() {
-        try {
-            const result = await apiCall('branch-info');
-            return result || { branch: 'main', hasChanges: false };
-        }
-        catch (error) {
-            (0,utils/* bomb */.fv)(`Failed to get branch info: ${error.message}`);
-            return { branch: 'main', hasChanges: false };
-        }
-    },
-    async killServer() {
-        await apiCall('kill-server');
-    }
-};
-
-;// ./src/ui/branch-runner.ts
-
-
-
-class BranchRunnerUI extends modal/* Modal */.a {
-    constructor() {
-        super('#branch-runner-modal');
-        this.branchTab = null;
-        this.isRunning = false;
-        this.div.appendFileHtml(branch_runner);
-        this.setupEventHandlers();
-    }
-    async showDialog() {
-        this.show();
-        await this.refreshBranches();
-    }
-    setupEventHandlers() {
-        this.div.d1('#branch-cancel').onClick(() => this.hide());
-        this.div.d1('#refresh-branches').onClick(() => void this.refreshBranches());
-    }
-    async refreshBranches() {
-        await git.fetchBranches();
-        const r = await git.listCodexBranches();
-        const b = r.branches || [];
-        this.div.d1('.branches').dList('.branch').updateFrom(b, (d, data) => {
-            const n = typeof data === 'string' ? data : data.branch;
-            const t = typeof data === 'string' ? '' : data.title;
-            const num = typeof data === 'string' ? 0 : data.number;
-            d.d1('.branch-name').text(n);
-            t ? d.d1('.branch-title').text(t).show() : d.d1('.branch-title').hide();
-            if (num > 0) {
-                const u = `https://github.com/${this.getRepoPath()}/pull/${num}`;
-                d.d1('.pr-link').href(u).show();
-            }
-            else
-                d.d1('.pr-link').hide();
-            const runBtn = d.d1('.branch-run');
-            runBtn.on('click', null).onClick(() => this.runBranch(n));
-            if (this.isRunning)
-                runBtn.disable(true).text('Running...');
-            else
-                runBtn.disable(false).text('Run');
-        });
-    }
-    async runBranch(branch) {
-        if (this.isRunning)
-            return;
-        this.isRunning = true;
-        const target = '/Users/jeffbay/src/firehouse-rl-branch';
-        this.div.d1('.branches').hide();
-        this.div.d1('.popup-actions').hide();
-        this.div.d1('.popup-help-text').hide();
-        this.div.d1('.progress-messages').show();
-        const log = this.div.d1('.progress-log');
-        const msg = (m) => { log.append('div').text(m); console.log(`Branch Runner: ${m}`); };
-        try {
-            msg('Stopping any existing server on port 8081...');
-            try {
-                await git.killServer();
-                msg('Server stopped (or was not running)');
-            }
-            catch (e) {
-                msg('No server was running to stop');
-            }
-            msg(`Cloning repository to ${target}...`);
-            await this.delay(100);
-            await git.cloneRepo(target);
-            msg('Repository ready');
-            msg(`Checking out branch: ${branch}`);
-            await this.delay(100);
-            await git.checkoutBranch(target, branch);
-            msg(`Branch ${branch} checked out and updated`);
-            msg('Starting webpack dev server on port 8081...');
-            await this.delay(100);
-            await git.startBranchServer(target);
-            msg('Server starting - waiting 5 seconds for full startup...');
-            await this.delay(5000);
-            msg('Opening branch in browser tab');
-            if (this.branchTab && !this.branchTab.closed) {
-                this.branchTab.location.href = 'http://localhost:8081';
-                this.branchTab.focus();
-            }
-            else
-                this.branchTab = window.open('http://localhost:8081', 'branch-testing');
-            msg('Branch server ready! Check browser tab.');
-            await this.delay(2000);
-            this.hide();
-            this.resetProgressUI();
-        }
-        catch (e) {
-            const m = e instanceof Error ? e.message : String(e);
-            msg(`Error: ${m}`);
-            msg('Check console for details. Click Cancel to close.');
-            console.error('Branch runner error:', e);
-        }
-        finally {
-            this.isRunning = false;
-        }
-    }
-    delay(ms) { return new Promise(r => setTimeout(r, ms)); }
-    resetProgressUI() {
-        this.div.d1('.progress-log').text('');
-        this.div.d1('.progress-messages').hide();
-        this.div.d1('.branches').show();
-        this.div.d1('.popup-actions').show();
-        this.div.d1('.popup-help-text').show();
-    }
-    getRepoPath() { return 'jlb0170/firehouse-rl'; }
-}
-
-// EXTERNAL MODULE: ./src/ui/play-controls.ts
-var play_controls = __webpack_require__(6488);
-// EXTERNAL MODULE: ./src/draw/fire.ts
-var fire = __webpack_require__(1267);
-// EXTERNAL MODULE: ./src/game/fires.ts
-var fires = __webpack_require__(6746);
-;// ./src/game/game.ts
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const GameStepped = new signal/* SignalWithCurrent */.Y();
-const LevelWon = new signal/* SignalWithCurrent */.Y();
-class Game {
-    constructor() {
-        this.running = false;
-        this.holding = false;
-        this.stepTimer = timer('step');
-        this.speed = 1;
-        this.showLighting = false;
-        this.showDarkness = false;
-        this.mutedLayers = new Set();
-        this.soloLayer = null;
-        this.helpSystem = new HelpSystem();
-        this.feedback = new feedback/* Feedback */.G();
-        this.envSwitch = new EnvSwitch();
-        this.setSpeed = (n) => {
-            this.speed = n;
-            if (this.running)
-                this.stepTimer.restartInMillis(this.delay(), this.tick);
-        };
-        this.delay = () => 350 / this.speed;
-        this.updateStepInfo = () => {
-            if (!GameStepped.current)
-                return;
-            const { frame, stepMs } = GameStepped.current;
-            const r = ui_renderer/* FrameRendered */.HO.current ?? 0;
-            (0,utils.$1)('step-frame').textContent = `${frame}`;
-            (0,utils.$1)('step-timing').textContent = `${stepMs}ms r${r}`;
-        };
-        this.updateFireCount = () => {
-            fires/* Fires */.UQ.decorate('fires');
-            fires/* Fires */.UQ.decorate('items');
-            fires/* Fires */.UQ.decorate('people');
-        };
-        this.keyDown = (e) => {
-            if (e.key === ' ') {
-                e.preventDefault();
-                if (this.holding)
-                    return;
-                this.holding = true;
-                if (LevelWon.current) {
-                    LevelWon.current = false;
-                    return;
-                }
-                if (this.map.uiRenderer.frozen())
-                    this.toggleFreeze();
-                if (!this.running)
-                    this.play();
-            }
-            else if (e.key === 'Escape') {
-                if (this.feedback.isVisible()) {
-                    this.feedback.hide();
-                }
-                else {
-                    this.closeHelp();
-                }
-            }
-            else if (e.key === 'ArrowLeft')
-                this.previousHelpPage();
-            else if (e.key === 'ArrowRight')
-                this.nextHelpPage();
-        };
-        this.keyUp = (e) => {
-            if (e.key === ' ' && this.holding) {
-                this.holding = false;
-                if (this.running)
-                    this.pause();
-            }
-        };
-        this.closeHelpOnOutsideClick = (e) => {
-            const popup = (0,utils.$1)('help-popup');
-            const target = e.target;
-            if (!popup.contains(target)) {
-                this.closeHelp();
-            }
-        };
-        this.tick = () => {
-            if (!this.running)
-                return;
-            this.step();
-            this.stepTimer.restartInMillis(this.delay(), this.tick);
-        };
-        this.chooseSwitchAction = () => this.envSwitch.show();
-        this.switchEnv = async () => {
-            const act = await this.chooseSwitchAction();
-            if (act === 'cancel')
-                return;
-            if (act === 'save' || act === 'push') {
-                this.state.save();
-                const gameStateData = storage/* storage */.I.get('gameState');
-                if (gameStateData)
-                    storage/* storage */.I.set('exportedSave', gameStateData);
-            }
-            let url = this.envDest();
-            if (act === 'push') {
-                const s = storage/* storage */.I.get('gameState');
-                if (s) {
-                    const g = await (0,compress/* gzip */.ZI)(s);
-                    alert(`Pushing ${(0,compress/* gzBytes */.vy)(g)} bytes`);
-                    url += '?import=' + encodeURIComponent(g);
-                    if ((0,compress/* longUrl */.wz)(url))
-                        alert('Save may exceed url length and be truncated');
-                }
-            }
-            location.href = url;
-        };
-        this.enterFirehouse = (pawns) => {
-            this.pause();
-            this.map.killAll();
-            this.map.display.clear();
-            this.map.smokeDisplay.clear();
-            this.map.uiRenderer.clearStrokes();
-            this.drawMap();
-            this.firehouse.open(this.state.firehouse.firehouseNum, pawns);
-        };
-        this.afterFirehouse = () => {
-            const models = this.state.firehouse.pawns;
-            const pawns = models.map(m => m.toPawn());
-            const opts = this.initializer.startNext(pawns);
-            this.resetCounters();
-            if (opts.showDarkness !== undefined)
-                this.showDarkness = opts.showDarkness;
-            this.updateDarknessToggleButton();
-            this.updateLightingEnabled();
-        };
-        this.map = new map/* Map */.T(config/* Config */.T.WIDTH, config/* Config */.T.HEIGHT);
-        window.map = this.map;
-        window.Fire = fire/* Fire */.v;
-        this.terminal = new Terminal();
-        this.ui = new UI(this.terminal, this.map);
-        this.attachToDOM();
-        this.setupPlayControls();
-        this.setupControls();
-        if ((0,utils/* isLocal */.IX)() && !(0,utils/* isBranchRunner */.ZL)()) {
-            this.branchRunner = new BranchRunnerUI();
-            (0,d3_extend.d1)('#branch-runner').show();
-        }
-        void this.showBranchInfo();
-        this.setupDebugControls();
-        this.updateEnvButton();
-        this.initializer = new initializer.Initializer(this.map);
-        this.initializer.initialize();
-        this.updateLightingEnabled();
-        this.drawMap();
-        this.updatePlayPauseButton();
-        this.updateFreezeButton();
-        this.updateStepInfo();
-        this.updateFireCount();
-        document.addEventListener('keydown', this.keyDown);
-        document.addEventListener('keyup', this.keyUp);
-        ui_renderer/* RedrawMap */.iQ.on(() => this.drawMap());
-        ui_renderer/* FrameRendered */.HO.on(() => this.updateStepInfo());
-        fires/* BurningCountersUpdated */.EZ.on(() => this.updateFireCount());
-        this.state = new state/* GameState */.m(this.map);
-        modal/* ModalShowing */.r.on(s => {
-            if (s) {
-                this.pauseForModal();
-                this.map.uiRenderer.freeze();
-            }
-            else {
-                this.map.uiRenderer.unfreeze();
-                this.resumeFromModal();
-            }
-        });
-        this.saveSlots = new SaveSlots(this.state);
-        this.firehouse = new firehouse/* FirehouseModal */._();
-        state/* FirehouseMode */.M.on(this.enterFirehouse);
-        firehouse/* FirehouseClosed */.F.on(this.afterFirehouse);
-        // Auto-show load dialog if saves exist, otherwise start normally
-        if (this.saveSlots.hasSavedGames()) {
-            this.saveSlots.showAutoLoadDialog();
-        }
-        else {
-            this.state.load();
-        }
-        GameStepped.emit({ frame: 0, stepMs: 0 });
-    }
-    resetCounters() {
-        GameStepped.emit({ frame: 0, stepMs: 0 });
-        ui_renderer/* FrameRendered */.HO.emit(0);
-        this.updateStepInfo();
-    }
-    attachToDOM() {
-        const container = (0,utils.$1)('game-container');
-        container.style.position = 'relative';
-        this.map.display.attachTo(container, { display: 'block', zIndex: '1' });
-        this.map.smokeDisplay.attachTo(container, { position: 'absolute', top: '0', left: '0', zIndex: '2', pointerEvents: 'none' });
-        this.map.uiRenderer.attachTo(container, { position: 'absolute', top: '0', left: '0', zIndex: '3', pointerEvents: 'none' });
-        this.map.onMousemove(this.ui.onMouseMove);
-        this.map.onClick(this.ui.onClick);
-    }
-    setupPlayControls() {
-        this.playControls = new play_controls/* PlayControls */.j('#play-wrapper', {
-            onPlayPause: () => this.togglePlayPause(),
-            onSpeedChange: (speed) => this.setSpeed(speed),
-            getIsRunning: () => this.running
-        });
-    }
-    setupControls() {
-        (0,utils/* onClick */.Af)((0,utils.$1)('next-button'), () => this.step());
-        (0,utils/* onClick */.Af)((0,utils.$1)('freeze-button'), () => this.toggleFreeze());
-        (0,utils/* onClick */.Af)((0,utils.$1)('help-button'), e => {
-            e.stopPropagation();
-            this.toggleHelp();
-        });
-        (0,utils/* onClick */.Af)((0,utils.$1)('feedback-button'), e => {
-            e.stopPropagation();
-            this.showFeedback();
-        });
-    }
-    setupDebugControls() {
-        (0,utils/* onClick */.Af)((0,utils.$1)('debug-toggle'), () => (0,utils/* toggleHidden */.N2)((0,utils.$1)('debug-controls')));
-        (0,utils/* onClick */.Af)((0,utils.$1)('lighting-toggle'), () => this.toggleLighting());
-        (0,utils/* onClick */.Af)((0,utils.$1)('darkness-toggle'), () => this.toggleDarkness());
-        (0,utils/* onClick */.Af)((0,utils.$1)('layer-on'), () => this.turnOnAllLayers());
-        (0,utils/* onClick */.Af)((0,utils.$1)('layer-off'), () => this.turnOffAllLayers());
-        (0,utils/* onClick */.Af)((0,utils.$1)('load-game'), () => this.saveSlots.showLoadDialog());
-        (0,utils/* onClick */.Af)((0,utils.$1)('save-game'), () => this.saveSlots.showSaveDialog());
-        (0,utils/* onClick */.Af)((0,utils.$1)('new-game'), () => this.confirmNewGame());
-        (0,utils/* onClick */.Af)((0,utils.$1)('draw-button'), () => { location.href = location.pathname + '?mode=editor'; });
-        (0,utils/* onClick */.Af)((0,utils.$1)('switch-env'), this.switchEnv);
-        if (this.branchRunner) {
-            (0,utils/* onClick */.Af)((0,utils.$1)('branch-runner'), () => void this.branchRunner.showDialog());
-        }
-        this.createLayerButtons();
-        game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
-            (0,utils/* onClick */.Af)((0,utils.$1)(`layer-${layerName}`), () => this.toggleLayerVisibility(layerName));
-        });
-    }
-    updatePlayPauseButton() {
-        this.playControls.updatePlayPauseButton();
-    }
-    updateFreezeButton() {
-        const button = (0,utils.$1)('freeze-button');
-        button.textContent = this.map.uiRenderer.frozen() ? '🧊' : '❄️';
-    }
-    resetFrameCounter() {
-        GameStepped.emit({ frame: 0, stepMs: 0 });
-    }
-    togglePlayPause() {
-        if (this.map.uiRenderer.frozen()) {
-            this.toggleFreeze();
-        }
-        if (this.running)
-            this.pause();
-        else
-            this.play();
-    }
-    toggleFreeze() {
-        if (this.map.uiRenderer.frozen()) {
-            this.map.uiRenderer.unfreeze();
-        }
-        else {
-            if (this.running)
-                this.pause();
-            this.map.uiRenderer.freeze();
-        }
-        this.updateFreezeButton();
-    }
-    toggleHelp() {
-        const popup = (0,utils.$1)('help-popup');
-        if (popup.classList.contains('hidden')) {
-            if (this.running)
-                this.pause();
-            this.loadHelp();
-            popup.classList.remove('hidden');
-            setTimeout(() => {
-                document.addEventListener('click', this.closeHelpOnOutsideClick);
-            }, 10);
-        }
-        else {
-            this.closeHelp();
-        }
-    }
-    closeHelp() {
-        const popup = (0,utils.$1)('help-popup');
-        popup.classList.add('hidden');
-        document.removeEventListener('click', this.closeHelpOnOutsideClick);
-    }
-    loadHelp() {
-        this.helpSystem.resetToFirstPage();
-        this.updateHelpDisplay();
-    }
-    showFeedback() {
-        if (this.running)
-            this.pause();
-        this.feedback.show();
-    }
-    pauseForModal() {
-        if (this.running)
-            this.pause();
-    }
-    resumeFromModal() {
-        // Game stays paused - user can resume manually if they want
-    }
-    updateHelpDisplay() {
-        const content = this.helpSystem.getCurrentPage();
-        const pageInfo = this.helpSystem.getPageInfo();
-        (0,utils.$1)('help-content').innerHTML = pageInfo + content;
-    }
-    nextHelpPage() {
-        if (!(0,utils.$1)('help-popup').classList.contains('hidden')) {
-            if (this.helpSystem.nextPage()) {
-                this.updateHelpDisplay();
-            }
-        }
-    }
-    previousHelpPage() {
-        if (!(0,utils.$1)('help-popup').classList.contains('hidden')) {
-            if (this.helpSystem.previousPage()) {
-                this.updateHelpDisplay();
-            }
-        }
-    }
-    pause() {
-        if (!this.running)
-            return;
-        this.running = false;
-        this.stepTimer.stop();
-        this.updatePlayPauseButton();
-    }
-    play() {
-        if (this.running)
-            return;
-        this.running = true;
-        this.tick();
-        this.updatePlayPauseButton();
-    }
-    step() {
-        const start = Date.now();
-        this.map.step();
-        this.map.lighting.redraw();
-        this.drawMap();
-        ui_renderer/* Repaint */.G2.emit();
-        const stepMs = Date.now() - start;
-        const frame = (GameStepped.current?.frame || 0) + 1;
-        GameStepped.emit({ frame, stepMs });
-        this.updateStepInfo();
-    }
-    drawMap() {
-        this.map.lighting.redraw(); // Update colors more frequently for flickering effect
-        const visibleLayers = this.getVisibleLayers();
-        const showNothing = this.mutedLayers.size === game_layers/* CellLayers */.v.layerNames.length;
-        const debug = this.mutedLayers.size > 0 || this.soloLayer !== null;
-        this.map.draw(this.showLighting, visibleLayers, showNothing, debug, this.showDarkness);
-    }
-    getVisibleLayers() {
-        if (this.soloLayer) {
-            return new Set([this.soloLayer]);
-        }
-        if (this.mutedLayers.size === 0) {
-            return new Set();
-        }
-        return new Set(game_layers/* CellLayers */.v.layerNames.filter(layer => !this.mutedLayers.has(layer)));
-    }
-    updateLightingEnabled() {
-        if (this.showLighting || this.showDarkness) {
-            this.map.lighting.enable();
-            this.map.lighting.redraw();
-        }
-        else
-            this.map.lighting.disable();
-    }
-    toggleLighting() {
-        this.showLighting = !this.showLighting;
-        const button = (0,utils.$1)('lighting-toggle');
-        button.textContent = this.showLighting ? 'LT*' : 'LT';
-        this.updateLightingEnabled();
-        this.drawMap();
-    }
-    toggleDarkness() {
-        this.showDarkness = !this.showDarkness;
-        const button = (0,utils.$1)('darkness-toggle');
-        button.textContent = this.showDarkness ? 'DK*' : 'DK';
-        this.updateLightingEnabled();
-        this.drawMap();
-    }
-    toggleLayerVisibility(layerName) {
-        const button = (0,utils.$1)(`layer-${layerName}`);
-        if (this.soloLayer === layerName) {
-            this.soloLayer = null;
-            button.classList.remove('solo');
-        }
-        else if (this.soloLayer) {
-            const oldButton = (0,utils.$1)(`layer-${this.soloLayer}`);
-            oldButton.classList.remove('solo');
-            this.soloLayer = layerName;
-            button.classList.add('solo');
-        }
-        else if (this.mutedLayers.has(layerName)) {
-            this.mutedLayers.delete(layerName);
-            button.classList.remove('muted');
-        }
-        else {
-            this.mutedLayers.add(layerName);
-            button.classList.add('muted');
-        }
-        this.drawMap();
-    }
-    turnOnAllLayers() {
-        this.mutedLayers.clear();
-        this.soloLayer = null;
-        game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
-            const button = (0,utils.$1)(`layer-${layerName}`);
-            button.classList.remove('muted', 'solo');
-        });
-        this.drawMap();
-    }
-    turnOffAllLayers() {
-        this.soloLayer = null;
-        this.mutedLayers = new Set(game_layers/* CellLayers */.v.layerNames);
-        game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
-            const button = (0,utils.$1)(`layer-${layerName}`);
-            button.classList.remove('solo');
-            button.classList.add('muted');
-        });
-        this.drawMap();
-    }
-    createLayerButtons() {
-        const layerGroup = (0,utils.$1)('layer-group');
-        const layerAbbrevs = (0,utils/* toMap */.J9)(game_layers/* CellLayers */.v.layerNames, name => name.slice(0, 3));
-        game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
-            const button = document.createElement('button');
-            button.id = `layer-${layerName}`;
-            button.className = 'button-secondary';
-            button.textContent = layerAbbrevs[layerName] || layerName.slice(0, 3);
-            layerGroup.appendChild(button);
-        });
-    }
-    envDest() {
-        return location.host.includes('github.io') ? 'http://localhost:8080' : 'https://jlb0170.github.io/firehouse-rl-play/';
-    }
-    updateEnvButton() {
-        (0,utils.$1)('switch-env').textContent = location.host.includes('github.io') ? 'LCL' : 'PROD';
-    }
-    updateDarknessToggleButton() {
-        const button = (0,utils.$1)('darkness-toggle');
-        button.textContent = this.showDarkness ? 'DK*' : 'DK';
-    }
-    async showBranchInfo() {
-        const d = (0,d3_extend.d1)('#branch-info');
-        if ((0,utils/* isLocal */.IX)()) {
-            try {
-                const { branch, hasChanges } = await git.getBranchInfo();
-                if (branch === 'main' || branch === 'master')
-                    d.hide();
-                else
-                    d.text(`Branch: ${branch}${hasChanges ? ' (uncommitted changes)' : ''}`).show();
-            }
-            catch (e) {
-                console.error('showBranchInfo', e);
-            }
-        }
-        else {
-            try {
-                const response = await fetch('./build-info.txt');
-                if (response.ok) {
-                    const text = await response.text();
-                    console.log('build', text);
-                    const sha = text.match(/Git SHA: (\w+)/)?.[1];
-                    const commit = text.match(/Commit: (.+)/)?.[1];
-                    if (sha) {
-                        const display = commit ? `Prod: ${sha} - ${commit}` : `Prod: ${sha}`;
-                        d.text(display).show();
-                    }
-                }
-            }
-            catch (e) {
-            }
-        }
-    }
-    confirmNewGame() {
-        const ok = confirm('Start a new game?\nThis will abandon your current progress.');
-        if (!ok)
-            return;
-        this.resetCounters();
-        this.state.restartIntro();
-    }
-}
 
 
 /***/ }),
@@ -11064,8 +9572,8 @@ var shapes = __webpack_require__(3720);
 var display = __webpack_require__(7328);
 // EXTERNAL MODULE: ./src/ui/ui-renderer.ts
 var ui_renderer = __webpack_require__(9889);
-// EXTERNAL MODULE: ./src/game/drawable-types.ts + 1 modules
-var drawable_types = __webpack_require__(1073);
+// EXTERNAL MODULE: ./src/game/drawable-types.ts + 3 modules
+var drawable_types = __webpack_require__(1363);
 ;// ./src/game/map.ts
 
 
@@ -11353,326 +9861,6 @@ class Display {
             if (game_xy.XY.oob(xy.x, xy.y))
                 return;
             callback(xy);
-        });
-    }
-}
-
-
-/***/ }),
-
-/***/ 7349:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-// ESM COMPAT FLAG
-__webpack_require__.r(__webpack_exports__);
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  Initializer: () => (/* binding */ Initializer)
-});
-
-// EXTERNAL MODULE: ./src/game/xy.ts
-var xy = __webpack_require__(88);
-// EXTERNAL MODULE: ./src/game/rect.ts
-var rect = __webpack_require__(6893);
-// EXTERNAL MODULE: ./src/draw/wall.ts
-var wall = __webpack_require__(239);
-// EXTERNAL MODULE: ./src/draw/floor.ts
-var floor = __webpack_require__(9177);
-// EXTERNAL MODULE: ./src/draw/lamp.ts
-var lamp = __webpack_require__(225);
-// EXTERNAL MODULE: ./src/utils.ts
-var utils = __webpack_require__(6185);
-// EXTERNAL MODULE: ./src/draw/pawn.ts + 1 modules
-var pawn = __webpack_require__(2705);
-// EXTERNAL MODULE: ./src/draw/fire.ts
-var fire = __webpack_require__(1267);
-// EXTERNAL MODULE: ./src/ui/text-stroke.ts
-var text_stroke = __webpack_require__(1485);
-// EXTERNAL MODULE: ./src/game/game.ts + 20 modules
-var game = __webpack_require__(4873);
-// EXTERNAL MODULE: ./src/game/state.ts + 1 modules
-var state = __webpack_require__(9308);
-// EXTERNAL MODULE: ./src/game/capabilities.ts
-var capabilities = __webpack_require__(3793);
-;// ./src/game/names.ts
-const firsts = "Mary,Anna,Emma,Elizabeth,Minnie,Margaret,Ida,Alice,Bertha,Sarah,Annie,Clara,Ella,Florence,Cora,Martha,Laura,Nellie,Grace,Carrie,Maude,Mabel,Bessie,Jennie,Gertrude,Julia,Hattie,Edith,Mattie,Rose,Catherine,Lillian,Ada,Lillie,Helen,Jessie,Louise,Ethel,Lula,Myrtle,Eva,Frances,Lena,Lucy,Edna,Maggie,Pearl,Daisy,Fannie,Josephine,Dora,Rosa,Katherine,Agnes,Marie,Nora,May,Mamie,Blanche,Stella,Ellen,Nancy,Effie,Sallie,Nettie,Della,Lizzie,Flora,Susie,Maud,Mae,Etta,Harriet,Sadie,Caroline,Katie,Lydia,Elsie,Kate,Susan,Mollie,Alma,Addie,Georgia,Eliza,Lulu,Nannie,Lottie,Amanda,Belle,Charlotte,Rebecca,Ruth,Viola,Olive,Amelia,Hannah,Jane,Virginia,Emily,Matilda,Irene,Kathryn,Esther,Willie,Henrietta,Ollie,Amy,Rachel,Sara,Estella,Theresa,Augusta,Ora,Pauline,Josie,Lola,Sophia,Leona,Anne,Mildred,Ann,Beulah,Callie,Lou,Delia,Eleanor,Barbara,Iva,Louisa,Maria,Mayme,Evelyn,Estelle,Nina,Betty,Marion,Bettie,Dorothy,Luella,Inez,Lela,Rosie,Allie,Millie,Janie,Cornelia,Victoria,Ruby,Winifred,Alta,Celia,Christine,Beatrice,Birdie,Harriett,Mable,Myra,Sophie,Tillie,Isabel,Sylvia,Carolyn,Isabelle,Leila,Sally,Ina,Essie,Bertie,Nell,Alberta,Katharine,Lora,Rena,Mina,Rhoda,Mathilda,Abbie,Eula,Dollie,Hettie,Eunice,Fanny,Ola,Lenora,Adelaide,Christina,Lelia,Nelle,Sue,Johanna,Lilly,Lucinda,Minerva,Lettie,Roxie,Cynthia,Helena,Hilda,Hulda,Bernice,Genevieve,Jean,Cordelia,Marian,Francis,Jeanette,Adeline,Gussie,Leah,Lois,Lura,Mittie,Hallie,Isabella,Olga,Phoebe,Teresa,Hester,Lida,Lina,Winnie,Claudia,Marguerite,Vera,Cecelia,Bess,Emilie,John,Rosetta,Verna,Myrtie,Cecilia,Elva,Olivia,Ophelia,Georgie,Elnora,Violet,Adele,Lily,Linnie,Loretta,Madge,Polly,Virgie,Eugenia,Lucile,Lucille,Mabelle,Rosalie,Kittie,Meta,Angie,Dessie,Georgiana,Lila,Regina,Selma,Wilhelmina,Bridget,Lilla,Malinda,Vina,Freda,Gertie,Jeannette,Louella,Mandy,Roberta,Cassie,Corinne,Ivy,Melissa,Lyda,Naomi,Norma,Bell,Margie,Nona,Zella,Dovie,Elvira,Erma,Irma,Leota,William,Artie,Blanch,Charity,Lorena,Lucretia,Orpha,Alvina,Annette,Catharine,Elma,Geneva,Janet,Lee,Leora,Lona,Miriam,Zora,Linda,Octavia,Sudie,Zula,Adella,Alpha,Frieda,George,Joanna,Leonora,Priscilla,Tennie,Angeline,Docia,Ettie,Flossie,Hanna,Letha,Minta,Retta,Rosella,Adah,Berta,Elisabeth,Elise,Goldie,Leola,Margret,Adaline,Floy,Idella,Juanita,Lenna,Lucie,Missouri,Nola,Zoe,Eda,Isabell,James,Julie,Letitia,Madeline,Malissa,Mariah,Pattie,Vivian,Almeda,Aurelia,Claire,Dolly,Hazel,Jannie,Kathleen,Kathrine,Lavinia,Marietta,Melvina,Ona,Pinkie,Samantha,Susanna,Chloe,Donnie,Elsa,Gladys,Matie,Pearle,Vesta,Vinnie,Antoinette,Clementine,Edythe,Harriette,Libbie,Lilian,Lue,Lutie,Magdalena,Meda,Rita,Tena,Zelma,Adelia,Annetta,Antonia,Dona,Elizebeth,Georgianna,Gracie,Iona,Lessie,Leta,Liza,Mertie,Molly,Neva,Oma,Alida,Alva,Cecile,Cleo,Donna,Ellie,Ernestine,Evie,Frankie,Helene,Minna,Myrta,Prudence,Queen,Rilla,Savannah,Tessie,Tina,Agatha,America,Anita,Arminta,Dorothea,Ira,Luvenia,Marjorie,Maybelle,Mellie,Nan,Pearlie,Sidney,Velma,Clare,Constance,Dixie,Ila,Iola,Jimmie,Louvenia,Lucia,Ludie,Luna,Metta,Patsy,Phebe,Sophronia,Adda,Avis,Betsy,Bonnie,Cecil,Cordie,Emmaline,Ethelyn,Hortense,June,Louie,Lovie,Marcella,Melinda,Mona,Odessa,Veronica,Aimee,Annabel,Ava,Bella,Carolina,Cathrine,Christena,Clyde,Dena,Dolores,Eleanore,Elmira,Fay,Frank,Jenny,Kizzie,Lonnie,Loula,Magdalene,Mettie,Mintie,Peggy,Reba,Serena,Vida,Zada,Abigail,Celestine,Celina,Claudie,Clemmie,Connie,Daisie,Deborah,Dessa,Easter,Eddie,Emelia,Emmie,Imogene,India,Jeanne,Joan,Lenore,Liddie,Lotta,Mame,Nevada,Rachael,Robert,Sina,Willa,Aline,Beryl,Charles,Daisey,Dorcas,Edmonia,Effa,Eldora,Eloise,Emmer,Era,Gena,Henry,Iris,Izora,Lennie,Lissie,Mallie,Malvina,Mathilde,Mazie,Queenie,Rosina,Salome,Theodora,Therese,Vena,Wanda,Wilda,Altha,Anastasia,Besse,Bird,Birtie,Clarissa,Claude,Delilah,Diana,Emelie,Erna,Fern,Florida,Frona,Hilma,Joseph,Juliet,Leonie,Lugenia,Mammie,Manda,Manerva,Manie,Nella,Paulina,Philomena,Rae,Selina,Sena,Theodosia,Tommie,Una,Vernie,Adela,Althea,Amalia,Amber,Angelina,Annabelle,Anner,Arie,Clarice,Corda,Corrie,Dell,Dellar,Donie,Doris,Elda,Elinor,Emeline,Emilia,Esta,Estell,Etha,Fred,Hope,Indiana,Ione,Jettie,Johnnie,Josiephine,Kitty,Lavina,Leda,Letta,Mahala,Marcia,Margarette,Maudie,Maye,Norah,Oda,Patty,Paula,Permelia,Rosalia,Roxanna,Sula,Vada,Winnifred,Adline,Almira,Alvena,Arizona,Becky,Bennie,Bernadette,Camille,Cordia,Corine,Dicie,Dove,Drusilla,Elena,Elenora,Elmina,Ethyl,Evalyn,Evelina,Faye,Huldah,Idell,Inga,Irena,Jewell,Kattie,Lavenia,Leslie,Lovina,Lulie,Magnolia,Margeret,Margery,Media,Millicent,Nena,Ocie,Orilla,Osie,Pansy,Ray,Rosia,Rowena,Shirley,Tabitha,Thomas,Verdie,Walter,Zetta,Zoa,Zona,Albertina,Albina,Alyce,Amie,Angela,Annis,Carol,Carra,Clarence,Clarinda,Delphia,Dillie,Doshie,Drucilla,Etna,Eugenie,Eulalia,Eve,Felicia,Florance,Fronie,Geraldine,Gina,Glenna,Grayce,Hedwig,Jessica,Jossie,Katheryn,Katy,Lea,Leanna,Leitha,Leone,Lidie,Loma,Lular,Magdalen,Maymie,Minervia,Muriel,Neppie,Olie,Onie,Osa,Otelia,Paralee,Patience,Rella,Rillie,Rosanna,Theo,Tilda,Tishie,Tressa,Viva,Yetta,Zena,Zola,Abby,Aileen,Alba,Alda,Alla,Alverta,Ara,Ardelia,Ardella,Arrie,Arvilla,Augustine,Aurora,Bama,Bena,Byrd,Calla,Camilla,Carey,Carlotta,Celestia,Cherry,Cinda,Classie,Claudine,Clemie,Clifford,Clyda,Creola,Debbie,Dee,Dinah,Doshia,Ednah,Edyth,Eleanora,Electa,Eola,Erie,Eudora,Euphemia,Evalena,Evaline,Faith,Fidelia,Freddie,Golda,Harry,Helma,Hermine,Hessie,Ivah,Janette,Jennette,Joella,Kathryne,Lacy,Lanie,Lauretta,Leana,Leatha,Leo,Liller,Lillis,Louetta,Madie,Mai,Martina,Maryann,Melva,Mena,Mercedes,Merle,Mima,Minda,Monica,Nealie,Netta,Nolia,Nonie,Odelia,Ottilie,Phyllis,Robbie,Sabina,Sada,Sammie,Suzanne,Sybilla,Thea,Tressie,Vallie,Venie,Viney,Wilhelmine,Winona,Zelda,Zilpha,Adelle,Adina,Adrienne,Albertine,Alys,Ana,Araminta,Arthur,Birtha,Bulah,Caddie,Celie,Charlotta,Clair,Concepcion,Cordella,Corrine,Delila,Delphine,Dosha,Edgar,Elaine,Elisa,Ellar,Elmire,Elvina,Ena,Estie,Etter,Fronnie,Genie,Georgina,Glenn,Gracia,Guadalupe,Gwendolyn,Hassie,Honora,Icy,Isa,Isadora,Jesse,Jewel,Joe,Johannah,Juana,Judith,Judy,Junie,Lavonia,Lella,Lemma,Letty,Linna,Littie,Lollie,Lorene,Louis,Love,Lovisa,Lucina,Lynn,Madora,Mahalia,Manervia,Manuela,Margarett,Margaretta,Margarita,Marilla,Mignon,Mozella,Natalie,Nelia,Nolie,Omie,Opal,Ossie,Ottie,Ottilia,Parthenia,Penelope,Pinkey,Pollie,Rennie,Reta,Roena,Rosalee,Roseanna,Ruthie,Sabra,Sannie,Selena,Sibyl,Tella,Tempie,Tennessee,Teressa,Texas,Theda,Thelma,Thursa,Ula,Vannie,Verona,Vertie,Wilma,John,William,James,Charles,George,Frank,Joseph,Thomas,Henry,Robert,Edward,Harry,Walter,Arthur,Fred,Albert,Samuel,David,Louis,Joe,Charlie,Clarence,Richard,Andrew,Daniel,Ernest,Will,Jesse,Oscar,Lewis,Peter,Benjamin,Frederick,Willie,Alfred,Sam,Roy,Herbert,Jacob,Tom,Elmer,Carl,Lee,Howard,Martin,Michael,Bert,Herman,Jim,Francis,Harvey,Earl,Eugene,Ralph,Ed,Claude,Edwin,Ben,Charley,Paul,Edgar,Isaac,Otto,Luther,Lawrence,Ira,Patrick,Guy,Oliver,Theodore,Hugh,Clyde,Alexander,August,Floyd,Homer,Jack,Leonard,Horace,Marion,Philip,Allen,Archie,Stephen,Chester,Willis,Raymond,Rufus,Warren,Jessie,Milton,Alex,Leo,Julius,Ray,Sidney,Bernard,Dan,Jerry,Calvin,Perry,Dave,Anthony,Eddie,Amos,Dennis,Clifford,Leroy,Wesley,Alonzo,Garfield,Franklin,Emil,Leon,Nathan,Harold,Matthew,Levi,Moses,Everett,Lester,Winfield,Adam,Lloyd,Mack,Fredrick,Jay,Jess,Melvin,Noah,Aaron,Alvin,Norman,Gilbert,Elijah,Victor,Gus,Nelson,Jasper,Silas,Jake,Christopher,Mike,Percy,Adolph,Maurice,Cornelius,Felix,Reuben,Wallace,Claud,Roscoe,Sylvester,Earnest,Hiram,Otis,Simon,Willard,Irvin,Mark,Jose,Wilbur,Abraham,Virgil,Clinton,Elbert,Leslie,Marshall,Owen,Wiley,Anton,Morris,Manuel,Phillip,Augustus,Emmett,Eli,Nicholas,Wilson,Alva,Harley,Newton,Timothy,Marvin,Ross,Curtis,Edmund,Jeff,Elias,Harrison,Stanley,Columbus,Lon,Ora,Ollie,Pearl,Russell,Solomon,Arch,Asa,Clayton,Enoch,Irving,Mathew,Nathaniel,Scott,Hubert,Lemuel,Andy,Ellis,Emanuel,Joshua,Millard,Vernon,Wade,Cyrus,Miles,Rudolph,Sherman,Austin,Bill,Chas,Lonnie,Monroe,Byron,Edd,Emery,Grant,Jerome,Max,Mose,Steve,Gordon,Abe,Pete,Chris,Clark,Gustave,Orville,Lorenzo,Bruce,Marcus,Preston,Bob,Dock,Donald,Jackson,Cecil,Barney,Delbert,Edmond,Anderson,Christian,Glenn,Jefferson,Luke,Neal,Burt,Ike,Myron,Tony,Conrad,Joel,Matt,Riley,Vincent,Emory,Isaiah,Nick,Ezra,Green,Juan,Clifton,Lucius,Porter,Arnold,Bud,Jeremiah,Taylor,Forrest,Roland,Spencer,Burton,Don,Emmet,Gustav,Louie,Morgan,Ned,Van,Ambrose,Chauncey,Elisha,Ferdinand,General,Julian,Kenneth,Mitchell,Allie,Josh,Judson,Lyman,Napoleon,Pedro,Berry,Dewitt,Ervin,Forest,Lynn,Pink,Ruben,Sanford,Ward,Douglas,Ole,Omer,Ulysses,Walker,Wilbert,Adelbert,Benjiman,Ivan,Jonas,Major,Abner,Archibald,Caleb,Clint,Dudley,Granville,King,Mary,Merton,Antonio,Bennie,Carroll,Freeman,Josiah,Milo,Royal,Dick,Earle,Elza,Emerson,Fletcher,Judge,Laurence,Roger,Seth,Glen,Hugo,Jimmie,Johnnie,Neil,Washington,Elwood,Gust,Harmon,Jordan,Simeon,Wayne,Wilber,Clem,Evan,Frederic,Irwin,Junius,Lafayette,Loren,Madison,Mason,Orval,Abram,Aubrey,Elliott,Hans,Karl,Minor,Wash,Wilfred,Allan,Alphonse,Dallas,Dee,Isiah,Jason,Johnny,Lawson,Lew,Micheal,Orin,Addison,Cal,Erastus,Francisco,Hardy,Lucien,Randolph,Stewart,Vern,Wilmer,Zack,Adrian,Alvah,Bertram,Clay,Ephraim,Fritz,Giles,Grover,Harris,Isom,Jesus,Johnie,Jonathan,Lucian,Malcolm,Merritt,Otho,Perley,Rolla,Sandy,Tomas,Wilford,Adolphus,Angus,Arther,Carlos,Cary,Cassius,Davis,Hamilton,Harve,Israel,Leander,Melville,Merle,Murray,Pleasant,Sterling,Steven,Axel,Boyd,Bryant,Clement,Erwin,Ezekiel,Foster,Frances,Geo,Houston,Issac,Jules,Larkin,Mat,Morton,Orlando,Pierce,Prince,Rollie,Rollin,Sim,Stuart,Wilburn,Bennett,Casper,Christ,Dell,Egbert,Elmo,Fay,Gabriel,Hector,Horatio,Lige,Saul,Smith,Squire,Tobe,Tommie,Wyatt,Alford,Alma,Alton,Andres,Burl,Cicero,Dean,Dorsey,Enos,Howell,Lou,Loyd,Mahlon,Nat,Omar,Oran,Parker,Raleigh,Reginald,Rubin,Seymour,Wm,Young,Benjamine,Carey,Carlton,Eldridge,Elzie,Garrett,Isham,Johnson,Larry,Logan,Merrill,Mont,Oren,Pierre,Rex,Rodney,Ted,Webster,West,Wheeler,Willam,Al,Aloysius,Alvie,Anna,Art,Augustine,Bailey,Benjaman,Beverly,Bishop,Clair,Cloyd,Coleman,Dana,Duncan,Dwight,Emile,Evert,Henderson,Hunter,Jean,Lem,Luis,Mathias,Maynard,Miguel,Mortimer,Nels,Norris,Pat,Phil,Rush,Santiago,Sol,Sydney,Thaddeus,Thornton,Tim,Travis,Truman,Watson,Webb,Wellington,Winfred,Wylie,Alec,Basil,Baxter,Bertrand,Buford,Burr,Cleveland,Colonel,Dempsey,Early,Ellsworth,Fate,Finley,Gabe,Garland,Gerald,Herschel,Hezekiah,Justus,Lindsey,Marcellus,Olaf,Olin,Pablo,Rolland,Turner,Verne,Volney,Williams,Almon,Alois,Alonza,Anson,Authur,Benton,Billie,Cornelious,Darius,Denis,Dillard,Doctor,Elvin,Emma,Eric,Evans,Gideon,Haywood,Hilliard,Hosea,Lincoln,Lonzo,Lucious,Lum,Malachi,Newt,Noel,Orie,Palmer,Pinkney,Shirley,Sumner,Terry,Urban,Uriah,Valentine,Waldo,Warner,Wong,Zeb,Abel,Alden,Archer,Avery,Carson,Cullen,Doc,Eben,Elige,Elizabeth,Elmore,Ernst,Finis,Freddie,Godfrey,Guss,Hamp,Hermann,Isadore,Isreal,Jones,June,Lacy,Lafe,Leland,Llewellyn,Ludwig,Manford,Maxwell,Minnie,Obie,Octave,Orrin,Ossie,Oswald,Park,Parley,Ramon,Rice,Stonewall,Theo,Tillman,Addie,Aron,Ashley,Bernhard,Bertie,Berton,Buster,Butler,Carleton,Carrie,Clara,Clarance,Clare,Crawford,Danial,Dayton,Dolphus,Elder,Ephriam,Fayette,Felipe,Fernando,Flem,Florence,Ford,Harlan,Hayes,Henery,Hoy,Huston,Ida,Ivory,Jonah,Justin,Lenard,Leopold,Lionel,Manley,Marquis,Marshal,Mart,Odie,Olen,Oral,Orley,Otha,Press,Price,Quincy,Randall,Rich,Richmond,Romeo,Russel,Rutherford,Shade,Shelby,Solon,Thurman,Tilden,Troy,Woodson,Worth,Aden,Alcide,Alf,Algie,Arlie,Bart,Bedford,Benito,Billy,Bird,Birt,Bruno,Burley,Chancy,Claus,Cliff,Clovis,Connie,Creed,Delos,Duke,Eber,Eligah,Elliot,Elton,Emmitt,Gene,Golden,Hal,Hardin,Harman,Hervey,Hollis,Ivey,Jennie,Len,Lindsay,Lonie,Lyle,Mac,Mal,Math,Miller,Orson,Osborne,Percival,Pleas,Ples,Rafael,Raoul,Roderick,Rose,Shelton,Sid,Theron,Tobias,Toney,Tyler,Vance,Vivian,Walton,Watt,Weaver,Wilton,Adolf,Albin,Albion,Allison,Alpha,Alpheus,Anastacio,Andre,Annie,Arlington,Armand,Asberry,Asbury,Asher,Augustin,Auther,Author,Ballard,Blas,Caesar,Candido,Cato,Clarke,Clemente,Colin,Commodore,Cora,Coy,Cruz,Curt,Damon,Davie,Delmar,Dexter,Dora,Doss,Drew,Edson,Elam,Elihu,Eliza,Elsie,Erie,Ernie,Ethel,Ferd,Friend,Garry,Gary,Grace,Gustaf,Hallie,Hampton,Harrie,Hattie,Hence,Hillard,Hollie,Holmes,Hope,Hyman,Ishmael,Jarrett,Jessee,Joeseph,Junious,Kirk,Levy,Mervin,Michel,Milford,Mitchel,Nellie,Noble,Obed,Oda,Orren,Ottis,Rafe,Redden,Reese,Rube,Ruby,Rupert,Salomon,Sammie,Sanders,Soloman,Stacy,Stanford,Stanton,Thad,Titus,Tracy,Vernie,Wendell,Wilhelm,Willian,Yee,Zeke,Ab,Abbott,Agustus,Albertus,Almer,Alphonso,Alvia,Artie,Arvid,Ashby,Augusta,Aurthur,Babe,Baldwin,Barnett,Bartholomew,Barton,Bernie,Blaine,Boston,Brad,Bradford,Bradley,Brooks,Buck,Budd,Ceylon,Chalmers,Chesley,Chin,Cleo,Crockett,Cyril,Daisy,Denver,Dow,Duff,Edie,Edith,Elick,Elie,Eliga,Eliseo,Elroy,Ely,Ennis,Enrique,Erasmus,Esau,Everette,Firman,Fleming,Flora,Gardner,Gee,Gorge,Gottlieb,Gregorio,Gregory,Gustavus,Halsey,Handy,Hardie,Harl,Hayden,Hays,Hermon,Hershel,Holly,Hosteen,Hoyt,Hudson,Huey,Humphrey,Hunt,Hyrum,Irven,Isam,Ivy,Jabez,Jewel,Jodie,Judd,Julious,Justice,Katherine,Kelly,Kit,Knute,Lavern,Lawyer,Layton,Leonidas,Lewie,Lillie,Linwood,Loran,Lorin,Mace,Malcom,Manly,Manson,Matthias,Mattie,Merida,Miner,Montgomery,Moroni,Murdock,Myrtle,Nate,Nathanial,Nimrod,Nora,Norval,Nova,Orion,Orla,Orrie,Payton,Philo,Phineas,Presley,Ransom,Reece,Rene,Roswell,Rowland,Sampson,Samual,Santos,Schuyler,Sheppard,Spurgeon,Starling,Sylvanus,Theadore,Theophile,Tilmon,Tommy,Unknown,Vann,Wes,Winston,Wood,Woodie,Worthy,Wright,York,Zachariah".split(',');
-const lasts = "Abbott,Abel,Adams,Addison,Adkins,Agent,Aldrich,Aldridge,Alexander,Alford,Allen,Appleton,Armstrong,Arrington,Arwood,Atkins,Austin,Avery,Bailey,Baine,Baird,Baldwin,Bankston,Barker,Barnes,Barnett,Barry,Barton,Baughan,Beard,Beasley,Beck,Bell,Bennefield,Bennett,Berry,Bishop,Black,Blackwell,Blake,Blaxton,Blaylock,Blevins,Bonds,Boone,Boston,Botiler,Boyd,Bradford,Brannon,Brazeall,Brewer,Bridgeman,Brimer,Brooks,Brown,Bryant,Burdick,Burnet,Burns,Burrell,Byars,Bynum,Cagle,Cagner,Cain,Calvert,Campbell,Canada,Cantrell,Carroll,Carter,Cary,Casey,Cates,Chambers,Chappell,Chillcoat,Clark,Cline,Cole,Collman,Commens,Compton	Conly,Cooper,Cotton,Cowart,Cox,Cummings,Curtis,Davidson,Davis,Deason,Dempsey,Derrick,Dickenson,Dodd,Donough,Dougherty,Dorris,Doss,Dover,Downy,Dunahoo,Duncan,Dunlap,Dupre,Eaton,Eatton,Ellenbury,Elliott,Ellis,England,Estes,Evans,Ezell,Fair,Farley,Farris,Faught,Forester,Fowler,Freeman,Frost,Gamble,Ganes,Gardener,Garrison,Garson,Gentle,George,Gibson,Gice,Gilbert,Glenn,Godsey,Goodwin,Gosset,Grantham,Grastey,Green,Griffin,Guest,Gunter,Guthrie,Hadder,Haines,Haley,Hamilton,Hampton,Hand,Harbin,Harmon,Harper,Harris,Hatchett,Haw,Haynes,Hays,Hebster,Hefner,Henderson,Hendon,Henson,Hewitt,Hicks,Hightower	Hill,Hiller,Hilton,Hinesley,Hix,Hogg,Holden,Holloway,Holt,Hood,Hoover,Hopson,Horton,Howard,Howells,Hudson,Hughes,Hyde,Ingle,Inmon,Isabell,Ivy,Jack,Jackson,James,Jamison,Jeffries,Jenkins,Johnson,Kely),Kemp,Key,Kidd,Kiker,Kile,Kilpatrick,Kimbrell,King,Knight,Knox,Lambert,Lane,Laneford,Laramore,Lauderdale,Lawson,Lay,League,Lewis,Little,Litton,Livingston,Logan,Long,Looney,Love,Lovelady,Lovell,Lovett,Lynn,Manasco,Mann,Martin,Mathews,McClane,McClung,McClure,McColum,McCoy,McCue,McCullan,McCullar,McDaniel,McDuff,McKay,McNames,McNeil,McNutt,Mellican,Merritt,Metcalf,Miles,Miller,Mitchell,Mize,Mobley,Montgomery,Moody,Mooney,Morgan,Morris,Morrison,Motes,Mullins,Musgrove,Nelson,Nesmith,Newman,Nolen,Noles,Nortwich,Oden,Odom,O'Henry,O'Mary,O'Rear,O'Steen,Overton,Owsley,Pace,Painter,Parsons,Partain,Patek,Patterson,Payne,Peak,Pearson,Pencard,Penn,Penyl,Perkins,Perry,Peters,Pittman,Plott,Poe,Pool,Portridge,Posey,Pouder,Powell,Preston,Pugh,Pulliam,Purdy,Radford,Ramey,Ramie,Ray,Raynes,Reeves,Richardson,Riddle,Rivers,Roberts,Robinson,Roden,Rollins,Romines,Ronow,Rowe,Rush,Russell,Rutledge,Sam,Samples,Sanford,Sarun,Scogin,Segars,Setton,Sexton,Seymore,Shadix,Shain,Shank,Shelly,Shelton,Shipman,Siddens,Simmons,Simpson,Sims,Slater,Slaughter,Smathers,Smith,Sneed,South,Southern,Spain,Spane,Sparks,Staten,Steel,Stephenson,Stevens,Stewart,Stokes,Stone,Strange,Sunmers,Surin,Sutherland,Suttles,Swindle,Taberson,Tarbutton,Taylor,Teague,Tedford,Thomanson,Thomas,Thompson,Thornton,Threadgill,Tidwell,Tittle,Tubs,Tucker,Turner,Tyler,Underwood,Ussery,Wadsworth,Waid,Wakefield,Walker,Walston,Ward,Ware,Warren,Watson,Watts,Weaver,Webb,Welborn,Welsh,West,Whisenhunt,White,Whitfield,Whitman,Whitney,Whitten,Wiley,Willborn,Williams,Willis,Willson,Wilson,Wise,Woodley,Woods,Wooley,Wright,Yarborough,York,Young".split(',');
-
-const initials = (n) => n[0] + n.split(' ')[1][0];
-const firstInitial = (n) => n[0];
-const group = (ns) => ns.reduce((m, n) => {
-    var _a;
-    (m[_a = n[0]] || (m[_a] = [])).push(n);
-    return m;
-}, {});
-class Names {
-    static randomName(used) {
-        const usedPairs = new Set(used.map(initials));
-        const usedFirsts = new Set(used.map(firstInitial));
-        // prefer unused first initials, then any unused pairs
-        for (const preferNewFirst of [true, false]) {
-            const availableFirsts = preferNewFirst
-                ? Names.fiAll.filter(f => !usedFirsts.has(f))
-                : Names.fiAll;
-            for (const fi of availableFirsts) {
-                const availableLasts = Names.liAll.filter(li => !usedPairs.has(fi + li));
-                if (availableLasts.length > 0) {
-                    const li = (0,utils/* randFrom */.Kt)(availableLasts);
-                    return `${(0,utils/* randFrom */.Kt)(Names.firstBy[fi])} ${(0,utils/* randFrom */.Kt)(Names.lastBy[li])}`;
-                }
-            }
-        }
-        // fallback to any random combination
-        const fi = (0,utils/* randFrom */.Kt)(Names.fiAll);
-        const li = (0,utils/* randFrom */.Kt)(Names.liAll);
-        return `${(0,utils/* randFrom */.Kt)(Names.firstBy[fi])} ${(0,utils/* randFrom */.Kt)(Names.lastBy[li])}`;
-    }
-}
-Names.firstBy = group(firsts);
-Names.lastBy = group(lasts);
-Names.fiAll = Object.keys(Names.firstBy);
-Names.liAll = Object.keys(Names.lastBy);
-const randomName = Names.randomName;
-
-// EXTERNAL MODULE: ./src/maps/fragments/intro-barracks.txt
-var intro_barracks = __webpack_require__(4461);
-// EXTERNAL MODULE: ./src/game/fragment.ts
-var game_fragment = __webpack_require__(8535);
-// EXTERNAL MODULE: ./src/game/models/firehouse.ts
-var firehouse = __webpack_require__(8646);
-;// ./src/game/levels/intro.ts
-
-
-
-
-
-
-
-
-
-
-
-
-
-const TITLE = [
-    "#   #  ###  ####  #     ####       ###  #   #      ##### ##### ####  #####",
-    "#   # #   # #   # #     #   #     #   # ##  #      #       #   #   # #    ",
-    "# # # #   # ####  #     #   #     #   # # # #      ####    #   ####  #### ",
-    "# # # #   # #   # #     #   #     #   # #  ##      #       #   #   # #    ",
-    "## ## #   # #   # #     #   #     #   # #   #      #       #   #   # #    ",
-    "#   #  ###  #   # ##### ####       ###  #   #      #     ##### #   # #####"
-];
-class Intro {
-    constructor(initializer, map) {
-        this.initializer = initializer;
-        this.map = map;
-        this.pawns = [];
-        this.pawnModels = [];
-    }
-    setup() {
-        this.addWorldOnFireRoom();
-        this.addPawns();
-        this.addBarracksWin();
-        this.addWelcomeText();
-        this.addUserSuggestion();
-    }
-    addWorldOnFireRoom() {
-        const w = TITLE[0].length;
-        const h = TITLE.length;
-        const startX = (0,utils/* centeredStart */.jw)(this.map.w, TITLE[0]);
-        const startY = Math.floor((this.map.h - h) / 2);
-        const start = xy.XY.at(startX, startY);
-        this.initializer.addRoom(rect/* Rect */.r.xyWH(start.add(-1, -1), w + 2, h + 2));
-        (0,utils/* each */.__)(TITLE, (line, y) => {
-            (0,utils/* each */.__)(line, (c, x) => {
-                if (c === '#')
-                    this.map.createAt(start.add(x, y), new fire/* Fire */.v());
-            });
-        });
-    }
-    addWelcomeText() {
-        text_stroke/* TextStroke */.m.centeredPlusY(this.map, "Welcome to Fire House RL", -13, 'welcome');
-        text_stroke/* TextStroke */.m.centeredPlusY(this.map, "press space to unpause", 13, 'instructions');
-        const endWelcome = game/* GameStepped */.K5.on(step => {
-            if (step.frame <= 0)
-                return;
-            this.map.uiRenderer.remove('welcome');
-            this.map.uiRenderer.remove('instructions');
-            endWelcome();
-        });
-    }
-    addPawns() {
-        const add = (x, y) => {
-            const usedNames = this.pawnModels.map(m => m.name);
-            const model = new firehouse/* PawnModel */.A(randomName(usedNames), capabilities/* Capabilities */.FD.basic());
-            const pawn = model.toPawn();
-            this.map.createAt(xy.XY.at(x, y), pawn);
-            this.pawns.push(pawn);
-            this.pawnModels.push(model);
-            return model;
-        };
-        add(55, 24);
-        add(39, 24);
-    }
-    addBarracksWin() {
-        const base = game_fragment/* Fragment */.F.load(intro_barracks);
-        const rotated = base.rotate((0,utils/* randTo */.JD)(4));
-        const upperLeft = xy.XY.at(59, 8);
-        const rect = rotated.place(this.map, upperLeft);
-        const label = '<-- GET INSIDE';
-        const labelY = (0,utils/* half */.MX)(this.map.h) - 13;
-        const labelX = Math.max(0, this.map.w - label.length);
-        text_stroke/* TextStroke */.m.render(this.map, label, xy.XY.at(labelX, labelY), 'barracks-label');
-        const ends = [
-            game/* GameStepped */.K5.on(() => {
-                const unrescued = this.pawns.filter(p => !rect.contains(p));
-                if (unrescued.length > 0)
-                    return;
-                this.map.uiRenderer.remove('barracks-label');
-                this.pawnModels.forEach(m => m.initialLevelUp());
-                state/* FirehouseMode */.M.emit(this.pawnModels);
-                ends.forEach(end => end());
-            }),
-            pawn/* PawnDied */.hq.on(_dead => {
-                this.map.uiRenderer.remove('barracks-label');
-                text_stroke/* TextStroke */.m.render(this.map, 'YOU LOSE', xy.XY.at(labelX, labelY), 'lose-text');
-                ends.forEach(end => end());
-            })
-        ];
-    }
-    addUserSuggestion() {
-        let show = true;
-        const suggest = () => {
-            const step = game/* GameStepped */.K5.current;
-            if (!step || step.frame % 5 !== 0)
-                return;
-            show = !show;
-            if (show)
-                text_stroke/* TextStroke */.m.centered(this.map, 'click the @ symbol', this.map.h - 1, 'suggestion', () => '#ff0', () => true, 10);
-            else
-                this.map.uiRenderer.remove('suggestion');
-        };
-        suggest();
-        const stop = game/* GameStepped */.K5.on(suggest);
-        pawn/* PawnSelected */.Ei.on(_pawn => { this.map.uiRenderer.remove('suggestion'); stop(); });
-    }
-}
-
-// EXTERNAL MODULE: ./src/maps/fragments/apartment-complex.txt
-var apartment_complex = __webpack_require__(9620);
-// EXTERNAL MODULE: ./src/game/fires.ts
-var fires = __webpack_require__(6746);
-// EXTERNAL MODULE: ./src/ui/colors.ts
-var colors = __webpack_require__(1919);
-;// ./src/game/levels/level1.ts
-
-
-
-
-
-
-
-
-
-
-class Level1 {
-    constructor(init, map, pawns = []) {
-        this.init = init;
-        this.map = map;
-        this.pawns = pawns;
-        this.showDarkness = true;
-        this.hasWon = false;
-        this.randomXY = () => xy.XY.at((0,utils/* randTo */.JD)(this.map.w), (0,utils/* randTo */.JD)(this.map.h));
-    }
-    pawnsToModels() {
-        return this.pawns.map(pawn => new firehouse/* PawnModel */.A(pawn.name, pawn.capabilities));
-    }
-    setup() {
-        const fragment = game_fragment/* Fragment */.F.fromText(apartment_complex);
-        fragment.place(this.map, xy.XY.at(0, 0));
-        this.igniteRandomStoves(1);
-        this.spawnPawns();
-        game/* GameStepped */.K5.on(stepInfo => this.checkWinCondition(stepInfo));
-        game/* LevelWon */.X_.on(() => this.handleContinue());
-    }
-    igniteRandomStoves(count) {
-        let ignited = 0;
-        for (let attempt = 0; attempt < 1000 && ignited < count; attempt++) {
-            const location = this.randomXY();
-            this.map.get(location).onItem(/Oven/, stove => {
-                const targetWall = stove.cell.cardinals().find(cell => cell.wall())?.wall();
-                targetWall?.ignite();
-                ignited++;
-            });
-        }
-    }
-    spawnPawns() {
-        (0,utils/* each */.__)(this.pawns, (pawn, index) => {
-            const location = xy.XY.at(0, (0,utils/* half */.MX)(this.map.h) + index);
-            this.map.createAt(location, pawn);
-        });
-    }
-    checkWinCondition(stepInfo) {
-        if (fires/* Fires */.UQ.burningCount !== 0 || this.hasWon)
-            return;
-        this.hasWon = true;
-        this.map.display.clear();
-        this.map.smokeDisplay.clear();
-        this.map.uiRenderer.clearStrokes();
-        text_stroke/* TextStroke */.m.centered(this.map, `YOU WIN, ${stepInfo.frame} TURNS - PRESS SPACE TO CONTINUE`, this.map.h / 2, 'win-message', () => colors/* WHITE */.UE);
-        game/* LevelWon */.X_.emit(true);
-    }
-    handleContinue() {
-        state/* FirehouseMode */.M.emit(this.pawnsToModels());
-    }
-}
-
-;// ./src/game/initializer.ts
-
-
-
-
-
-
-
-
-
-class Initializer {
-    constructor(map) {
-        this.map = map;
-    }
-    initialize() {
-        this.start(new Intro(this, this.map));
-    }
-    start(level) {
-        this.reset();
-        this.addField();
-        game/* GameStepped */.K5.emit({ frame: 0, stepMs: 0 });
-        level.setup();
-        return { showDarkness: level.showDarkness };
-    }
-    startNext(pawns = []) {
-        return this.start(new Level1(this, this.map, pawns));
-    }
-    reset() {
-        this.map.killAll();
-        this.map.display.clear();
-        this.map.smokeDisplay.clear();
-        this.map.uiRenderer.clearStrokes();
-        fires/* Fires */.UQ.reset();
-    }
-    addField() {
-        rect/* Rect */.r.xyWH(xy.XY.at(0, 0), this.map.w, this.map.h).eachCell(xy => {
-            this.map.createAt(xy, new floor/* Floor */.Z());
-        });
-    }
-    addRoom(rect) {
-        rect.eachBorder(xy => {
-            this.map.createAt(xy, new wall/* Wall */.j());
-        });
-        [rect.ul.add(1, 1), rect.ur.add(-1, 1), rect.bl.add(1, -1), rect.br.add(-1, -1)].forEach(xy => {
-            this.map.createAt(xy, new lamp/* Lamp */.z());
         });
     }
 }
@@ -12807,7 +10995,7 @@ const storage = new Storage();
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   F: () => (/* binding */ Fragment)
 /* harmony export */ });
-/* harmony import */ var _drawable_types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1073);
+/* harmony import */ var _drawable_types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1363);
 /* harmony import */ var _rect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6893);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6185);
 
@@ -12884,6 +11072,1911 @@ const rot90 = (rows) => {
     return result;
 };
 const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
+
+/***/ }),
+
+/***/ 8639:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  Zt: () => (/* binding */ Game),
+  K5: () => (/* binding */ GameStepped),
+  QD: () => (/* binding */ LevelReset),
+  X_: () => (/* binding */ LevelWon)
+});
+
+// EXTERNAL MODULE: ./src/utils.ts
+var utils = __webpack_require__(6185);
+// EXTERNAL MODULE: ./src/d3-extend.ts
+var d3_extend = __webpack_require__(452);
+// EXTERNAL MODULE: ./src/compress.ts
+var compress = __webpack_require__(5074);
+// EXTERNAL MODULE: ./src/game/map.ts + 2 modules
+var map = __webpack_require__(7283);
+// EXTERNAL MODULE: ./src/game/initializer.ts + 5 modules
+var initializer = __webpack_require__(2253);
+// EXTERNAL MODULE: ./src/game/config.ts
+var config = __webpack_require__(6457);
+// EXTERNAL MODULE: ./src/draw/pawn.ts + 1 modules
+var draw_pawn = __webpack_require__(2705);
+// EXTERNAL MODULE: ./src/game/capabilities.ts
+var capabilities = __webpack_require__(3793);
+;// ./src/html/terminal.html
+/* harmony default export */ const terminal = ("<div id=\"terminal\">\n    <div id=\"terminal-content\">\n        <div class=\"cell-container\">\n            <div class=\"cell-coord\"></div>\n            <div class=\"layers\">\n                <div class=\"layer template\">\n                    <span class=\"name\">floor</span>: <span class=\"description text-subtle\">Floor(4477)</span>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div id=\"selected-info\">\n        <div class=\"selected-container\">\n            <div class=\"pawn-desc\">firefighter 10</div>\n            <table class=\"capabilities\">\n                <tr class=\"capability template\">\n                    <td class=\"score\">10</td>\n                    <td class=\"name\">str</td>\n                    <td class=\"skill-score\">1</td>\n                    <td class=\"skill\">inventory</td>\n                </tr>\n            </table>\n            <div class=\"tasks\">\n                <div class=\"task-info template\">\n                    <span class=\"task-desc\">TEMPLATE go to 73, 26</span>\n                    <span class=\"clear-task clickable text-danger bold\" data-index=\"0\">[x]</span>\n                </div>\n            </div>\n            <div id=\"clear-all\" class=\"clickable text-danger bold\" title=\"clear all\">[xx]</div>\n        </div>\n    </div>\n</div>\n");
+// EXTERNAL MODULE: ./src/ui/ui-renderer.ts
+var ui_renderer = __webpack_require__(9889);
+;// ./src/ui/terminal.ts
+
+
+
+
+
+class Terminal {
+    constructor() {
+        this.currentCell = null;
+        this.setCurrent = (cell) => this.currentCell = cell;
+        this.div = (0,d3_extend.d1)('#terminal');
+        this.div.appendFileHtml(terminal);
+        this.repaintSelectedPawn();
+        ui_renderer/* Repaint */.G2.on(() => this.draw());
+        draw_pawn/* PawnSelected */.Ei.on(pawn => this.repaintSelectedPawn());
+        draw_pawn/* PawnMoved */.w.on(({ pawn }) => this.repaintSelectedPawn());
+        draw_pawn/* PawnBurned */.zW.on(pawn => this.repaintSelectedPawn());
+        draw_pawn/* TaskRemoved */.qe.on(pawn => this.repaintSelectedPawn());
+    }
+    draw() {
+        this.updateCell();
+    }
+    updateCell() {
+        const content = this.div.d1('#terminal-content');
+        content.updateFrom(this.currentCell, (cell => {
+            content.d1('.cell-coord').text(cell.xy.x + ', ' + cell.xy.y);
+            content.dList('.layer').updateFrom(cell.presentLayers(), (layer, snapshot) => {
+                layer.d1('.name').text(snapshot.name);
+                layer.d1('.description').text(snapshot.desc).style('color', snapshot.color);
+            });
+        }), () => {
+            content.d1('.cell-coord').text('no cell selected');
+            content.dList('.layer').updateFrom([], () => { });
+        });
+    }
+    repaintSelectedPawn() {
+        const pawn = draw_pawn/* PawnSelected */.Ei.current;
+        const selectedInfo = this.div.d1('#selected-info');
+        selectedInfo.updateFrom(pawn, (pawn) => {
+            const container = selectedInfo.d1('.selected-container');
+            container.d1('.pawn-desc').text(pawn.desc());
+            const rows = [];
+            pawn.capabilities.eachPair((name, skills) => {
+                const nz = skills.filter(s => s.level !== 0);
+                const head = { score: String(skills.reduce((a, s) => a + s.level, 0)), name: (0,capabilities/* capabilityAbbr */.gv)(name) };
+                if (nz.length === 0)
+                    rows.push({ ...head, skillScore: '', skill: '' });
+                else {
+                    rows.push({ ...head, skillScore: String(nz[0].level), skill: nz[0].name });
+                    nz.slice(1).forEach(s => rows.push({ skillScore: String(s.level), skill: s.name }));
+                }
+            });
+            container.d1('.capabilities').dList('.capability').updateFrom(rows, (row, d) => {
+                row.d1('.score').text(d.score || '');
+                row.d1('.name').text(d.name || '');
+                row.d1('.skill-score').text(d.skillScore || '');
+                row.d1('.skill').text(d.skill || '');
+            });
+            container.d1('.tasks').dList('.task-info').updateFrom(pawn.tasks, (taskDiv, task) => {
+                taskDiv.d1('.task-desc').text(task.desc());
+                taskDiv.d1('.clear-task').on('click', () => task.remove());
+            });
+            container.d1('#clear-all').style('display', 'block').on('click', () => pawn.clearTasks());
+        }, () => {
+            const container = selectedInfo.d1('.selected-container');
+            container.d1('.pawn-desc').text('no pawn selected');
+            container.d1('.capabilities').dList('.capability').updateFrom([], () => { });
+            container.d1('.tasks').dList('.task-info').updateFrom([], () => { });
+            container.d1('#clear-all').style('display', 'none').on('click', null);
+        });
+    }
+}
+
+// EXTERNAL MODULE: ./src/game/layers.ts
+var game_layers = __webpack_require__(5633);
+;// ./src/ui/states/select-state.ts
+class SelectState {
+    constructor(ui) {
+        this.ui = ui;
+    }
+    onClick(cell, _c) {
+        if (!cell)
+            return;
+        const pawn = cell.pawn();
+        if (pawn)
+            this.ui.setState('menu', pawn);
+    }
+    onMouseMove(cell) {
+        this.ui.terminal.setCurrent(cell);
+    }
+}
+
+// EXTERNAL MODULE: ./src/game/tasks/task.ts
+var task = __webpack_require__(1877);
+// EXTERNAL MODULE: ./src/draw/door.ts
+var draw_door = __webpack_require__(2483);
+;// ./src/game/tasks/destination-task.ts
+
+
+
+class DestinationTask extends task/* Task */.YZ {
+    constructor(pawn, destination, fixedRay = null) {
+        super(pawn);
+        this.destination = destination;
+        this.done = false;
+        this.isDone = () => this.done;
+        this.strokeId = `destination-task-${Date.now()}-${Math.random()}`;
+        this.fixedRay = fixedRay;
+    }
+    nextStepFromPath() {
+        const path = this.pawn.cell.pathTo(this.destination);
+        if (!path)
+            return null;
+        const it = path[Symbol.iterator]();
+        const { value, done } = it.next();
+        return done ? null : value;
+    }
+    buildFixedRay(from, to) {
+        const ray = [];
+        from.map.eachRay(from.xy, to.xy, c => { ray.push(c); return true; });
+        return ray;
+    }
+    nextFromFixedRay() {
+        if (!this.fixedRay)
+            return null;
+        if (this.fixedRay.length === 0)
+            return null;
+        return this.fixedRay.shift() || null;
+    }
+    nextCell() {
+        const n = this.nextFromFixedRay();
+        if (n)
+            return n;
+        const step = this.nextStepFromPath();
+        if (step)
+            return step;
+        const cur = this.pawn.cell;
+        const ray = this.buildFixedRay(cur, this.destination);
+        return ray.length === 0 ? null : ray[0];
+    }
+    advance(next) {
+        const door = next.wall();
+        if (door instanceof draw_door/* Door */.$ && !door.passable) {
+            door.toggle();
+            return;
+        }
+        if (!next.passable()) {
+            this.done = true;
+            return;
+        }
+        this.pawn.cell.queueMove(this.pawn, next.xy);
+        if (next === this.destination)
+            this.done = true;
+    }
+    step() {
+        if (this.done)
+            return;
+        const next = this.nextCell();
+        if (!next) {
+            this.done = true;
+            return;
+        }
+        this.advance(next);
+    }
+    cleanup() { this.pawn.cell.map.uiRenderer.remove(this.strokeId); }
+    desc() { return `go to ${this.destination.xy.toString()}`; }
+    strokeAndNext(start) {
+        if (this.fixedRay) {
+            const ray = this.buildFixedRay(start, this.destination);
+            const colorFn = () => this.pawn.selected ? (0,task/* TASK_COLOR_SELECTED */.Gm)() : (0,task/* TASK_COLOR */.k$)();
+            this.pawn.cell.map.uiRenderer.replace(this.strokeId, task/* Task */.YZ.strokeOfCells(ray, colorFn, () => !this.done, 1));
+            return this.destination;
+        }
+        else {
+            const path = start.pathTo(this.destination);
+            if (path) {
+                const cells = Array.from(path);
+                const colorFn = () => this.pawn.selected ? (0,task/* TASK_COLOR_SELECTED */.Gm)() : (0,task/* TASK_COLOR */.k$)();
+                this.pawn.cell.map.uiRenderer.replace(this.strokeId, task/* Task */.YZ.strokeOfCells(cells, colorFn, () => !this.done, 1));
+            }
+            else {
+                const colorFn = () => this.pawn.selected ? (0,task/* TASK_COLOR_SELECTED */.Gm)() : (0,task/* TASK_COLOR */.k$)();
+                task/* Task */.YZ.strokePathBetween(start, this.destination, this.strokeId, colorFn, () => !this.done, 1);
+            }
+            return this.destination;
+        }
+    }
+}
+
+// EXTERNAL MODULE: ./src/ui/colors.ts
+var colors = __webpack_require__(1919);
+// EXTERNAL MODULE: ./src/ui/stroke.ts
+var ui_stroke = __webpack_require__(891);
+;// ./src/game/tasks/extinguish-task.ts
+
+
+
+class ExtinguishTask extends task/* Task */.YZ {
+    constructor(pawn) {
+        super(pawn);
+        this.done = false;
+        this.id = `extinguish-${Date.now()}-${Math.random()}`;
+        this.color = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy(['#f00', '#00f']));
+        this.isDone = () => this.done;
+        this.desc = () => `extinguish ${this.stepsRemaining}`;
+        this.stepsRemaining = pawn.material.isBurning() ? 5 : 1;
+    }
+    step() {
+        if (this.done)
+            return;
+        if (--this.stepsRemaining <= 0) {
+            if (this.pawn.material.isBurning()) {
+                this.pawn.material.extinguish();
+            }
+            else {
+                const neighbors = this.pawn.cell.neighbors();
+                const fireNeighbors = neighbors.filter(cell => cell.fire());
+                neighbors.forEach(cell => cell.onFire(fire => fire.died()));
+                if (fireNeighbors.length < 4) {
+                    this.pawn.cell.cardinals().forEach(cell => cell.extinguish());
+                }
+            }
+            this.done = true;
+        }
+    }
+    strokeAndNext(start) {
+        start.map.uiRenderer.replace(this.id, new ui_stroke/* Stroke */.t([{ cell: start, char: 'e' }], this.color, () => !this.done, 1));
+        return start;
+    }
+    cleanup() { this.pawn.cell.map.uiRenderer.remove(this.id); }
+}
+
+;// ./src/ui/states/destination-state.ts
+
+
+
+
+
+
+class DestinationState {
+    menuAction(key) {
+        if (key === 'x')
+            this.ui.setState('select');
+        else if (key === 'r')
+            this.removeLastTask();
+        else if (key === '.')
+            this.ui.nextPawn(this.selected);
+        else if (key === 'g' || key === 'e')
+            this.locatedAction(key);
+    }
+    locatedAction(key) {
+        if (!this.hoveredCell)
+            return;
+        const start = this.selected.tipCell;
+        const fixedRay = this.shift ? this.buildFixedRay(start, this.hoveredCell) : null;
+        this.selected.addTask(new DestinationTask(this.selected, this.hoveredCell, fixedRay));
+        if (key === 'e')
+            this.selected.addTask(new ExtinguishTask(this.selected));
+        this.ui.setState('destination', this.selected);
+    }
+    removeLastTask() {
+        (0,utils/* onLastMaybe */.iw)(this.selected.tasks, task => task.remove());
+        if (this.hoveredCell)
+            this.onMouseMove(this.hoveredCell);
+        ui_renderer/* Repaint */.G2.emit();
+    }
+    constructor(ui) {
+        this.ui = ui;
+        this.shift = false;
+        this.keyDown = (event) => {
+            if (event.key === 'Escape')
+                this.ui.setState('menu', this.selected);
+            else if (event.key === 'Shift')
+                this.shift = true;
+            else
+                this.menuAction(event.key);
+        };
+        this.keyUp = (event) => {
+            if (event.key === 'Shift')
+                this.shift = false;
+        };
+        this.outside = (e) => {
+            const canvas = this.ui.map.display.canvas();
+            if (!canvas.contains(e.target)) {
+                e.preventDefault();
+                this.ui.setState('menu', this.selected);
+            }
+        };
+        this.pawnDied = (pawn) => {
+            if (pawn === this.selected)
+                this.ui.setState('select');
+        };
+    }
+    onClick(cell, c) {
+        if (c.button === 'RIGHT' || !cell)
+            return this.ui.setState('menu', this.selected);
+        const pawn = cell.pawn();
+        if (pawn === this.selected)
+            return this.ui.setState('menu', this.selected);
+        if (pawn)
+            return this.ui.setState('menu', pawn);
+        const start = this.selected.tipCell;
+        const fixedRay = c.shift ? this.buildFixedRay(start, cell) : null;
+        this.selected.addTask(new DestinationTask(this.selected, cell, fixedRay));
+    }
+    buildFixedRay(from, to) {
+        const ray = [];
+        from.map.eachRay(from.xy, to.xy, c => { ray.push(c); return true; });
+        return ray;
+    }
+    onMouseMove(cell) {
+        this.hoveredCell = cell;
+        this.ui.terminal.setCurrent(cell);
+        const start = this.selected.tipCell;
+        if (!start)
+            return;
+        if (this.shift) {
+            const ray = this.buildFixedRay(start, cell);
+            this.ui.map.uiRenderer.replace(draw_pawn/* Pawn */.vc.HOVER_PATH_STROKE, task/* Task */.YZ.strokeOfCells(ray, task/* TASK_COLOR */.k$, () => true, 2));
+            ui_renderer/* Repaint */.G2.emit();
+            return;
+        }
+        const path = start.pathTo(cell);
+        if (path) {
+            const cells = Array.from(path);
+            const last = cells[cells.length - 1];
+            if (last && last === cell) {
+                this.ui.map.uiRenderer.replace(draw_pawn/* Pawn */.vc.HOVER_PATH_STROKE, task/* Task */.YZ.strokeOfCells(cells, task/* TASK_COLOR */.k$, () => true, 2));
+            }
+            else {
+                const ray = this.buildFixedRay(start, cell);
+                this.ui.map.uiRenderer.replace(draw_pawn/* Pawn */.vc.HOVER_PATH_STROKE, task/* Task */.YZ.strokeOfCells(ray, task/* TASK_COLOR_UNREACHABLE */.r9, () => true, 2));
+            }
+        }
+        else {
+            const ray = this.buildFixedRay(start, cell);
+            this.ui.map.uiRenderer.replace(draw_pawn/* Pawn */.vc.HOVER_PATH_STROKE, task/* Task */.YZ.strokeOfCells(ray, task/* TASK_COLOR_UNREACHABLE */.r9, () => true, 2));
+        }
+        ui_renderer/* Repaint */.G2.emit();
+    }
+    enter(pawn) {
+        this.selected = pawn;
+        this.selected.selected = true;
+        draw_pawn/* PawnSelected */.Ei.emit(pawn);
+        document.addEventListener('keydown', this.keyDown);
+        document.addEventListener('keyup', this.keyUp);
+        document.addEventListener('click', this.outside);
+        document.addEventListener('contextmenu', this.outside);
+        this.unsubDied = draw_pawn/* PawnDied */.hq.on(this.pawnDied);
+    }
+    exit() {
+        document.removeEventListener('keydown', this.keyDown);
+        document.removeEventListener('keyup', this.keyUp);
+        document.removeEventListener('click', this.outside);
+        document.removeEventListener('contextmenu', this.outside);
+        this.unsubDied();
+        this.ui.map.uiRenderer.remove(draw_pawn/* Pawn */.vc.HOVER_PATH_STROKE);
+        this.selected.selected = false;
+        this.hoveredCell = undefined;
+        ui_renderer/* Repaint */.G2.emit();
+        draw_pawn/* PawnSelected */.Ei.emit(null);
+    }
+}
+
+// EXTERNAL MODULE: ./src/ui/text-stroke.ts
+var text_stroke = __webpack_require__(1485);
+;// ./src/ui/menu.ts
+
+
+
+const MENU_ITEMS = [
+    { key: 'x', desc: 'Exit menu and return to selection', action: ui => ui.setState('select') },
+    { key: 'g', desc: 'Go to destination by path - shift for line', action: (ui, pawn) => ui.setState('destination', pawn) },
+    { key: 'e', desc: 'Extinguish - put out burning firefighter', action: (ui, pawn) => { pawn.addTask(new ExtinguishTask(pawn)); ui.setState('menu', pawn); } },
+    { key: '.', desc: 'Select next firefighter', action: (ui, pawn) => ui.setState('menu', draw_pawn/* Pawn */.vc.next(pawn)) },
+    { key: 'r', desc: "Remove last task from firefighter's queue", action: (ui, pawn) => { (0,utils/* onLastMaybe */.iw)(pawn.tasks, task => task.remove()); ui.setState('menu', pawn); } }
+];
+
+// EXTERNAL MODULE: ./src/game/drawable-types.ts + 3 modules
+var drawable_types = __webpack_require__(1363);
+// EXTERNAL MODULE: ./src/draw/material.ts
+var material = __webpack_require__(2994);
+;// ./src/ui/help.ts
+
+
+
+
+
+const MENU_HELP = (0,utils/* toEntries */.Wo)(MENU_ITEMS, i => [i.key, i.desc]);
+class HelpSystem {
+    constructor() {
+        this.pages = [];
+        this.currentPage = 0;
+        this.generatePages();
+    }
+    getCurrentPage() {
+        return this.pages[this.currentPage] || this.pages[0];
+    }
+    getPageInfo() {
+        return `<div style="text-align: center; margin-bottom: 10px; color: #888;">Page ${this.currentPage + 1} of ${this.pages.length} • Use ← → keys to navigate</div>`;
+    }
+    nextPage() {
+        if (this.currentPage < this.pages.length - 1) {
+            this.currentPage++;
+            return true;
+        }
+        return false;
+    }
+    previousPage() {
+        if (this.currentPage > 0) {
+            this.currentPage--;
+            return true;
+        }
+        return false;
+    }
+    resetToFirstPage() {
+        this.currentPage = 0;
+    }
+    generatePages() {
+        const menuItems = MENU_ITEMS;
+        const layerInfo = {
+            'floor': { char: '.', desc: 'Floor tiles and terrain', color: '#666' },
+            'walls': { char: '#', desc: 'Walls, doors (+), windows (□), wall lights (¤)', color: '#666' },
+            'items': { char: '*', desc: 'Lamps, equipment, and other things laying around', color: '#ff0' },
+            'fire': { char: '▲', desc: 'Active fires that spread and create smoke', color: '#f44' },
+            'smoke': { char: '+', desc: 'Smoke that drifts and blocks vision', color: '#999' },
+            'pawn': { char: '@', desc: 'Firefighters under your command', color: '#0f0' }
+        };
+        const layerSections = game_layers/* CellLayers */.v.layerNames.map(layerName => {
+            const info = layerInfo[layerName];
+            if (info) {
+                return `• <strong>${layerName}</strong> (<strong style="color: ${info.color}">${info.char}</strong>) - ${info.desc}`;
+            }
+            return `• <strong>${layerName}</strong> - Layer type`;
+        }).join('<br/>');
+        const menuSection = menuItems
+            .map(item => `• <strong>${item.key}</strong> - ${item.desc}`)
+            .join('<br/>');
+        const layerButtons = game_layers/* CellLayers */.v.layerNames.map(name => name.slice(0, 3)).join(', ');
+        const drawableNotes = { Oven: 'Can spark fires' };
+        const drawableRows = Object.entries(drawable_types/* DrawableType */.Z.registry)
+            .map(([name, create]) => {
+            const drawable = create();
+            const row = `<tr><td style="text-align:center;color:${drawable.color()}">${drawable.char()}</td>` +
+                `<td>${name}</td><td>${drawableNotes[name] ?? ''}</td></tr>`;
+            drawable.diedAndAlreadyRemovedFromCell();
+            return row;
+        })
+            .join('');
+        const drawableTable = `<table class="help-table">` +
+            `<tr><th>Symbol</th><th>Object</th><th>Notes</th></tr>${drawableRows}</table>`;
+        const materials = [
+            ['Meat', material/* MEAT */.SN],
+            ['Wood', material/* WOOD */.wB],
+            ['Plant', material/* PLANT */.G5],
+            ['Metal', material/* METAL */.cJ],
+            ['Brick', material/* BRICK */.qv],
+            ['Glass', material/* GLASS */.fk],
+        ];
+        const materialRows = materials
+            .map(([name, type]) => `<tr><td style="color:${type.color}">${name}</td><td>${type.flammable ? 'Yes' : 'No'}</td><td>${type.note}</td></tr>`)
+            .join('');
+        const materialTable = `<table class="help-table">` +
+            `<tr><th>Material</th><th>Flammable</th><th>Notes</th></tr>${materialRows}</table>`;
+        this.pages = [
+            // Page 1: Overview and Controls
+            `<div class="help-text">
+<strong>🔥 FIRE HOUSE RL 🔥</strong><br/>
+<br/>
+<strong>GAME OVERVIEW:</strong><br/>
+Control a squad of firefighters (@) in a tactical roguelike. Give orders, then watch them execute in real-time or step-by-step.<br/>
+<br/>
+<strong>MAIN CONTROLS:</strong><br/>
+• <strong>▶️ Play/Pause</strong> - Start/stop game simulation<br/>
+• <strong>⏭️ Step</strong> - Advance one game step<br/>
+• <strong>❄️ Freeze</strong> - Pause rendering (game continues)<br/>
+• <strong>❓ Help</strong> - Open this help system<br/>
+• <strong>SPACE</strong> - Play/Pause game<br/>
+• <strong>ESC</strong> - Close help or menus<br/>
+<br/>
+<strong>MOUSE CONTROLS:</strong><br/>
+• <strong>Click @</strong> - Select firefighter<br/>
+• <strong>Hover</strong> - Inspect cells in terminal<br/>
+• <strong>Right-click</strong> - Cancel selection<br/>
+<br/>
+<strong>GETTING STARTED:</strong><br/>
+Hold the space bar to play, tap to step, release to halt.<br/>
+You can slow or speed up time under the play/pause button.<br/>
+1. Click the <strong>@</strong> symbol to select a firefighter<br/>
+2. Choose an action from the menu that appears<br/>
+3. Watch your firefighters carry out their orders!<br/>
+</div>`,
+            // Page 2: Firefighter Menu
+            `<div class="help-text">
+<strong>🚒 FIREFIGHTER COMMANDS 🚒</strong><br/>
+<br/>
+<strong>FIREFIGHTER MENU:</strong><br/>
+When you click a firefighter (@), a menu appears around them with these options:<br/>
+<br/>
+${menuSection}<br/>
+<br/>
+<strong>TASK SYSTEM:</strong><br/>
+• Firefighters can queue multiple tasks<br/>
+• Tasks are shown as colored paths on the map<br/>
+• Blue lines show planned movement routes<br/>
+• Tasks execute in order from first to last<br/>
+<br/>
+<strong>TERMINAL PANEL:</strong><br/>
+The right panel shows detailed info about:<br/>
+• Current cell under mouse cursor<br/>
+• Selected firefighter's active tasks<br/>
+• Layer contents and properties<br/>
+• Click <strong>[x]</strong> next to tasks to remove them<br/>
+<br/>
+<strong>SELECTION TIPS:</strong><br/>
+• Selected firefighters have inverted colors<br/>
+• Hover over destinations to see path preview<br/>
+• Right-click to cancel current selection<br/>
+</div>`,
+            // Page 3: Layers and Terrain
+            `<div class="help-text">
+<strong>🗺️ LAYERS & TERRAIN 🗺️</strong><br/>
+<br/>
+<strong>LAYER SYSTEM:</strong><br/>
+The game world is built in layers (${game_layers/* CellLayers */.v.layerNames.length} total). From bottom to top:<br/>
+<br/>
+${layerSections}<br/>
+<br/>
+<strong>TERRAIN INTERACTIONS:</strong><br/>
+• <strong>Walls</strong> block movement and vision<br/>
+• <strong>Doors</strong> (+) can be opened and closed<br/>
+• <strong>Items</strong> provide light and can be carried<br/>
+• <strong>Fires</strong> spread to adjacent flammable materials<br/>
+• <strong>Smoke</strong> reduces visibility and can harm firefighters<br/>
+<br/>
+<strong>LIGHTING SYSTEM:</strong><br/>
+• Fires and lamps provide illumination<br/>
+• Darkness affects visibility and movement<br/>
+• Smoke blocks light transmission<br/>
+• Materials cast shadows and block vision<br/>
+</div>`,
+            // Page 4: Fire Mechanics and Debug
+            `<div class="help-text">
+<strong>🔥 FIRE MECHANICS & DEBUG 🔥</strong><br/>
+<br/>
+<strong>FIRE BEHAVIOR:</strong><br/>
+• Fires spread to adjacent cells over time<br/>
+• Fires create smoke that drifts randomly<br/>
+• Materials can ignite and burn<br/>
+• Lighting affects visibility and tactics<br/>
+• Older fires burn out eventually<br/>
+<br/>
+<strong>SMOKE MECHANICS:</strong><br/>
+• Smoke reduces transparency and vision<br/>
+• Smoke drifts to adjacent cells<br/>
+• Smoke dissipates over time<br/>
+• Can harm firefighters with prolonged exposure<br/>
+<br/>
+<strong>DEBUG CONTROLS:</strong><br/>
+• <strong>LT</strong> - Toggle lighting display<br/>
+• <strong>Layer buttons</strong> - Show/hide specific layers (${layerButtons})<br/>
+• <strong>on/off</strong> - Turn all layers on/off<br/>
+<br/>
+<strong>LAYER DEBUGGING:</strong><br/>
+• Click layer buttons to toggle visibility<br/>
+• Muted layers appear grayed out<br/>
+• Solo mode shows only one layer<br/>
+• Useful for debugging complex scenarios<br/>
+</div>`,
+            // Page 5: Symbols
+            `<div class="help-text"><strong>🔣 SYMBOLS 🔣</strong><br/><br/>${drawableTable}</div>`,
+            // Page 6: Materials
+            `<div class="help-text"><strong>🔩 MATERIALS 🔩</strong><br/><br/>${materialTable}</div>`
+        ];
+    }
+}
+
+;// ./src/timer.ts
+class Timer {
+    restartInMillis(ms, f) {
+        this.stop();
+        this.id = setTimeout(() => { this.id = undefined; f(); }, ms);
+    }
+    stop() {
+        if (this.id)
+            clearTimeout(this.id);
+        this.id = undefined;
+    }
+}
+const timer = (_name) => new Timer();
+
+// EXTERNAL MODULE: ./src/game/xy.ts
+var game_xy = __webpack_require__(88);
+;// ./src/ui/states/menu-state.ts
+
+
+
+
+
+
+
+
+
+
+class Spot {
+    constructor(key, command) {
+        this.key = key;
+        this.command = command;
+    }
+}
+class MenuState {
+    constructor(ui) {
+        this.ui = ui;
+        this.itemsByXY = new Map();
+        this.key = (e) => {
+            if (e.key === 'Escape')
+                this.ui.setState('select');
+            const item = MENU_ITEMS.find(i => i.key === e.key);
+            if (!item)
+                return;
+            this.hideHelp();
+            item.action(this.ui, this.pawn);
+            ui_renderer/* Repaint */.G2.emit();
+        };
+        this.showTimer = timer('show');
+        this.hideTimer = timer('hide');
+        this.helpId = 'menu-help';
+        this.sync = () => {
+            const base = this.pawn.cell?.xy;
+            if (!base || game_xy.XY.matches(base, this.lastBase))
+                return;
+            this.lastBase = base;
+            this.hideHelp();
+            this.hideMenu();
+            this.showMenu();
+            ui_renderer/* Repaint */.G2.emit();
+        };
+        this.died = (pawn) => {
+            if (pawn === this.pawn)
+                this.ui.setState('select');
+        };
+    }
+    onClick(cell, _c) {
+        if (!cell)
+            return this.ui.setState('select');
+        const pawn = cell.pawn();
+        if (pawn && pawn !== this.pawn)
+            return this.ui.setState('menu', pawn);
+        const menuItem = this.itemsByXY.get(cell.xy.toString());
+        if (!menuItem)
+            return this.ui.setState('select');
+        this.hideHelp();
+        menuItem.command();
+    }
+    onMouseMove(cell) {
+        this.ui.terminal.setCurrent(cell);
+        const item = this.itemsByXY.get(cell.xy.toString());
+        if (item) {
+            this.hideTimer.stop();
+            if (this.hovered !== item) {
+                this.hovered = item;
+                this.showTimer.restartInMillis(700, () => this.showHelp(cell, item));
+            }
+        }
+        else {
+            this.hovered = undefined;
+            this.hideTimer.restartInMillis(300, () => this.hideHelp());
+        }
+    }
+    enter(pawn) {
+        this.pawn = pawn;
+        this.pawn.selected = true;
+        draw_pawn/* PawnSelected */.Ei.emit(pawn);
+        this.unsubMove = draw_pawn/* PawnMoved */.w.on(({ pawn }) => { if (pawn === this.pawn)
+            this.sync(); });
+        this.unsubDied = draw_pawn/* PawnDied */.hq.on(this.died);
+        this.unsubFrame = ui_renderer/* FrameRendered */.HO.on(this.sync);
+        document.addEventListener('keydown', this.key);
+        this.showMenu();
+        this.lastBase = this.pawn.cell.xy;
+    }
+    exit() {
+        this.pawn.selected = false;
+        draw_pawn/* PawnSelected */.Ei.emit(null);
+        this.hideMenu();
+        this.hideHelp();
+        this.unsubMove?.();
+        this.unsubDied?.();
+        this.unsubFrame?.();
+        document.removeEventListener('keydown', this.key);
+    }
+    showMenu() {
+        this.placeCommands(MENU_ITEMS);
+    }
+    addUnusedMenuCells() {
+        if ((0,utils/* isEmpty */.Im)(this.itemsByXY))
+            return this.pawn.cell.neighbors();
+        const result = [];
+        this.itemsByXY.forEach((_item, key) => {
+            const [x, y] = key.split(', ').map(n => parseInt(n));
+            const cell = this.ui.map.get(game_xy.XY.at(x, y));
+            result.push(...cell.neighbors().filter(neighbor => !this.itemsByXY.has(neighbor.xy.toString())));
+        });
+        return result;
+    }
+    placeCommands(commands) {
+        const cells = this.addUnusedMenuCells();
+        const placeable = commands.slice(0, cells.length);
+        const remaining = commands.slice(cells.length);
+        placeable.forEach(item => {
+            const cell = cells.shift();
+            this.itemsByXY.set(cell.xy.toString(), new Spot(item.key, () => item.action(this.ui, this.pawn)));
+            this.ui.map.uiRenderer.replace(`menu-${item.key}`, this.createMenuStroke(cell, item.key));
+        });
+        if ((0,utils/* hasContent */.ov)(remaining))
+            this.placeCommands(remaining);
+    }
+    hideMenu() {
+        this.itemsByXY.forEach(item => {
+            this.ui.map.uiRenderer.remove(`menu-${item.key}`);
+        });
+        this.itemsByXY.clear();
+    }
+    findUnobstructedMenuLocation(itemCell, text) {
+        const base = this.pawn.cell.xy;
+        const textWidth = text.length;
+        const map = this.ui.map;
+        const fitsOnMap = (xy) => {
+            if (game_xy.XY.oob(xy))
+                return false;
+            const endX = xy.x + textWidth - 1;
+            return endX < map.w;
+        };
+        const doesNotBlockMenu = (xy) => {
+            for (let i = 0; i < textWidth; i++) {
+                const checkXY = xy.add(i, 0);
+                if (this.itemsByXY.has(checkXY.toString()) ||
+                    (checkXY.x === base.x && checkXY.y === base.y)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        const tryPosition = (startXY) => {
+            let bestX = startXY.x;
+            const isRightOfPawn = startXY.x > base.x;
+            const isOnCenterLine = startXY.x === base.x;
+            const trySlideLeft = (x) => {
+                for (let i = x; i >= 0; i--) {
+                    const xy = game_xy.XY.at(i, startXY.y);
+                    if (fitsOnMap(xy) && doesNotBlockMenu(xy))
+                        return i;
+                }
+                return x;
+            };
+            const trySlideRight = (x) => {
+                for (let i = x; i + textWidth <= map.w; i++) {
+                    const xy = game_xy.XY.at(i, startXY.y);
+                    if (fitsOnMap(xy) && doesNotBlockMenu(xy))
+                        return i;
+                }
+                return x;
+            };
+            if (isRightOfPawn || isOnCenterLine) {
+                bestX = trySlideRight(startXY.x);
+                if (bestX === startXY.x)
+                    bestX = trySlideLeft(bestX);
+            }
+            else {
+                bestX = trySlideLeft(startXY.x);
+                if (bestX === startXY.x)
+                    bestX = trySlideRight(bestX);
+            }
+            const finalXY = game_xy.XY.at(bestX, startXY.y);
+            if (fitsOnMap(finalXY) && doesNotBlockMenu(finalXY)) {
+                return finalXY;
+            }
+            return null;
+        };
+        // For center line items, prefer offset Y positions first
+        const menuItemDirection = itemCell.xy.x - base.x;
+        const yPreferences = menuItemDirection === 0
+            ? [1, -1, 0, 2, -2, 3, -3, 4, -4] // center: try offset first
+            : [0, 1, -1, 2, -2, 3, -3, 4, -4]; // sides: try same row first
+        for (const yOffset of yPreferences) {
+            const y = itemCell.xy.y + yOffset;
+            if (y < 0 || y >= map.h)
+                continue;
+            const result = tryPosition(game_xy.XY.at(itemCell.xy.x, y));
+            if (result)
+                return map.get(result);
+        }
+        // Ultimate fallback
+        return itemCell;
+    }
+    showHelp(cell, item) {
+        const text = MENU_HELP[item.key];
+        if (!text)
+            return;
+        const target = this.findUnobstructedMenuLocation(cell, text);
+        text_stroke/* TextStroke */.m.render(this.ui.map, text, target.xy, this.helpId, () => colors/* WHITE */.UE, () => true, 6, colors/* BACKGROUND */.h4);
+    }
+    hideHelp() {
+        this.showTimer.stop();
+        this.hideTimer.stop();
+        this.ui.map.uiRenderer.remove(this.helpId);
+        this.hovered = undefined;
+    }
+    createMenuStroke(cell, char) {
+        const stroke = new ui_stroke/* Stroke */.t([], () => '#ff0', () => true, 5);
+        stroke.add(cell, char);
+        return stroke;
+    }
+}
+
+;// ./src/ui/states/observe-state.ts
+
+class ObservePawnState {
+    constructor(ui) {
+        this.ui = ui;
+    }
+    onClick(cell, _c) {
+        if (!cell)
+            return this.ui.setState('select');
+        const pawn = cell.pawn();
+        if (pawn)
+            this.ui.setState('menu', pawn);
+        else
+            this.ui.setState('select');
+    }
+    onMouseMove(cell) {
+        this.ui.terminal.setCurrent(cell);
+    }
+    enter(pawn) {
+        this.selected = pawn;
+        this.selected.selected = true;
+        draw_pawn/* PawnSelected */.Ei.emit(pawn);
+    }
+    exit() {
+        this.selected.selected = false;
+        draw_pawn/* PawnSelected */.Ei.emit(null);
+    }
+}
+
+;// ./src/ui/ui.ts
+
+
+
+
+
+
+class UI {
+    constructor(terminal, map) {
+        this.terminal = terminal;
+        this.map = map;
+        this.state = 'select';
+        this.onClick = (cell, c) => {
+            this.states[this.state].onClick(cell, c);
+            ui_renderer/* Repaint */.G2.emit();
+        };
+        this.onMouseMove = (cell) => {
+            this.states[this.state].onMouseMove(cell);
+            this.terminal.draw();
+        };
+        this.states = {
+            select: new SelectState(this),
+            destination: new DestinationState(this),
+            menu: new MenuState(this),
+            observe: new ObservePawnState(this)
+        };
+    }
+    setState(newState, data) {
+        this.states[this.state].exit?.();
+        this.state = newState;
+        this.states[this.state].enter?.(data);
+    }
+    nextPawn(pawn) {
+        this.setState('menu', draw_pawn/* Pawn */.vc.next(pawn));
+    }
+}
+
+// EXTERNAL MODULE: ./src/signal.ts
+var signal = __webpack_require__(334);
+// EXTERNAL MODULE: ./src/ui/firehouse.ts + 1 modules
+var firehouse = __webpack_require__(8846);
+// EXTERNAL MODULE: ./src/game/state.ts + 1 modules
+var state = __webpack_require__(9308);
+// EXTERNAL MODULE: ./src/ui/feedback.ts + 1 modules
+var feedback = __webpack_require__(5264);
+;// ./src/html/switch-env.html
+/* harmony default export */ const switch_env = ("<div id=\"env-switch-modal\" class=\"modal-window column gap-form\">\n    <div class=\"row items-between cross-aligned-center gap-modal-header border-bottom\">\n        <h3>SWITCH ENVIRONMENT</h3>\n        <button id=\"env-switch-close\" class=\"button-secondary close-button\">×</button>\n    </div>\n    <div id=\"env-switch-message\"></div>\n    <div class=\"row aligned-end gap-buttons\">\n        <button id=\"env-switch-cancel\" class=\"button-secondary\">Cancel</button>\n        <button id=\"env-switch-save-push\" class=\"button-primary\">Save &amp; Push</button>\n        <button id=\"env-switch-save\" class=\"button-primary\">Save Here &amp; Switch</button>\n        <button id=\"env-switch-switch\" class=\"button-primary\">Switch Only</button>\n    </div>\n</div>\n");
+// EXTERNAL MODULE: ./src/ui/modal.ts
+var modal = __webpack_require__(5382);
+// EXTERNAL MODULE: ./src/storage.ts
+var storage = __webpack_require__(8421);
+;// ./src/ui/env-switch.ts
+
+
+
+
+class EnvSwitch extends modal/* Modal */.a {
+    constructor() {
+        super('#env-switch-modal');
+        this.div.appendFileHtml(switch_env);
+        const close = () => this.choose('cancel');
+        this.div.d1('#env-switch-close').onClick(close);
+        this.div.d1('#env-switch-cancel').onClick(close);
+        this.div.d1('#env-switch-save-push').onClick(() => this.choose('push'));
+        this.div.d1('#env-switch-save').onClick(() => this.choose('save'));
+        this.div.d1('#env-switch-switch').onClick(() => this.choose('switch'));
+    }
+    async show() {
+        const s = storage/* storage */.I.get('gameState');
+        const bytes = s ? await (0,compress/* gzSize */.F8)(s) : 0;
+        this.div.d1('#env-switch-message').text(`Save is ${bytes}b`);
+        super.show();
+        return new Promise(r => (this.resolve = r));
+    }
+    choose(a) {
+        super.hide();
+        this.resolve?.(a);
+    }
+    modalKeyHandled(e) {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            this.choose('cancel');
+            return true;
+        }
+        return false;
+    }
+}
+
+;// ./src/html/save-slots.html
+/* harmony default export */ const save_slots = ("<div id=\"save-slots-modal\" class=\"modal-window column gap-form\">\n    <h3 id=\"save-title\" class=\"popup-title border-bottom\">SAVE GAME - SELECT SLOT</h3>\n    <div class=\"imported-save-section border-bottom\">\n        <div class=\"imported-save template save-slot panel\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">Imported</div>\n                <button class=\"slot-delete button-secondary close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Imported Save</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"exported-save-section\">\n        <div class=\"exported-save template save-slot panel\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">Exported</div>\n                <button class=\"slot-delete button-secondary close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Exported Save</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"slots\">\n        <div class=\"slot template save-slot panel\">\n            <div class=\"slot-header row items-spread cross-aligned-center\">\n                <div class=\"slot-number\">1</div>\n                <button class=\"slot-delete button-secondary close-button\">×</button>\n            </div>\n            <div class=\"slot-info column gap-terminal-info\">\n                <div class=\"slot-status\">Empty Slot</div>\n                <div class=\"slot-details\"></div>\n            </div>\n        </div>\n    </div>\n    <div class=\"save-actions row aligned-end\">\n        <button id=\"save-cancel\" class=\"button-secondary\">Cancel</button>\n    </div>\n    <div class=\"popup-help-text\">\n        Click a slot to select • ESC to cancel\n    </div>\n</div>\n");
+;// ./src/ui/save-slots.ts
+
+
+
+
+
+class SaveSlots extends modal/* Modal */.a {
+    constructor(gameState) {
+        super('#save-slots-modal');
+        this.gameState = gameState;
+        this.currentAction = 'save';
+        this.isAutoLoadAtStartup = false;
+        this.div.appendFileHtml(save_slots);
+        this.div.d1('#save-cancel').onClick(() => this.hide());
+    }
+    async showSaveDialog() {
+        this.currentAction = 'save';
+        this.div.d1('#save-title').text('SAVE GAME - SELECT SLOT');
+        await this.renderSlots();
+        this.show();
+    }
+    async showLoadDialog() {
+        this.currentAction = 'load';
+        this.isAutoLoadAtStartup = false;
+        this.div.d1('#save-title').text('LOAD GAME - SELECT SLOT');
+        await this.renderSlots();
+        this.show();
+    }
+    async showAutoLoadDialog() {
+        this.currentAction = 'load';
+        this.isAutoLoadAtStartup = true;
+        this.div.d1('#save-title').text('LOAD GAME - SELECT SLOT');
+        await this.renderSlots();
+        this.show();
+    }
+    async renderSlots() {
+        await this.renderEphemeralSave('imported', 'importedSave', 'Imported');
+        await this.renderEphemeralSave('exported', 'exportedSave', 'Exported');
+        const slots = await this.getSlotData();
+        this.div.d1('.slots').dList('.slot').updateFrom(slots, (slotDiv, slotData) => {
+            const index = slots.indexOf(slotData);
+            const slotNum = index + 1;
+            slotDiv.d1('.slot-number').text(slotNum.toString());
+            if (slotData.exists) {
+                slotDiv.d1('.slot-status').text(`Firehouse #${slotData.firehouseNum}`);
+                slotDiv.d1('.slot-details').text(`${slotData.count} firefighters - ${slotData.bytes}b`);
+                slotDiv.classed('slot-exists', true).classed('slot-empty', false);
+            }
+            else {
+                slotDiv.d1('.slot-status').text('Empty Slot');
+                slotDiv.d1('.slot-details').text('');
+                slotDiv.classed('slot-exists', false).classed('slot-empty', true);
+            }
+            slotDiv.onClick(() => this.selectSlot(slotNum));
+            slotDiv.d1('.slot-delete').on('click', async (event) => {
+                event.stopPropagation();
+                this.deleteSlot(slotNum);
+                await this.renderSlots();
+            });
+        });
+    }
+    async renderEphemeralSave(type, storageKey, displayName) {
+        const section = this.div.d1(`.${type}-save-section`);
+        if (this.currentAction === 'save') {
+            section.style('display', 'none');
+            return;
+        }
+        const data = this.getSaveData(storageKey);
+        if (!data) {
+            section.style('display', 'none');
+            return;
+        }
+        section.style('display', 'block');
+        const saveDiv = section.d1(`.${type}-save`);
+        const bytes = await (0,compress/* gzSize */.F8)(JSON.stringify(data));
+        const info = this.extractInfo(data);
+        saveDiv.d1('.slot-status').text(`Firehouse #${info.firehouseNum}`);
+        saveDiv.d1('.slot-details').text(`${info.count} firefighters - ${bytes}b`);
+        saveDiv.classed('slot-exists', true).classed('slot-empty', false);
+        saveDiv.onClick(() => this.loadEphemeralSave(storageKey, displayName));
+        saveDiv.d1('.slot-delete').on('click', async (event) => {
+            event.stopPropagation();
+            this.deleteEphemeralSave(storageKey, displayName);
+            await this.renderSlots();
+        });
+    }
+    extractInfo(data) {
+        if (data && data.firehouse) {
+            const fh = data.firehouse;
+            return { count: (fh.pawns || []).length, firehouseNum: fh.firehouseNum || 0 };
+        }
+        return { count: (data?.pawns || []).length, firehouseNum: data?.firehouseNum || 0 };
+    }
+    loadEphemeralSave(storageKey, displayName) {
+        const raw = storage/* storage */.I.get(storageKey);
+        if (!raw)
+            return;
+        try {
+            const parsed = JSON.parse(raw);
+            this.gameState.loadData(parsed);
+            storage/* storage */.I.remove(storageKey);
+            if (this.gameState.introSucceeded)
+                state/* FirehouseMode */.M.emit(this.gameState.firehouse.pawns);
+            this.isAutoLoadAtStartup = false;
+            this.hide();
+            console.log(`${displayName} save loaded`);
+        }
+        catch (e) {
+            console.error(`Failed to load ${displayName} save`, e);
+            console.error('Save JSON:', raw);
+            const archiveKey = `badSaves_${Date.now()}`;
+            storage/* storage */.I.set(archiveKey, raw);
+            storage/* storage */.I.remove(storageKey);
+            const err = new Error(`Failed to load ${displayName} save\narchived at ${archiveKey}`);
+            err.cause = e;
+            throw err;
+        }
+    }
+    deleteEphemeralSave(storageKey, displayName) {
+        storage/* storage */.I.remove(storageKey);
+        console.log(`${displayName} save deleted`);
+    }
+    getSaveData(storageKey) {
+        const data = storage/* storage */.I.get(storageKey);
+        if (!data)
+            return null;
+        try {
+            return JSON.parse(data);
+        }
+        catch {
+            return null;
+        }
+    }
+    selectSlot(slotNum) {
+        if (this.currentAction === 'save') {
+            this.saveToSlot(slotNum);
+        }
+        else {
+            this.loadFromSlot(slotNum);
+        }
+        this.isAutoLoadAtStartup = false;
+        this.hide();
+    }
+    saveToSlot(slotNum) {
+        const key = `gameState_${slotNum}`;
+        storage/* storage */.I.set(key, JSON.stringify(this.gameState.data()));
+        console.log(`Game saved to slot ${slotNum}`);
+    }
+    loadFromSlot(slotNum) {
+        const key = `gameState_${slotNum}`;
+        const raw = storage/* storage */.I.get(key);
+        if (!raw) {
+            console.log(`Starting fresh game (empty slot ${slotNum})`);
+            this.startFreshGame();
+            return;
+        }
+        try {
+            const parsed = JSON.parse(raw);
+            this.gameState.loadData(parsed);
+            if (this.gameState.introSucceeded)
+                state/* FirehouseMode */.M.emit(this.gameState.firehouse.pawns);
+            console.log(`Game loaded from slot ${slotNum}`);
+        }
+        catch (e) {
+            console.error(`Failed to load slot ${slotNum}`, e);
+            console.error('Save JSON:', raw);
+            const archiveKey = `badSaves_${slotNum}_${Date.now()}`;
+            storage/* storage */.I.set(archiveKey, raw);
+            storage/* storage */.I.remove(key);
+            const err = new Error(`Failed to load slot ${slotNum}\narchived at ${archiveKey}`);
+            err.cause = e;
+            throw err;
+        }
+    }
+    deleteSlot(slotNum) {
+        const key = `gameState_${slotNum}`;
+        storage/* storage */.I.remove(key);
+        console.log(`Deleted save slot ${slotNum}`);
+    }
+    startFreshGame() {
+        this.gameState.restartIntro();
+    }
+    hasSavedGames() {
+        return [1, 2, 3].some(slotNum => {
+            const key = `gameState_${slotNum}`;
+            return storage/* storage */.I.get(key) !== null;
+        }) || this.hasEphemeralSave('importedSave') || this.hasEphemeralSave('exportedSave');
+    }
+    hasEphemeralSave(storageKey) {
+        return storage/* storage */.I.get(storageKey) !== null;
+    }
+    async getSlotData() {
+        return Promise.all([1, 2, 3].map(async (slotNum) => {
+            const key = `gameState_${slotNum}`;
+            const raw = storage/* storage */.I.get(key);
+            if (!raw)
+                return { exists: false, count: 0, firehouseNum: 0, bytes: 0 };
+            const parsed = JSON.parse(raw);
+            const bytes = await (0,compress/* gzSize */.F8)(raw);
+            const info = this.extractInfo(parsed);
+            return {
+                exists: true,
+                count: info.count,
+                firehouseNum: info.firehouseNum,
+                bytes
+            };
+        }));
+    }
+    hide() {
+        super.hide();
+        this.isAutoLoadAtStartup = false;
+    }
+    modalKeyHandled(e) {
+        if (e.key >= '1' && e.key <= '3') {
+            this.selectSlot(parseInt(e.key));
+            return true;
+        }
+        return false;
+    }
+}
+
+;// ./src/html/branch-runner.html
+/* harmony default export */ const branch_runner = ("<div id=\"branch-runner-modal\" class=\"modal-window column gap-form\">\n    <h3 class=\"popup-title border-bottom\">BRANCH RUNNER</h3>\n    <div class=\"branch-actions\">\n        <button id=\"refresh-branches\" class=\"button-link\">Refresh</button>\n    </div>\n    <div class=\"branches\">\n        <div class=\"branch template branch-item\">\n            <div class=\"branch-info\">\n                <div class=\"branch-name\"></div>\n                <div class=\"branch-title\"></div>\n            </div>\n            <div class=\"branch-actions\">\n                <a class=\"button-link pr-link\" href=\"#\" target=\"_blank\">PR</a>\n                <button class=\"button-primary branch-run\">Run</button>\n            </div>\n        </div>\n    </div>\n    <div class=\"popup-actions\">\n        <button id=\"branch-cancel\" class=\"button-secondary\">Cancel</button>\n    </div>\n    <div class=\"progress-messages hidden\">\n        <div class=\"progress-title\">Running branch...</div>\n        <div class=\"progress-log\"></div>\n    </div>\n    <div class=\"popup-help-text\">\n        Click Run to test branch • Refresh to update list • ESC to cancel\n    </div>\n</div>\n");
+;// ./src/git.ts
+
+const apiCall = async (endpoint, data) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `/api/git/${endpoint}`, true); // asynchronous
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    return new Promise((resolve, reject) => {
+        xhr.onload = () => {
+            if (xhr.status === 200) {
+                try {
+                    resolve(JSON.parse(xhr.responseText));
+                }
+                catch (e) {
+                    reject(new Error(`Failed to parse response: ${e}`));
+                }
+            }
+            else {
+                reject(new Error(`API call failed: ${xhr.statusText}`));
+            }
+        };
+        xhr.onerror = () => reject(new Error('Network error'));
+        xhr.ontimeout = () => reject(new Error('Request timeout'));
+        xhr.timeout = 30000; // 30 second timeout
+        try {
+            xhr.send(JSON.stringify(data || {}));
+        }
+        catch (error) {
+            reject(new Error(`Git API call failed: ${endpoint}\n${error.message}`));
+        }
+    });
+};
+const git = {
+    async fetchBranches() {
+        try {
+            await apiCall('fetch');
+        }
+        catch (error) {
+            (0,utils/* bomb */.fv)(`Failed to fetch branches: ${error.message}`);
+        }
+    },
+    async listCodexBranches() {
+        try {
+            const result = await apiCall('list-branches');
+            return result || { branches: [] };
+        }
+        catch (error) {
+            (0,utils/* bomb */.fv)(`Failed to list branches: ${error.message}`);
+            return { branches: [] };
+        }
+    },
+    async cloneRepo(targetDir) {
+        try {
+            await apiCall('clone', { targetDir });
+        }
+        catch (error) {
+            (0,utils/* bomb */.fv)(`Failed to clone repo: ${error.message}`);
+        }
+    },
+    async checkoutBranch(repoDir, branch) {
+        try {
+            await apiCall('checkout', { repoDir, branch });
+        }
+        catch (error) {
+            (0,utils/* bomb */.fv)(`Failed to checkout branch: ${error.message}`);
+        }
+    },
+    async startBranchServer(repoDir) {
+        try {
+            await apiCall('start-server', { repoDir });
+        }
+        catch (error) {
+            (0,utils/* bomb */.fv)(`Failed to start server: ${error.message}`);
+        }
+    },
+    async getBranchInfo() {
+        try {
+            const result = await apiCall('branch-info');
+            return result || { branch: 'main', hasChanges: false };
+        }
+        catch (error) {
+            (0,utils/* bomb */.fv)(`Failed to get branch info: ${error.message}`);
+            return { branch: 'main', hasChanges: false };
+        }
+    },
+    async killServer() {
+        await apiCall('kill-server');
+    }
+};
+
+;// ./src/ui/branch-runner.ts
+
+
+
+class BranchRunnerUI extends modal/* Modal */.a {
+    constructor() {
+        super('#branch-runner-modal');
+        this.branchTab = null;
+        this.isRunning = false;
+        this.div.appendFileHtml(branch_runner);
+        this.setupEventHandlers();
+    }
+    async showDialog() {
+        this.show();
+        await this.refreshBranches();
+    }
+    setupEventHandlers() {
+        this.div.d1('#branch-cancel').onClick(() => this.hide());
+        this.div.d1('#refresh-branches').onClick(() => void this.refreshBranches());
+    }
+    async refreshBranches() {
+        await git.fetchBranches();
+        const r = await git.listCodexBranches();
+        const b = r.branches || [];
+        this.div.d1('.branches').dList('.branch').updateFrom(b, (d, data) => {
+            const n = typeof data === 'string' ? data : data.branch;
+            const t = typeof data === 'string' ? '' : data.title;
+            const num = typeof data === 'string' ? 0 : data.number;
+            d.d1('.branch-name').text(n);
+            t ? d.d1('.branch-title').text(t).show() : d.d1('.branch-title').hide();
+            if (num > 0) {
+                const u = `https://github.com/${this.getRepoPath()}/pull/${num}`;
+                d.d1('.pr-link').href(u).show();
+            }
+            else
+                d.d1('.pr-link').hide();
+            const runBtn = d.d1('.branch-run');
+            runBtn.on('click', null).onClick(() => this.runBranch(n));
+            if (this.isRunning)
+                runBtn.disable(true).text('Running...');
+            else
+                runBtn.disable(false).text('Run');
+        });
+    }
+    async runBranch(branch) {
+        if (this.isRunning)
+            return;
+        this.isRunning = true;
+        const target = '/Users/jeffbay/src/firehouse-rl-branch';
+        this.div.d1('.branches').hide();
+        this.div.d1('.popup-actions').hide();
+        this.div.d1('.popup-help-text').hide();
+        this.div.d1('.progress-messages').show();
+        const log = this.div.d1('.progress-log');
+        const msg = (m) => { log.append('div').text(m); console.log(`Branch Runner: ${m}`); };
+        try {
+            msg('Stopping any existing server on port 8081...');
+            try {
+                await git.killServer();
+                msg('Server stopped (or was not running)');
+            }
+            catch (e) {
+                msg('No server was running to stop');
+            }
+            msg(`Cloning repository to ${target}...`);
+            await this.delay(100);
+            await git.cloneRepo(target);
+            msg('Repository ready');
+            msg(`Checking out branch: ${branch}`);
+            await this.delay(100);
+            await git.checkoutBranch(target, branch);
+            msg(`Branch ${branch} checked out and updated`);
+            msg('Starting webpack dev server on port 8081...');
+            await this.delay(100);
+            await git.startBranchServer(target);
+            msg('Server starting - waiting 5 seconds for full startup...');
+            await this.delay(5000);
+            msg('Opening branch in browser tab');
+            if (this.branchTab && !this.branchTab.closed) {
+                this.branchTab.location.href = 'http://localhost:8081';
+                this.branchTab.focus();
+            }
+            else
+                this.branchTab = window.open('http://localhost:8081', 'branch-testing');
+            msg('Branch server ready! Check browser tab.');
+            await this.delay(2000);
+            this.hide();
+            this.resetProgressUI();
+        }
+        catch (e) {
+            const m = e instanceof Error ? e.message : String(e);
+            msg(`Error: ${m}`);
+            msg('Check console for details. Click Cancel to close.');
+            console.error('Branch runner error:', e);
+        }
+        finally {
+            this.isRunning = false;
+        }
+    }
+    delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+    resetProgressUI() {
+        this.div.d1('.progress-log').text('');
+        this.div.d1('.progress-messages').hide();
+        this.div.d1('.branches').show();
+        this.div.d1('.popup-actions').show();
+        this.div.d1('.popup-help-text').show();
+    }
+    getRepoPath() { return 'jlb0170/firehouse-rl'; }
+}
+
+// EXTERNAL MODULE: ./src/ui/play-controls.ts
+var play_controls = __webpack_require__(6488);
+// EXTERNAL MODULE: ./src/draw/fire.ts
+var fire = __webpack_require__(1267);
+// EXTERNAL MODULE: ./src/game/fires.ts
+var fires = __webpack_require__(6746);
+;// ./src/game/game.ts
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const GameStepped = new signal/* SignalWithCurrent */.Y();
+const LevelWon = new signal/* SignalWithCurrent */.Y();
+const LevelReset = new signal/* Signal */.H();
+class Game {
+    constructor() {
+        this.running = false;
+        this.holding = false;
+        this.stepTimer = timer('step');
+        this.speed = 1;
+        this.showLighting = false;
+        this.showDarkness = false;
+        this.mutedLayers = new Set();
+        this.soloLayer = null;
+        this.helpSystem = new HelpSystem();
+        this.feedback = new feedback/* Feedback */.G();
+        this.envSwitch = new EnvSwitch();
+        this.setSpeed = (n) => {
+            this.speed = n;
+            if (this.running)
+                this.stepTimer.restartInMillis(this.delay(), this.tick);
+        };
+        this.delay = () => 350 / this.speed;
+        this.updateStepInfo = () => {
+            if (!GameStepped.current)
+                return;
+            const { frame, stepMs } = GameStepped.current;
+            const r = ui_renderer/* FrameRendered */.HO.current ?? 0;
+            (0,utils.$1)('step-frame').textContent = `${frame}`;
+            (0,utils.$1)('step-timing').textContent = `${stepMs}ms r${r}`;
+        };
+        this.updateFireCount = () => {
+            fires/* Fires */.UQ.decorate('fires');
+            fires/* Fires */.UQ.decorate('items');
+            fires/* Fires */.UQ.decorate('people');
+        };
+        this.keyDown = (e) => {
+            if (e.key === ' ') {
+                e.preventDefault();
+                if (this.holding)
+                    return;
+                this.holding = true;
+                if (LevelWon.current) {
+                    LevelWon.current = false;
+                    return;
+                }
+                if (this.map.uiRenderer.frozen())
+                    this.toggleFreeze();
+                if (!this.running)
+                    this.play();
+            }
+            else if (e.key === 'Escape') {
+                if (this.feedback.isVisible()) {
+                    this.feedback.hide();
+                }
+                else {
+                    this.closeHelp();
+                }
+            }
+            else if (e.key === 'ArrowLeft')
+                this.previousHelpPage();
+            else if (e.key === 'ArrowRight')
+                this.nextHelpPage();
+        };
+        this.keyUp = (e) => {
+            if (e.key === ' ' && this.holding) {
+                this.holding = false;
+                if (this.running)
+                    this.pause();
+            }
+        };
+        this.closeHelpOnOutsideClick = (e) => {
+            const popup = (0,utils.$1)('help-popup');
+            const target = e.target;
+            if (!popup.contains(target)) {
+                this.closeHelp();
+            }
+        };
+        this.tick = () => {
+            if (!this.running)
+                return;
+            this.step();
+            this.stepTimer.restartInMillis(this.delay(), this.tick);
+        };
+        this.chooseSwitchAction = () => this.envSwitch.show();
+        this.switchEnv = async () => {
+            const act = await this.chooseSwitchAction();
+            if (act === 'cancel')
+                return;
+            if (act === 'save' || act === 'push') {
+                this.state.save();
+                const gameStateData = storage/* storage */.I.get('gameState');
+                if (gameStateData)
+                    storage/* storage */.I.set('exportedSave', gameStateData);
+            }
+            let url = this.envDest();
+            if (act === 'push') {
+                const s = storage/* storage */.I.get('gameState');
+                if (s) {
+                    const g = await (0,compress/* gzip */.ZI)(s);
+                    alert(`Pushing ${(0,compress/* gzBytes */.vy)(g)} bytes`);
+                    url += '?import=' + encodeURIComponent(g);
+                    if ((0,compress/* longUrl */.wz)(url))
+                        alert('Save may exceed url length and be truncated');
+                }
+            }
+            location.href = url;
+        };
+        this.enterFirehouse = (pawns) => {
+            this.pause();
+            this.map.killAll();
+            this.map.display.clear();
+            this.map.smokeDisplay.clear();
+            this.map.uiRenderer.clearStrokes();
+            this.drawMap();
+            this.firehouse.open(this.state.firehouse.firehouseNum, pawns);
+        };
+        this.afterFirehouse = () => {
+            const models = this.state.firehouse.pawns;
+            const pawns = models.map(m => m.toPawn());
+            const opts = this.initializer.startNext(pawns);
+            this.resetCounters();
+            if (opts.showDarkness !== undefined)
+                this.showDarkness = opts.showDarkness;
+            this.updateDarknessToggleButton();
+            this.updateLightingEnabled();
+        };
+        this.map = new map/* Map */.T(config/* Config */.T.WIDTH, config/* Config */.T.HEIGHT);
+        window.map = this.map;
+        window.Fire = fire/* Fire */.v;
+        this.terminal = new Terminal();
+        this.ui = new UI(this.terminal, this.map);
+        this.attachToDOM();
+        this.setupPlayControls();
+        this.setupControls();
+        if ((0,utils/* isLocal */.IX)() && !(0,utils/* isBranchRunner */.ZL)()) {
+            this.branchRunner = new BranchRunnerUI();
+            (0,d3_extend.d1)('#branch-runner').show();
+        }
+        void this.showBranchInfo();
+        this.setupDebugControls();
+        this.updateEnvButton();
+        this.initializer = new initializer.Initializer(this.map);
+        this.initializer.initialize();
+        this.updateLightingEnabled();
+        this.drawMap();
+        this.updatePlayPauseButton();
+        this.updateFreezeButton();
+        this.updateStepInfo();
+        this.updateFireCount();
+        document.addEventListener('keydown', this.keyDown);
+        document.addEventListener('keyup', this.keyUp);
+        ui_renderer/* RedrawMap */.iQ.on(() => this.drawMap());
+        ui_renderer/* FrameRendered */.HO.on(() => this.updateStepInfo());
+        fires/* BurningCountersUpdated */.EZ.on(() => this.updateFireCount());
+        this.state = new state/* GameState */.m(this.map);
+        modal/* ModalShowing */.r.on(s => {
+            if (s) {
+                this.pauseForModal();
+                this.map.uiRenderer.freeze();
+            }
+            else {
+                this.map.uiRenderer.unfreeze();
+                this.resumeFromModal();
+            }
+        });
+        this.saveSlots = new SaveSlots(this.state);
+        this.firehouse = new firehouse/* FirehouseModal */._();
+        state/* FirehouseMode */.M.on(this.enterFirehouse);
+        firehouse/* FirehouseClosed */.F.on(this.afterFirehouse);
+        // Auto-show load dialog if saves exist, otherwise start normally
+        if (this.saveSlots.hasSavedGames()) {
+            this.saveSlots.showAutoLoadDialog();
+        }
+        else {
+            this.state.load();
+        }
+        GameStepped.emit({ frame: 0, stepMs: 0 });
+    }
+    resetCounters() {
+        GameStepped.emit({ frame: 0, stepMs: 0 });
+        ui_renderer/* FrameRendered */.HO.emit(0);
+        this.updateStepInfo();
+    }
+    attachToDOM() {
+        const container = (0,utils.$1)('game-container');
+        container.style.position = 'relative';
+        this.map.display.attachTo(container, { display: 'block', zIndex: '1' });
+        this.map.smokeDisplay.attachTo(container, { position: 'absolute', top: '0', left: '0', zIndex: '2', pointerEvents: 'none' });
+        this.map.uiRenderer.attachTo(container, { position: 'absolute', top: '0', left: '0', zIndex: '3', pointerEvents: 'none' });
+        this.map.onMousemove(this.ui.onMouseMove);
+        this.map.onClick(this.ui.onClick);
+    }
+    setupPlayControls() {
+        this.playControls = new play_controls/* PlayControls */.j('#play-wrapper', {
+            onPlayPause: () => this.togglePlayPause(),
+            onSpeedChange: (speed) => this.setSpeed(speed),
+            getIsRunning: () => this.running
+        });
+    }
+    setupControls() {
+        (0,utils/* onClick */.Af)((0,utils.$1)('next-button'), () => this.step());
+        (0,utils/* onClick */.Af)((0,utils.$1)('freeze-button'), () => this.toggleFreeze());
+        (0,utils/* onClick */.Af)((0,utils.$1)('help-button'), e => {
+            e.stopPropagation();
+            this.toggleHelp();
+        });
+        (0,utils/* onClick */.Af)((0,utils.$1)('feedback-button'), e => {
+            e.stopPropagation();
+            this.showFeedback();
+        });
+    }
+    setupDebugControls() {
+        (0,utils/* onClick */.Af)((0,utils.$1)('debug-toggle'), () => (0,utils/* toggleHidden */.N2)((0,utils.$1)('debug-controls')));
+        (0,utils/* onClick */.Af)((0,utils.$1)('lighting-toggle'), () => this.toggleLighting());
+        (0,utils/* onClick */.Af)((0,utils.$1)('darkness-toggle'), () => this.toggleDarkness());
+        (0,utils/* onClick */.Af)((0,utils.$1)('layer-on'), () => this.turnOnAllLayers());
+        (0,utils/* onClick */.Af)((0,utils.$1)('layer-off'), () => this.turnOffAllLayers());
+        (0,utils/* onClick */.Af)((0,utils.$1)('load-game'), () => this.saveSlots.showLoadDialog());
+        (0,utils/* onClick */.Af)((0,utils.$1)('save-game'), () => this.saveSlots.showSaveDialog());
+        (0,utils/* onClick */.Af)((0,utils.$1)('new-game'), () => this.confirmNewGame());
+        (0,utils/* onClick */.Af)((0,utils.$1)('draw-button'), () => { location.href = location.pathname + '?mode=editor'; });
+        (0,utils/* onClick */.Af)((0,utils.$1)('switch-env'), this.switchEnv);
+        if (this.branchRunner) {
+            (0,utils/* onClick */.Af)((0,utils.$1)('branch-runner'), () => void this.branchRunner.showDialog());
+        }
+        this.createLayerButtons();
+        game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
+            (0,utils/* onClick */.Af)((0,utils.$1)(`layer-${layerName}`), () => this.toggleLayerVisibility(layerName));
+        });
+    }
+    updatePlayPauseButton() {
+        this.playControls.updatePlayPauseButton();
+    }
+    updateFreezeButton() {
+        const button = (0,utils.$1)('freeze-button');
+        button.textContent = this.map.uiRenderer.frozen() ? '🧊' : '❄️';
+    }
+    resetFrameCounter() {
+        GameStepped.emit({ frame: 0, stepMs: 0 });
+    }
+    togglePlayPause() {
+        if (this.map.uiRenderer.frozen()) {
+            this.toggleFreeze();
+        }
+        if (this.running)
+            this.pause();
+        else
+            this.play();
+    }
+    toggleFreeze() {
+        if (this.map.uiRenderer.frozen()) {
+            this.map.uiRenderer.unfreeze();
+        }
+        else {
+            if (this.running)
+                this.pause();
+            this.map.uiRenderer.freeze();
+        }
+        this.updateFreezeButton();
+    }
+    toggleHelp() {
+        const popup = (0,utils.$1)('help-popup');
+        if (popup.classList.contains('hidden')) {
+            if (this.running)
+                this.pause();
+            this.loadHelp();
+            popup.classList.remove('hidden');
+            setTimeout(() => {
+                document.addEventListener('click', this.closeHelpOnOutsideClick);
+            }, 10);
+        }
+        else {
+            this.closeHelp();
+        }
+    }
+    closeHelp() {
+        const popup = (0,utils.$1)('help-popup');
+        popup.classList.add('hidden');
+        document.removeEventListener('click', this.closeHelpOnOutsideClick);
+    }
+    loadHelp() {
+        this.helpSystem.resetToFirstPage();
+        this.updateHelpDisplay();
+    }
+    showFeedback() {
+        if (this.running)
+            this.pause();
+        this.feedback.show();
+    }
+    pauseForModal() {
+        if (this.running)
+            this.pause();
+    }
+    resumeFromModal() {
+        // Game stays paused - user can resume manually if they want
+    }
+    updateHelpDisplay() {
+        const content = this.helpSystem.getCurrentPage();
+        const pageInfo = this.helpSystem.getPageInfo();
+        (0,utils.$1)('help-content').innerHTML = pageInfo + content;
+    }
+    nextHelpPage() {
+        if (!(0,utils.$1)('help-popup').classList.contains('hidden')) {
+            if (this.helpSystem.nextPage()) {
+                this.updateHelpDisplay();
+            }
+        }
+    }
+    previousHelpPage() {
+        if (!(0,utils.$1)('help-popup').classList.contains('hidden')) {
+            if (this.helpSystem.previousPage()) {
+                this.updateHelpDisplay();
+            }
+        }
+    }
+    pause() {
+        if (!this.running)
+            return;
+        this.running = false;
+        this.stepTimer.stop();
+        this.updatePlayPauseButton();
+    }
+    play() {
+        if (this.running)
+            return;
+        this.running = true;
+        this.tick();
+        this.updatePlayPauseButton();
+    }
+    step() {
+        const start = Date.now();
+        this.map.step();
+        this.map.lighting.redraw();
+        this.drawMap();
+        ui_renderer/* Repaint */.G2.emit();
+        const stepMs = Date.now() - start;
+        const frame = (GameStepped.current?.frame || 0) + 1;
+        GameStepped.emit({ frame, stepMs });
+        this.updateStepInfo();
+    }
+    drawMap() {
+        this.map.lighting.redraw(); // Update colors more frequently for flickering effect
+        const visibleLayers = this.getVisibleLayers();
+        const showNothing = this.mutedLayers.size === game_layers/* CellLayers */.v.layerNames.length;
+        const debug = this.mutedLayers.size > 0 || this.soloLayer !== null;
+        this.map.draw(this.showLighting, visibleLayers, showNothing, debug, this.showDarkness);
+    }
+    getVisibleLayers() {
+        if (this.soloLayer) {
+            return new Set([this.soloLayer]);
+        }
+        if (this.mutedLayers.size === 0) {
+            return new Set();
+        }
+        return new Set(game_layers/* CellLayers */.v.layerNames.filter(layer => !this.mutedLayers.has(layer)));
+    }
+    updateLightingEnabled() {
+        if (this.showLighting || this.showDarkness) {
+            this.map.lighting.enable();
+            this.map.lighting.redraw();
+        }
+        else
+            this.map.lighting.disable();
+    }
+    toggleLighting() {
+        this.showLighting = !this.showLighting;
+        const button = (0,utils.$1)('lighting-toggle');
+        button.textContent = this.showLighting ? 'LT*' : 'LT';
+        this.updateLightingEnabled();
+        this.drawMap();
+    }
+    toggleDarkness() {
+        this.showDarkness = !this.showDarkness;
+        const button = (0,utils.$1)('darkness-toggle');
+        button.textContent = this.showDarkness ? 'DK*' : 'DK';
+        this.updateLightingEnabled();
+        this.drawMap();
+    }
+    toggleLayerVisibility(layerName) {
+        const button = (0,utils.$1)(`layer-${layerName}`);
+        if (this.soloLayer === layerName) {
+            this.soloLayer = null;
+            button.classList.remove('solo');
+        }
+        else if (this.soloLayer) {
+            const oldButton = (0,utils.$1)(`layer-${this.soloLayer}`);
+            oldButton.classList.remove('solo');
+            this.soloLayer = layerName;
+            button.classList.add('solo');
+        }
+        else if (this.mutedLayers.has(layerName)) {
+            this.mutedLayers.delete(layerName);
+            button.classList.remove('muted');
+        }
+        else {
+            this.mutedLayers.add(layerName);
+            button.classList.add('muted');
+        }
+        this.drawMap();
+    }
+    turnOnAllLayers() {
+        this.mutedLayers.clear();
+        this.soloLayer = null;
+        game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
+            const button = (0,utils.$1)(`layer-${layerName}`);
+            button.classList.remove('muted', 'solo');
+        });
+        this.drawMap();
+    }
+    turnOffAllLayers() {
+        this.soloLayer = null;
+        this.mutedLayers = new Set(game_layers/* CellLayers */.v.layerNames);
+        game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
+            const button = (0,utils.$1)(`layer-${layerName}`);
+            button.classList.remove('solo');
+            button.classList.add('muted');
+        });
+        this.drawMap();
+    }
+    createLayerButtons() {
+        const layerGroup = (0,utils.$1)('layer-group');
+        const layerAbbrevs = (0,utils/* toMap */.J9)(game_layers/* CellLayers */.v.layerNames, name => name.slice(0, 3));
+        game_layers/* CellLayers */.v.layerNames.forEach(layerName => {
+            const button = document.createElement('button');
+            button.id = `layer-${layerName}`;
+            button.className = 'button-secondary';
+            button.textContent = layerAbbrevs[layerName] || layerName.slice(0, 3);
+            layerGroup.appendChild(button);
+        });
+    }
+    envDest() {
+        return location.host.includes('github.io') ? 'http://localhost:8080' : 'https://jlb0170.github.io/firehouse-rl-play/';
+    }
+    updateEnvButton() {
+        (0,utils.$1)('switch-env').textContent = location.host.includes('github.io') ? 'LCL' : 'PROD';
+    }
+    updateDarknessToggleButton() {
+        const button = (0,utils.$1)('darkness-toggle');
+        button.textContent = this.showDarkness ? 'DK*' : 'DK';
+    }
+    async showBranchInfo() {
+        const d = (0,d3_extend.d1)('#branch-info');
+        if ((0,utils/* isLocal */.IX)()) {
+            try {
+                const { branch, hasChanges } = await git.getBranchInfo();
+                if (branch === 'main' || branch === 'master')
+                    d.hide();
+                else
+                    d.text(`Branch: ${branch}${hasChanges ? ' (uncommitted changes)' : ''}`).show();
+            }
+            catch (e) {
+                console.error('showBranchInfo', e);
+            }
+        }
+        else {
+            try {
+                const response = await fetch('./build-info.txt');
+                if (response.ok) {
+                    const text = await response.text();
+                    console.log('build', text);
+                    const sha = text.match(/Git SHA: (\w+)/)?.[1];
+                    const commit = text.match(/Commit: (.+)/)?.[1];
+                    if (sha) {
+                        const display = commit ? `Prod: ${sha} - ${commit}` : `Prod: ${sha}`;
+                        d.text(display).show();
+                    }
+                }
+            }
+            catch (e) {
+            }
+        }
+    }
+    confirmNewGame() {
+        const ok = confirm('Start a new game?\nThis will abandon your current progress.');
+        if (!ok)
+            return;
+        this.resetCounters();
+        this.state.restartIntro();
+    }
+}
 
 
 /***/ }),
@@ -13208,6 +13301,13 @@ class FirehouseModal extends modal/* Modal */.a {
     }
 }
 
+
+/***/ }),
+
+/***/ 9110:
+/***/ ((module) => {
+
+module.exports = ".....................................................................................\n.....................................................................................\n............✰.✰......................................................................\n...........✰..........✰..............................................................\n..✰......................T................✰.✰...✰..✰.✰✰✰.....✰...........✰...........\n................✰................T.......T..✰...........✰✰..✰✰..✰......✰.....✰.......\n..✰..............T.........#####...........✰..✰.✰✰.✰..✰.......................✰......\n.............T..✰✰......###*...*###......✰...✰✰.........✰..✰.TT✰...................✰.\n.......✰...............#h*.==.==.*h###.....✰...✰..T..✰......✰..✰✰....................\n........✰..............#...==.==...#.*#....✰...........✰....✰.............✰..........\n.....✰................✰#...==.==...+.↻#...........✰.✰...✰....✰✰......................\n.....✰...✰✰.........✰..#...........#.f#.......✰✰.....✰✰..✰....✰......................\n........✰..............#.h.........#.░#......✰.....✰..✰✰✰..✰.✰............✰..........\n...✰.✰..........✰......#◘◘.........#.f#.....✰...✰....✰.✰.T....✰✰✰...............✰....\n.......................#◘◘*...h....+.↻#...........✰✰.................................\n.......................#h....░░░*..#__#........................................T.....\n.......................###+#####...####....#+++#.........✰.....####.................✰\n........T..............#...#...#...+..*#..#*...*#......✰✰✰....#.==.#.................\n................✰......#...#...+...+....#+..hhh..+....✰✰.✰...#*.==.*#................\n......................✰###############+##*.h◘◘◘h.*#.........#........#.......✰.......\n..................................#*f#.*#..h◘◘◘h..#........#*........✰#....✰.........\n............✰...........T.........#..+..+...hhh...##########░........h#..............\n..................................#.↻#..+...........*]]]]*.#░.......*◘#..............\n......✰..........✰.......#############.*#..................#*........h#......✰.......\n..........T..........✰...+.........+.+..+......░...........#..........#..........✰...\n..........✰..............#.........###++#*░...░░░..*hh..hh*#+##########..............\n...................✰.....#.........#....#░░....░*..........#..*#✰.*.__#....✰✰.....✰..\n.........✰...✰...✰.......#.........#░..*#[[....f░#...hhhh..+...+.....✰#.✰.......✰....\n..✰......................#.........#░..◛#[[....f░#.........#...#░ff░.↻#.............✰\n...........✰.........✰...#.........#◛..◛#░░....░░#.#*....✰✰#+##########..............\n...................TT....#.........#◛..░#░*░..░░░#..#✰.✰..✰#...*h◘h..*#.............✰\n.....✰...✰...............#.........#░.._#░░░◉◉░░*#..#*..✰✰*#.........*#...........T..\n.........................###+++++###░..░##########++########..........#......✰..✰....\n......✰.............✰..............#*.._#........*..*......#..........#.............✰\n.........✰.........................#.__░#...................#........#...............\n..........✰✰..✰....................######......✰✰T..T.✰✰.....#*.==.*#....✰.✰✰........\n....✰...✰.....✰...✰.✰............................✰...✰..✰.....#.==.#.......T.........\n.......✰..✰...✰...................✰.......✰✰✰.✰✰✰✰..✰✰✰✰.✰.✰...####..................\n.....✰.........................✰..........✰..✰✰..*..✰.✰✰.✰✰✰✰........................\n...✰.......✰.T......................✰✰....✰✰.✰...✰..*✰✰✰...✰.........................\n..........✰.✰................✰..............✰.✰✰.✰..✰✰..✰✰...................✰.....✰.\n.................✰.✰...............✰.✰........✰✰✰....✰✰✰...............✰.............\n...........✰.......✰..✰...T......................*..✰......✰...✰...................✰.\n..........✰.............✰........................T..T...✰..............✰..........✰..\n....✰✰✰...............✰✰...........T......✰.........*✰...✰..........✰................\n.....................✰....✰........T................✰.........✰✰..............✰......\n..........✰....✰........✰.............✰.......................✰......................\n..........✰.........................✰..✰................✰.✰.....✰....................\n.....................................................................................\nKEY\n✰ = Bush\nT = tree\n# = Wall\n* = Lamp\nh = Chair\n= = Bed\n+ = Door\n↻ = Toilet\nf = Sink\n░ = Counter\n◘ = Table\n_ = Tub\n] = Tv\n[ = Refrigerator\n◛ = Washer/dryer\n◉ = Oven\n";
 
 /***/ }),
 
@@ -16493,7 +16593,7 @@ class GameState {
         this.map.display.clear();
         this.map.smokeDisplay.clear();
         this.map.uiRenderer.clearStrokes();
-        const { Initializer } = __webpack_require__(7349);
+        const { Initializer } = __webpack_require__(2253);
         const initializer = new Initializer(this.map);
         initializer.initialize();
         this.map.lighting.redraw();
@@ -16522,7 +16622,7 @@ module.exports = ".........................................................\n...
 /* harmony export */ });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6185);
 /* harmony import */ var _display__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7328);
-/* harmony import */ var _game_game__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4873);
+/* harmony import */ var _game_game__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(8639);
 /* harmony import */ var _signal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(334);
 
 
@@ -16674,7 +16774,7 @@ class UIRenderer {
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames based on template
-/******/ 			return "" + chunkId + ".bundle." + "19bc88e7" + ".js";
+/******/ 			return "" + chunkId + ".bundle." + "93634f72" + ".js";
 /******/ 		};
 /******/ 	})();
 /******/ 	
@@ -16924,8 +17024,8 @@ var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
 
        /* harmony default export */ const src_style = (style/* default */.A && style/* default */.A.locals ? style/* default */.A.locals : undefined);
 
-// EXTERNAL MODULE: ./src/game/game.ts + 20 modules
-var game = __webpack_require__(4873);
+// EXTERNAL MODULE: ./src/game/game.ts + 19 modules
+var game = __webpack_require__(8639);
 // EXTERNAL MODULE: ./src/compress.ts
 var compress = __webpack_require__(5074);
 // EXTERNAL MODULE: ./src/storage.ts
