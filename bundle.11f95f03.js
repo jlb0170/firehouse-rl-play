@@ -91,10 +91,9 @@ XY.at = (x, y) => new XY(x, y);
 
 class Lamp extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
     constructor() {
-        super(...arguments);
+        super(_material__WEBPACK_IMPORTED_MODULE_4__/* .WOOD */ .wB);
         this.layer = 'items';
         this.transparency = 1;
-        this.material = new _material__WEBPACK_IMPORTED_MODULE_4__/* .Material */ .im(this, _material__WEBPACK_IMPORTED_MODULE_4__/* .WOOD */ .wB);
         this.passable = true;
         this.light = () => this.material.light(5);
         this.char = () => '*';
@@ -127,17 +126,15 @@ class Lamp extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
 
 
 class Wall extends _drawable__WEBPACK_IMPORTED_MODULE_1__/* .Drawable */ .h {
-    constructor() {
-        super(...arguments);
+    constructor(materialType = _material__WEBPACK_IMPORTED_MODULE_2__/* .WOOD */ .wB) {
+        super(materialType);
         this.layer = 'walls';
         this.passable = false;
         this.transparency = 0;
-        this.material = new _material__WEBPACK_IMPORTED_MODULE_2__/* .Material */ .im(this, _material__WEBPACK_IMPORTED_MODULE_2__/* .WOOD */ .wB);
         this.char = () => '#';
         this.color = () => this.material.color(_ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .BORDER */ .XE);
         this.light = () => this.material.light(0);
         this.desc = () => this.material.desc('Wall');
-        this.ignite = () => this.material.ignite();
     }
     step() {
         this.material.step(() => { });
@@ -992,8 +989,9 @@ body {
 /***/ 1267:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   v: () => (/* binding */ Fire)
+/* harmony export */   Fire: () => (/* binding */ Fire)
 /* harmony export */ });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6185);
 /* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1919);
@@ -1041,139 +1039,6 @@ class Fire extends _drawable__WEBPACK_IMPORTED_MODULE_2__/* .Drawable */ .h {
     }
 }
 Fire.CHAR = "▲";
-
-
-/***/ }),
-
-/***/ 1363:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  Z: () => (/* binding */ DrawableType)
-});
-
-// EXTERNAL MODULE: ./src/draw/door.ts
-var door = __webpack_require__(2483);
-// EXTERNAL MODULE: ./src/draw/lamp.ts
-var lamp = __webpack_require__(225);
-// EXTERNAL MODULE: ./src/draw/wall.ts
-var wall = __webpack_require__(239);
-// EXTERNAL MODULE: ./src/ui/colors.ts
-var colors = __webpack_require__(1919);
-;// ./src/draw/wall-light.ts
-
-
-class WallLight extends wall/* Wall */.j {
-    constructor() {
-        super(...arguments);
-        this.char = () => '¤';
-        this.color = () => this.material.color(colors/* LAMP */.zu.random());
-        this.light = () => this.material.light(3);
-        this.desc = () => this.material.desc('Wall light');
-    }
-}
-
-// EXTERNAL MODULE: ./src/draw/material.ts
-var material = __webpack_require__(2994);
-;// ./src/draw/window.ts
-
-
-
-class Window extends wall/* Wall */.j {
-    constructor() {
-        super(...arguments);
-        this.transparency = 1;
-        this.material = new material/* Material */.im(this, material/* GLASS */.fk);
-        this.char = () => '□';
-        this.color = () => this.material.color(colors/* COLOR_GLASS */.zC);
-        this.desc = () => this.material.desc('Window');
-    }
-}
-
-// EXTERNAL MODULE: ./src/draw/floor.ts
-var floor = __webpack_require__(9177);
-// EXTERNAL MODULE: ./src/draw/smoke.ts
-var smoke = __webpack_require__(4502);
-// EXTERNAL MODULE: ./src/draw/fire.ts
-var fire = __webpack_require__(1267);
-// EXTERNAL MODULE: ./src/draw/pawn.ts + 1 modules
-var pawn = __webpack_require__(2705);
-// EXTERNAL MODULE: ./src/game/capabilities.ts
-var capabilities = __webpack_require__(3793);
-// EXTERNAL MODULE: ./src/draw/editor-item.ts
-var editor_item = __webpack_require__(6372);
-// EXTERNAL MODULE: ./src/draw/drawable.ts
-var drawable = __webpack_require__(1721);
-;// ./src/draw/prop-item.ts
-
-
-class PropItem extends drawable/* Drawable */.h {
-    constructor(symbol, name, materialType, passable = true) {
-        super();
-        this.symbol = symbol;
-        this.name = name;
-        this.materialType = materialType;
-        this.layer = 'items';
-        this.light = () => this.material.light(this.materialType.light);
-        this.char = () => this.symbol;
-        this.color = () => this.material.color(this.materialType.color);
-        this.desc = () => this.material.desc(this.name);
-        this.keyName = () => this.name;
-        this.passable = passable;
-        this.material = new material/* Material */.im(this, materialType);
-    }
-    step() {
-        this.material.step(() => { });
-    }
-}
-
-;// ./src/game/drawable-types.ts
-
-
-
-
-
-
-
-
-
-
-
-
-
-class DrawableType {
-}
-DrawableType.registry = {
-    'Wall': () => new wall/* Wall */.j(),
-    'Door': () => new door/* Door */.$(),
-    'Wall light': () => new WallLight(),
-    'Window': () => new Window(),
-    'Lamp': () => new lamp/* Lamp */.z(),
-    'Floor': () => new floor/* Floor */.Z(),
-    'Smoke': () => new smoke/* Smoke */._(),
-    'Fire': () => new fire/* Fire */.v(),
-    'Pawn': () => new pawn/* Pawn */.vc('firefighter', capabilities/* Capabilities */.FD.basic()),
-    'Bush': () => new PropItem('✰', 'Bush', material/* PLANT */.G5),
-    'Tree': () => new PropItem('T', 'Tree', material/* PLANT */.G5),
-    'Counter': () => new PropItem('░', 'Counter', material/* BRICK */.qv),
-    'Sink': () => new PropItem('f', 'Sink', material/* METAL */.cJ),
-    'Tv': () => new PropItem(']', 'Tv', material/* METAL */.cJ),
-    'Chair': () => new PropItem('h', 'Chair', material/* WOOD */.wB),
-    'Oven': () => new PropItem('◉', 'Oven', material/* METAL */.cJ),
-    'Table': () => new PropItem('◘', 'Table', material/* WOOD */.wB),
-    'Refrigerator': () => new PropItem('[', 'Refrigerator', material/* METAL */.cJ, false),
-    'Bed': () => new PropItem('=', 'Bed', material/* WOOD */.wB),
-    'Tub': () => new PropItem('_', 'Tub', material/* METAL */.cJ),
-    'Toilet': () => new PropItem('↻', 'Toilet', material/* METAL */.cJ),
-    'Washer/dryer': () => new PropItem('◛', 'Washer/dryer', material/* METAL */.cJ),
-    'Coin machine': () => new PropItem('❱', 'Coin machine', material/* METAL */.cJ, false),
-};
-DrawableType.make = (symbol, name) => {
-    const f = DrawableType.registry[name];
-    return f ? f() : new editor_item/* EditorItem */.R(symbol, name);
-};
 
 
 /***/ }),
@@ -6768,11 +6633,15 @@ module.exports = function (i) {
 /* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1919);
 /* harmony import */ var _game_xy__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(88);
 /* harmony import */ var _game_lighting__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2615);
+/* harmony import */ var _material__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(2994);
 
 
 
+
+const toHex = (value) => value.toString(16).padStart(2, '0');
+const rgbToHex = (rgb) => `#${rgb.map(toHex).join('')}`;
 class Drawable {
-    constructor() {
+    constructor(materialType = _material__WEBPACK_IMPORTED_MODULE_3__/* .IMMATERIAL */ .KJ) {
         this.id = Drawable.nextId++;
         this.born = false;
         this.age = 0;
@@ -6780,13 +6649,17 @@ class Drawable {
         this.transparency = 1;
         this.cell = null;
         Drawable.alive.add(this);
+        this.material = new _material__WEBPACK_IMPORTED_MODULE_3__/* .Material */ .im(this, materialType);
     }
     step() { }
     desc() { return `${this.constructor.name}`; }
     keyName() { return this.constructor.name; }
+    get hits() { return this.material.remaining(); }
+    get maxHits() { return this.material.max(); }
     draw(_debug, illumination) {
         const fg = this.applyIllumination(this.color(), illumination);
-        this.cell.map.drawAt(this.cell.xy.x, this.cell.xy.y, this.char(), fg, _ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .BACKGROUND */ .h4);
+        const bg = this.applyIllumination(this.material.background(_ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .BACKGROUND */ .h4), illumination);
+        this.cell.map.drawAt(this.cell.xy.x, this.cell.xy.y, this.char(), fg, bg);
         return true;
     }
     movedInto(cell) {
@@ -6795,36 +6668,12 @@ class Drawable {
     applyIllumination(color, illumination) {
         if (!color.startsWith('#'))
             return color;
-        const clamped = Math.min(illumination, 9);
-        const normalized = clamped / 9;
-        const factor = Math.max(0, normalized);
-        let r, g, b;
-        if (color.length === 4) {
-            // 3-char hex like #0a0
-            r = parseInt(color[1] + color[1], 16);
-            g = parseInt(color[2] + color[2], 16);
-            b = parseInt(color[3] + color[3], 16);
-        }
-        else if (color.length === 7) {
-            // 6-char hex like #00aa00
-            r = parseInt(color.slice(1, 3), 16);
-            g = parseInt(color.slice(3, 5), 16);
-            b = parseInt(color.slice(5, 7), 16);
-        }
-        else {
-            return color;
-        }
-        const darkR = Math.floor(r * factor);
-        const darkG = Math.floor(g * factor);
-        const darkB = Math.floor(b * factor);
-        const [lr, lg, lb] = this.cell.map.lighting.colorAt(this.cell);
-        const tintR = Math.floor(lr * _game_lighting__WEBPACK_IMPORTED_MODULE_2__/* .COLOR_INTENSITY */ .c);
-        const tintG = Math.floor(lg * _game_lighting__WEBPACK_IMPORTED_MODULE_2__/* .COLOR_INTENSITY */ .c);
-        const tintB = Math.floor(lb * _game_lighting__WEBPACK_IMPORTED_MODULE_2__/* .COLOR_INTENSITY */ .c);
-        const finalR = Math.min(255, darkR + tintR);
-        const finalG = Math.min(255, darkG + tintG);
-        const finalB = Math.min(255, darkB + tintB);
-        return `#${finalR.toString(16).padStart(2, '0')}${finalG.toString(16).padStart(2, '0')}${finalB.toString(16).padStart(2, '0')}`;
+        if (color === _ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .BLACK */ .Uv || color === '#000000')
+            return '#000000';
+        const factor = Math.max(0, Math.min(illumination, 9) / 9);
+        const light = rgbToHex(this.cell.map.lighting.colorAt(this.cell));
+        const darkened = (0,_ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .blend */ .au)(_ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .BLACK */ .Uv, color, factor);
+        return (0,_ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .blend */ .au)(darkened, light, _game_lighting__WEBPACK_IMPORTED_MODULE_2__/* .COLOR_INTENSITY */ .c * factor);
     }
     r() { return this.cell.r(); }
     l() { return this.cell.l(); }
@@ -6843,16 +6692,8 @@ class Drawable {
     merge(_other, _from) {
         throw new Error('merge not implemented');
     }
-    ignite() {
-        const material = this.material;
-        if (material?.ignite)
-            material.ignite();
-    }
-    extinguish() {
-        const material = this.material;
-        if (material?.extinguish)
-            material.extinguish();
-    }
+    ignite() { this.material.ignite(); }
+    extinguish() { this.material.extinguish(); }
     died() { this.cell.died(this); }
     diedAndAlreadyRemovedFromCell() {
         Drawable.alive.delete(this);
@@ -6911,13 +6752,17 @@ class Task {
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   E2: () => (/* binding */ hexToRgb),
 /* harmony export */   Jy: () => (/* binding */ Colors),
 /* harmony export */   LS: () => (/* binding */ BONE),
 /* harmony export */   SK: () => (/* binding */ COLOR_METAL),
 /* harmony export */   UE: () => (/* binding */ WHITE),
 /* harmony export */   Ui: () => (/* binding */ COLOR_BRICK),
+/* harmony export */   Uv: () => (/* binding */ BLACK),
 /* harmony export */   XE: () => (/* binding */ BORDER),
 /* harmony export */   ZK: () => (/* binding */ FIRE),
+/* harmony export */   _w: () => (/* binding */ SPAWN),
+/* harmony export */   au: () => (/* binding */ blend),
 /* harmony export */   h4: () => (/* binding */ BACKGROUND),
 /* harmony export */   oE: () => (/* binding */ SMOKE),
 /* harmony export */   sX: () => (/* binding */ COLOR_WOOD),
@@ -6932,6 +6777,7 @@ class Task {
 
 const FOREGROUND = "#0a0";
 const BACKGROUND = "#000";
+const BLACK = "#000";
 const BORDER = "#444";
 const WOOD = "#8B4513";
 const COLOR_WOOD = "#8B4513";
@@ -6942,6 +6788,7 @@ const COLOR_GLASS = "#aaddff";
 const SMOLDERING = '#6c200e';
 const BONE = "#fff";
 const WHITE = "#fff";
+const SPAWN = "#ffff99";
 class Colors {
     constructor(colors) {
         this.colors = colors;
@@ -6964,6 +6811,28 @@ class Colors {
 const FIRE = new Colors(['#ff6600', '#ff9900', '#ffcc00', '#ff3300']);
 const SMOKE = new Colors(['rgba(51,51,51,0.6)', 'rgba(85,85,85,0.6)', 'rgba(102,102,102,0.6)', 'rgba(119,119,119,0.6)', 'rgba(136,136,136,0.6)', 'rgba(153,153,153,0.6)', 'rgba(170,170,170,0.6)', 'rgba(187,187,187,0.6)', 'rgba(204,204,204,0.6)']);
 const LAMP = new Colors(['#ccffff', '#99ddff', '#66ccff']);
+const hexToRgb = (hex) => {
+    if (!hex.startsWith('#'))
+        return null;
+    if (hex.length === 4)
+        return [1, 2, 3].map(i => parseInt(hex[i] + hex[i], 16));
+    if (hex.length === 7)
+        return [
+            parseInt(hex.slice(1, 3), 16),
+            parseInt(hex.slice(3, 5), 16),
+            parseInt(hex.slice(5, 7), 16)
+        ];
+    return null;
+};
+const toHex = (n) => n.toString(16).padStart(2, '0');
+const blend = (from, to, ratio) => {
+    const frgb = hexToRgb(from);
+    const trgb = hexToRgb(to);
+    if (!frgb || !trgb)
+        return from;
+    const mix = (f, t) => Math.round(f + (t - f) * ratio);
+    return `#${toHex(mix(frgb[0], trgb[0]))}${toHex(mix(frgb[1], trgb[1]))}${toHex(mix(frgb[2], trgb[2]))}`;
+};
 
 
 /***/ }),
@@ -7095,7 +6964,7 @@ class Intro {
         (0,utils/* each */.__)(TITLE, (line, y) => {
             (0,utils/* each */.__)(line, (c, x) => {
                 if (c === '#')
-                    this.map.createAt(start.add(x, y), new fire/* Fire */.v());
+                    this.map.createAt(start.add(x, y), new fire.Fire());
             });
         });
     }
@@ -7142,7 +7011,7 @@ class Intro {
                 state/* FirehouseMode */.M.emit(this.pawnModels);
                 ends.forEach(end => end());
             }),
-            pawn/* PawnDied */.hq.on(_dead => {
+            pawn.PawnDied.on(_dead => {
                 this.map.uiRenderer.remove('barracks-label');
                 text_stroke/* TextStroke */.m.render(this.map, 'YOU LOSE', xy.XY.at(labelX, labelY), 'lose-text');
                 ends.forEach(end => end());
@@ -7167,7 +7036,7 @@ class Intro {
         };
         suggest();
         const stop = game/* GameStepped */.K5.on(suggest);
-        pawn/* PawnSelected */.Ei.on(_pawn => { this.map.uiRenderer.remove('suggestion'); stop(); });
+        pawn.PawnSelected.on(_pawn => { this.map.uiRenderer.remove('suggestion'); stop(); });
         game/* LevelReset */.QD.on(() => { this.map.uiRenderer.remove('suggestion'); stop(); });
     }
 }
@@ -7194,6 +7063,7 @@ class BaseLevel {
         this.fragmentText = fragmentText;
         this.showDarkness = true;
         this.hasWon = false;
+        this.ends = [];
     }
     pawnsToModels() {
         return this.pawns.map(pawn => new firehouse/* PawnModel */.A(pawn.name, pawn.capabilities));
@@ -7203,8 +7073,9 @@ class BaseLevel {
         fragment.place(this.map, xy.XY.at(0, 0));
         this.igniteRandomStoves(1);
         this.spawnPawns();
-        game/* GameStepped */.K5.on(stepInfo => this.checkWinCondition(stepInfo));
-        game/* LevelWon */.X_.on(() => this.handleContinue());
+        this.ends.push(game/* GameStepped */.K5.on(stepInfo => this.checkWinCondition(stepInfo)));
+        this.ends.push(game/* LevelWon */.X_.on(() => this.handleContinue()));
+        this.ends.push(game/* LevelReset */.QD.on(() => this.teardown()));
     }
     igniteRandomStoves(count) {
         const ovens = [];
@@ -7217,8 +7088,15 @@ class BaseLevel {
         });
     }
     spawnPawns() {
+        const spawns = [];
+        this.map.eachCell(cell => {
+            cell.onItem(/Spawn point/, item => {
+                spawns.push(cell.xy);
+            });
+        });
         (0,utils/* each */.__)(this.pawns, (pawn, index) => {
-            const location = xy.XY.at((0,utils/* half */.MX)(this.map.w) + index, this.map.h - 1);
+            const fallback = xy.XY.at((0,utils/* half */.MX)(this.map.w) + index, this.map.h - 1);
+            const location = spawns[index] ?? fallback;
             this.map.createAt(location, pawn);
         });
     }
@@ -7234,6 +7112,11 @@ class BaseLevel {
     }
     handleContinue() {
         state/* FirehouseMode */.M.emit(this.pawnsToModels());
+        this.teardown();
+    }
+    teardown() {
+        this.ends.forEach(end => end());
+        this.ends = [];
     }
 }
 
@@ -7336,12 +7219,11 @@ class Initializer {
 
 class Door extends _drawable__WEBPACK_IMPORTED_MODULE_1__/* .Drawable */ .h {
     constructor() {
-        super(...arguments);
+        super(_material__WEBPACK_IMPORTED_MODULE_2__/* .WOOD */ .wB);
         this.layer = 'walls';
         this.open = false;
         this.passable = false;
         this.transparency = 0;
-        this.material = new _material__WEBPACK_IMPORTED_MODULE_2__/* .Material */ .im(this, _material__WEBPACK_IMPORTED_MODULE_2__/* .WOOD */ .wB);
         this.light = () => this.material.light(0);
         this.char = () => this.open ? '/' : '+';
         this.color = () => this.material.color(_ui_colors__WEBPACK_IMPORTED_MODULE_0__/* .WOOD */ .wB);
@@ -7368,6 +7250,8 @@ class Door extends _drawable__WEBPACK_IMPORTED_MODULE_1__/* .Drawable */ .h {
 /* harmony import */ var _xy__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(88);
 /* harmony import */ var _shapes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3720);
 /* harmony import */ var _layers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(5633);
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(1919);
+
 
 
 
@@ -7510,7 +7394,7 @@ class Lighting {
         for (const l of _layers__WEBPACK_IMPORTED_MODULE_2__/* .CellLayers */ .v.layerNames) {
             const d = cell.layers.data[l];
             if (d && d.light() > 0) {
-                const rgb = Lighting.hex(d.color());
+                const rgb = (0,_ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .hexToRgb */ .E2)(d.color());
                 if (!rgb)
                     continue;
                 const weight = d.light();
@@ -7524,23 +7408,6 @@ class Lighting {
             return [0, 0, 0];
         return [r / w, g / w, b / w];
     }
-    static hex(color) {
-        if (!color.startsWith('#'))
-            return null;
-        if (color.length === 4)
-            return [
-                parseInt(color[1] + color[1], 16),
-                parseInt(color[2] + color[2], 16),
-                parseInt(color[3] + color[3], 16)
-            ];
-        if (color.length === 7)
-            return [
-                parseInt(color.slice(1, 3), 16),
-                parseInt(color.slice(3, 5), 16),
-                parseInt(color.slice(5, 7), 16)
-            ];
-        return null;
-    }
 }
 
 
@@ -7549,18 +7416,19 @@ class Lighting {
 /***/ 2705:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  vc: () => (/* binding */ Pawn),
-  zW: () => (/* binding */ PawnBurned),
-  hq: () => (/* binding */ PawnDied),
-  w: () => (/* binding */ PawnMoved),
-  Ei: () => (/* binding */ PawnSelected),
-  qe: () => (/* binding */ TaskRemoved)
+  Pawn: () => (/* binding */ Pawn),
+  PawnBorn: () => (/* binding */ PawnBorn),
+  PawnBurned: () => (/* binding */ PawnBurned),
+  PawnDied: () => (/* binding */ PawnDied),
+  PawnMoved: () => (/* binding */ PawnMoved),
+  PawnSelected: () => (/* binding */ PawnSelected),
+  TaskRemoved: () => (/* binding */ TaskRemoved)
 });
-
-// UNUSED EXPORTS: PawnBorn
 
 // EXTERNAL MODULE: ./src/ui/colors.ts
 var colors = __webpack_require__(1919);
@@ -7622,12 +7490,11 @@ class Pawn extends drawable/* Drawable */.h {
         return Pawn.pawns[(index + 1) % Pawn.pawns.length];
     }
     constructor(name, capabilities) {
-        super();
+        super(material/* MEAT */.SN);
         this.name = name;
         this.capabilities = capabilities;
         this.selected = false;
         this.passable = false;
-        this.material = new material/* Material */.im(this, material/* MEAT */.SN);
         this.desc = () => this.material.desc(this.name);
         this.layer = 'pawn';
         this.transparency = 0;
@@ -7776,6 +7643,7 @@ Pawn.HOVER_PATH_COLOR = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy([
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   G5: () => (/* binding */ PLANT),
+/* harmony export */   KJ: () => (/* binding */ IMMATERIAL),
 /* harmony export */   SN: () => (/* binding */ MEAT),
 /* harmony export */   cJ: () => (/* binding */ METAL),
 /* harmony export */   fk: () => (/* binding */ GLASS),
@@ -7783,14 +7651,10 @@ Pawn.HOVER_PATH_COLOR = colors/* Colors */.Jy.rotate(new colors/* Colors */.Jy([
 /* harmony export */   qv: () => (/* binding */ BRICK),
 /* harmony export */   wB: () => (/* binding */ WOOD)
 /* harmony export */ });
-/* unused harmony exports MaterialType, Wood, Meat, Plant, Metal, Brick, Glass */
+/* unused harmony exports MaterialType, Wood, Meat, Plant, Metal, Brick, Glass, Immaterial, damageColor */
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6185);
-/* harmony import */ var _smoke__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4502);
-/* harmony import */ var _fire__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1267);
-/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(1919);
-/* harmony import */ var _game_fires__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(6746);
-
-
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1919);
+/* harmony import */ var _game_fires__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6746);
 
 
 
@@ -7798,7 +7662,7 @@ class MaterialType {
     constructor() {
         this.flammable = true;
         this.light = 0;
-        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .BORDER */ .XE;
+        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .BORDER */ .XE;
         this.note = '';
     }
 }
@@ -7806,14 +7670,14 @@ class Wood extends MaterialType {
     constructor() {
         super(...arguments);
         this.hits = 40;
-        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .COLOR_WOOD */ .sX;
+        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .COLOR_WOOD */ .sX;
         this.note = 'flammable';
     }
     step(owner) {
         if (!_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo && (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(2))
-            owner.cell.reborn(new _smoke__WEBPACK_IMPORTED_MODULE_1__/* .Smoke */ ._());
+            owner.cell.spawnSmoke();
         if (!_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo && (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(4))
-            owner.cell.reborn(new _fire__WEBPACK_IMPORTED_MODULE_2__/* .Fire */ .v());
+            owner.cell.spawnFire();
     }
 }
 Wood.instance = new Wood();
@@ -7830,13 +7694,13 @@ class Plant extends MaterialType {
     constructor() {
         super(...arguments);
         this.hits = 20;
-        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .COLOR_PLANT */ .yv;
+        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .COLOR_PLANT */ .yv;
         this.note = "extra smokey but don't burn hot";
     }
     step(owner) {
-        owner.cell.reborn(new _smoke__WEBPACK_IMPORTED_MODULE_1__/* .Smoke */ ._());
+        owner.cell.spawnSmoke();
         if (!_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo && (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(4))
-            owner.cell.reborn(new _fire__WEBPACK_IMPORTED_MODULE_2__/* .Fire */ .v());
+            owner.cell.spawnFire();
     }
 }
 Plant.instance = new Plant();
@@ -7845,7 +7709,7 @@ class Metal extends MaterialType {
         super(...arguments);
         this.flammable = false;
         this.hits = 50;
-        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .COLOR_METAL */ .SK;
+        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .COLOR_METAL */ .SK;
         this.note = 'non-flammable';
     }
     step(_owner) { }
@@ -7856,7 +7720,7 @@ class Brick extends MaterialType {
         super(...arguments);
         this.flammable = false;
         this.hits = 20;
-        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .COLOR_BRICK */ .Ui;
+        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .COLOR_BRICK */ .Ui;
         this.note = 'non-flammable';
     }
     step(_owner) { }
@@ -7867,7 +7731,7 @@ class Glass extends MaterialType {
         super(...arguments);
         this.flammable = false;
         this.hits = 10;
-        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .COLOR_GLASS */ .zC;
+        this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .COLOR_GLASS */ .zC;
         this.note = 'non-flammable, transparent';
     }
     step(_owner) { }
@@ -7879,43 +7743,74 @@ const PLANT = Plant.instance;
 const METAL = Metal.instance;
 const BRICK = Brick.instance;
 const GLASS = Glass.instance;
+class Immaterial extends MaterialType {
+    constructor() {
+        super(...arguments);
+        this.flammable = false;
+        this.hits = 0;
+        this.note = 'immaterial';
+    }
+    step(_owner) { }
+}
+Immaterial.instance = new Immaterial();
+const IMMATERIAL = Immaterial.instance;
+const damageColor = {
+    foregroundPower: 0.5,
+    backgroundPower: 0.1
+};
 class Material {
     constructor(owner, type) {
         this.owner = owner;
         this.type = type;
-        this.burn = null;
+        this.burning = false;
         this.ignite = () => {
-            if (!this.type.flammable)
+            this.takeHit();
+            if (!this.type.flammable || this.burning)
                 return;
-            if (this.burn === null) {
-                this.burn = this.type.hits;
-                _game_fires__WEBPACK_IMPORTED_MODULE_4__/* .Fires */ .UQ.increment(this.owner);
-            }
+            this.burning = true;
+            _game_fires__WEBPACK_IMPORTED_MODULE_2__/* .Fires */ .UQ.increment(this.owner);
         };
         this.extinguish = () => {
-            if (this.burn !== null) {
-                this.burn = null;
-                _game_fires__WEBPACK_IMPORTED_MODULE_4__/* .Fires */ .UQ.decrement(this.owner);
-            }
+            if (!this.burning)
+                return;
+            this.burning = false;
+            _game_fires__WEBPACK_IMPORTED_MODULE_2__/* .Fires */ .UQ.decrement(this.owner);
         };
-        this.isBurning = () => this.burn !== null;
+        this.damagePercent = () => this.type.hits > 0 ? 1 - this.hits / this.type.hits : 0;
+        this.isBurning = () => this.burning;
         this.light = (base) => this.isBurning() ? base + 1 : base;
-        this.color = (base) => this.isBurning() && !_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo && (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(3) ? _ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .FIRE */ .ZK.random() : base;
-        this.remaining = () => this.burn ?? 0;
-        this.desc = (base) => this.isBurning() ? `${base} ▲${this.remaining()}` : base;
+        this.color = (base) => {
+            if (this.isBurning())
+                return _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .FIRE */ .ZK.random();
+            const d = this.damagePercent();
+            return (0,_ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .blend */ .au)(base, _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .BLACK */ .Uv, Math.pow(d, damageColor.foregroundPower));
+        };
+        this.background = (base) => {
+            const d = this.damagePercent();
+            return (0,_ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .blend */ .au)(base, _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .WHITE */ .UE, 1 - Math.pow(1 - d, damageColor.backgroundPower));
+        };
+        this.remaining = () => this.hits;
+        this.max = () => this.type.hits;
+        this.desc = (base) => this.isBurning() ? `${base} ▲` : base;
+        this.takeHit = (amount = 1) => {
+            if (this.type.hits <= 0)
+                return true;
+            this.hits -= amount;
+            if (this.hits > 0)
+                return true;
+            if (this.burning)
+                _game_fires__WEBPACK_IMPORTED_MODULE_2__/* .Fires */ .UQ.decrement(this.owner);
+            this.owner.cell.died(this.owner);
+            return false;
+        };
+        this.hits = type.hits;
     }
     step(stillAlive) {
-        if (this.burn === null)
+        if (!this.burning)
             return stillAlive();
-        const cell = this.owner.cell;
         this.type.step(this.owner);
-        if (this.burn <= 0) {
-            _game_fires__WEBPACK_IMPORTED_MODULE_4__/* .Fires */ .UQ.decrement(this.owner);
-            cell.died(this.owner);
-            return;
-        }
-        this.burn--;
-        stillAlive();
+        if (this.takeHit())
+            stillAlive();
     }
 }
 
@@ -9232,12 +9127,8 @@ function childMatcher(selector) {
 /* harmony export */ });
 /* unused harmony exports BurningNew, BurningOut */
 /* harmony import */ var _signal__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(334);
-/* harmony import */ var _draw_fire__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1267);
-/* harmony import */ var _draw_pawn__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2705);
-/* harmony import */ var _d3_extend__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(452);
-/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(1919);
-
-
+/* harmony import */ var _d3_extend__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(452);
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1919);
 
 
 
@@ -9249,31 +9140,30 @@ class Fires {
         return this.fires + this.items + this.people;
     }
     static increment(obj) {
-        if (obj instanceof _draw_fire__WEBPACK_IMPORTED_MODULE_1__/* .Fire */ .v) {
+        const { Fire } = __webpack_require__(1267);
+        const { Pawn } = __webpack_require__(2705);
+        if (obj instanceof Fire)
             this.fires++;
-        }
-        else if (obj instanceof _draw_pawn__WEBPACK_IMPORTED_MODULE_2__/* .Pawn */ .vc) {
+        else if (obj instanceof Pawn)
             this.people++;
-        }
-        else {
+        else
             this.items++;
-        }
         BurningNew.emit();
         this.updateCounters();
     }
     static decrement(obj) {
-        if (obj instanceof _draw_fire__WEBPACK_IMPORTED_MODULE_1__/* .Fire */ .v) {
+        const { Fire } = __webpack_require__(1267);
+        const { Pawn } = __webpack_require__(2705);
+        if (obj instanceof Fire) {
             if (this.fires > 0)
                 this.fires--;
         }
-        else if (obj instanceof _draw_pawn__WEBPACK_IMPORTED_MODULE_2__/* .Pawn */ .vc) {
+        else if (obj instanceof Pawn) {
             if (this.people > 0)
                 this.people--;
         }
-        else {
-            if (this.items > 0)
-                this.items--;
-        }
+        else if (this.items > 0)
+            this.items--;
         BurningOut.emit();
         this.updateCounters();
     }
@@ -9285,15 +9175,14 @@ class Fires {
     }
     static decorate(name) {
         const count = this[name];
-        const icon = (0,_d3_extend__WEBPACK_IMPORTED_MODULE_3__.d1)(`#${name}-icon`);
-        const countEl = (0,_d3_extend__WEBPACK_IMPORTED_MODULE_3__.d1)(`#${name}-count`);
-        const color = count > 0 ? _ui_colors__WEBPACK_IMPORTED_MODULE_4__/* .FIRE */ .ZK.random() : _ui_colors__WEBPACK_IMPORTED_MODULE_4__/* .COLOR_METAL */ .SK;
-        if (name === 'fires') {
-            icon.text(_draw_fire__WEBPACK_IMPORTED_MODULE_1__/* .Fire */ .v.CHAR).style('color', color);
-        }
-        else {
+        const icon = (0,_d3_extend__WEBPACK_IMPORTED_MODULE_1__.d1)(`#${name}-icon`);
+        const countEl = (0,_d3_extend__WEBPACK_IMPORTED_MODULE_1__.d1)(`#${name}-count`);
+        const color = count > 0 ? _ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .FIRE */ .ZK.random() : _ui_colors__WEBPACK_IMPORTED_MODULE_2__/* .COLOR_METAL */ .SK;
+        const { Fire } = __webpack_require__(1267);
+        if (name === 'fires')
+            icon.text(Fire.CHAR).style('color', color);
+        else
             icon.style('color', color);
-        }
         countEl.text(`${count}`).style('color', color);
     }
     static updateCounters() {
@@ -9447,6 +9336,154 @@ Rect.between = (start, end) => {
 
 /***/ }),
 
+/***/ 7022:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  Z: () => (/* binding */ DrawableType)
+});
+
+// EXTERNAL MODULE: ./src/draw/door.ts
+var door = __webpack_require__(2483);
+// EXTERNAL MODULE: ./src/draw/lamp.ts
+var lamp = __webpack_require__(225);
+// EXTERNAL MODULE: ./src/draw/wall.ts
+var wall = __webpack_require__(239);
+// EXTERNAL MODULE: ./src/ui/colors.ts
+var colors = __webpack_require__(1919);
+;// ./src/draw/wall-light.ts
+
+
+class WallLight extends wall/* Wall */.j {
+    constructor() {
+        super(...arguments);
+        this.char = () => '¤';
+        this.color = () => this.material.color(colors/* LAMP */.zu.random());
+        this.light = () => this.material.light(3);
+        this.desc = () => this.material.desc('Wall light');
+    }
+}
+
+// EXTERNAL MODULE: ./src/draw/material.ts
+var material = __webpack_require__(2994);
+;// ./src/draw/window.ts
+
+
+
+class Window extends wall/* Wall */.j {
+    constructor() {
+        super(material/* GLASS */.fk);
+        this.transparency = 1;
+        this.char = () => '□';
+        this.color = () => this.material.color(colors/* COLOR_GLASS */.zC);
+        this.desc = () => this.material.desc('Window');
+    }
+}
+
+// EXTERNAL MODULE: ./src/draw/floor.ts
+var floor = __webpack_require__(9177);
+// EXTERNAL MODULE: ./src/draw/smoke.ts
+var smoke = __webpack_require__(4502);
+// EXTERNAL MODULE: ./src/draw/fire.ts
+var fire = __webpack_require__(1267);
+// EXTERNAL MODULE: ./src/draw/pawn.ts + 1 modules
+var pawn = __webpack_require__(2705);
+// EXTERNAL MODULE: ./src/game/capabilities.ts
+var capabilities = __webpack_require__(3793);
+// EXTERNAL MODULE: ./src/draw/editor-item.ts
+var editor_item = __webpack_require__(6372);
+// EXTERNAL MODULE: ./src/draw/drawable.ts
+var drawable = __webpack_require__(1721);
+;// ./src/draw/prop-item.ts
+
+class PropItem extends drawable/* Drawable */.h {
+    constructor(symbol, name, materialType, passable = true) {
+        super(materialType);
+        this.symbol = symbol;
+        this.name = name;
+        this.materialType = materialType;
+        this.layer = 'items';
+        this.light = () => this.material.light(this.materialType.light);
+        this.char = () => this.symbol;
+        this.color = () => this.material.color(this.materialType.color);
+        this.desc = () => this.material.desc(this.name);
+        this.keyName = () => this.name;
+        this.passable = passable;
+    }
+    step() {
+        this.material.step(() => { });
+    }
+}
+
+;// ./src/draw/spawn-item.ts
+
+
+class SpawnItem extends drawable/* Drawable */.h {
+    constructor() {
+        super(...arguments);
+        this.layer = 'items';
+        this.passable = true;
+        this.light = () => 0;
+        this.char = () => 'S';
+        this.color = () => colors/* SPAWN */._w;
+        this.keyName = () => 'Spawn point';
+        this.desc = () => 'Spawn point';
+    }
+}
+
+;// ./src/game/drawable-types.ts
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class DrawableType {
+}
+DrawableType.registry = {
+    'Wall': () => new wall/* Wall */.j(),
+    'Door': () => new door/* Door */.$(),
+    'Wall light': () => new WallLight(),
+    'Window': () => new Window(),
+    'Lamp': () => new lamp/* Lamp */.z(),
+    'Floor': () => new floor/* Floor */.Z(),
+    'Smoke': () => new smoke/* Smoke */._(),
+    'Fire': () => new fire.Fire(),
+    'Pawn': () => new pawn.Pawn('firefighter', capabilities/* Capabilities */.FD.basic()),
+    'Bush': () => new PropItem('✰', 'Bush', material/* PLANT */.G5),
+    'Tree': () => new PropItem('T', 'Tree', material/* PLANT */.G5),
+    'Counter': () => new PropItem('░', 'Counter', material/* BRICK */.qv),
+    'Sink': () => new PropItem('f', 'Sink', material/* METAL */.cJ),
+    'Tv': () => new PropItem(']', 'Tv', material/* METAL */.cJ),
+    'Chair': () => new PropItem('h', 'Chair', material/* WOOD */.wB),
+    'Oven': () => new PropItem('◉', 'Oven', material/* METAL */.cJ),
+    'Table': () => new PropItem('◘', 'Table', material/* WOOD */.wB),
+    'Refrigerator': () => new PropItem('[', 'Refrigerator', material/* METAL */.cJ, false),
+    'Bed': () => new PropItem('=', 'Bed', material/* WOOD */.wB),
+    'Tub': () => new PropItem('_', 'Tub', material/* METAL */.cJ),
+    'Toilet': () => new PropItem('↻', 'Toilet', material/* METAL */.cJ),
+    'Washer/dryer': () => new PropItem('◛', 'Washer/dryer', material/* METAL */.cJ),
+    'Coin machine': () => new PropItem('❱', 'Coin machine', material/* METAL */.cJ, false),
+    'Spawn point': () => new SpawnItem(),
+};
+DrawableType.make = (symbol, name) => {
+    const f = DrawableType.registry[name];
+    return f ? f() : new editor_item/* EditorItem */.R(symbol, name);
+};
+
+
+/***/ }),
+
 /***/ 7268:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
@@ -9572,8 +9609,8 @@ var shapes = __webpack_require__(3720);
 var display = __webpack_require__(7328);
 // EXTERNAL MODULE: ./src/ui/ui-renderer.ts
 var ui_renderer = __webpack_require__(9889);
-// EXTERNAL MODULE: ./src/game/drawable-types.ts + 3 modules
-var drawable_types = __webpack_require__(1363);
+// EXTERNAL MODULE: ./src/game/drawable-types.ts + 4 modules
+var drawable_types = __webpack_require__(7022);
 ;// ./src/game/map.ts
 
 
@@ -9720,7 +9757,7 @@ class map_Map {
                         continue;
                     const ch = d.char();
                     chars[y][x] = ch;
-                    const tn = d.constructor?.name;
+                    const tn = d.keyName ? d.keyName() : d.constructor?.name;
                     if (tn && ch !== '.')
                         key.set(ch, tn);
                     break;
@@ -10995,7 +11032,7 @@ const storage = new Storage();
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   F: () => (/* binding */ Fragment)
 /* harmony export */ });
-/* harmony import */ var _drawable_types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1363);
+/* harmony import */ var _drawable_types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7022);
 /* harmony import */ var _rect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6893);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6185);
 
@@ -11105,7 +11142,7 @@ var draw_pawn = __webpack_require__(2705);
 // EXTERNAL MODULE: ./src/game/capabilities.ts
 var capabilities = __webpack_require__(3793);
 ;// ./src/html/terminal.html
-/* harmony default export */ const terminal = ("<div id=\"terminal\">\n    <div id=\"terminal-content\">\n        <div class=\"cell-container\">\n            <div class=\"cell-coord\"></div>\n            <div class=\"layers\">\n                <div class=\"layer template\">\n                    <span class=\"name\">floor</span>: <span class=\"description text-subtle\">Floor(4477)</span>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div id=\"selected-info\">\n        <div class=\"selected-container\">\n            <div class=\"pawn-desc\">firefighter 10</div>\n            <table class=\"capabilities\">\n                <tr class=\"capability template\">\n                    <td class=\"score\">10</td>\n                    <td class=\"name\">str</td>\n                    <td class=\"skill-score\">1</td>\n                    <td class=\"skill\">inventory</td>\n                </tr>\n            </table>\n            <div class=\"tasks\">\n                <div class=\"task-info template\">\n                    <span class=\"task-desc\">TEMPLATE go to 73, 26</span>\n                    <span class=\"clear-task clickable text-danger bold\" data-index=\"0\">[x]</span>\n                </div>\n            </div>\n            <div id=\"clear-all\" class=\"clickable text-danger bold\" title=\"clear all\">[xx]</div>\n        </div>\n    </div>\n</div>\n");
+/* harmony default export */ const terminal = ("<div id=\"terminal\">\n    <div id=\"terminal-content\">\n        <div class=\"cell-container\">\n            <div class=\"cell-coord\"></div>\n            <div class=\"layers\">\n                <div class=\"layer template\">\n                    <span class=\"name\"></span>: <span class=\"description text-subtle\"></span> <span class=\"hits\"></span>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div id=\"selected-info\">\n        <div class=\"selected-container\">\n            <div class=\"pawn-desc\"></div>\n            <div class=\"pawn-hits\"></div>\n            <table class=\"capabilities\">\n                <tr class=\"capability template\">\n                    <td class=\"score\">10</td>\n                    <td class=\"name\">str</td>\n                    <td class=\"skill-score\">1</td>\n                    <td class=\"skill\">inventory</td>\n                </tr>\n            </table>\n            <div class=\"tasks\">\n                <div class=\"task-info template\">\n                    <span class=\"task-desc\">TEMPLATE go to 73, 26</span>\n                    <span class=\"clear-task clickable text-danger bold\" data-index=\"0\">[x]</span>\n                </div>\n            </div>\n            <div id=\"clear-all\" class=\"clickable text-danger bold\" title=\"clear all\">[xx]</div>\n        </div>\n    </div>\n</div>\n");
 // EXTERNAL MODULE: ./src/ui/ui-renderer.ts
 var ui_renderer = __webpack_require__(9889);
 ;// ./src/ui/terminal.ts
@@ -11122,10 +11159,11 @@ class Terminal {
         this.div.appendFileHtml(terminal);
         this.repaintSelectedPawn();
         ui_renderer/* Repaint */.G2.on(() => this.draw());
-        draw_pawn/* PawnSelected */.Ei.on(pawn => this.repaintSelectedPawn());
-        draw_pawn/* PawnMoved */.w.on(({ pawn }) => this.repaintSelectedPawn());
-        draw_pawn/* PawnBurned */.zW.on(pawn => this.repaintSelectedPawn());
-        draw_pawn/* TaskRemoved */.qe.on(pawn => this.repaintSelectedPawn());
+        ui_renderer/* Repaint */.G2.on(() => this.updateSelectedPawnColor());
+        draw_pawn.PawnSelected.on(pawn => this.repaintSelectedPawn());
+        draw_pawn.PawnMoved.on(({ pawn }) => this.repaintSelectedPawn());
+        draw_pawn.PawnBurned.on(pawn => this.repaintSelectedPawn());
+        draw_pawn.TaskRemoved.on(pawn => this.repaintSelectedPawn());
     }
     draw() {
         this.updateCell();
@@ -11137,6 +11175,8 @@ class Terminal {
             content.dList('.layer').updateFrom(cell.presentLayers(), (layer, snapshot) => {
                 layer.d1('.name').text(snapshot.name);
                 layer.d1('.description').text(snapshot.desc).style('color', snapshot.color);
+                const hits = snapshot.maxHits > 0 ? `${snapshot.hits}/${snapshot.maxHits}` : '';
+                layer.d1('.hits').text(hits);
             });
         }), () => {
             content.d1('.cell-coord').text('no cell selected');
@@ -11144,11 +11184,13 @@ class Terminal {
         });
     }
     repaintSelectedPawn() {
-        const pawn = draw_pawn/* PawnSelected */.Ei.current;
+        const pawn = draw_pawn.PawnSelected.current;
         const selectedInfo = this.div.d1('#selected-info');
         selectedInfo.updateFrom(pawn, (pawn) => {
             const container = selectedInfo.d1('.selected-container');
             container.d1('.pawn-desc').text(pawn.desc());
+            const hits = pawn.maxHits > 0 ? `${pawn.hits}/${pawn.maxHits}` : '';
+            container.d1('.pawn-hits').text(hits);
             const rows = [];
             pawn.capabilities.eachPair((name, skills) => {
                 const nz = skills.filter(s => s.level !== 0);
@@ -11174,10 +11216,18 @@ class Terminal {
         }, () => {
             const container = selectedInfo.d1('.selected-container');
             container.d1('.pawn-desc').text('no pawn selected');
+            container.d1('.pawn-hits').text('');
             container.d1('.capabilities').dList('.capability').updateFrom([], () => { });
             container.d1('.tasks').dList('.task-info').updateFrom([], () => { });
             container.d1('#clear-all').style('display', 'none').on('click', null);
         });
+        this.updateSelectedPawnColor();
+    }
+    updateSelectedPawnColor() {
+        const pawn = draw_pawn.PawnSelected.current;
+        const color = pawn ? pawn.color() : '';
+        this.div.d1('.pawn-desc').style('color', color);
+        this.div.d1('.pawn-hits').style('color', color);
     }
 }
 
@@ -11426,7 +11476,7 @@ class DestinationState {
             return;
         if (this.shift) {
             const ray = this.buildFixedRay(start, cell);
-            this.ui.map.uiRenderer.replace(draw_pawn/* Pawn */.vc.HOVER_PATH_STROKE, task/* Task */.YZ.strokeOfCells(ray, task/* TASK_COLOR */.k$, () => true, 2));
+            this.ui.map.uiRenderer.replace(draw_pawn.Pawn.HOVER_PATH_STROKE, task/* Task */.YZ.strokeOfCells(ray, task/* TASK_COLOR */.k$, () => true, 2));
             ui_renderer/* Repaint */.G2.emit();
             return;
         }
@@ -11435,28 +11485,28 @@ class DestinationState {
             const cells = Array.from(path);
             const last = cells[cells.length - 1];
             if (last && last === cell) {
-                this.ui.map.uiRenderer.replace(draw_pawn/* Pawn */.vc.HOVER_PATH_STROKE, task/* Task */.YZ.strokeOfCells(cells, task/* TASK_COLOR */.k$, () => true, 2));
+                this.ui.map.uiRenderer.replace(draw_pawn.Pawn.HOVER_PATH_STROKE, task/* Task */.YZ.strokeOfCells(cells, task/* TASK_COLOR */.k$, () => true, 2));
             }
             else {
                 const ray = this.buildFixedRay(start, cell);
-                this.ui.map.uiRenderer.replace(draw_pawn/* Pawn */.vc.HOVER_PATH_STROKE, task/* Task */.YZ.strokeOfCells(ray, task/* TASK_COLOR_UNREACHABLE */.r9, () => true, 2));
+                this.ui.map.uiRenderer.replace(draw_pawn.Pawn.HOVER_PATH_STROKE, task/* Task */.YZ.strokeOfCells(ray, task/* TASK_COLOR_UNREACHABLE */.r9, () => true, 2));
             }
         }
         else {
             const ray = this.buildFixedRay(start, cell);
-            this.ui.map.uiRenderer.replace(draw_pawn/* Pawn */.vc.HOVER_PATH_STROKE, task/* Task */.YZ.strokeOfCells(ray, task/* TASK_COLOR_UNREACHABLE */.r9, () => true, 2));
+            this.ui.map.uiRenderer.replace(draw_pawn.Pawn.HOVER_PATH_STROKE, task/* Task */.YZ.strokeOfCells(ray, task/* TASK_COLOR_UNREACHABLE */.r9, () => true, 2));
         }
         ui_renderer/* Repaint */.G2.emit();
     }
     enter(pawn) {
         this.selected = pawn;
         this.selected.selected = true;
-        draw_pawn/* PawnSelected */.Ei.emit(pawn);
+        draw_pawn.PawnSelected.emit(pawn);
         document.addEventListener('keydown', this.keyDown);
         document.addEventListener('keyup', this.keyUp);
         document.addEventListener('click', this.outside);
         document.addEventListener('contextmenu', this.outside);
-        this.unsubDied = draw_pawn/* PawnDied */.hq.on(this.pawnDied);
+        this.unsubDied = draw_pawn.PawnDied.on(this.pawnDied);
     }
     exit() {
         document.removeEventListener('keydown', this.keyDown);
@@ -11464,11 +11514,11 @@ class DestinationState {
         document.removeEventListener('click', this.outside);
         document.removeEventListener('contextmenu', this.outside);
         this.unsubDied();
-        this.ui.map.uiRenderer.remove(draw_pawn/* Pawn */.vc.HOVER_PATH_STROKE);
+        this.ui.map.uiRenderer.remove(draw_pawn.Pawn.HOVER_PATH_STROKE);
         this.selected.selected = false;
         this.hoveredCell = undefined;
         ui_renderer/* Repaint */.G2.emit();
-        draw_pawn/* PawnSelected */.Ei.emit(null);
+        draw_pawn.PawnSelected.emit(null);
     }
 }
 
@@ -11482,12 +11532,12 @@ const MENU_ITEMS = [
     { key: 'x', desc: 'Exit menu and return to selection', action: ui => ui.setState('select') },
     { key: 'g', desc: 'Go to destination by path - shift for line', action: (ui, pawn) => ui.setState('destination', pawn) },
     { key: 'e', desc: 'Extinguish - put out burning firefighter', action: (ui, pawn) => { pawn.addTask(new ExtinguishTask(pawn)); ui.setState('menu', pawn); } },
-    { key: '.', desc: 'Select next firefighter', action: (ui, pawn) => ui.setState('menu', draw_pawn/* Pawn */.vc.next(pawn)) },
+    { key: '.', desc: 'Select next firefighter', action: (ui, pawn) => ui.setState('menu', draw_pawn.Pawn.next(pawn)) },
     { key: 'r', desc: "Remove last task from firefighter's queue", action: (ui, pawn) => { (0,utils/* onLastMaybe */.iw)(pawn.tasks, task => task.remove()); ui.setState('menu', pawn); } }
 ];
 
-// EXTERNAL MODULE: ./src/game/drawable-types.ts + 3 modules
-var drawable_types = __webpack_require__(1363);
+// EXTERNAL MODULE: ./src/game/drawable-types.ts + 4 modules
+var drawable_types = __webpack_require__(7022);
 // EXTERNAL MODULE: ./src/draw/material.ts
 var material = __webpack_require__(2994);
 ;// ./src/ui/help.ts
@@ -11659,6 +11709,8 @@ ${layerSections}<br/>
 • Materials can ignite and burn<br/>
 • Lighting affects visibility and tactics<br/>
 • Older fires burn out eventually<br/>
+• While on fire, extinguishing yourself takes five turns<br/>
+• Another pawn can put you out in one—firefighters work best in teams!<br/>
 <br/>
 <strong>SMOKE MECHANICS:</strong><br/>
 • Smoke reduces transparency and vision<br/>
@@ -11780,10 +11832,10 @@ class MenuState {
     enter(pawn) {
         this.pawn = pawn;
         this.pawn.selected = true;
-        draw_pawn/* PawnSelected */.Ei.emit(pawn);
-        this.unsubMove = draw_pawn/* PawnMoved */.w.on(({ pawn }) => { if (pawn === this.pawn)
+        draw_pawn.PawnSelected.emit(pawn);
+        this.unsubMove = draw_pawn.PawnMoved.on(({ pawn }) => { if (pawn === this.pawn)
             this.sync(); });
-        this.unsubDied = draw_pawn/* PawnDied */.hq.on(this.died);
+        this.unsubDied = draw_pawn.PawnDied.on(this.died);
         this.unsubFrame = ui_renderer/* FrameRendered */.HO.on(this.sync);
         document.addEventListener('keydown', this.key);
         this.showMenu();
@@ -11791,7 +11843,7 @@ class MenuState {
     }
     exit() {
         this.pawn.selected = false;
-        draw_pawn/* PawnSelected */.Ei.emit(null);
+        draw_pawn.PawnSelected.emit(null);
         this.hideMenu();
         this.hideHelp();
         this.unsubMove?.();
@@ -11918,7 +11970,7 @@ class MenuState {
     }
     createMenuStroke(cell, char) {
         const stroke = new ui_stroke/* Stroke */.t([], () => '#ff0', () => true, 5);
-        stroke.add(cell, char);
+        stroke.add(cell, char, colors/* BLACK */.Uv);
         return stroke;
     }
 }
@@ -11944,11 +11996,11 @@ class ObservePawnState {
     enter(pawn) {
         this.selected = pawn;
         this.selected.selected = true;
-        draw_pawn/* PawnSelected */.Ei.emit(pawn);
+        draw_pawn.PawnSelected.emit(pawn);
     }
     exit() {
         this.selected.selected = false;
-        draw_pawn/* PawnSelected */.Ei.emit(null);
+        draw_pawn.PawnSelected.emit(null);
     }
 }
 
@@ -11985,7 +12037,7 @@ class UI {
         this.states[this.state].enter?.(data);
     }
     nextPawn(pawn) {
-        this.setState('menu', draw_pawn/* Pawn */.vc.next(pawn));
+        this.setState('menu', draw_pawn.Pawn.next(pawn));
     }
 }
 
@@ -12053,7 +12105,6 @@ class SaveSlots extends modal/* Modal */.a {
         super('#save-slots-modal');
         this.gameState = gameState;
         this.currentAction = 'save';
-        this.isAutoLoadAtStartup = false;
         this.div.appendFileHtml(save_slots);
         this.div.d1('#save-cancel').onClick(() => this.hide());
     }
@@ -12065,14 +12116,12 @@ class SaveSlots extends modal/* Modal */.a {
     }
     async showLoadDialog() {
         this.currentAction = 'load';
-        this.isAutoLoadAtStartup = false;
         this.div.d1('#save-title').text('LOAD GAME - SELECT SLOT');
         await this.renderSlots();
         this.show();
     }
     async showAutoLoadDialog() {
         this.currentAction = 'load';
-        this.isAutoLoadAtStartup = true;
         this.div.d1('#save-title').text('LOAD GAME - SELECT SLOT');
         await this.renderSlots();
         this.show();
@@ -12145,9 +12194,8 @@ class SaveSlots extends modal/* Modal */.a {
             storage/* storage */.I.remove(storageKey);
             if (this.gameState.introSucceeded)
                 state/* FirehouseMode */.M.emit(this.gameState.firehouse.pawns);
-            this.isAutoLoadAtStartup = false;
             this.hide();
-            console.log(`${displayName} save loaded`);
+            console.log(`loaded ephemeral save "${displayName}" successfully`);
         }
         catch (e) {
             console.error(`Failed to load ${displayName} save`, e);
@@ -12162,7 +12210,6 @@ class SaveSlots extends modal/* Modal */.a {
     }
     deleteEphemeralSave(storageKey, displayName) {
         storage/* storage */.I.remove(storageKey);
-        console.log(`${displayName} save deleted`);
     }
     getSaveData(storageKey) {
         const data = storage/* storage */.I.get(storageKey);
@@ -12182,19 +12229,18 @@ class SaveSlots extends modal/* Modal */.a {
         else {
             this.loadFromSlot(slotNum);
         }
-        this.isAutoLoadAtStartup = false;
         this.hide();
     }
     saveToSlot(slotNum) {
         const key = `gameState_${slotNum}`;
         storage/* storage */.I.set(key, JSON.stringify(this.gameState.data()));
-        console.log(`Game saved to slot ${slotNum}`);
+        console.log('saved to slot', slotNum);
     }
     loadFromSlot(slotNum) {
         const key = `gameState_${slotNum}`;
+        console.log('loading save from slot', slotNum);
         const raw = storage/* storage */.I.get(key);
         if (!raw) {
-            console.log(`Starting fresh game (empty slot ${slotNum})`);
             this.startFreshGame();
             return;
         }
@@ -12203,7 +12249,6 @@ class SaveSlots extends modal/* Modal */.a {
             this.gameState.loadData(parsed);
             if (this.gameState.introSucceeded)
                 state/* FirehouseMode */.M.emit(this.gameState.firehouse.pawns);
-            console.log(`Game loaded from slot ${slotNum}`);
         }
         catch (e) {
             console.error(`Failed to load slot ${slotNum}`, e);
@@ -12219,9 +12264,10 @@ class SaveSlots extends modal/* Modal */.a {
     deleteSlot(slotNum) {
         const key = `gameState_${slotNum}`;
         storage/* storage */.I.remove(key);
-        console.log(`Deleted save slot ${slotNum}`);
+        console.log('deleted save slot', slotNum);
     }
     startFreshGame() {
+        console.log('starting fresh game');
         this.gameState.restartIntro();
     }
     hasSavedGames() {
@@ -12252,7 +12298,6 @@ class SaveSlots extends modal/* Modal */.a {
     }
     hide() {
         super.hide();
-        this.isAutoLoadAtStartup = false;
     }
     modalKeyHandled(e) {
         if (e.key >= '1' && e.key <= '3') {
@@ -12542,8 +12587,6 @@ class Game {
                     LevelWon.current = false;
                     return;
                 }
-                if (this.map.uiRenderer.frozen())
-                    this.toggleFreeze();
                 if (!this.running)
                     this.play();
             }
@@ -12610,6 +12653,9 @@ class Game {
             this.map.display.clear();
             this.map.smokeDisplay.clear();
             this.map.uiRenderer.clearStrokes();
+            this.showDarkness = true;
+            this.updateDarknessToggleButton();
+            this.updateLightingEnabled();
             this.drawMap();
             this.firehouse.open(this.state.firehouse.firehouseNum, pawns);
         };
@@ -12625,7 +12671,7 @@ class Game {
         };
         this.map = new map/* Map */.T(config/* Config */.T.WIDTH, config/* Config */.T.HEIGHT);
         window.map = this.map;
-        window.Fire = fire/* Fire */.v;
+        window.Fire = fire.Fire;
         this.terminal = new Terminal();
         this.ui = new UI(this.terminal, this.map);
         this.attachToDOM();
@@ -12738,9 +12784,6 @@ class Game {
         GameStepped.emit({ frame: 0, stepMs: 0 });
     }
     togglePlayPause() {
-        if (this.map.uiRenderer.frozen()) {
-            this.toggleFreeze();
-        }
         if (this.running)
             this.pause();
         else
@@ -12994,7 +13037,7 @@ class PawnModel {
     constructor(name, capabilities) {
         this.name = name;
         this.capabilities = capabilities;
-        this.toPawn = () => new _draw_pawn__WEBPACK_IMPORTED_MODULE_0__/* .Pawn */ .vc(this.name, this.capabilities);
+        this.toPawn = () => new _draw_pawn__WEBPACK_IMPORTED_MODULE_0__.Pawn(this.name, this.capabilities);
         this.initialLevelUp = () => {
             this.capabilities.initialLevelUp();
         };
@@ -13028,6 +13071,10 @@ var game_layers = __webpack_require__(5633);
 var utils = __webpack_require__(6185);
 // EXTERNAL MODULE: ./src/game/xyl.ts
 var xyl = __webpack_require__(6830);
+// EXTERNAL MODULE: ./src/draw/fire.ts
+var fire = __webpack_require__(1267);
+// EXTERNAL MODULE: ./src/draw/smoke.ts
+var smoke = __webpack_require__(4502);
 // EXTERNAL MODULE: ./src/ui/colors.ts
 var colors = __webpack_require__(1919);
 // EXTERNAL MODULE: ./node_modules/rot-js/lib/index.js + 46 modules
@@ -13112,6 +13159,8 @@ Path.between = (startCell, endCell) => {
 
 
 
+
+
 class Cell {
     constructor(xy, map) {
         this.layers = new game_layers/* CellLayers */.v();
@@ -13185,6 +13234,8 @@ class Cell {
     queueMove(drawable, xy) {
         this.map.moving(drawable, xyl/* XYL */.Y.at(this.xy, drawable.layer), xyl/* XYL */.Y.at(xy, drawable.layer));
     }
+    spawnSmoke() { this.reborn(new smoke/* Smoke */._()); }
+    spawnFire() { this.reborn(new fire.Fire()); }
     presentLayers() {
         return game_layers/* CellLayers */.v.layerNames
             .filter((name) => this.layers.data[name])
@@ -13194,7 +13245,9 @@ class Cell {
                 name,
                 drawable,
                 desc: drawable.desc(),
-                color: drawable.color()
+                color: drawable.color(),
+                hits: drawable.hits,
+                maxHits: drawable.maxHits
             };
         });
     }
@@ -13307,7 +13360,7 @@ class FirehouseModal extends modal/* Modal */.a {
 /***/ 9110:
 /***/ ((module) => {
 
-module.exports = ".....................................................................................\n.....................................................................................\n............✰.✰......................................................................\n...........✰..........✰..............................................................\n..✰......................T................✰.✰...✰..✰.✰✰✰.....✰...........✰...........\n................✰................T.......T..✰...........✰✰..✰✰..✰......✰.....✰.......\n..✰..............T.........#####...........✰..✰.✰✰.✰..✰.......................✰......\n.............T..✰✰......###*...*###......✰...✰✰.........✰..✰.TT✰...................✰.\n.......✰...............#h*.==.==.*h###.....✰...✰..T..✰......✰..✰✰....................\n........✰..............#...==.==...#.*#....✰...........✰....✰.............✰..........\n.....✰................✰#...==.==...+.↻#...........✰.✰...✰....✰✰......................\n.....✰...✰✰.........✰..#...........#.f#.......✰✰.....✰✰..✰....✰......................\n........✰..............#.h.........#.░#......✰.....✰..✰✰✰..✰.✰............✰..........\n...✰.✰..........✰......#◘◘.........#.f#.....✰...✰....✰.✰.T....✰✰✰...............✰....\n.......................#◘◘*...h....+.↻#...........✰✰.................................\n.......................#h....░░░*..#__#........................................T.....\n.......................###+#####...####....#+++#.........✰.....####.................✰\n........T..............#...#...#...+..*#..#*...*#......✰✰✰....#.==.#.................\n................✰......#...#...+...+....#+..hhh..+....✰✰.✰...#*.==.*#................\n......................✰###############+##*.h◘◘◘h.*#.........#........#.......✰.......\n..................................#*f#.*#..h◘◘◘h..#........#*........✰#....✰.........\n............✰...........T.........#..+..+...hhh...##########░........h#..............\n..................................#.↻#..+...........*]]]]*.#░.......*◘#..............\n......✰..........✰.......#############.*#..................#*........h#......✰.......\n..........T..........✰...+.........+.+..+......░...........#..........#..........✰...\n..........✰..............#.........###++#*░...░░░..*hh..hh*#+##########..............\n...................✰.....#.........#....#░░....░*..........#..*#✰.*.__#....✰✰.....✰..\n.........✰...✰...✰.......#.........#░..*#[[....f░#...hhhh..+...+.....✰#.✰.......✰....\n..✰......................#.........#░..◛#[[....f░#.........#...#░ff░.↻#.............✰\n...........✰.........✰...#.........#◛..◛#░░....░░#.#*....✰✰#+##########..............\n...................TT....#.........#◛..░#░*░..░░░#..#✰.✰..✰#...*h◘h..*#.............✰\n.....✰...✰...............#.........#░.._#░░░◉◉░░*#..#*..✰✰*#.........*#...........T..\n.........................###+++++###░..░##########++########..........#......✰..✰....\n......✰.............✰..............#*.._#........*..*......#..........#.............✰\n.........✰.........................#.__░#...................#........#...............\n..........✰✰..✰....................######......✰✰T..T.✰✰.....#*.==.*#....✰.✰✰........\n....✰...✰.....✰...✰.✰............................✰...✰..✰.....#.==.#.......T.........\n.......✰..✰...✰...................✰.......✰✰✰.✰✰✰✰..✰✰✰✰.✰.✰...####..................\n.....✰.........................✰..........✰..✰✰..*..✰.✰✰.✰✰✰✰........................\n...✰.......✰.T......................✰✰....✰✰.✰...✰..*✰✰✰...✰.........................\n..........✰.✰................✰..............✰.✰✰.✰..✰✰..✰✰...................✰.....✰.\n.................✰.✰...............✰.✰........✰✰✰....✰✰✰...............✰.............\n...........✰.......✰..✰...T......................*..✰......✰...✰...................✰.\n..........✰.............✰........................T..T...✰..............✰..........✰..\n....✰✰✰...............✰✰...........T......✰.........*✰...✰..........✰................\n.....................✰....✰........T................✰.........✰✰..............✰......\n..........✰....✰........✰.............✰.......................✰......................\n..........✰.........................✰..✰................✰.✰.....✰....................\n.....................................................................................\nKEY\n✰ = Bush\nT = tree\n# = Wall\n* = Lamp\nh = Chair\n= = Bed\n+ = Door\n↻ = Toilet\nf = Sink\n░ = Counter\n◘ = Table\n_ = Tub\n] = Tv\n[ = Refrigerator\n◛ = Washer/dryer\n◉ = Oven\n";
+module.exports = ".....................................................................................\n.....................................................................................\n............✰.✰......................................................................\n...........✰..........✰..............................................................\n..✰......................T................✰.✰...✰..✰.✰✰✰.....✰...........✰...........\n................✰................T.......T..✰...........✰✰..✰✰..✰......✰.....✰.......\n..✰..............T.........#####...........✰..✰.✰✰.✰..✰.......................✰......\n.............T..✰✰......###*...*###......✰...✰✰.........✰..✰.TT✰...................✰.\n.......✰...............#h*.==.==.*h###.....✰...✰..T..✰......✰..✰✰....................\n........✰..............#...==.==...#.*#....✰...........✰....✰.............✰..........\n.....✰................✰#...==.==...+.↻#...........✰.✰...✰....✰✰......................\n.....✰...✰✰.........✰..#...........#.f#.......✰✰.....✰✰..✰....✰......................\n........✰..............#.h.........#.░#......✰.....✰..✰✰✰..✰.✰............✰..........\n...✰.✰..........✰......#◘◘.........#.f#.....✰...✰....✰.✰.T....✰✰✰...............✰....\n.......................#◘◘*...h....+.↻#...........✰✰.................................\n.......................#h....░░░*..#__#........................................T.....\n.......................###+#####...####....#+++#.........✰.....####.................✰\n........T..............#...#...#...+..*#..#*...*#......✰✰✰....#.==.#.................\n................✰......#...#...+...+....#+..hhh..+....✰✰.✰...#*.==.*#................\n......................✰###############+##*.h◘◘◘h.*#.........#........#.......✰.......\n..................................#*f#.*#..h◘◘◘h..#........#*........✰#....✰.........\n............✰...........T.........#..+..+...hhh...##########░........h#..............\n..................................#.↻#..+...........*]]]]*.#░.......*◘#..............\n......✰..........✰.......#############.*#..................#*........h#......✰.......\n..........T..........✰...+.........+.+..+......░...........#..........#..........✰...\n..........✰..............#.........###++#*░...░░░..*hh..hh*#+##########..............\n...................✰.....#.........#....#░░....░*..........#..*#✰.*.__#....✰✰.....✰..\n.........✰...✰...✰.......#.........#░..*#[[....f░#...hhhh..+...+.....✰#.✰.......✰....\n..✰......................#.........#░..◛#[[....f░#.........#...#░ff░.↻#.............✰\n...........✰.........✰...#.........#◛..◛#░░....░░#.#*....✰✰#+##########..............\n...................TT....#.........#◛..░#░*░..░░░#..#✰.✰..✰#...*h◘h..*#.............✰\n.....✰...✰...............#.........#░.._#░░░◉◉░░*#..#*..✰✰*#.........*#...........T..\n.........................###+++++###░..░##########++########..........#......✰..✰....\n......✰.............✰..............#*.._#........*..*......#..........#.............✰\n.........✰.........................#.__░#...................#........#...............\n..........✰✰..✰....................######......✰✰T..T.✰✰.....#*.==.*#....✰.✰✰........\n....✰...✰.....✰...✰.✰............................✰...✰..✰.....#.==.#.......T.........\n.......✰..✰...✰...................✰.......✰✰✰.✰✰✰✰..✰✰✰✰.✰.✰...####..................\n.....✰.........................✰..........✰..✰✰..*..✰.✰✰.✰✰✰✰........................\n...✰.......✰.T......................✰✰....✰✰.✰...✰..*✰✰✰...✰.........................\n..........✰.✰................✰..............✰.✰✰.✰..✰✰..✰✰...................✰.....✰.\n.................✰.✰...............✰.✰........✰✰✰....✰✰✰...............✰.............\n...........✰.......✰..✰...T......................*..✰......✰...✰...................✰.\n..........✰.............✰........................T..T...✰..............✰..........✰..\n....✰✰✰...............✰✰...........T......✰.........*✰...✰..........✰................\n.....................✰....✰........T................✰.........✰✰..............✰......\n..........✰....✰........✰.............✰.......................✰......................\n..........✰.........................✰..✰................✰.✰.....✰....................\n................................................SSSSSS...............................\nKEY\n✰ = Bush\nT = tree\n# = Wall\n* = Lamp\nh = Chair\n= = Bed\n+ = Door\n↻ = Toilet\nf = Sink\n░ = Counter\n◘ = Table\n_ = Tub\n] = Tv\n[ = Refrigerator\n◛ = Washer/dryer\n◉ = Oven\nS = spawn point\n";
 
 /***/ }),
 
@@ -16554,6 +16607,7 @@ class GameState {
         this.loadData = (d) => {
             this.introSucceeded = d.introSucceeded;
             this.firehouse = FirehouseStorage.from(d.firehouse);
+            console.log('loaded gameState', this.firehouse);
         };
         this.reset = () => {
             this.introSucceeded = false;
@@ -16607,7 +16661,7 @@ const FirehouseMode = new signal/* Signal */.H();
 /***/ 9620:
 /***/ ((module) => {
 
-module.exports = ".........................................................\n.........................................................\n...........##+##.........................................\n...........#*..######....................................\n..#####....#✰...*░ff#....................................\n..#*..######].h..░.◉#....................................\n..#✰...*░ff#].◘h.░.░#....................................\n..#].h..░.◉#].◘h.░.[#....................................\n..#].◘h.░.░#].h*.░.[#....................................\n..#].◘h.░.[#✰....░.░#....................................\n..#].h*.░.[#.......*###################################..\n..#✰....░.░#.........#f◉░[[░*.#..*....#f◉░[[░*.#..*...#..\n..#.......*#✰..*##+###f.......+...===.#f.......+...===#..\n..+........##+###h...#░░░░░░..#h◘.===##░░░░░░..#h◘.===#..\n..#✰..*##+##_..#h◘...#*.......##h....#.*.......##h....#..\n..##+###h..#_..#...*##..hh*...*#######...hh*...*#######..\n..#_..#h◘..#...#.==.#..h◘◘h....#....*#..h◘◘h....#....*#..\n..#_..#...*#...#.==.#..........+....f#..........+....f#..\n..#...#.==.#↻f*#.==.#*✰]]]]✰..✰#__..↻#*✰]]]]✰..✰#__..↻#..\n..#...#.==.##################+################+########..\n..#↻f*#.==.#..........................................#..\n..##########..........................................+..\n........+............................................##..\n........+............................................#...\n....###+###+#....###+#....###+#....###+#....###+#....+...\n....#...#*..######*..######*..######*..######*..######...\n....#◛.◛#✰...*░ff#✰...*░ff#✰...*░ff#✰...*░ff#✰...*░ff#...\n....#...#].h..░.◉#].h..░.◉#].h..░.◉#].h..░.◉#].h..░.◉#...\n....#◛.❱#].◘h.░.░#].◘h.░.░#].◘h.░.░#].◘h.░.░#].◘h.░.░#...\n....#..◛#].◘h.░.[#].◘h.░.[#].◘h.░.[#].◘h.░.[#].◘h.░.[#...\n....#◛..#].h*.░.[#].h*.░.[#].h*.░.[#].h*.░.[#].h*.░.[#...\n....#..◛#✰....░.░#✰....░.░#✰....░.░#✰....░.░#✰....░.░#...\n....#####.......*#.......*#.......*#.......*#.......*#...\n........#........#........#........#........#........#...\n........#✰..*##+##✰..*##+##✰..*##+##✰..*##+##✰..*##+##...\n........##+###h..##+###h..##+###h..##+###h..##+###h..#...\n........#_..#h◘..#_..#h◘..#_..#h◘..#_..#h◘..#_..#h◘..#...\n........#_..#...*#_..#...*#_..#...*#_..#...*#_..#...*#...\n........#...#.==.#...#.==.#...#.==.#...#.==.#...#.==.#...\n........#...#.==.#...#.==.#...#.==.#...#.==.#...#.==.#...\n........#↻f*#.==.#↻f*#.==.#↻f*#.==.#↻f*#.==.#↻f*#.==.#...\n........##############################################...\n.........................................................\n.........................................................\nKEY\n# = Wall\n+ = Door\n* = Lamp\n✰ = Bush\n░ = Counter\nf = Sink\n] = Tv\nh = Chair\n◉ = Oven\n◘ = Table\n[ = Refrigerator\n= = Bed\n_ = Tub\n↻ = Toilet\n◛ = washer/dryer\n❱ = coin machine\n";
+module.exports = ".........................................................\n.........................................................\n...........##+##.........................................\n...........#*..######....................................\n..#####....#✰...*░ff#....................................\n..#*..######].h..░.◉#....................................\n..#✰...*░ff#].◘h.░.░#....................................\n..#].h..░.◉#].◘h.░.[#....................................\n..#].◘h.░.░#].h*.░.[#....................................\n..#].◘h.░.[#✰....░.░#....................................\n..#].h*.░.[#.......*###################################..\n..#✰....░.░#.........#f◉░[[░*.#..*....#f◉░[[░*.#..*...#..\n..#.......*#✰..*##+###f.......+...===.#f.......+...===#..\n..+........##+###h...#░░░░░░..#h◘.===##░░░░░░..#h◘.===#..\n..#✰..*##+##_..#h◘...#*.......##h....#.*.......##h....#..\n..##+###h..#_..#...*##..hh*...*#######...hh*...*#######..\n..#_..#h◘..#...#.==.#..h◘◘h....#....*#..h◘◘h....#....*#..\n..#_..#...*#...#.==.#..........+....f#..........+....f#..\n..#...#.==.#↻f*#.==.#*✰]]]]✰..✰#__..↻#*✰]]]]✰..✰#__..↻#..\n..#...#.==.##################+################+########..\n..#↻f*#.==.#..........................................#..\n..##########..........................................+..\nSS......+............................................##..\nSS......+............................................#...\nSS..###+###+#....###+#....###+#....###+#....###+#....+...\n....#...#*..######*..######*..######*..######*..######...\n....#◛.◛#✰...*░ff#✰...*░ff#✰...*░ff#✰...*░ff#✰...*░ff#...\n....#...#].h..░.◉#].h..░.◉#].h..░.◉#].h..░.◉#].h..░.◉#...\n....#◛.❱#].◘h.░.░#].◘h.░.░#].◘h.░.░#].◘h.░.░#].◘h.░.░#...\n....#..◛#].◘h.░.[#].◘h.░.[#].◘h.░.[#].◘h.░.[#].◘h.░.[#...\n....#◛..#].h*.░.[#].h*.░.[#].h*.░.[#].h*.░.[#].h*.░.[#...\n....#..◛#✰....░.░#✰....░.░#✰....░.░#✰....░.░#✰....░.░#...\n....#####.......*#.......*#.......*#.......*#.......*#...\n........#........#........#........#........#........#...\n........#✰..*##+##✰..*##+##✰..*##+##✰..*##+##✰..*##+##...\n........##+###h..##+###h..##+###h..##+###h..##+###h..#...\n........#_..#h◘..#_..#h◘..#_..#h◘..#_..#h◘..#_..#h◘..#...\n........#_..#...*#_..#...*#_..#...*#_..#...*#_..#...*#...\n........#...#.==.#...#.==.#...#.==.#...#.==.#...#.==.#...\n........#...#.==.#...#.==.#...#.==.#...#.==.#...#.==.#...\n........#↻f*#.==.#↻f*#.==.#↻f*#.==.#↻f*#.==.#↻f*#.==.#...\n........##############################################...\n.........................................................\n.........................................................\nKEY\n# = Wall\n+ = Door\n* = Lamp\n✰ = Bush\n░ = Counter\nf = Sink\n] = Tv\nh = Chair\n◉ = Oven\n◘ = Table\n[ = Refrigerator\n= = Bed\n_ = Tub\n↻ = Toilet\n◛ = washer/dryer\n❱ = coin machine\nS = spawn point\n";
 
 /***/ }),
 
@@ -16774,7 +16828,7 @@ class UIRenderer {
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames based on template
-/******/ 			return "" + chunkId + ".bundle." + "93634f72" + ".js";
+/******/ 			return "" + chunkId + ".bundle." + "8d3e91c6" + ".js";
 /******/ 		};
 /******/ 	})();
 /******/ 	
