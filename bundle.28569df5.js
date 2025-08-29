@@ -7669,7 +7669,7 @@ class MaterialType {
 class Wood extends MaterialType {
     constructor() {
         super(...arguments);
-        this.hits = 40;
+        this.hits = 60;
         this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .COLOR_WOOD */ .sX;
         this.note = 'flammable';
     }
@@ -7684,7 +7684,7 @@ Wood.instance = new Wood();
 class Meat extends MaterialType {
     constructor() {
         super(...arguments);
-        this.hits = 20;
+        this.hits = 30;
         this.note = 'flammable';
     }
     step(_owner) { }
@@ -7693,13 +7693,13 @@ Meat.instance = new Meat();
 class Plant extends MaterialType {
     constructor() {
         super(...arguments);
-        this.hits = 20;
+        this.hits = 30;
         this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .COLOR_PLANT */ .yv;
         this.note = "extra smokey but don't burn hot";
     }
     step(owner) {
         owner.cell.spawnSmoke();
-        if (!_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo && (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(4))
+        if (!_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo && (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(6))
             owner.cell.spawnFire();
     }
 }
@@ -7708,7 +7708,7 @@ class Metal extends MaterialType {
     constructor() {
         super(...arguments);
         this.flammable = false;
-        this.hits = 50;
+        this.hits = 75;
         this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .COLOR_METAL */ .SK;
         this.note = 'non-flammable';
     }
@@ -7719,7 +7719,7 @@ class Brick extends MaterialType {
     constructor() {
         super(...arguments);
         this.flammable = false;
-        this.hits = 20;
+        this.hits = 30;
         this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .COLOR_BRICK */ .Ui;
         this.note = 'non-flammable';
     }
@@ -7730,7 +7730,7 @@ class Glass extends MaterialType {
     constructor() {
         super(...arguments);
         this.flammable = false;
-        this.hits = 10;
+        this.hits = 15;
         this.color = _ui_colors__WEBPACK_IMPORTED_MODULE_1__/* .COLOR_GLASS */ .zC;
         this.note = 'non-flammable, transparent';
     }
@@ -7809,6 +7809,11 @@ class Material {
         if (!this.burning)
             return stillAlive();
         this.type.step(this.owner);
+        // chance to self-extinguish while burning
+        if (!_utils__WEBPACK_IMPORTED_MODULE_0__/* .isInTestMode */ .Jo && (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .oneIn */ .A7)(30)) {
+            this.extinguish();
+            return stillAlive();
+        }
         if (this.takeHit())
             stillAlive();
     }
@@ -9143,27 +9148,23 @@ class Fires {
         const { Fire } = __webpack_require__(1267);
         const { Pawn } = __webpack_require__(2705);
         if (obj instanceof Fire)
-            this.fires++;
+            this.fireSet.add(obj);
         else if (obj instanceof Pawn)
-            this.people++;
+            this.peopleSet.add(obj);
         else
-            this.items++;
+            this.itemSet.add(obj);
         BurningNew.emit();
         this.updateCounters();
     }
     static decrement(obj) {
         const { Fire } = __webpack_require__(1267);
         const { Pawn } = __webpack_require__(2705);
-        if (obj instanceof Fire) {
-            if (this.fires > 0)
-                this.fires--;
-        }
-        else if (obj instanceof Pawn) {
-            if (this.people > 0)
-                this.people--;
-        }
-        else if (this.items > 0)
-            this.items--;
+        if (obj instanceof Fire)
+            this.fireSet.delete(obj);
+        else if (obj instanceof Pawn)
+            this.peopleSet.delete(obj);
+        else
+            this.itemSet.delete(obj);
         BurningOut.emit();
         this.updateCounters();
     }
@@ -9171,6 +9172,9 @@ class Fires {
         this.fires = 0;
         this.items = 0;
         this.people = 0;
+        this.fireSet.clear();
+        this.itemSet.clear();
+        this.peopleSet.clear();
         this.updateCounters();
     }
     static decorate(name) {
@@ -9186,16 +9190,52 @@ class Fires {
         countEl.text(`${count}`).style('color', color);
     }
     static updateCounters() {
+        this.cleanupSets();
+        // Sync numeric counters to authoritative sets
+        this.fires = this.fireSet.size;
+        this.items = this.itemSet.size;
+        this.people = this.peopleSet.size;
         BurningCountersUpdated.emit({
             fireCount: this.fires,
             itemCount: this.items,
             peopleCount: this.people
         });
     }
+    static cleanupSets() {
+        const alive = (obj) => !!obj; // keep even if cell not set yet
+        const stillBurning = (obj) => !!obj?.material?.isBurning?.();
+        // Trust Fire.dying() to call decrement; don't prune newly created fires
+        this.fireSet = new Set([...this.fireSet].filter(alive));
+        this.peopleSet = new Set([...this.peopleSet].filter(o => alive(o) && stillBurning(o)));
+        this.itemSet = new Set([...this.itemSet].filter(o => alive(o) && stillBurning(o)));
+    }
+    static highlightOnce(map, name) {
+        const id = `highlight-${name}`;
+        const targets = name === 'people' ? this.peopleSet : this.itemSet;
+        const strokeCells = [...targets]
+            .filter(o => o?.cell)
+            .map(o => ({ cell: o.cell, char: '▣', bg: undefined }));
+        const Stroke = (__webpack_require__(891)/* .Stroke */ .t);
+        const start = Date.now();
+        const pulseMs = 400;
+        const pulses = 3;
+        const totalMs = pulseMs * pulses;
+        const colorFn = () => {
+            const elapsed = Date.now() - start;
+            const t = Math.max(0, Math.min(elapsed % pulseMs, pulseMs)) / pulseMs;
+            const alpha = Math.sin(Math.PI * t); // 0 -> 1 -> 0
+            return `rgba(255,102,0,${alpha.toFixed(2)})`;
+        };
+        const isValid = () => (Date.now() - start) < totalMs;
+        map.uiRenderer.replace(id, new Stroke(strokeCells, colorFn, isValid, 50));
+    }
 }
 Fires.fires = 0;
 Fires.items = 0;
 Fires.people = 0;
+Fires.fireSet = new Set();
+Fires.itemSet = new Set();
+Fires.peopleSet = new Set();
 
 
 /***/ }),
@@ -12749,6 +12789,8 @@ class Game {
             e.stopPropagation();
             this.toggleHelp();
         });
+        (0,utils/* onClick */.Af)((0,utils.$1)('items-icon'), () => fires/* Fires */.UQ.highlightOnce(this.map, 'items'));
+        (0,utils/* onClick */.Af)((0,utils.$1)('people-icon'), () => fires/* Fires */.UQ.highlightOnce(this.map, 'people'));
         (0,utils/* onClick */.Af)((0,utils.$1)('feedback-button'), e => {
             e.stopPropagation();
             this.showFeedback();
@@ -16689,7 +16731,8 @@ class UIRenderer {
     constructor(map) {
         this.map = map;
         this.strokes = new Map();
-        this.frozen = () => !this.intervalId;
+        this.frozenFlag = false;
+        this.frozen = () => this.frozenFlag;
         this.display = new _display__WEBPACK_IMPORTED_MODULE_1__/* .Display */ .n(map.w, map.h, true);
         this.intervalId = this.start();
         _game_game__WEBPACK_IMPORTED_MODULE_2__/* .GameStepped */ .K5.on(() => this.render());
@@ -16698,7 +16741,7 @@ class UIRenderer {
     unfreeze() {
         if (!this.frozen())
             return;
-        this.intervalId = this.start();
+        this.frozenFlag = false;
     }
     start() {
         return setInterval(() => { Repaint.emit(); }, 100);
@@ -16729,8 +16772,7 @@ class UIRenderer {
     freeze() {
         if (this.frozen())
             return;
-        clearInterval(this.intervalId);
-        this.intervalId = null;
+        this.frozenFlag = true;
     }
     render() {
         (0,_utils__WEBPACK_IMPORTED_MODULE_0__/* .eachPair */ .cd)(this.strokes, (id, stroke) => {
@@ -16747,7 +16789,8 @@ class UIRenderer {
             });
         });
         const frame = (FrameRendered.current || 0) + 1;
-        if (frame % 4 === 0)
+        // Avoid full map redraw flicker while frozen; still advance frame for animations
+        if (frame % 4 === 0 && !this.frozen())
             RedrawMap.emit();
         FrameRendered.emit(frame);
     }
