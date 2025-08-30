@@ -6,6 +6,7 @@
 var map = {
 	"./apartment-big.txt": 4806,
 	"./apartment-complex.txt": 9620,
+	"./diner.txt": 5461,
 	"./house.txt": 5833,
 	"./intro-barracks.txt": 4461,
 	"./level1.txt": 4648,
