@@ -11,7 +11,8 @@ var map = {
 	"./intro-barracks.txt": 4461,
 	"./level1.txt": 4648,
 	"./manor.txt": 9110,
-	"./test-editor-items.txt": 9444
+	"./test-editor-items.txt": 9444,
+	"./woods-cabin.txt": 1135
 };
 
 
@@ -109,8 +110,8 @@ var d3_extend = __webpack_require__(452);
 /* harmony default export */ const editor_panel = ("<div id=\"terminal\">\n  <div id=\"editor-panel\" class=\"column gap-body\">\n    <div class=\"top column gap-controls\">\n      <div class=\"row fit-container cross-aligned-center gap-button-group\">\n        <div class=\"label\"></div>\n        <div id=\"layer-choices\" class=\"column fit-container gap-controls\">\n          <div class=\"layer template\">\n            <div class=\"row fit-container gap-buttons\">\n              <div class=\"name\"></div>\n              <div class=\"column fit-container\">\n                <div class=\"choices gap-buttons\">\n                  <button class=\"choice template\"></button>\n                </div>\n                <div class=\"editor-items column gap-buttons\">\n                  <div class=\"editor-item row\">\n                    <button id=\"add-item\" class=\"button-secondary\">Add</button>\n                  </div>\n                  <div class=\"editor-item-buttons\">\n                    <div class=\"editor-item row template\">\n                      <button class=\"choice\"></button>\n                      <button class=\"button-secondary close-button\">×</button>\n                    </div>\n                  </div>\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"bottom column gap-controls\">\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Paint</div>\n        <div class=\"char\"></div>\n        <div class=\"cell-coord\"></div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <div class=\"label\">Stutter</div>\n        <input id=\"stutter\" type=\"range\" min=\"0\" max=\"100\" value=\"0\" />\n        <div id=\"stutter-val\">0%</div>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"undo-btn\" class=\"button-secondary\">undo</button>\n        <button id=\"paste-btn\" class=\"button-secondary\" disabled>paste</button>\n        <button id=\"rotate-left\" class=\"button-secondary hidden\" disabled>⟲</button>\n        <button id=\"rotate-right\" class=\"button-secondary hidden\" disabled>⟳</button>\n        <button id=\"copy-cancel\" class=\"button-secondary\" disabled>cxl</button>\n      </div>\n      <div id=\"tool-row\" class=\"column gap-buttons\">\n        <button class=\"tool template\" data-tool=\"\"></button>\n      </div>\n      <div id=\"fragment-preview\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">Fragment</div>\n          <button id=\"fragment-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <pre id=\"fragment-text\"></pre>\n      </div>\n      <div id=\"symbol-picker\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">New Item</div>\n          <button id=\"symbol-picker-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div id=\"symbol-grid\" class=\"symbols\">\n          <div class=\"sym template\"></div>\n        </div>\n        <div class=\"actions\">\n          <input id=\"editor-item-name\" type=\"text\" placeholder=\"name\" />\n          <button id=\"editor-item-add\" class=\"button-secondary\" disabled>Add</button>\n        </div>\n      </div>\n      <div id=\"fragment-loader\" class=\"panel hidden\">\n        <div class=\"row items-between\">\n          <div class=\"label\">Load Fragment</div>\n          <button id=\"fragment-loader-close\" class=\"button-secondary close-button\">×</button>\n        </div>\n        <div id=\"fragment-list\" class=\"column gap-buttons\">\n          <button class=\"fragment-file template\" data-file=\"\"></button>\n        </div>\n      </div>\n      <div class=\"fill\"></div>\n      <div id=\"controls-help\" class=\"text-subtle\">\n        L/R: paint/erase · Shift: constrain · Ctrl: all layers · Hold C: copy · ←/→ or L/R: rotate\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"load-fragment\" class=\"button-secondary\">load fragment</button>\n        <button id=\"copy-fragment\" class=\"button-secondary\">cc clipboard</button>\n        <button id=\"submit-fragment\" class=\"button-secondary\">submit issue</button>\n        <button id=\"show-fragment\" class=\"button-secondary\">show fragment</button>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"clear-map\" class=\"button-secondary\">clear</button>\n      </div>\n      <div class=\"row gap-buttons\">\n        <button id=\"simulate-button\" class=\"button-secondary\">simulate</button>\n        <div id=\"simulate-play-wrapper\" class=\"play-controls-wrapper\"></div>\n        <button id=\"simulate-step\" class=\"button-secondary hidden\">⏭️</button>\n        <button id=\"simulate-return\" class=\"button-secondary hidden\">return</button>\n      </div>\n    </div>\n  </div>\n</div>");
 // EXTERNAL MODULE: ./src/game/layers.ts
 var game_layers = __webpack_require__(5633);
-// EXTERNAL MODULE: ./src/game/drawable-types.ts + 4 modules
-var drawable_types = __webpack_require__(7022);
+// EXTERNAL MODULE: ./src/game/drawable-types.ts + 6 modules
+var drawable_types = __webpack_require__(4380);
 // EXTERNAL MODULE: ./src/draw/editor-item.ts
 var editor_item = __webpack_require__(6372);
 ;// ./src/ui/editor-panel.ts
@@ -573,12 +574,13 @@ class Editor {
                 this.playSimulation();
             }
         };
+        this.simulationDelay = (speed) => speed === Infinity ? 10 : 350 / speed;
         this.setSimulationSpeed = (speed) => {
             if (this.stepTimer) {
                 clearInterval(this.stepTimer);
                 this.stepTimer = setInterval(() => {
                     this.stepSimulation();
-                }, 350 / speed);
+                }, this.simulationDelay(speed));
             }
         };
         this.playSimulation = () => {
@@ -588,7 +590,7 @@ class Editor {
             this.simulatePlayControls?.updatePlayPauseButton();
             this.stepTimer = setInterval(() => {
                 this.stepSimulation();
-            }, 350 / (this.simulatePlayControls?.getSpeed() || 1));
+            }, this.simulationDelay(this.simulatePlayControls?.getSpeed() || 1));
         };
         this.pauseSimulation = () => {
             if (!this.simulationRunning)
@@ -1216,7 +1218,6 @@ class Editor {
         this.map.lighting.disable();
         this.hide('#play-controls');
         this.hide('#next-button');
-        this.hide('#freeze-button');
         this.hide('#help-button');
         this.hide('#save-group');
         this.hide('#step-info');
