@@ -7555,9 +7555,20 @@ class Terminal {
 // EXTERNAL MODULE: ./src/game/layers.ts
 var game_layers = __webpack_require__(5633);
 ;// ./src/ui/states/select-state.ts
+
 class SelectState {
     constructor(ui) {
         this.ui = ui;
+        this.keyDown = (event) => {
+            if (event.key === 'v')
+                this.ui.nextPawn(firefighter/* PawnSelected */.Ei.current);
+        };
+    }
+    enter() {
+        document.addEventListener('keydown', this.keyDown);
+    }
+    exit() {
+        document.removeEventListener('keydown', this.keyDown);
     }
     onClick(cell, _c) {
         if (!cell)
@@ -8360,14 +8371,20 @@ class UI {
             menu: new MenuState(this),
             observe: new ObservePawnState(this)
         };
+        this.states[this.state].enter?.();
     }
     setState(newState, data) {
         this.states[this.state].exit?.();
         this.state = newState;
         this.states[this.state].enter?.(data);
     }
-    nextPawn(pawn) {
-        this.setState('menu', firefighter/* Firefighter */.go.next(pawn));
+    nextPawn(current) {
+        const pawns = firefighter/* Firefighter */.go.pawns;
+        if (pawns.length === 0)
+            return;
+        const pawn = current ?? firefighter/* PawnSelected */.Ei.current;
+        const next = pawn ? firefighter/* Firefighter */.go.next(pawn) : pawns[0];
+        this.setState('menu', next);
     }
 }
 
