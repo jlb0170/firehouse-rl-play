@@ -7205,7 +7205,7 @@ class Corpse extends drawable.Drawable {
         this.cause = cause;
         this.layer = 'items';
         this.passable = false;
-        this.desc = () => `${this.pawn.desc()}, died by ${this.cause}`;
+        this.desc = () => `${this.pawn.material.desc(this.pawn.name)}, died by ${this.cause}`;
         this.light = () => 0;
         this.char = () => '%';
         this.color = () => colors/* BONE */.LS;
@@ -7511,6 +7511,77 @@ class Material {
         }
         if (this.takeHit())
             stillAlive();
+    }
+}
+
+
+/***/ }),
+
+/***/ 3326:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   u: () => (/* binding */ Civilian)
+/* harmony export */ });
+/* harmony import */ var _pawn__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2705);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6185);
+/* harmony import */ var _door__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2483);
+/* harmony import */ var _ui_colors__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(1919);
+
+
+
+
+const jobPatterns = {
+    cook: [/Oven/, /Refrigerator/, /Sink/, /Counter/],
+    sleep: [/Bed/, /Toilet|Tub|Sink/],
+    wander: [/Window/, /Door/, /Bush/],
+    eat: []
+};
+class Civilian extends _pawn__WEBPACK_IMPORTED_MODULE_0__.Pawn {
+    constructor(name, job) {
+        super(name);
+        this.job = job;
+        this.desc = () => this.material.desc(`${this.name} (${this.job})`);
+        this.char = () => '@';
+        this.color = () => this.material.color(_ui_colors__WEBPACK_IMPORTED_MODULE_3__/* .WHITE */ .UE);
+        this.targetIndex = 0;
+        this.destination = null;
+    }
+    stepTasks() {
+        if (this.job === 'eat')
+            return;
+        if (!this.destination)
+            this.setDestination();
+        if (!this.destination)
+            return;
+        if (this.cell === this.destination) {
+            this.advanceJob();
+            return;
+        }
+        const next = this.cell.pathTo(this.destination)?.cells[0];
+        if (!next) {
+            this.destination = null;
+            return;
+        }
+        const ahead = next.wall();
+        if (ahead instanceof _door__WEBPACK_IMPORTED_MODULE_2__/* .Door */ .$ && !ahead.passable) {
+            ahead.toggle();
+            return;
+        }
+        this.cell.queueMove(this, next.xy);
+    }
+    setDestination() {
+        const pattern = jobPatterns[this.job][this.targetIndex];
+        const choices = [];
+        this.cell.map.eachCell(cell => cell.onItem(pattern, _ => {
+            cell.cardinals().filter(n => n.passable() && !n.pawn()).forEach(n => choices.push(n));
+        }));
+        this.destination = choices.length ? (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .randFrom */ .Kt)(choices) : null;
+    }
+    advanceJob() {
+        const patterns = jobPatterns[this.job];
+        this.targetIndex = (this.targetIndex + 1) % patterns.length;
+        this.destination = null;
     }
 }
 
@@ -9337,8 +9408,8 @@ var d3_extend = __webpack_require__(452);
 var compress = __webpack_require__(5074);
 // EXTERNAL MODULE: ./src/game/map.ts + 2 modules
 var map = __webpack_require__(7283);
-// EXTERNAL MODULE: ./src/game/initializer.ts + 8 modules
-var initializer = __webpack_require__(8652);
+// EXTERNAL MODULE: ./src/game/initializer.ts + 7 modules
+var initializer = __webpack_require__(7988);
 // EXTERNAL MODULE: ./src/game/config.ts
 var config = __webpack_require__(6457);
 // EXTERNAL MODULE: ./src/draw/firefighter.ts
@@ -11275,7 +11346,13 @@ var cell = __webpack_require__(8668);
 var lighting = __webpack_require__(2615);
 // EXTERNAL MODULE: ./src/game/layers.ts
 var game_layers = __webpack_require__(5633);
+// EXTERNAL MODULE: ./src/draw/firefighter.ts
+var firefighter = __webpack_require__(9290);
+// EXTERNAL MODULE: ./src/draw/civilian.ts
+var civilian = __webpack_require__(3326);
 ;// ./src/game/movers.ts
+
+
 
 class Move {
     constructor(drawable, from, to) {
@@ -11316,14 +11393,26 @@ class Movers {
         stillpossible.forEach(m => (0,utils/* pushMap */.H3)(destinations, m.to, m)); // TODO - this is group by, right?
         const pending = [];
         destinations.forEach((entrants, dest) => {
-            if (entrants.length !== 1)
-                return;
-            const move = (0,utils/* the */.C8)(entrants);
             const cell = this.map.get(dest.xy);
             if (!cell.passable())
                 return;
-            if (!cell.occupied(move.drawable.layer))
-                pending.push(move);
+            if (entrants.length === 1) {
+                const move = (0,utils/* the */.C8)(entrants);
+                if (!cell.occupied(move.drawable.layer))
+                    pending.push(move);
+                return;
+            }
+            if (!cell.occupied(entrants[0].drawable.layer)) {
+                const cmp = (a, b) => {
+                    const ra = a.drawable instanceof firefighter/* Firefighter */.go ? 0 : a.drawable instanceof civilian/* Civilian */.u ? 1 : 2;
+                    const rb = b.drawable instanceof firefighter/* Firefighter */.go ? 0 : b.drawable instanceof civilian/* Civilian */.u ? 1 : 2;
+                    if (ra !== rb)
+                        return ra - rb;
+                    return a.drawable.id - b.drawable.id;
+                };
+                const winner = entrants.slice().sort(cmp)[0];
+                pending.push(winner);
+            }
         });
         return pending;
     }
@@ -11782,6 +11871,466 @@ var xhtml = "http://www.w3.org/1999/xhtml";
   xml: "http://www.w3.org/XML/1998/namespace",
   xmlns: "http://www.w3.org/2000/xmlns/"
 });
+
+
+/***/ }),
+
+/***/ 7988:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  Initializer: () => (/* binding */ Initializer)
+});
+
+// EXTERNAL MODULE: ./src/game/xy.ts
+var xy = __webpack_require__(88);
+// EXTERNAL MODULE: ./src/game/rect.ts
+var rect = __webpack_require__(6893);
+// EXTERNAL MODULE: ./src/draw/wall.ts
+var wall = __webpack_require__(239);
+// EXTERNAL MODULE: ./src/draw/floor.ts
+var floor = __webpack_require__(9177);
+// EXTERNAL MODULE: ./src/draw/lamp.ts
+var lamp = __webpack_require__(225);
+// EXTERNAL MODULE: ./src/utils.ts
+var utils = __webpack_require__(6185);
+// EXTERNAL MODULE: ./src/draw/firefighter.ts
+var firefighter = __webpack_require__(9290);
+// EXTERNAL MODULE: ./src/draw/fire.ts
+var fire = __webpack_require__(1267);
+// EXTERNAL MODULE: ./src/ui/text-stroke.ts
+var text_stroke = __webpack_require__(1485);
+// EXTERNAL MODULE: ./src/game/game.ts + 20 modules
+var game = __webpack_require__(7215);
+// EXTERNAL MODULE: ./src/game/state.ts + 1 modules
+var state = __webpack_require__(9308);
+// EXTERNAL MODULE: ./src/game/capabilities.ts
+var capabilities = __webpack_require__(3793);
+;// ./src/game/names.ts
+const firsts = "Mary,Anna,Emma,Elizabeth,Minnie,Margaret,Ida,Alice,Bertha,Sarah,Annie,Clara,Ella,Florence,Cora,Martha,Laura,Nellie,Grace,Carrie,Maude,Mabel,Bessie,Jennie,Gertrude,Julia,Hattie,Edith,Mattie,Rose,Catherine,Lillian,Ada,Lillie,Helen,Jessie,Louise,Ethel,Lula,Myrtle,Eva,Frances,Lena,Lucy,Edna,Maggie,Pearl,Daisy,Fannie,Josephine,Dora,Rosa,Katherine,Agnes,Marie,Nora,May,Mamie,Blanche,Stella,Ellen,Nancy,Effie,Sallie,Nettie,Della,Lizzie,Flora,Susie,Maud,Mae,Etta,Harriet,Sadie,Caroline,Katie,Lydia,Elsie,Kate,Susan,Mollie,Alma,Addie,Georgia,Eliza,Lulu,Nannie,Lottie,Amanda,Belle,Charlotte,Rebecca,Ruth,Viola,Olive,Amelia,Hannah,Jane,Virginia,Emily,Matilda,Irene,Kathryn,Esther,Willie,Henrietta,Ollie,Amy,Rachel,Sara,Estella,Theresa,Augusta,Ora,Pauline,Josie,Lola,Sophia,Leona,Anne,Mildred,Ann,Beulah,Callie,Lou,Delia,Eleanor,Barbara,Iva,Louisa,Maria,Mayme,Evelyn,Estelle,Nina,Betty,Marion,Bettie,Dorothy,Luella,Inez,Lela,Rosie,Allie,Millie,Janie,Cornelia,Victoria,Ruby,Winifred,Alta,Celia,Christine,Beatrice,Birdie,Harriett,Mable,Myra,Sophie,Tillie,Isabel,Sylvia,Carolyn,Isabelle,Leila,Sally,Ina,Essie,Bertie,Nell,Alberta,Katharine,Lora,Rena,Mina,Rhoda,Mathilda,Abbie,Eula,Dollie,Hettie,Eunice,Fanny,Ola,Lenora,Adelaide,Christina,Lelia,Nelle,Sue,Johanna,Lilly,Lucinda,Minerva,Lettie,Roxie,Cynthia,Helena,Hilda,Hulda,Bernice,Genevieve,Jean,Cordelia,Marian,Francis,Jeanette,Adeline,Gussie,Leah,Lois,Lura,Mittie,Hallie,Isabella,Olga,Phoebe,Teresa,Hester,Lida,Lina,Winnie,Claudia,Marguerite,Vera,Cecelia,Bess,Emilie,John,Rosetta,Verna,Myrtie,Cecilia,Elva,Olivia,Ophelia,Georgie,Elnora,Violet,Adele,Lily,Linnie,Loretta,Madge,Polly,Virgie,Eugenia,Lucile,Lucille,Mabelle,Rosalie,Kittie,Meta,Angie,Dessie,Georgiana,Lila,Regina,Selma,Wilhelmina,Bridget,Lilla,Malinda,Vina,Freda,Gertie,Jeannette,Louella,Mandy,Roberta,Cassie,Corinne,Ivy,Melissa,Lyda,Naomi,Norma,Bell,Margie,Nona,Zella,Dovie,Elvira,Erma,Irma,Leota,William,Artie,Blanch,Charity,Lorena,Lucretia,Orpha,Alvina,Annette,Catharine,Elma,Geneva,Janet,Lee,Leora,Lona,Miriam,Zora,Linda,Octavia,Sudie,Zula,Adella,Alpha,Frieda,George,Joanna,Leonora,Priscilla,Tennie,Angeline,Docia,Ettie,Flossie,Hanna,Letha,Minta,Retta,Rosella,Adah,Berta,Elisabeth,Elise,Goldie,Leola,Margret,Adaline,Floy,Idella,Juanita,Lenna,Lucie,Missouri,Nola,Zoe,Eda,Isabell,James,Julie,Letitia,Madeline,Malissa,Mariah,Pattie,Vivian,Almeda,Aurelia,Claire,Dolly,Hazel,Jannie,Kathleen,Kathrine,Lavinia,Marietta,Melvina,Ona,Pinkie,Samantha,Susanna,Chloe,Donnie,Elsa,Gladys,Matie,Pearle,Vesta,Vinnie,Antoinette,Clementine,Edythe,Harriette,Libbie,Lilian,Lue,Lutie,Magdalena,Meda,Rita,Tena,Zelma,Adelia,Annetta,Antonia,Dona,Elizebeth,Georgianna,Gracie,Iona,Lessie,Leta,Liza,Mertie,Molly,Neva,Oma,Alida,Alva,Cecile,Cleo,Donna,Ellie,Ernestine,Evie,Frankie,Helene,Minna,Myrta,Prudence,Queen,Rilla,Savannah,Tessie,Tina,Agatha,America,Anita,Arminta,Dorothea,Ira,Luvenia,Marjorie,Maybelle,Mellie,Nan,Pearlie,Sidney,Velma,Clare,Constance,Dixie,Ila,Iola,Jimmie,Louvenia,Lucia,Ludie,Luna,Metta,Patsy,Phebe,Sophronia,Adda,Avis,Betsy,Bonnie,Cecil,Cordie,Emmaline,Ethelyn,Hortense,June,Louie,Lovie,Marcella,Melinda,Mona,Odessa,Veronica,Aimee,Annabel,Ava,Bella,Carolina,Cathrine,Christena,Clyde,Dena,Dolores,Eleanore,Elmira,Fay,Frank,Jenny,Kizzie,Lonnie,Loula,Magdalene,Mettie,Mintie,Peggy,Reba,Serena,Vida,Zada,Abigail,Celestine,Celina,Claudie,Clemmie,Connie,Daisie,Deborah,Dessa,Easter,Eddie,Emelia,Emmie,Imogene,India,Jeanne,Joan,Lenore,Liddie,Lotta,Mame,Nevada,Rachael,Robert,Sina,Willa,Aline,Beryl,Charles,Daisey,Dorcas,Edmonia,Effa,Eldora,Eloise,Emmer,Era,Gena,Henry,Iris,Izora,Lennie,Lissie,Mallie,Malvina,Mathilde,Mazie,Queenie,Rosina,Salome,Theodora,Therese,Vena,Wanda,Wilda,Altha,Anastasia,Besse,Bird,Birtie,Clarissa,Claude,Delilah,Diana,Emelie,Erna,Fern,Florida,Frona,Hilma,Joseph,Juliet,Leonie,Lugenia,Mammie,Manda,Manerva,Manie,Nella,Paulina,Philomena,Rae,Selina,Sena,Theodosia,Tommie,Una,Vernie,Adela,Althea,Amalia,Amber,Angelina,Annabelle,Anner,Arie,Clarice,Corda,Corrie,Dell,Dellar,Donie,Doris,Elda,Elinor,Emeline,Emilia,Esta,Estell,Etha,Fred,Hope,Indiana,Ione,Jettie,Johnnie,Josiephine,Kitty,Lavina,Leda,Letta,Mahala,Marcia,Margarette,Maudie,Maye,Norah,Oda,Patty,Paula,Permelia,Rosalia,Roxanna,Sula,Vada,Winnifred,Adline,Almira,Alvena,Arizona,Becky,Bennie,Bernadette,Camille,Cordia,Corine,Dicie,Dove,Drusilla,Elena,Elenora,Elmina,Ethyl,Evalyn,Evelina,Faye,Huldah,Idell,Inga,Irena,Jewell,Kattie,Lavenia,Leslie,Lovina,Lulie,Magnolia,Margeret,Margery,Media,Millicent,Nena,Ocie,Orilla,Osie,Pansy,Ray,Rosia,Rowena,Shirley,Tabitha,Thomas,Verdie,Walter,Zetta,Zoa,Zona,Albertina,Albina,Alyce,Amie,Angela,Annis,Carol,Carra,Clarence,Clarinda,Delphia,Dillie,Doshie,Drucilla,Etna,Eugenie,Eulalia,Eve,Felicia,Florance,Fronie,Geraldine,Gina,Glenna,Grayce,Hedwig,Jessica,Jossie,Katheryn,Katy,Lea,Leanna,Leitha,Leone,Lidie,Loma,Lular,Magdalen,Maymie,Minervia,Muriel,Neppie,Olie,Onie,Osa,Otelia,Paralee,Patience,Rella,Rillie,Rosanna,Theo,Tilda,Tishie,Tressa,Viva,Yetta,Zena,Zola,Abby,Aileen,Alba,Alda,Alla,Alverta,Ara,Ardelia,Ardella,Arrie,Arvilla,Augustine,Aurora,Bama,Bena,Byrd,Calla,Camilla,Carey,Carlotta,Celestia,Cherry,Cinda,Classie,Claudine,Clemie,Clifford,Clyda,Creola,Debbie,Dee,Dinah,Doshia,Ednah,Edyth,Eleanora,Electa,Eola,Erie,Eudora,Euphemia,Evalena,Evaline,Faith,Fidelia,Freddie,Golda,Harry,Helma,Hermine,Hessie,Ivah,Janette,Jennette,Joella,Kathryne,Lacy,Lanie,Lauretta,Leana,Leatha,Leo,Liller,Lillis,Louetta,Madie,Mai,Martina,Maryann,Melva,Mena,Mercedes,Merle,Mima,Minda,Monica,Nealie,Netta,Nolia,Nonie,Odelia,Ottilie,Phyllis,Robbie,Sabina,Sada,Sammie,Suzanne,Sybilla,Thea,Tressie,Vallie,Venie,Viney,Wilhelmine,Winona,Zelda,Zilpha,Adelle,Adina,Adrienne,Albertine,Alys,Ana,Araminta,Arthur,Birtha,Bulah,Caddie,Celie,Charlotta,Clair,Concepcion,Cordella,Corrine,Delila,Delphine,Dosha,Edgar,Elaine,Elisa,Ellar,Elmire,Elvina,Ena,Estie,Etter,Fronnie,Genie,Georgina,Glenn,Gracia,Guadalupe,Gwendolyn,Hassie,Honora,Icy,Isa,Isadora,Jesse,Jewel,Joe,Johannah,Juana,Judith,Judy,Junie,Lavonia,Lella,Lemma,Letty,Linna,Littie,Lollie,Lorene,Louis,Love,Lovisa,Lucina,Lynn,Madora,Mahalia,Manervia,Manuela,Margarett,Margaretta,Margarita,Marilla,Mignon,Mozella,Natalie,Nelia,Nolie,Omie,Opal,Ossie,Ottie,Ottilia,Parthenia,Penelope,Pinkey,Pollie,Rennie,Reta,Roena,Rosalee,Roseanna,Ruthie,Sabra,Sannie,Selena,Sibyl,Tella,Tempie,Tennessee,Teressa,Texas,Theda,Thelma,Thursa,Ula,Vannie,Verona,Vertie,Wilma,John,William,James,Charles,George,Frank,Joseph,Thomas,Henry,Robert,Edward,Harry,Walter,Arthur,Fred,Albert,Samuel,David,Louis,Joe,Charlie,Clarence,Richard,Andrew,Daniel,Ernest,Will,Jesse,Oscar,Lewis,Peter,Benjamin,Frederick,Willie,Alfred,Sam,Roy,Herbert,Jacob,Tom,Elmer,Carl,Lee,Howard,Martin,Michael,Bert,Herman,Jim,Francis,Harvey,Earl,Eugene,Ralph,Ed,Claude,Edwin,Ben,Charley,Paul,Edgar,Isaac,Otto,Luther,Lawrence,Ira,Patrick,Guy,Oliver,Theodore,Hugh,Clyde,Alexander,August,Floyd,Homer,Jack,Leonard,Horace,Marion,Philip,Allen,Archie,Stephen,Chester,Willis,Raymond,Rufus,Warren,Jessie,Milton,Alex,Leo,Julius,Ray,Sidney,Bernard,Dan,Jerry,Calvin,Perry,Dave,Anthony,Eddie,Amos,Dennis,Clifford,Leroy,Wesley,Alonzo,Garfield,Franklin,Emil,Leon,Nathan,Harold,Matthew,Levi,Moses,Everett,Lester,Winfield,Adam,Lloyd,Mack,Fredrick,Jay,Jess,Melvin,Noah,Aaron,Alvin,Norman,Gilbert,Elijah,Victor,Gus,Nelson,Jasper,Silas,Jake,Christopher,Mike,Percy,Adolph,Maurice,Cornelius,Felix,Reuben,Wallace,Claud,Roscoe,Sylvester,Earnest,Hiram,Otis,Simon,Willard,Irvin,Mark,Jose,Wilbur,Abraham,Virgil,Clinton,Elbert,Leslie,Marshall,Owen,Wiley,Anton,Morris,Manuel,Phillip,Augustus,Emmett,Eli,Nicholas,Wilson,Alva,Harley,Newton,Timothy,Marvin,Ross,Curtis,Edmund,Jeff,Elias,Harrison,Stanley,Columbus,Lon,Ora,Ollie,Pearl,Russell,Solomon,Arch,Asa,Clayton,Enoch,Irving,Mathew,Nathaniel,Scott,Hubert,Lemuel,Andy,Ellis,Emanuel,Joshua,Millard,Vernon,Wade,Cyrus,Miles,Rudolph,Sherman,Austin,Bill,Chas,Lonnie,Monroe,Byron,Edd,Emery,Grant,Jerome,Max,Mose,Steve,Gordon,Abe,Pete,Chris,Clark,Gustave,Orville,Lorenzo,Bruce,Marcus,Preston,Bob,Dock,Donald,Jackson,Cecil,Barney,Delbert,Edmond,Anderson,Christian,Glenn,Jefferson,Luke,Neal,Burt,Ike,Myron,Tony,Conrad,Joel,Matt,Riley,Vincent,Emory,Isaiah,Nick,Ezra,Green,Juan,Clifton,Lucius,Porter,Arnold,Bud,Jeremiah,Taylor,Forrest,Roland,Spencer,Burton,Don,Emmet,Gustav,Louie,Morgan,Ned,Van,Ambrose,Chauncey,Elisha,Ferdinand,General,Julian,Kenneth,Mitchell,Allie,Josh,Judson,Lyman,Napoleon,Pedro,Berry,Dewitt,Ervin,Forest,Lynn,Pink,Ruben,Sanford,Ward,Douglas,Ole,Omer,Ulysses,Walker,Wilbert,Adelbert,Benjiman,Ivan,Jonas,Major,Abner,Archibald,Caleb,Clint,Dudley,Granville,King,Mary,Merton,Antonio,Bennie,Carroll,Freeman,Josiah,Milo,Royal,Dick,Earle,Elza,Emerson,Fletcher,Judge,Laurence,Roger,Seth,Glen,Hugo,Jimmie,Johnnie,Neil,Washington,Elwood,Gust,Harmon,Jordan,Simeon,Wayne,Wilber,Clem,Evan,Frederic,Irwin,Junius,Lafayette,Loren,Madison,Mason,Orval,Abram,Aubrey,Elliott,Hans,Karl,Minor,Wash,Wilfred,Allan,Alphonse,Dallas,Dee,Isiah,Jason,Johnny,Lawson,Lew,Micheal,Orin,Addison,Cal,Erastus,Francisco,Hardy,Lucien,Randolph,Stewart,Vern,Wilmer,Zack,Adrian,Alvah,Bertram,Clay,Ephraim,Fritz,Giles,Grover,Harris,Isom,Jesus,Johnie,Jonathan,Lucian,Malcolm,Merritt,Otho,Perley,Rolla,Sandy,Tomas,Wilford,Adolphus,Angus,Arther,Carlos,Cary,Cassius,Davis,Hamilton,Harve,Israel,Leander,Melville,Merle,Murray,Pleasant,Sterling,Steven,Axel,Boyd,Bryant,Clement,Erwin,Ezekiel,Foster,Frances,Geo,Houston,Issac,Jules,Larkin,Mat,Morton,Orlando,Pierce,Prince,Rollie,Rollin,Sim,Stuart,Wilburn,Bennett,Casper,Christ,Dell,Egbert,Elmo,Fay,Gabriel,Hector,Horatio,Lige,Saul,Smith,Squire,Tobe,Tommie,Wyatt,Alford,Alma,Alton,Andres,Burl,Cicero,Dean,Dorsey,Enos,Howell,Lou,Loyd,Mahlon,Nat,Omar,Oran,Parker,Raleigh,Reginald,Rubin,Seymour,Wm,Young,Benjamine,Carey,Carlton,Eldridge,Elzie,Garrett,Isham,Johnson,Larry,Logan,Merrill,Mont,Oren,Pierre,Rex,Rodney,Ted,Webster,West,Wheeler,Willam,Al,Aloysius,Alvie,Anna,Art,Augustine,Bailey,Benjaman,Beverly,Bishop,Clair,Cloyd,Coleman,Dana,Duncan,Dwight,Emile,Evert,Henderson,Hunter,Jean,Lem,Luis,Mathias,Maynard,Miguel,Mortimer,Nels,Norris,Pat,Phil,Rush,Santiago,Sol,Sydney,Thaddeus,Thornton,Tim,Travis,Truman,Watson,Webb,Wellington,Winfred,Wylie,Alec,Basil,Baxter,Bertrand,Buford,Burr,Cleveland,Colonel,Dempsey,Early,Ellsworth,Fate,Finley,Gabe,Garland,Gerald,Herschel,Hezekiah,Justus,Lindsey,Marcellus,Olaf,Olin,Pablo,Rolland,Turner,Verne,Volney,Williams,Almon,Alois,Alonza,Anson,Authur,Benton,Billie,Cornelious,Darius,Denis,Dillard,Doctor,Elvin,Emma,Eric,Evans,Gideon,Haywood,Hilliard,Hosea,Lincoln,Lonzo,Lucious,Lum,Malachi,Newt,Noel,Orie,Palmer,Pinkney,Shirley,Sumner,Terry,Urban,Uriah,Valentine,Waldo,Warner,Wong,Zeb,Abel,Alden,Archer,Avery,Carson,Cullen,Doc,Eben,Elige,Elizabeth,Elmore,Ernst,Finis,Freddie,Godfrey,Guss,Hamp,Hermann,Isadore,Isreal,Jones,June,Lacy,Lafe,Leland,Llewellyn,Ludwig,Manford,Maxwell,Minnie,Obie,Octave,Orrin,Ossie,Oswald,Park,Parley,Ramon,Rice,Stonewall,Theo,Tillman,Addie,Aron,Ashley,Bernhard,Bertie,Berton,Buster,Butler,Carleton,Carrie,Clara,Clarance,Clare,Crawford,Danial,Dayton,Dolphus,Elder,Ephriam,Fayette,Felipe,Fernando,Flem,Florence,Ford,Harlan,Hayes,Henery,Hoy,Huston,Ida,Ivory,Jonah,Justin,Lenard,Leopold,Lionel,Manley,Marquis,Marshal,Mart,Odie,Olen,Oral,Orley,Otha,Press,Price,Quincy,Randall,Rich,Richmond,Romeo,Russel,Rutherford,Shade,Shelby,Solon,Thurman,Tilden,Troy,Woodson,Worth,Aden,Alcide,Alf,Algie,Arlie,Bart,Bedford,Benito,Billy,Bird,Birt,Bruno,Burley,Chancy,Claus,Cliff,Clovis,Connie,Creed,Delos,Duke,Eber,Eligah,Elliot,Elton,Emmitt,Gene,Golden,Hal,Hardin,Harman,Hervey,Hollis,Ivey,Jennie,Len,Lindsay,Lonie,Lyle,Mac,Mal,Math,Miller,Orson,Osborne,Percival,Pleas,Ples,Rafael,Raoul,Roderick,Rose,Shelton,Sid,Theron,Tobias,Toney,Tyler,Vance,Vivian,Walton,Watt,Weaver,Wilton,Adolf,Albin,Albion,Allison,Alpha,Alpheus,Anastacio,Andre,Annie,Arlington,Armand,Asberry,Asbury,Asher,Augustin,Auther,Author,Ballard,Blas,Caesar,Candido,Cato,Clarke,Clemente,Colin,Commodore,Cora,Coy,Cruz,Curt,Damon,Davie,Delmar,Dexter,Dora,Doss,Drew,Edson,Elam,Elihu,Eliza,Elsie,Erie,Ernie,Ethel,Ferd,Friend,Garry,Gary,Grace,Gustaf,Hallie,Hampton,Harrie,Hattie,Hence,Hillard,Hollie,Holmes,Hope,Hyman,Ishmael,Jarrett,Jessee,Joeseph,Junious,Kirk,Levy,Mervin,Michel,Milford,Mitchel,Nellie,Noble,Obed,Oda,Orren,Ottis,Rafe,Redden,Reese,Rube,Ruby,Rupert,Salomon,Sammie,Sanders,Soloman,Stacy,Stanford,Stanton,Thad,Titus,Tracy,Vernie,Wendell,Wilhelm,Willian,Yee,Zeke,Ab,Abbott,Agustus,Albertus,Almer,Alphonso,Alvia,Artie,Arvid,Ashby,Augusta,Aurthur,Babe,Baldwin,Barnett,Bartholomew,Barton,Bernie,Blaine,Boston,Brad,Bradford,Bradley,Brooks,Buck,Budd,Ceylon,Chalmers,Chesley,Chin,Cleo,Crockett,Cyril,Daisy,Denver,Dow,Duff,Edie,Edith,Elick,Elie,Eliga,Eliseo,Elroy,Ely,Ennis,Enrique,Erasmus,Esau,Everette,Firman,Fleming,Flora,Gardner,Gee,Gorge,Gottlieb,Gregorio,Gregory,Gustavus,Halsey,Handy,Hardie,Harl,Hayden,Hays,Hermon,Hershel,Holly,Hosteen,Hoyt,Hudson,Huey,Humphrey,Hunt,Hyrum,Irven,Isam,Ivy,Jabez,Jewel,Jodie,Judd,Julious,Justice,Katherine,Kelly,Kit,Knute,Lavern,Lawyer,Layton,Leonidas,Lewie,Lillie,Linwood,Loran,Lorin,Mace,Malcom,Manly,Manson,Matthias,Mattie,Merida,Miner,Montgomery,Moroni,Murdock,Myrtle,Nate,Nathanial,Nimrod,Nora,Norval,Nova,Orion,Orla,Orrie,Payton,Philo,Phineas,Presley,Ransom,Reece,Rene,Roswell,Rowland,Sampson,Samual,Santos,Schuyler,Sheppard,Spurgeon,Starling,Sylvanus,Theadore,Theophile,Tilmon,Tommy,Unknown,Vann,Wes,Winston,Wood,Woodie,Worthy,Wright,York,Zachariah".split(',');
+const lasts = "Abbott,Abel,Adams,Addison,Adkins,Agent,Aldrich,Aldridge,Alexander,Alford,Allen,Appleton,Armstrong,Arrington,Arwood,Atkins,Austin,Avery,Bailey,Baine,Baird,Baldwin,Bankston,Barker,Barnes,Barnett,Barry,Barton,Baughan,Beard,Beasley,Beck,Bell,Bennefield,Bennett,Berry,Bishop,Black,Blackwell,Blake,Blaxton,Blaylock,Blevins,Bonds,Boone,Boston,Botiler,Boyd,Bradford,Brannon,Brazeall,Brewer,Bridgeman,Brimer,Brooks,Brown,Bryant,Burdick,Burnet,Burns,Burrell,Byars,Bynum,Cagle,Cagner,Cain,Calvert,Campbell,Canada,Cantrell,Carroll,Carter,Cary,Casey,Cates,Chambers,Chappell,Chillcoat,Clark,Cline,Cole,Collman,Commens,Compton	Conly,Cooper,Cotton,Cowart,Cox,Cummings,Curtis,Davidson,Davis,Deason,Dempsey,Derrick,Dickenson,Dodd,Donough,Dougherty,Dorris,Doss,Dover,Downy,Dunahoo,Duncan,Dunlap,Dupre,Eaton,Eatton,Ellenbury,Elliott,Ellis,England,Estes,Evans,Ezell,Fair,Farley,Farris,Faught,Forester,Fowler,Freeman,Frost,Gamble,Ganes,Gardener,Garrison,Garson,Gentle,George,Gibson,Gice,Gilbert,Glenn,Godsey,Goodwin,Gosset,Grantham,Grastey,Green,Griffin,Guest,Gunter,Guthrie,Hadder,Haines,Haley,Hamilton,Hampton,Hand,Harbin,Harmon,Harper,Harris,Hatchett,Haw,Haynes,Hays,Hebster,Hefner,Henderson,Hendon,Henson,Hewitt,Hicks,Hightower	Hill,Hiller,Hilton,Hinesley,Hix,Hogg,Holden,Holloway,Holt,Hood,Hoover,Hopson,Horton,Howard,Howells,Hudson,Hughes,Hyde,Ingle,Inmon,Isabell,Ivy,Jack,Jackson,James,Jamison,Jeffries,Jenkins,Johnson,Kely),Kemp,Key,Kidd,Kiker,Kile,Kilpatrick,Kimbrell,King,Knight,Knox,Lambert,Lane,Laneford,Laramore,Lauderdale,Lawson,Lay,League,Lewis,Little,Litton,Livingston,Logan,Long,Looney,Love,Lovelady,Lovell,Lovett,Lynn,Manasco,Mann,Martin,Mathews,McClane,McClung,McClure,McColum,McCoy,McCue,McCullan,McCullar,McDaniel,McDuff,McKay,McNames,McNeil,McNutt,Mellican,Merritt,Metcalf,Miles,Miller,Mitchell,Mize,Mobley,Montgomery,Moody,Mooney,Morgan,Morris,Morrison,Motes,Mullins,Musgrove,Nelson,Nesmith,Newman,Nolen,Noles,Nortwich,Oden,Odom,O'Henry,O'Mary,O'Rear,O'Steen,Overton,Owsley,Pace,Painter,Parsons,Partain,Patek,Patterson,Payne,Peak,Pearson,Pencard,Penn,Penyl,Perkins,Perry,Peters,Pittman,Plott,Poe,Pool,Portridge,Posey,Pouder,Powell,Preston,Pugh,Pulliam,Purdy,Radford,Ramey,Ramie,Ray,Raynes,Reeves,Richardson,Riddle,Rivers,Roberts,Robinson,Roden,Rollins,Romines,Ronow,Rowe,Rush,Russell,Rutledge,Sam,Samples,Sanford,Sarun,Scogin,Segars,Setton,Sexton,Seymore,Shadix,Shain,Shank,Shelly,Shelton,Shipman,Siddens,Simmons,Simpson,Sims,Slater,Slaughter,Smathers,Smith,Sneed,South,Southern,Spain,Spane,Sparks,Staten,Steel,Stephenson,Stevens,Stewart,Stokes,Stone,Strange,Sunmers,Surin,Sutherland,Suttles,Swindle,Taberson,Tarbutton,Taylor,Teague,Tedford,Thomanson,Thomas,Thompson,Thornton,Threadgill,Tidwell,Tittle,Tubs,Tucker,Turner,Tyler,Underwood,Ussery,Wadsworth,Waid,Wakefield,Walker,Walston,Ward,Ware,Warren,Watson,Watts,Weaver,Webb,Welborn,Welsh,West,Whisenhunt,White,Whitfield,Whitman,Whitney,Whitten,Wiley,Willborn,Williams,Willis,Willson,Wilson,Wise,Woodley,Woods,Wooley,Wright,Yarborough,York,Young".split(',');
+
+const initials = (n) => n[0] + n.split(' ')[1][0];
+const firstInitial = (n) => n[0];
+const group = (ns) => ns.reduce((m, n) => {
+    var _a;
+    (m[_a = n[0]] || (m[_a] = [])).push(n);
+    return m;
+}, {});
+class Names {
+    static randomName(used) {
+        const usedPairs = new Set(used.map(initials));
+        const usedFirsts = new Set(used.map(firstInitial));
+        // prefer unused first initials, then any unused pairs
+        for (const preferNewFirst of [true, false]) {
+            const availableFirsts = preferNewFirst
+                ? Names.fiAll.filter(f => !usedFirsts.has(f))
+                : Names.fiAll;
+            for (const fi of availableFirsts) {
+                const availableLasts = Names.liAll.filter(li => !usedPairs.has(fi + li));
+                if (availableLasts.length > 0) {
+                    const li = (0,utils/* randFrom */.Kt)(availableLasts);
+                    return `${(0,utils/* randFrom */.Kt)(Names.firstBy[fi])} ${(0,utils/* randFrom */.Kt)(Names.lastBy[li])}`;
+                }
+            }
+        }
+        // fallback to any random combination
+        const fi = (0,utils/* randFrom */.Kt)(Names.fiAll);
+        const li = (0,utils/* randFrom */.Kt)(Names.liAll);
+        return `${(0,utils/* randFrom */.Kt)(Names.firstBy[fi])} ${(0,utils/* randFrom */.Kt)(Names.lastBy[li])}`;
+    }
+}
+Names.firstBy = group(firsts);
+Names.lastBy = group(lasts);
+Names.fiAll = Object.keys(Names.firstBy);
+Names.liAll = Object.keys(Names.lastBy);
+const randomName = Names.randomName;
+
+// EXTERNAL MODULE: ./src/maps/fragments/intro-barracks.txt
+var intro_barracks = __webpack_require__(4461);
+// EXTERNAL MODULE: ./src/game/fragment.ts
+var game_fragment = __webpack_require__(8535);
+// EXTERNAL MODULE: ./src/game/models/firehouse.ts
+var firehouse = __webpack_require__(8646);
+;// ./src/game/levels/intro.ts
+
+
+
+
+
+
+
+
+
+
+
+
+
+const TITLE = [
+    "#   #  ###  ####  #     ####       ###  #   #      ##### ##### ####  #####",
+    "#   # #   # #   # #     #   #     #   # ##  #      #       #   #   # #    ",
+    "# # # #   # ####  #     #   #     #   # # # #      ####    #   ####  #### ",
+    "# # # #   # #   # #     #   #     #   # #  ##      #       #   #   # #    ",
+    "## ## #   # #   # #     #   #     #   # #   #      #       #   #   # #    ",
+    "#   #  ###  #   # ##### ####       ###  #   #      #     ##### #   # #####"
+];
+class Intro {
+    constructor(initializer, map) {
+        this.initializer = initializer;
+        this.map = map;
+        this.pawns = [];
+        this.pawnModels = [];
+    }
+    setup() {
+        this.addWorldOnFireRoom();
+        this.addPawns();
+        this.addBarracksWin();
+        this.addWelcomeText();
+        this.addUserSuggestion();
+    }
+    addWorldOnFireRoom() {
+        const w = TITLE[0].length;
+        const h = TITLE.length;
+        const startX = (0,utils/* centeredStart */.jw)(this.map.w, TITLE[0]);
+        const startY = Math.floor((this.map.h - h) / 2);
+        const start = xy.XY.at(startX, startY);
+        this.initializer.addRoom(rect/* Rect */.r.xyWH(start.add(-1, -1), w + 2, h + 2));
+        (0,utils/* each */.__)(TITLE, (line, y) => {
+            (0,utils/* each */.__)(line, (c, x) => {
+                if (c === '#')
+                    this.map.createAt(start.add(x, y), new fire.Fire());
+            });
+        });
+    }
+    addWelcomeText() {
+        text_stroke/* TextStroke */.m.centeredPlusY(this.map, "Welcome to Fire House RL", -13, 'welcome');
+        text_stroke/* TextStroke */.m.centeredPlusY(this.map, "press space to unpause", 13, 'instructions');
+        const endWelcome = game.GameStepped.on(step => {
+            if (step.frame <= 0)
+                return;
+            this.map.uiRenderer.remove('welcome');
+            this.map.uiRenderer.remove('instructions');
+            endWelcome();
+        });
+    }
+    addPawns() {
+        const add = (x, y) => {
+            const usedNames = this.pawnModels.map(m => m.name);
+            const model = new firehouse/* PawnModel */.A(randomName(usedNames), capabilities/* Capabilities */.FD.basic());
+            const pawn = model.toPawn();
+            this.map.createAt(xy.XY.at(x, y), pawn);
+            this.pawns.push(pawn);
+            this.pawnModels.push(model);
+            return model;
+        };
+        add(55, 24);
+        add(39, 24);
+    }
+    addBarracksWin() {
+        const base = game_fragment/* Fragment */.F.load(intro_barracks);
+        const rotated = base.rotate((0,utils/* randTo */.JD)(4));
+        const upperLeft = xy.XY.at(59, 8);
+        const rect = rotated.place(this.map, upperLeft);
+        const label = '<-- GET INSIDE';
+        const labelY = (0,utils/* half */.MX)(this.map.h) - 13;
+        const labelX = Math.max(0, this.map.w - label.length);
+        text_stroke/* TextStroke */.m.render(this.map, label, xy.XY.at(labelX, labelY), 'barracks-label');
+        const ends = [
+            game.GameStepped.on(() => {
+                const unrescued = this.pawns.filter(p => !rect.contains(p));
+                if (unrescued.length > 0)
+                    return;
+                this.map.uiRenderer.remove('barracks-label');
+                this.pawnModels.forEach(m => m.initialLevelUp());
+                state/* FirehouseMode */.M.emit(this.pawnModels);
+                ends.forEach(end => end());
+            }),
+            firefighter/* PawnDied */.hq.on(_dead => {
+                this.map.uiRenderer.remove('barracks-label');
+                text_stroke/* TextStroke */.m.render(this.map, 'YOU LOSE', xy.XY.at(labelX, labelY), 'lose-text');
+                ends.forEach(end => end());
+            })
+        ];
+        game.LevelReset.on(() => {
+            this.map.uiRenderer.remove('barracks-label');
+            ends.forEach(end => end());
+        });
+    }
+    addUserSuggestion() {
+        let show = true;
+        const suggest = () => {
+            const step = game.GameStepped.current;
+            if (!step || step.frame % 5 !== 0)
+                return;
+            show = !show;
+            if (show)
+                text_stroke/* TextStroke */.m.centered(this.map, 'click the @ symbol', this.map.h - 1, 'suggestion', () => '#ff0', () => true, 10);
+            else
+                this.map.uiRenderer.remove('suggestion');
+        };
+        suggest();
+        const stop = game.GameStepped.on(suggest);
+        firefighter/* PawnSelected */.Ei.on(_pawn => { this.map.uiRenderer.remove('suggestion'); stop(); });
+        game.LevelReset.on(() => { this.map.uiRenderer.remove('suggestion'); stop(); });
+    }
+}
+
+// EXTERNAL MODULE: ./src/draw/civilian.ts
+var civilian = __webpack_require__(3326);
+// EXTERNAL MODULE: ./src/game/fires.ts
+var fires = __webpack_require__(6746);
+// EXTERNAL MODULE: ./src/ui/colors.ts
+var colors = __webpack_require__(1919);
+;// ./src/game/levels/base-level.ts
+
+
+
+
+
+
+
+
+
+
+
+class BaseLevel {
+    constructor(init, map, pawns = [], fragmentText) {
+        this.init = init;
+        this.map = map;
+        this.pawns = pawns;
+        this.fragmentText = fragmentText;
+        this.showDarkness = true;
+        this.hasWon = false;
+        this.ends = [];
+        this.stoveIgnitions = 1;
+    }
+    pawnsToModels() {
+        return this.pawns.map(pawn => new firehouse/* PawnModel */.A(pawn.name, pawn.capabilities));
+    }
+    setup() {
+        const fragment = game_fragment/* Fragment */.F.fromText(this.fragmentText);
+        fragment.place(this.map, xy.XY.at(0, 0));
+        this.igniteRandomStoves(this.stoveIgnitions);
+        this.spawnPawns();
+        this.spawnCivilians();
+        this.ends.push(game.GameStepped.on(stepInfo => this.checkWinCondition(stepInfo)));
+        this.ends.push(game.LevelWon.on(() => this.handleContinue()));
+        this.ends.push(game.LevelReset.on(() => this.teardown()));
+    }
+    igniteRandomStoves(count) {
+        const ovens = [];
+        this.map.eachCell(cell => {
+            cell.onItem(/Oven/, oven => ovens.push(oven));
+        });
+        (0,utils/* times */.Hn)(count, () => {
+            const oven = (0,utils/* randFrom */.Kt)(ovens);
+            oven.cell.cardinals().find(cell => cell.wall())?.wall()?.ignite();
+        });
+    }
+    spawnPawns() {
+        const spawns = [];
+        this.map.eachCell(cell => {
+            cell.onItem(/Spawn point/, item => {
+                spawns.push(cell.xy);
+            });
+        });
+        (0,utils/* each */.__)(this.pawns, (pawn, index) => {
+            const fallback = xy.XY.at((0,utils/* half */.MX)(this.map.w) + index, this.map.h - 1);
+            const location = spawns[index] ?? fallback;
+            this.map.createAt(location, pawn);
+        });
+    }
+    spawnCivilians() {
+        const bedCells = new globalThis.Map();
+        const ovenCells = [];
+        const chairCells = [];
+        this.map.eachCell(cell => {
+            cell.onItem(/Bed/, _ => bedCells.set(cell.xy.toString(), cell));
+            cell.onItem(/Oven/, _ => ovenCells.push(cell));
+            cell.onItem(/Chair/, _ => chairCells.push(cell));
+        });
+        const usedNames = [];
+        const spawnAtCell = (cell, job = 'wander') => {
+            const name = randomName(usedNames);
+            usedNames.push(name);
+            cell.create(new civilian/* Civilian */.u(name, job));
+        };
+        const bedGroups = [];
+        const visited = new Set();
+        const collectGroup = (cell) => {
+            const key = cell.xy.toString();
+            if (!bedCells.has(key) || visited.has(key))
+                return [];
+            visited.add(key);
+            return [cell, ...cell.cardinals().flatMap(collectGroup)];
+        };
+        bedCells.forEach(cell => {
+            const group = collectGroup(cell);
+            if (group.length)
+                bedGroups.push(group);
+        });
+        if (bedGroups.length > 0) {
+            bedGroups.forEach(group => {
+                const size = group.length;
+                if (size % 2 === 1)
+                    console.warn(`odd bed tokens ${size} at ${group[0].xy.toString()}`);
+                const count = size === 4 ? 2 : 1;
+                group.slice(0, count).forEach(cell => spawnAtCell(cell, 'sleep'));
+            });
+        }
+        else {
+            ovenCells.forEach(ovenCell => {
+                const neighbor = ovenCell.cardinals().find(n => n.passable() && !n.pawn());
+                if (neighbor)
+                    spawnAtCell(neighbor, 'cook');
+            });
+            chairCells.filter((_cell, index) => index % 4 === 0)
+                .forEach(cell => spawnAtCell(cell, 'eat'));
+        }
+    }
+    checkWinCondition(stepInfo) {
+        if (fires/* Fires */.UQ.burningCount !== 0 || this.hasWon)
+            return;
+        this.hasWon = true;
+        this.map.display.clear();
+        this.map.smokeDisplay.clear();
+        this.map.uiRenderer.clearStrokes();
+        text_stroke/* TextStroke */.m.centered(this.map, `YOU WIN, ${stepInfo.frame} TURNS - PRESS SPACE TO CONTINUE`, this.map.h / 2, 'win-message', () => colors/* WHITE */.UE);
+        game.LevelWon.emit(true);
+    }
+    handleContinue() {
+        state/* FirehouseMode */.M.emit(this.pawnsToModels());
+        this.teardown();
+    }
+    teardown() {
+        this.ends.forEach(end => end());
+        this.ends = [];
+    }
+}
+
+// EXTERNAL MODULE: ./src/maps/fragments/manor.txt
+var manor = __webpack_require__(9110);
+;// ./src/game/levels/level1.ts
+
+
+class Level1 extends BaseLevel {
+    constructor(init, map, pawns = []) {
+        super(init, map, pawns, manor);
+    }
+}
+
+// EXTERNAL MODULE: ./src/maps/fragments/apartment-complex.txt
+var apartment_complex = __webpack_require__(9620);
+;// ./src/game/levels/level2.ts
+
+
+class Level2 extends BaseLevel {
+    constructor(init, map, pawns = []) {
+        super(init, map, pawns, apartment_complex);
+    }
+}
+
+// EXTERNAL MODULE: ./src/maps/fragments/diner.txt
+var diner = __webpack_require__(5461);
+;// ./src/game/levels/level3.ts
+
+
+class Level3 extends BaseLevel {
+    constructor(init, map, pawns = []) {
+        super(init, map, pawns, diner);
+    }
+}
+
+// EXTERNAL MODULE: ./src/maps/fragments/woods-cabin.txt
+var woods_cabin = __webpack_require__(1135);
+;// ./src/game/levels/level4.ts
+
+
+class Level4 extends BaseLevel {
+    constructor(init, map, pawns = []) {
+        super(init, map, pawns, woods_cabin);
+        this.stoveIgnitions = 0;
+    }
+}
+
+;// ./src/game/initializer.ts
+
+
+
+
+
+
+
+
+
+
+
+
+class Initializer {
+    constructor(map) {
+        this.map = map;
+        this.currentLevel = 0;
+        this.getCurrentLevel = () => this.currentLevel;
+    }
+    initialize() {
+        this.currentLevel = 0;
+        this.start(new Intro(this, this.map));
+    }
+    start(level) {
+        this.reset();
+        this.addField();
+        level.setup();
+        game.GameStepped.emit({ frame: 0, stepMs: 0 });
+        return { showDarkness: level.showDarkness };
+    }
+    startNext(pawns = []) {
+        this.currentLevel++;
+        if (this.currentLevel === 1) {
+            return this.start(new Level1(this, this.map, pawns));
+        }
+        else if (this.currentLevel === 2) {
+            return this.start(new Level2(this, this.map, pawns));
+        }
+        else if (this.currentLevel === 3) {
+            console.log('Starting level 3');
+            return this.start(new Level3(this, this.map, pawns));
+        }
+        else if (this.currentLevel === 4) {
+            return this.start(new Level4(this, this.map, pawns));
+        }
+        this.currentLevel = 0;
+        return this.startNext(pawns);
+    }
+    startLevel(levelNumber, pawns = []) {
+        this.currentLevel = levelNumber - 1;
+        return this.startNext(pawns);
+    }
+    reset() {
+        this.map.killAll();
+        this.map.display.clear();
+        this.map.smokeDisplay.clear();
+        this.map.uiRenderer.clearStrokes();
+        fires/* Fires */.UQ.reset();
+        game.LevelReset.emit();
+    }
+    addField() {
+        rect/* Rect */.r.xyWH(xy.XY.at(0, 0), this.map.w, this.map.h).eachCell(xy => {
+            this.map.createAt(xy, new floor/* Floor */.Z());
+        });
+    }
+    addRoom(rect) {
+        rect.eachBorder(xy => {
+            this.map.createAt(xy, new wall/* Wall */.j());
+        });
+        [rect.ul.add(1, 1), rect.ur.add(-1, 1), rect.bl.add(1, -1), rect.br.add(-1, -1)].forEach(xy => {
+            this.map.createAt(xy, new lamp/* Lamp */.z());
+        });
+    }
+}
 
 
 /***/ }),
@@ -12893,489 +13442,6 @@ class FirehouseModel {
         this.upgrades = upgrades;
         this.firehouseNum = firehouseNum;
         this.name = name;
-    }
-}
-
-
-/***/ }),
-
-/***/ 8652:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-// ESM COMPAT FLAG
-__webpack_require__.r(__webpack_exports__);
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  Initializer: () => (/* binding */ Initializer)
-});
-
-// EXTERNAL MODULE: ./src/game/xy.ts
-var xy = __webpack_require__(88);
-// EXTERNAL MODULE: ./src/game/rect.ts
-var rect = __webpack_require__(6893);
-// EXTERNAL MODULE: ./src/draw/wall.ts
-var wall = __webpack_require__(239);
-// EXTERNAL MODULE: ./src/draw/floor.ts
-var floor = __webpack_require__(9177);
-// EXTERNAL MODULE: ./src/draw/lamp.ts
-var lamp = __webpack_require__(225);
-// EXTERNAL MODULE: ./src/utils.ts
-var utils = __webpack_require__(6185);
-// EXTERNAL MODULE: ./src/draw/firefighter.ts
-var firefighter = __webpack_require__(9290);
-// EXTERNAL MODULE: ./src/draw/fire.ts
-var fire = __webpack_require__(1267);
-// EXTERNAL MODULE: ./src/ui/text-stroke.ts
-var text_stroke = __webpack_require__(1485);
-// EXTERNAL MODULE: ./src/game/game.ts + 20 modules
-var game = __webpack_require__(7215);
-// EXTERNAL MODULE: ./src/game/state.ts + 1 modules
-var state = __webpack_require__(9308);
-// EXTERNAL MODULE: ./src/game/capabilities.ts
-var capabilities = __webpack_require__(3793);
-;// ./src/game/names.ts
-const firsts = "Mary,Anna,Emma,Elizabeth,Minnie,Margaret,Ida,Alice,Bertha,Sarah,Annie,Clara,Ella,Florence,Cora,Martha,Laura,Nellie,Grace,Carrie,Maude,Mabel,Bessie,Jennie,Gertrude,Julia,Hattie,Edith,Mattie,Rose,Catherine,Lillian,Ada,Lillie,Helen,Jessie,Louise,Ethel,Lula,Myrtle,Eva,Frances,Lena,Lucy,Edna,Maggie,Pearl,Daisy,Fannie,Josephine,Dora,Rosa,Katherine,Agnes,Marie,Nora,May,Mamie,Blanche,Stella,Ellen,Nancy,Effie,Sallie,Nettie,Della,Lizzie,Flora,Susie,Maud,Mae,Etta,Harriet,Sadie,Caroline,Katie,Lydia,Elsie,Kate,Susan,Mollie,Alma,Addie,Georgia,Eliza,Lulu,Nannie,Lottie,Amanda,Belle,Charlotte,Rebecca,Ruth,Viola,Olive,Amelia,Hannah,Jane,Virginia,Emily,Matilda,Irene,Kathryn,Esther,Willie,Henrietta,Ollie,Amy,Rachel,Sara,Estella,Theresa,Augusta,Ora,Pauline,Josie,Lola,Sophia,Leona,Anne,Mildred,Ann,Beulah,Callie,Lou,Delia,Eleanor,Barbara,Iva,Louisa,Maria,Mayme,Evelyn,Estelle,Nina,Betty,Marion,Bettie,Dorothy,Luella,Inez,Lela,Rosie,Allie,Millie,Janie,Cornelia,Victoria,Ruby,Winifred,Alta,Celia,Christine,Beatrice,Birdie,Harriett,Mable,Myra,Sophie,Tillie,Isabel,Sylvia,Carolyn,Isabelle,Leila,Sally,Ina,Essie,Bertie,Nell,Alberta,Katharine,Lora,Rena,Mina,Rhoda,Mathilda,Abbie,Eula,Dollie,Hettie,Eunice,Fanny,Ola,Lenora,Adelaide,Christina,Lelia,Nelle,Sue,Johanna,Lilly,Lucinda,Minerva,Lettie,Roxie,Cynthia,Helena,Hilda,Hulda,Bernice,Genevieve,Jean,Cordelia,Marian,Francis,Jeanette,Adeline,Gussie,Leah,Lois,Lura,Mittie,Hallie,Isabella,Olga,Phoebe,Teresa,Hester,Lida,Lina,Winnie,Claudia,Marguerite,Vera,Cecelia,Bess,Emilie,John,Rosetta,Verna,Myrtie,Cecilia,Elva,Olivia,Ophelia,Georgie,Elnora,Violet,Adele,Lily,Linnie,Loretta,Madge,Polly,Virgie,Eugenia,Lucile,Lucille,Mabelle,Rosalie,Kittie,Meta,Angie,Dessie,Georgiana,Lila,Regina,Selma,Wilhelmina,Bridget,Lilla,Malinda,Vina,Freda,Gertie,Jeannette,Louella,Mandy,Roberta,Cassie,Corinne,Ivy,Melissa,Lyda,Naomi,Norma,Bell,Margie,Nona,Zella,Dovie,Elvira,Erma,Irma,Leota,William,Artie,Blanch,Charity,Lorena,Lucretia,Orpha,Alvina,Annette,Catharine,Elma,Geneva,Janet,Lee,Leora,Lona,Miriam,Zora,Linda,Octavia,Sudie,Zula,Adella,Alpha,Frieda,George,Joanna,Leonora,Priscilla,Tennie,Angeline,Docia,Ettie,Flossie,Hanna,Letha,Minta,Retta,Rosella,Adah,Berta,Elisabeth,Elise,Goldie,Leola,Margret,Adaline,Floy,Idella,Juanita,Lenna,Lucie,Missouri,Nola,Zoe,Eda,Isabell,James,Julie,Letitia,Madeline,Malissa,Mariah,Pattie,Vivian,Almeda,Aurelia,Claire,Dolly,Hazel,Jannie,Kathleen,Kathrine,Lavinia,Marietta,Melvina,Ona,Pinkie,Samantha,Susanna,Chloe,Donnie,Elsa,Gladys,Matie,Pearle,Vesta,Vinnie,Antoinette,Clementine,Edythe,Harriette,Libbie,Lilian,Lue,Lutie,Magdalena,Meda,Rita,Tena,Zelma,Adelia,Annetta,Antonia,Dona,Elizebeth,Georgianna,Gracie,Iona,Lessie,Leta,Liza,Mertie,Molly,Neva,Oma,Alida,Alva,Cecile,Cleo,Donna,Ellie,Ernestine,Evie,Frankie,Helene,Minna,Myrta,Prudence,Queen,Rilla,Savannah,Tessie,Tina,Agatha,America,Anita,Arminta,Dorothea,Ira,Luvenia,Marjorie,Maybelle,Mellie,Nan,Pearlie,Sidney,Velma,Clare,Constance,Dixie,Ila,Iola,Jimmie,Louvenia,Lucia,Ludie,Luna,Metta,Patsy,Phebe,Sophronia,Adda,Avis,Betsy,Bonnie,Cecil,Cordie,Emmaline,Ethelyn,Hortense,June,Louie,Lovie,Marcella,Melinda,Mona,Odessa,Veronica,Aimee,Annabel,Ava,Bella,Carolina,Cathrine,Christena,Clyde,Dena,Dolores,Eleanore,Elmira,Fay,Frank,Jenny,Kizzie,Lonnie,Loula,Magdalene,Mettie,Mintie,Peggy,Reba,Serena,Vida,Zada,Abigail,Celestine,Celina,Claudie,Clemmie,Connie,Daisie,Deborah,Dessa,Easter,Eddie,Emelia,Emmie,Imogene,India,Jeanne,Joan,Lenore,Liddie,Lotta,Mame,Nevada,Rachael,Robert,Sina,Willa,Aline,Beryl,Charles,Daisey,Dorcas,Edmonia,Effa,Eldora,Eloise,Emmer,Era,Gena,Henry,Iris,Izora,Lennie,Lissie,Mallie,Malvina,Mathilde,Mazie,Queenie,Rosina,Salome,Theodora,Therese,Vena,Wanda,Wilda,Altha,Anastasia,Besse,Bird,Birtie,Clarissa,Claude,Delilah,Diana,Emelie,Erna,Fern,Florida,Frona,Hilma,Joseph,Juliet,Leonie,Lugenia,Mammie,Manda,Manerva,Manie,Nella,Paulina,Philomena,Rae,Selina,Sena,Theodosia,Tommie,Una,Vernie,Adela,Althea,Amalia,Amber,Angelina,Annabelle,Anner,Arie,Clarice,Corda,Corrie,Dell,Dellar,Donie,Doris,Elda,Elinor,Emeline,Emilia,Esta,Estell,Etha,Fred,Hope,Indiana,Ione,Jettie,Johnnie,Josiephine,Kitty,Lavina,Leda,Letta,Mahala,Marcia,Margarette,Maudie,Maye,Norah,Oda,Patty,Paula,Permelia,Rosalia,Roxanna,Sula,Vada,Winnifred,Adline,Almira,Alvena,Arizona,Becky,Bennie,Bernadette,Camille,Cordia,Corine,Dicie,Dove,Drusilla,Elena,Elenora,Elmina,Ethyl,Evalyn,Evelina,Faye,Huldah,Idell,Inga,Irena,Jewell,Kattie,Lavenia,Leslie,Lovina,Lulie,Magnolia,Margeret,Margery,Media,Millicent,Nena,Ocie,Orilla,Osie,Pansy,Ray,Rosia,Rowena,Shirley,Tabitha,Thomas,Verdie,Walter,Zetta,Zoa,Zona,Albertina,Albina,Alyce,Amie,Angela,Annis,Carol,Carra,Clarence,Clarinda,Delphia,Dillie,Doshie,Drucilla,Etna,Eugenie,Eulalia,Eve,Felicia,Florance,Fronie,Geraldine,Gina,Glenna,Grayce,Hedwig,Jessica,Jossie,Katheryn,Katy,Lea,Leanna,Leitha,Leone,Lidie,Loma,Lular,Magdalen,Maymie,Minervia,Muriel,Neppie,Olie,Onie,Osa,Otelia,Paralee,Patience,Rella,Rillie,Rosanna,Theo,Tilda,Tishie,Tressa,Viva,Yetta,Zena,Zola,Abby,Aileen,Alba,Alda,Alla,Alverta,Ara,Ardelia,Ardella,Arrie,Arvilla,Augustine,Aurora,Bama,Bena,Byrd,Calla,Camilla,Carey,Carlotta,Celestia,Cherry,Cinda,Classie,Claudine,Clemie,Clifford,Clyda,Creola,Debbie,Dee,Dinah,Doshia,Ednah,Edyth,Eleanora,Electa,Eola,Erie,Eudora,Euphemia,Evalena,Evaline,Faith,Fidelia,Freddie,Golda,Harry,Helma,Hermine,Hessie,Ivah,Janette,Jennette,Joella,Kathryne,Lacy,Lanie,Lauretta,Leana,Leatha,Leo,Liller,Lillis,Louetta,Madie,Mai,Martina,Maryann,Melva,Mena,Mercedes,Merle,Mima,Minda,Monica,Nealie,Netta,Nolia,Nonie,Odelia,Ottilie,Phyllis,Robbie,Sabina,Sada,Sammie,Suzanne,Sybilla,Thea,Tressie,Vallie,Venie,Viney,Wilhelmine,Winona,Zelda,Zilpha,Adelle,Adina,Adrienne,Albertine,Alys,Ana,Araminta,Arthur,Birtha,Bulah,Caddie,Celie,Charlotta,Clair,Concepcion,Cordella,Corrine,Delila,Delphine,Dosha,Edgar,Elaine,Elisa,Ellar,Elmire,Elvina,Ena,Estie,Etter,Fronnie,Genie,Georgina,Glenn,Gracia,Guadalupe,Gwendolyn,Hassie,Honora,Icy,Isa,Isadora,Jesse,Jewel,Joe,Johannah,Juana,Judith,Judy,Junie,Lavonia,Lella,Lemma,Letty,Linna,Littie,Lollie,Lorene,Louis,Love,Lovisa,Lucina,Lynn,Madora,Mahalia,Manervia,Manuela,Margarett,Margaretta,Margarita,Marilla,Mignon,Mozella,Natalie,Nelia,Nolie,Omie,Opal,Ossie,Ottie,Ottilia,Parthenia,Penelope,Pinkey,Pollie,Rennie,Reta,Roena,Rosalee,Roseanna,Ruthie,Sabra,Sannie,Selena,Sibyl,Tella,Tempie,Tennessee,Teressa,Texas,Theda,Thelma,Thursa,Ula,Vannie,Verona,Vertie,Wilma,John,William,James,Charles,George,Frank,Joseph,Thomas,Henry,Robert,Edward,Harry,Walter,Arthur,Fred,Albert,Samuel,David,Louis,Joe,Charlie,Clarence,Richard,Andrew,Daniel,Ernest,Will,Jesse,Oscar,Lewis,Peter,Benjamin,Frederick,Willie,Alfred,Sam,Roy,Herbert,Jacob,Tom,Elmer,Carl,Lee,Howard,Martin,Michael,Bert,Herman,Jim,Francis,Harvey,Earl,Eugene,Ralph,Ed,Claude,Edwin,Ben,Charley,Paul,Edgar,Isaac,Otto,Luther,Lawrence,Ira,Patrick,Guy,Oliver,Theodore,Hugh,Clyde,Alexander,August,Floyd,Homer,Jack,Leonard,Horace,Marion,Philip,Allen,Archie,Stephen,Chester,Willis,Raymond,Rufus,Warren,Jessie,Milton,Alex,Leo,Julius,Ray,Sidney,Bernard,Dan,Jerry,Calvin,Perry,Dave,Anthony,Eddie,Amos,Dennis,Clifford,Leroy,Wesley,Alonzo,Garfield,Franklin,Emil,Leon,Nathan,Harold,Matthew,Levi,Moses,Everett,Lester,Winfield,Adam,Lloyd,Mack,Fredrick,Jay,Jess,Melvin,Noah,Aaron,Alvin,Norman,Gilbert,Elijah,Victor,Gus,Nelson,Jasper,Silas,Jake,Christopher,Mike,Percy,Adolph,Maurice,Cornelius,Felix,Reuben,Wallace,Claud,Roscoe,Sylvester,Earnest,Hiram,Otis,Simon,Willard,Irvin,Mark,Jose,Wilbur,Abraham,Virgil,Clinton,Elbert,Leslie,Marshall,Owen,Wiley,Anton,Morris,Manuel,Phillip,Augustus,Emmett,Eli,Nicholas,Wilson,Alva,Harley,Newton,Timothy,Marvin,Ross,Curtis,Edmund,Jeff,Elias,Harrison,Stanley,Columbus,Lon,Ora,Ollie,Pearl,Russell,Solomon,Arch,Asa,Clayton,Enoch,Irving,Mathew,Nathaniel,Scott,Hubert,Lemuel,Andy,Ellis,Emanuel,Joshua,Millard,Vernon,Wade,Cyrus,Miles,Rudolph,Sherman,Austin,Bill,Chas,Lonnie,Monroe,Byron,Edd,Emery,Grant,Jerome,Max,Mose,Steve,Gordon,Abe,Pete,Chris,Clark,Gustave,Orville,Lorenzo,Bruce,Marcus,Preston,Bob,Dock,Donald,Jackson,Cecil,Barney,Delbert,Edmond,Anderson,Christian,Glenn,Jefferson,Luke,Neal,Burt,Ike,Myron,Tony,Conrad,Joel,Matt,Riley,Vincent,Emory,Isaiah,Nick,Ezra,Green,Juan,Clifton,Lucius,Porter,Arnold,Bud,Jeremiah,Taylor,Forrest,Roland,Spencer,Burton,Don,Emmet,Gustav,Louie,Morgan,Ned,Van,Ambrose,Chauncey,Elisha,Ferdinand,General,Julian,Kenneth,Mitchell,Allie,Josh,Judson,Lyman,Napoleon,Pedro,Berry,Dewitt,Ervin,Forest,Lynn,Pink,Ruben,Sanford,Ward,Douglas,Ole,Omer,Ulysses,Walker,Wilbert,Adelbert,Benjiman,Ivan,Jonas,Major,Abner,Archibald,Caleb,Clint,Dudley,Granville,King,Mary,Merton,Antonio,Bennie,Carroll,Freeman,Josiah,Milo,Royal,Dick,Earle,Elza,Emerson,Fletcher,Judge,Laurence,Roger,Seth,Glen,Hugo,Jimmie,Johnnie,Neil,Washington,Elwood,Gust,Harmon,Jordan,Simeon,Wayne,Wilber,Clem,Evan,Frederic,Irwin,Junius,Lafayette,Loren,Madison,Mason,Orval,Abram,Aubrey,Elliott,Hans,Karl,Minor,Wash,Wilfred,Allan,Alphonse,Dallas,Dee,Isiah,Jason,Johnny,Lawson,Lew,Micheal,Orin,Addison,Cal,Erastus,Francisco,Hardy,Lucien,Randolph,Stewart,Vern,Wilmer,Zack,Adrian,Alvah,Bertram,Clay,Ephraim,Fritz,Giles,Grover,Harris,Isom,Jesus,Johnie,Jonathan,Lucian,Malcolm,Merritt,Otho,Perley,Rolla,Sandy,Tomas,Wilford,Adolphus,Angus,Arther,Carlos,Cary,Cassius,Davis,Hamilton,Harve,Israel,Leander,Melville,Merle,Murray,Pleasant,Sterling,Steven,Axel,Boyd,Bryant,Clement,Erwin,Ezekiel,Foster,Frances,Geo,Houston,Issac,Jules,Larkin,Mat,Morton,Orlando,Pierce,Prince,Rollie,Rollin,Sim,Stuart,Wilburn,Bennett,Casper,Christ,Dell,Egbert,Elmo,Fay,Gabriel,Hector,Horatio,Lige,Saul,Smith,Squire,Tobe,Tommie,Wyatt,Alford,Alma,Alton,Andres,Burl,Cicero,Dean,Dorsey,Enos,Howell,Lou,Loyd,Mahlon,Nat,Omar,Oran,Parker,Raleigh,Reginald,Rubin,Seymour,Wm,Young,Benjamine,Carey,Carlton,Eldridge,Elzie,Garrett,Isham,Johnson,Larry,Logan,Merrill,Mont,Oren,Pierre,Rex,Rodney,Ted,Webster,West,Wheeler,Willam,Al,Aloysius,Alvie,Anna,Art,Augustine,Bailey,Benjaman,Beverly,Bishop,Clair,Cloyd,Coleman,Dana,Duncan,Dwight,Emile,Evert,Henderson,Hunter,Jean,Lem,Luis,Mathias,Maynard,Miguel,Mortimer,Nels,Norris,Pat,Phil,Rush,Santiago,Sol,Sydney,Thaddeus,Thornton,Tim,Travis,Truman,Watson,Webb,Wellington,Winfred,Wylie,Alec,Basil,Baxter,Bertrand,Buford,Burr,Cleveland,Colonel,Dempsey,Early,Ellsworth,Fate,Finley,Gabe,Garland,Gerald,Herschel,Hezekiah,Justus,Lindsey,Marcellus,Olaf,Olin,Pablo,Rolland,Turner,Verne,Volney,Williams,Almon,Alois,Alonza,Anson,Authur,Benton,Billie,Cornelious,Darius,Denis,Dillard,Doctor,Elvin,Emma,Eric,Evans,Gideon,Haywood,Hilliard,Hosea,Lincoln,Lonzo,Lucious,Lum,Malachi,Newt,Noel,Orie,Palmer,Pinkney,Shirley,Sumner,Terry,Urban,Uriah,Valentine,Waldo,Warner,Wong,Zeb,Abel,Alden,Archer,Avery,Carson,Cullen,Doc,Eben,Elige,Elizabeth,Elmore,Ernst,Finis,Freddie,Godfrey,Guss,Hamp,Hermann,Isadore,Isreal,Jones,June,Lacy,Lafe,Leland,Llewellyn,Ludwig,Manford,Maxwell,Minnie,Obie,Octave,Orrin,Ossie,Oswald,Park,Parley,Ramon,Rice,Stonewall,Theo,Tillman,Addie,Aron,Ashley,Bernhard,Bertie,Berton,Buster,Butler,Carleton,Carrie,Clara,Clarance,Clare,Crawford,Danial,Dayton,Dolphus,Elder,Ephriam,Fayette,Felipe,Fernando,Flem,Florence,Ford,Harlan,Hayes,Henery,Hoy,Huston,Ida,Ivory,Jonah,Justin,Lenard,Leopold,Lionel,Manley,Marquis,Marshal,Mart,Odie,Olen,Oral,Orley,Otha,Press,Price,Quincy,Randall,Rich,Richmond,Romeo,Russel,Rutherford,Shade,Shelby,Solon,Thurman,Tilden,Troy,Woodson,Worth,Aden,Alcide,Alf,Algie,Arlie,Bart,Bedford,Benito,Billy,Bird,Birt,Bruno,Burley,Chancy,Claus,Cliff,Clovis,Connie,Creed,Delos,Duke,Eber,Eligah,Elliot,Elton,Emmitt,Gene,Golden,Hal,Hardin,Harman,Hervey,Hollis,Ivey,Jennie,Len,Lindsay,Lonie,Lyle,Mac,Mal,Math,Miller,Orson,Osborne,Percival,Pleas,Ples,Rafael,Raoul,Roderick,Rose,Shelton,Sid,Theron,Tobias,Toney,Tyler,Vance,Vivian,Walton,Watt,Weaver,Wilton,Adolf,Albin,Albion,Allison,Alpha,Alpheus,Anastacio,Andre,Annie,Arlington,Armand,Asberry,Asbury,Asher,Augustin,Auther,Author,Ballard,Blas,Caesar,Candido,Cato,Clarke,Clemente,Colin,Commodore,Cora,Coy,Cruz,Curt,Damon,Davie,Delmar,Dexter,Dora,Doss,Drew,Edson,Elam,Elihu,Eliza,Elsie,Erie,Ernie,Ethel,Ferd,Friend,Garry,Gary,Grace,Gustaf,Hallie,Hampton,Harrie,Hattie,Hence,Hillard,Hollie,Holmes,Hope,Hyman,Ishmael,Jarrett,Jessee,Joeseph,Junious,Kirk,Levy,Mervin,Michel,Milford,Mitchel,Nellie,Noble,Obed,Oda,Orren,Ottis,Rafe,Redden,Reese,Rube,Ruby,Rupert,Salomon,Sammie,Sanders,Soloman,Stacy,Stanford,Stanton,Thad,Titus,Tracy,Vernie,Wendell,Wilhelm,Willian,Yee,Zeke,Ab,Abbott,Agustus,Albertus,Almer,Alphonso,Alvia,Artie,Arvid,Ashby,Augusta,Aurthur,Babe,Baldwin,Barnett,Bartholomew,Barton,Bernie,Blaine,Boston,Brad,Bradford,Bradley,Brooks,Buck,Budd,Ceylon,Chalmers,Chesley,Chin,Cleo,Crockett,Cyril,Daisy,Denver,Dow,Duff,Edie,Edith,Elick,Elie,Eliga,Eliseo,Elroy,Ely,Ennis,Enrique,Erasmus,Esau,Everette,Firman,Fleming,Flora,Gardner,Gee,Gorge,Gottlieb,Gregorio,Gregory,Gustavus,Halsey,Handy,Hardie,Harl,Hayden,Hays,Hermon,Hershel,Holly,Hosteen,Hoyt,Hudson,Huey,Humphrey,Hunt,Hyrum,Irven,Isam,Ivy,Jabez,Jewel,Jodie,Judd,Julious,Justice,Katherine,Kelly,Kit,Knute,Lavern,Lawyer,Layton,Leonidas,Lewie,Lillie,Linwood,Loran,Lorin,Mace,Malcom,Manly,Manson,Matthias,Mattie,Merida,Miner,Montgomery,Moroni,Murdock,Myrtle,Nate,Nathanial,Nimrod,Nora,Norval,Nova,Orion,Orla,Orrie,Payton,Philo,Phineas,Presley,Ransom,Reece,Rene,Roswell,Rowland,Sampson,Samual,Santos,Schuyler,Sheppard,Spurgeon,Starling,Sylvanus,Theadore,Theophile,Tilmon,Tommy,Unknown,Vann,Wes,Winston,Wood,Woodie,Worthy,Wright,York,Zachariah".split(',');
-const lasts = "Abbott,Abel,Adams,Addison,Adkins,Agent,Aldrich,Aldridge,Alexander,Alford,Allen,Appleton,Armstrong,Arrington,Arwood,Atkins,Austin,Avery,Bailey,Baine,Baird,Baldwin,Bankston,Barker,Barnes,Barnett,Barry,Barton,Baughan,Beard,Beasley,Beck,Bell,Bennefield,Bennett,Berry,Bishop,Black,Blackwell,Blake,Blaxton,Blaylock,Blevins,Bonds,Boone,Boston,Botiler,Boyd,Bradford,Brannon,Brazeall,Brewer,Bridgeman,Brimer,Brooks,Brown,Bryant,Burdick,Burnet,Burns,Burrell,Byars,Bynum,Cagle,Cagner,Cain,Calvert,Campbell,Canada,Cantrell,Carroll,Carter,Cary,Casey,Cates,Chambers,Chappell,Chillcoat,Clark,Cline,Cole,Collman,Commens,Compton	Conly,Cooper,Cotton,Cowart,Cox,Cummings,Curtis,Davidson,Davis,Deason,Dempsey,Derrick,Dickenson,Dodd,Donough,Dougherty,Dorris,Doss,Dover,Downy,Dunahoo,Duncan,Dunlap,Dupre,Eaton,Eatton,Ellenbury,Elliott,Ellis,England,Estes,Evans,Ezell,Fair,Farley,Farris,Faught,Forester,Fowler,Freeman,Frost,Gamble,Ganes,Gardener,Garrison,Garson,Gentle,George,Gibson,Gice,Gilbert,Glenn,Godsey,Goodwin,Gosset,Grantham,Grastey,Green,Griffin,Guest,Gunter,Guthrie,Hadder,Haines,Haley,Hamilton,Hampton,Hand,Harbin,Harmon,Harper,Harris,Hatchett,Haw,Haynes,Hays,Hebster,Hefner,Henderson,Hendon,Henson,Hewitt,Hicks,Hightower	Hill,Hiller,Hilton,Hinesley,Hix,Hogg,Holden,Holloway,Holt,Hood,Hoover,Hopson,Horton,Howard,Howells,Hudson,Hughes,Hyde,Ingle,Inmon,Isabell,Ivy,Jack,Jackson,James,Jamison,Jeffries,Jenkins,Johnson,Kely),Kemp,Key,Kidd,Kiker,Kile,Kilpatrick,Kimbrell,King,Knight,Knox,Lambert,Lane,Laneford,Laramore,Lauderdale,Lawson,Lay,League,Lewis,Little,Litton,Livingston,Logan,Long,Looney,Love,Lovelady,Lovell,Lovett,Lynn,Manasco,Mann,Martin,Mathews,McClane,McClung,McClure,McColum,McCoy,McCue,McCullan,McCullar,McDaniel,McDuff,McKay,McNames,McNeil,McNutt,Mellican,Merritt,Metcalf,Miles,Miller,Mitchell,Mize,Mobley,Montgomery,Moody,Mooney,Morgan,Morris,Morrison,Motes,Mullins,Musgrove,Nelson,Nesmith,Newman,Nolen,Noles,Nortwich,Oden,Odom,O'Henry,O'Mary,O'Rear,O'Steen,Overton,Owsley,Pace,Painter,Parsons,Partain,Patek,Patterson,Payne,Peak,Pearson,Pencard,Penn,Penyl,Perkins,Perry,Peters,Pittman,Plott,Poe,Pool,Portridge,Posey,Pouder,Powell,Preston,Pugh,Pulliam,Purdy,Radford,Ramey,Ramie,Ray,Raynes,Reeves,Richardson,Riddle,Rivers,Roberts,Robinson,Roden,Rollins,Romines,Ronow,Rowe,Rush,Russell,Rutledge,Sam,Samples,Sanford,Sarun,Scogin,Segars,Setton,Sexton,Seymore,Shadix,Shain,Shank,Shelly,Shelton,Shipman,Siddens,Simmons,Simpson,Sims,Slater,Slaughter,Smathers,Smith,Sneed,South,Southern,Spain,Spane,Sparks,Staten,Steel,Stephenson,Stevens,Stewart,Stokes,Stone,Strange,Sunmers,Surin,Sutherland,Suttles,Swindle,Taberson,Tarbutton,Taylor,Teague,Tedford,Thomanson,Thomas,Thompson,Thornton,Threadgill,Tidwell,Tittle,Tubs,Tucker,Turner,Tyler,Underwood,Ussery,Wadsworth,Waid,Wakefield,Walker,Walston,Ward,Ware,Warren,Watson,Watts,Weaver,Webb,Welborn,Welsh,West,Whisenhunt,White,Whitfield,Whitman,Whitney,Whitten,Wiley,Willborn,Williams,Willis,Willson,Wilson,Wise,Woodley,Woods,Wooley,Wright,Yarborough,York,Young".split(',');
-
-const initials = (n) => n[0] + n.split(' ')[1][0];
-const firstInitial = (n) => n[0];
-const group = (ns) => ns.reduce((m, n) => {
-    var _a;
-    (m[_a = n[0]] || (m[_a] = [])).push(n);
-    return m;
-}, {});
-class Names {
-    static randomName(used) {
-        const usedPairs = new Set(used.map(initials));
-        const usedFirsts = new Set(used.map(firstInitial));
-        // prefer unused first initials, then any unused pairs
-        for (const preferNewFirst of [true, false]) {
-            const availableFirsts = preferNewFirst
-                ? Names.fiAll.filter(f => !usedFirsts.has(f))
-                : Names.fiAll;
-            for (const fi of availableFirsts) {
-                const availableLasts = Names.liAll.filter(li => !usedPairs.has(fi + li));
-                if (availableLasts.length > 0) {
-                    const li = (0,utils/* randFrom */.Kt)(availableLasts);
-                    return `${(0,utils/* randFrom */.Kt)(Names.firstBy[fi])} ${(0,utils/* randFrom */.Kt)(Names.lastBy[li])}`;
-                }
-            }
-        }
-        // fallback to any random combination
-        const fi = (0,utils/* randFrom */.Kt)(Names.fiAll);
-        const li = (0,utils/* randFrom */.Kt)(Names.liAll);
-        return `${(0,utils/* randFrom */.Kt)(Names.firstBy[fi])} ${(0,utils/* randFrom */.Kt)(Names.lastBy[li])}`;
-    }
-}
-Names.firstBy = group(firsts);
-Names.lastBy = group(lasts);
-Names.fiAll = Object.keys(Names.firstBy);
-Names.liAll = Object.keys(Names.lastBy);
-const randomName = Names.randomName;
-
-// EXTERNAL MODULE: ./src/maps/fragments/intro-barracks.txt
-var intro_barracks = __webpack_require__(4461);
-// EXTERNAL MODULE: ./src/game/fragment.ts
-var game_fragment = __webpack_require__(8535);
-// EXTERNAL MODULE: ./src/game/models/firehouse.ts
-var firehouse = __webpack_require__(8646);
-;// ./src/game/levels/intro.ts
-
-
-
-
-
-
-
-
-
-
-
-
-
-const TITLE = [
-    "#   #  ###  ####  #     ####       ###  #   #      ##### ##### ####  #####",
-    "#   # #   # #   # #     #   #     #   # ##  #      #       #   #   # #    ",
-    "# # # #   # ####  #     #   #     #   # # # #      ####    #   ####  #### ",
-    "# # # #   # #   # #     #   #     #   # #  ##      #       #   #   # #    ",
-    "## ## #   # #   # #     #   #     #   # #   #      #       #   #   # #    ",
-    "#   #  ###  #   # ##### ####       ###  #   #      #     ##### #   # #####"
-];
-class Intro {
-    constructor(initializer, map) {
-        this.initializer = initializer;
-        this.map = map;
-        this.pawns = [];
-        this.pawnModels = [];
-    }
-    setup() {
-        this.addWorldOnFireRoom();
-        this.addPawns();
-        this.addBarracksWin();
-        this.addWelcomeText();
-        this.addUserSuggestion();
-    }
-    addWorldOnFireRoom() {
-        const w = TITLE[0].length;
-        const h = TITLE.length;
-        const startX = (0,utils/* centeredStart */.jw)(this.map.w, TITLE[0]);
-        const startY = Math.floor((this.map.h - h) / 2);
-        const start = xy.XY.at(startX, startY);
-        this.initializer.addRoom(rect/* Rect */.r.xyWH(start.add(-1, -1), w + 2, h + 2));
-        (0,utils/* each */.__)(TITLE, (line, y) => {
-            (0,utils/* each */.__)(line, (c, x) => {
-                if (c === '#')
-                    this.map.createAt(start.add(x, y), new fire.Fire());
-            });
-        });
-    }
-    addWelcomeText() {
-        text_stroke/* TextStroke */.m.centeredPlusY(this.map, "Welcome to Fire House RL", -13, 'welcome');
-        text_stroke/* TextStroke */.m.centeredPlusY(this.map, "press space to unpause", 13, 'instructions');
-        const endWelcome = game.GameStepped.on(step => {
-            if (step.frame <= 0)
-                return;
-            this.map.uiRenderer.remove('welcome');
-            this.map.uiRenderer.remove('instructions');
-            endWelcome();
-        });
-    }
-    addPawns() {
-        const add = (x, y) => {
-            const usedNames = this.pawnModels.map(m => m.name);
-            const model = new firehouse/* PawnModel */.A(randomName(usedNames), capabilities/* Capabilities */.FD.basic());
-            const pawn = model.toPawn();
-            this.map.createAt(xy.XY.at(x, y), pawn);
-            this.pawns.push(pawn);
-            this.pawnModels.push(model);
-            return model;
-        };
-        add(55, 24);
-        add(39, 24);
-    }
-    addBarracksWin() {
-        const base = game_fragment/* Fragment */.F.load(intro_barracks);
-        const rotated = base.rotate((0,utils/* randTo */.JD)(4));
-        const upperLeft = xy.XY.at(59, 8);
-        const rect = rotated.place(this.map, upperLeft);
-        const label = '<-- GET INSIDE';
-        const labelY = (0,utils/* half */.MX)(this.map.h) - 13;
-        const labelX = Math.max(0, this.map.w - label.length);
-        text_stroke/* TextStroke */.m.render(this.map, label, xy.XY.at(labelX, labelY), 'barracks-label');
-        const ends = [
-            game.GameStepped.on(() => {
-                const unrescued = this.pawns.filter(p => !rect.contains(p));
-                if (unrescued.length > 0)
-                    return;
-                this.map.uiRenderer.remove('barracks-label');
-                this.pawnModels.forEach(m => m.initialLevelUp());
-                state/* FirehouseMode */.M.emit(this.pawnModels);
-                ends.forEach(end => end());
-            }),
-            firefighter/* PawnDied */.hq.on(_dead => {
-                this.map.uiRenderer.remove('barracks-label');
-                text_stroke/* TextStroke */.m.render(this.map, 'YOU LOSE', xy.XY.at(labelX, labelY), 'lose-text');
-                ends.forEach(end => end());
-            })
-        ];
-        game.LevelReset.on(() => {
-            this.map.uiRenderer.remove('barracks-label');
-            ends.forEach(end => end());
-        });
-    }
-    addUserSuggestion() {
-        let show = true;
-        const suggest = () => {
-            const step = game.GameStepped.current;
-            if (!step || step.frame % 5 !== 0)
-                return;
-            show = !show;
-            if (show)
-                text_stroke/* TextStroke */.m.centered(this.map, 'click the @ symbol', this.map.h - 1, 'suggestion', () => '#ff0', () => true, 10);
-            else
-                this.map.uiRenderer.remove('suggestion');
-        };
-        suggest();
-        const stop = game.GameStepped.on(suggest);
-        firefighter/* PawnSelected */.Ei.on(_pawn => { this.map.uiRenderer.remove('suggestion'); stop(); });
-        game.LevelReset.on(() => { this.map.uiRenderer.remove('suggestion'); stop(); });
-    }
-}
-
-// EXTERNAL MODULE: ./src/draw/pawn.ts + 1 modules
-var pawn = __webpack_require__(2705);
-// EXTERNAL MODULE: ./src/draw/door.ts
-var draw_door = __webpack_require__(2483);
-// EXTERNAL MODULE: ./src/ui/colors.ts
-var colors = __webpack_require__(1919);
-;// ./src/draw/civilian.ts
-
-
-
-
-class Civilian extends pawn.Pawn {
-    constructor() {
-        super(...arguments);
-        this.char = () => '@';
-        this.color = () => this.material.color(colors/* WHITE */.UE);
-    }
-    stepTasks() {
-        const target = (0,utils/* randFrom */.Kt)(this.cell.neighbors());
-        if (!target.passable())
-            return;
-        const door = this.cell.wall();
-        this.cell.queueMove(this, target.xy);
-        if (door instanceof draw_door/* Door */.$ && door.open)
-            door.toggle();
-    }
-}
-
-// EXTERNAL MODULE: ./src/game/fires.ts
-var fires = __webpack_require__(6746);
-;// ./src/game/levels/base-level.ts
-
-
-
-
-
-
-
-
-
-
-
-class BaseLevel {
-    constructor(init, map, pawns = [], fragmentText) {
-        this.init = init;
-        this.map = map;
-        this.pawns = pawns;
-        this.fragmentText = fragmentText;
-        this.showDarkness = true;
-        this.hasWon = false;
-        this.ends = [];
-        this.stoveIgnitions = 1;
-    }
-    pawnsToModels() {
-        return this.pawns.map(pawn => new firehouse/* PawnModel */.A(pawn.name, pawn.capabilities));
-    }
-    setup() {
-        const fragment = game_fragment/* Fragment */.F.fromText(this.fragmentText);
-        fragment.place(this.map, xy.XY.at(0, 0));
-        this.igniteRandomStoves(this.stoveIgnitions);
-        this.spawnPawns();
-        this.spawnCivilians();
-        this.ends.push(game.GameStepped.on(stepInfo => this.checkWinCondition(stepInfo)));
-        this.ends.push(game.LevelWon.on(() => this.handleContinue()));
-        this.ends.push(game.LevelReset.on(() => this.teardown()));
-    }
-    igniteRandomStoves(count) {
-        const ovens = [];
-        this.map.eachCell(cell => {
-            cell.onItem(/Oven/, oven => ovens.push(oven));
-        });
-        (0,utils/* times */.Hn)(count, () => {
-            const oven = (0,utils/* randFrom */.Kt)(ovens);
-            oven.cell.cardinals().find(cell => cell.wall())?.wall()?.ignite();
-        });
-    }
-    spawnPawns() {
-        const spawns = [];
-        this.map.eachCell(cell => {
-            cell.onItem(/Spawn point/, item => {
-                spawns.push(cell.xy);
-            });
-        });
-        (0,utils/* each */.__)(this.pawns, (pawn, index) => {
-            const fallback = xy.XY.at((0,utils/* half */.MX)(this.map.w) + index, this.map.h - 1);
-            const location = spawns[index] ?? fallback;
-            this.map.createAt(location, pawn);
-        });
-    }
-    spawnCivilians() {
-        const bedCells = new globalThis.Map();
-        const ovenCells = [];
-        const chairCells = [];
-        this.map.eachCell(cell => {
-            cell.onItem(/Bed/, _ => bedCells.set(cell.xy.toString(), cell));
-            cell.onItem(/Oven/, _ => ovenCells.push(cell));
-            cell.onItem(/Chair/, _ => chairCells.push(cell));
-        });
-        const usedNames = [];
-        const spawnAtCell = (cell) => {
-            const name = randomName(usedNames);
-            usedNames.push(name);
-            cell.create(new Civilian(name));
-        };
-        const bedGroups = [];
-        const visited = new Set();
-        const collectGroup = (cell) => {
-            const key = cell.xy.toString();
-            if (!bedCells.has(key) || visited.has(key))
-                return [];
-            visited.add(key);
-            return [cell, ...cell.cardinals().flatMap(collectGroup)];
-        };
-        bedCells.forEach(cell => {
-            const group = collectGroup(cell);
-            if (group.length)
-                bedGroups.push(group);
-        });
-        if (bedGroups.length > 0) {
-            bedGroups.forEach(group => {
-                const size = group.length;
-                if (size % 2 === 1)
-                    console.warn(`odd bed tokens ${size} at ${group[0].xy.toString()}`);
-                const count = size === 4 ? 2 : 1;
-                group.slice(0, count).forEach(spawnAtCell);
-            });
-        }
-        else {
-            ovenCells.forEach(ovenCell => {
-                const neighbor = ovenCell.cardinals().find(n => n.passable() && !n.pawn());
-                if (neighbor)
-                    spawnAtCell(neighbor);
-            });
-            chairCells.filter((_cell, index) => index % 4 === 0).forEach(spawnAtCell);
-        }
-    }
-    checkWinCondition(stepInfo) {
-        if (fires/* Fires */.UQ.burningCount !== 0 || this.hasWon)
-            return;
-        this.hasWon = true;
-        this.map.display.clear();
-        this.map.smokeDisplay.clear();
-        this.map.uiRenderer.clearStrokes();
-        text_stroke/* TextStroke */.m.centered(this.map, `YOU WIN, ${stepInfo.frame} TURNS - PRESS SPACE TO CONTINUE`, this.map.h / 2, 'win-message', () => colors/* WHITE */.UE);
-        game.LevelWon.emit(true);
-    }
-    handleContinue() {
-        state/* FirehouseMode */.M.emit(this.pawnsToModels());
-        this.teardown();
-    }
-    teardown() {
-        this.ends.forEach(end => end());
-        this.ends = [];
-    }
-}
-
-// EXTERNAL MODULE: ./src/maps/fragments/manor.txt
-var manor = __webpack_require__(9110);
-;// ./src/game/levels/level1.ts
-
-
-class Level1 extends BaseLevel {
-    constructor(init, map, pawns = []) {
-        super(init, map, pawns, manor);
-    }
-}
-
-// EXTERNAL MODULE: ./src/maps/fragments/apartment-complex.txt
-var apartment_complex = __webpack_require__(9620);
-;// ./src/game/levels/level2.ts
-
-
-class Level2 extends BaseLevel {
-    constructor(init, map, pawns = []) {
-        super(init, map, pawns, apartment_complex);
-    }
-}
-
-// EXTERNAL MODULE: ./src/maps/fragments/diner.txt
-var diner = __webpack_require__(5461);
-;// ./src/game/levels/level3.ts
-
-
-class Level3 extends BaseLevel {
-    constructor(init, map, pawns = []) {
-        super(init, map, pawns, diner);
-    }
-}
-
-// EXTERNAL MODULE: ./src/maps/fragments/woods-cabin.txt
-var woods_cabin = __webpack_require__(1135);
-;// ./src/game/levels/level4.ts
-
-
-class Level4 extends BaseLevel {
-    constructor(init, map, pawns = []) {
-        super(init, map, pawns, woods_cabin);
-        this.stoveIgnitions = 0;
-    }
-}
-
-;// ./src/game/initializer.ts
-
-
-
-
-
-
-
-
-
-
-
-
-class Initializer {
-    constructor(map) {
-        this.map = map;
-        this.currentLevel = 0;
-        this.getCurrentLevel = () => this.currentLevel;
-    }
-    initialize() {
-        this.currentLevel = 0;
-        this.start(new Intro(this, this.map));
-    }
-    start(level) {
-        this.reset();
-        this.addField();
-        level.setup();
-        game.GameStepped.emit({ frame: 0, stepMs: 0 });
-        return { showDarkness: level.showDarkness };
-    }
-    startNext(pawns = []) {
-        this.currentLevel++;
-        if (this.currentLevel === 1) {
-            return this.start(new Level1(this, this.map, pawns));
-        }
-        else if (this.currentLevel === 2) {
-            return this.start(new Level2(this, this.map, pawns));
-        }
-        else if (this.currentLevel === 3) {
-            console.log('Starting level 3');
-            return this.start(new Level3(this, this.map, pawns));
-        }
-        else if (this.currentLevel === 4) {
-            return this.start(new Level4(this, this.map, pawns));
-        }
-        this.currentLevel = 0;
-        return this.startNext(pawns);
-    }
-    startLevel(levelNumber, pawns = []) {
-        this.currentLevel = levelNumber - 1;
-        return this.startNext(pawns);
-    }
-    reset() {
-        this.map.killAll();
-        this.map.display.clear();
-        this.map.smokeDisplay.clear();
-        this.map.uiRenderer.clearStrokes();
-        fires/* Fires */.UQ.reset();
-        game.LevelReset.emit();
-    }
-    addField() {
-        rect/* Rect */.r.xyWH(xy.XY.at(0, 0), this.map.w, this.map.h).eachCell(xy => {
-            this.map.createAt(xy, new floor/* Floor */.Z());
-        });
-    }
-    addRoom(rect) {
-        rect.eachBorder(xy => {
-            this.map.createAt(xy, new wall/* Wall */.j());
-        });
-        [rect.ul.add(1, 1), rect.ur.add(-1, 1), rect.bl.add(1, -1), rect.br.add(-1, -1)].forEach(xy => {
-            this.map.createAt(xy, new lamp/* Lamp */.z());
-        });
     }
 }
 
@@ -17095,7 +17161,7 @@ class GameState {
         this.map.display.clear();
         this.map.smokeDisplay.clear();
         this.map.uiRenderer.clearStrokes();
-        const { Initializer } = __webpack_require__(8652);
+        const { Initializer } = __webpack_require__(7988);
         const initializer = new Initializer(this.map);
         initializer.initialize();
         this.map.lighting.redraw();
