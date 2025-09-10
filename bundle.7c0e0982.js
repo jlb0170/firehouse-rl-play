@@ -6708,7 +6708,7 @@ class Drawable {
     }
     ignite() { this.material.ignite(); }
     extinguish() { this.material.extinguish(); }
-    died() { this.cell.died(this); }
+    died() { this.cell ? this.cell.died(this) : this.diedAndAlreadyRemovedFromCell(); }
     diedAndAlreadyRemovedFromCell() {
         Drawable.alive.delete(this);
     }
@@ -8143,7 +8143,7 @@ class Smoke extends _drawable__WEBPACK_IMPORTED_MODULE_2__.Drawable {
     }
     step() {
         if (this.agedOut()) {
-            this.cell.died(this);
+            this.died();
             return;
         }
         if (this.shouldDrift())
