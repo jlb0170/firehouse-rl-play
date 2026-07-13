@@ -96,12 +96,12 @@ var update = injectStylesIntoStyleTag_default()(editor/* default */.A, options);
 
 // EXTERNAL MODULE: ./src/utils.ts
 var utils = __webpack_require__(6185);
-// EXTERNAL MODULE: ./src/game/map.ts + 2 modules
-var map = __webpack_require__(7283);
+// EXTERNAL MODULE: ./src/game/map.ts + 3 modules
+var map = __webpack_require__(8058);
 // EXTERNAL MODULE: ./src/ui/feedback.ts + 1 modules
 var feedback = __webpack_require__(5264);
-// EXTERNAL MODULE: ./src/game/config.ts
-var config = __webpack_require__(6457);
+// EXTERNAL MODULE: ./src/game/config.ts + 47 modules
+var config = __webpack_require__(5843);
 // EXTERNAL MODULE: ./src/draw/floor.ts
 var floor = __webpack_require__(9177);
 // EXTERNAL MODULE: ./src/d3-extend.ts
@@ -1332,7 +1332,13 @@ class Editor {
         const visible = this.getVisible();
         const showNothing = this.muted.size === game_layers/* CellLayers */.v.layerNames.length;
         const debug = this.muted.size > 0 || this.solo !== null;
-        this.map.draw(this.showLighting, visible, showNothing, debug, this.showDarkness);
+        this.map.draw({
+            showLighting: this.showLighting,
+            visibleLayers: visible,
+            showNothing,
+            debug,
+            showDarkness: this.showDarkness
+        });
     }
     async showFragmentLoader() {
         const loader = (0,d3_extend.d1)('#fragment-loader');

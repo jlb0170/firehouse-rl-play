@@ -1,3 +1,0 @@
-Git SHA: d1c31742
-Commit: fix an occasional died timing glitch
-Built: 2025-09-10 17:26:23 UTC
