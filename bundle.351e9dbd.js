@@ -1513,7 +1513,10 @@ const MENU_ITEMS = [
 var drawable_types = __webpack_require__(4380);
 // EXTERNAL MODULE: ./src/draw/material.ts
 var material = __webpack_require__(2994);
+// EXTERNAL MODULE: ./src/game/models/firehouse.ts
+var firehouse = __webpack_require__(8646);
 ;// ./src/ui/help.ts
+
 
 
 
@@ -1556,8 +1559,8 @@ class HelpSystem {
             'walls': { char: '#', desc: 'Walls, doors (+), windows (□), wall lights (¤)', color: '#666' },
             'items': { char: '*', desc: 'Lamps, equipment, and other things laying around', color: '#ff0' },
             'fire': { char: '▲', desc: 'Active fires that spread and create smoke', color: '#f44' },
-            'smoke': { char: '+', desc: 'Smoke that drifts and blocks vision', color: '#999' },
-            'pawn': { char: '@', desc: 'Firefighters under your command', color: '#0f0' }
+            'smoke': { char: '+', desc: 'Smoke that drifts and blocks sight; blue smoke is steam from water', color: '#999' },
+            'pawn': { char: '@', desc: 'Firefighters under your command, and the civilians they came for', color: '#0f0' }
         };
         const layerSections = game_layers/* CellLayers */.v.layerNames.map(layerName => {
             const info = layerInfo[layerName];
@@ -1583,6 +1586,7 @@ class HelpSystem {
         const drawableTable = `<table class="help-table">` +
             `<tr><th>Symbol</th><th>Object</th><th>Notes</th></tr>${drawableRows}</table>`;
         const materials = [
+            ['Crew', material/* CREW */.Ko],
             ['Meat', material/* MEAT */.SN],
             ['Wood', material/* WOOD */.wB],
             ['Plant', material/* PLANT */.G5],
@@ -1602,6 +1606,13 @@ class HelpSystem {
 <br/>
 <strong>GAME OVERVIEW:</strong><br/>
 Control a squad of firefighters (@) in a tactical roguelike. Give orders, then watch them execute in real-time or step-by-step.<br/>
+<br/>
+<strong>YOUR MISSION:</strong><br/>
+• The fire will not stop on its own - only you can put it out<br/>
+• Put out every fire to win; the banner tallies who you saved<br/>
+• Civilians are inside - carry them (or let them flee) to the map edge to rescue them<br/>
+• Every rescue pays the firehouse $25 - spend it on upgrades between missions<br/>
+• If your whole crew falls, the mission is lost<br/>
 <br/>
 <strong>MAIN CONTROLS:</strong><br/>
 • <strong>▶️ Play/Pause</strong> - Start/stop game simulation<br/>
@@ -1661,39 +1672,50 @@ The game world is built in layers (${game_layers/* CellLayers */.v.layerNames.le
 ${layerSections}<br/>
 <br/>
 <strong>TERRAIN INTERACTIONS:</strong><br/>
-• <strong>Walls</strong> block movement and vision<br/>
+• <strong>Walls</strong> block movement, light, and sight - even where they only touch diagonally<br/>
 • <strong>Doors</strong> (+) can be opened and closed<br/>
-• <strong>Items</strong> provide light and can be carried<br/>
-• <strong>Fires</strong> spread to adjacent flammable materials<br/>
-• <strong>Smoke</strong> reduces visibility and can harm firefighters<br/>
+• <strong>Fires</strong> spread to adjacent flammable, dry materials<br/>
+• <strong>Smoke</strong> ends sight lines and sets pawns coughing<br/>
+<br/>
+<strong>WHAT YOU CAN SEE:</strong><br/>
+You know only what your crew knows:<br/>
+• <strong>Visible</strong> - in a firefighter's lit line of sight right now<br/>
+• <strong>Remembered</strong> - dim gray: how it looked when you last saw it (it may have burned since)<br/>
+• <strong>Gold marks</strong> - intel: dispatch knows the building's outside doors before you arrive<br/>
+• <strong>Darkness</strong> - unexplored; sound carries though, so listen for coughs and cries<br/>
 <br/>
 <strong>LIGHTING SYSTEM:</strong><br/>
-• Fires and lamps provide illumination<br/>
-• Darkness affects visibility and movement<br/>
-• Smoke blocks light transmission<br/>
-• Materials cast shadows and block vision<br/>
+• Fires and lamps provide illumination - the fire you fight is also the light you see by<br/>
+• A dark room in plain sight still hides what it holds<br/>
+• Your firefighters carry lanterns; civilians do not<br/>
 </div>`,
             // Page 4: Fire Mechanics and Debug
             `<div class="help-text">
 <strong>🔥 FIRE MECHANICS & DEBUG 🔥</strong><br/>
 <br/>
 <strong>FIRE BEHAVIOR:</strong><br/>
-• Fires spread to adjacent cells over time<br/>
-• Fires create smoke that drifts randomly<br/>
-• Materials can ignite and burn<br/>
-• Lighting affects visibility and tactics<br/>
-• Older fires burn out eventually<br/>
+• Fire feeds on fuel: it burns as long as its cell holds dry flammable material<br/>
+• It spreads to fresh fuel nearby and consumes what it stands on<br/>
+• A burned-out wall leaves a charred gap - and a way through<br/>
+• The last fire never dies on its own: someone has to put it out<br/>
 • While on fire, extinguishing yourself takes five turns<br/>
 • Another pawn can put you out in one—firefighters work best in teams!<br/>
 <br/>
+<strong>WATER & DAMP:</strong><br/>
+• Throwing water (<strong>w</strong>) kills fire and soaks the splash - damp reads blue, ≈ in the terminal<br/>
+• Damp material cannot catch fire; each fire hit boils off some damp as steam<br/>
+• Wet lines painted ahead of the fire hold as firebreaks; water thrown into a blaze boils away fast<br/>
+• Soaked pawns are fireproof but move at half speed while damp<br/>
+• Buckets hold ${firehouse/* BASE_WATER */.s1} throws - refill beside sinks, tubs, and toilets<br/>
+<br/>
 <strong>SMOKE MECHANICS:</strong><br/>
-• Smoke reduces transparency and vision<br/>
-• Smoke drifts to adjacent cells<br/>
-• Smoke dissipates over time<br/>
-• Can harm firefighters with prolonged exposure<br/>
+• Smoke ends your sight lines - a burning building blinds you as it burns<br/>
+• Smoke drifts, dissipates, and sets pawns coughing, which costs them their turn<br/>
 <br/>
 <strong>DEBUG CONTROLS:</strong><br/>
 • <strong>LT</strong> - Toggle lighting display<br/>
+• <strong>DK</strong> - Toggle darkness<br/>
+• <strong>FOG</strong> - Toggle fog of war<br/>
 • <strong>Layer buttons</strong> - Show/hide specific layers (${layerButtons})<br/>
 • <strong>on/off</strong> - Turn all layers on/off<br/>
 <br/>
@@ -2138,7 +2160,7 @@ class UI {
 // EXTERNAL MODULE: ./src/signal.ts
 var signal = __webpack_require__(334);
 // EXTERNAL MODULE: ./src/ui/firehouse.ts + 1 modules
-var firehouse = __webpack_require__(8846);
+var ui_firehouse = __webpack_require__(8846);
 // EXTERNAL MODULE: ./src/game/state.ts + 1 modules
 var state = __webpack_require__(9308);
 // EXTERNAL MODULE: ./src/ui/feedback.ts + 1 modules
@@ -2909,9 +2931,9 @@ class Game {
                 this.resumeFromModal();
         });
         this.saveSlots = new SaveSlots(this.state);
-        this.firehouse = new firehouse/* FirehouseModal */._();
+        this.firehouse = new ui_firehouse/* FirehouseModal */._();
         state/* FirehouseMode */.M.on(this.enterFirehouse);
-        this.offFirehouseClosed = firehouse/* FirehouseClosed */.F.on(this.afterFirehouse);
+        this.offFirehouseClosed = ui_firehouse/* FirehouseClosed */.F.on(this.afterFirehouse);
         // Auto-show load dialog if saves exist, otherwise start normally
         if (this.saveSlots.hasSavedGames()) {
             this.saveSlots.showAutoLoadDialog();
@@ -3179,7 +3201,7 @@ class Game {
         if (this.offFirehouseClosed)
             this.offFirehouseClosed();
         this.firehouse.hide();
-        this.offFirehouseClosed = firehouse/* FirehouseClosed */.F.on(this.afterFirehouse);
+        this.offFirehouseClosed = ui_firehouse/* FirehouseClosed */.F.on(this.afterFirehouse);
     }
     updateDarknessToggleButton() {
         const button = (0,utils.$1)('darkness-toggle');
@@ -4070,6 +4092,7 @@ class Crew extends Meat {
         super(...arguments);
         this.hits = 60;
         this.dryRate = 2;
+        this.note = 'flammable - your firefighters: tough, and their gear sheds water fast';
     }
 }
 Crew.instance = new Crew();
@@ -14107,9 +14130,10 @@ const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Af: () => (/* binding */ PawnModel),
 /* harmony export */   EX: () => (/* binding */ UPGRADES),
-/* harmony export */   oj: () => (/* binding */ FirehouseModel)
+/* harmony export */   oj: () => (/* binding */ FirehouseModel),
+/* harmony export */   s1: () => (/* binding */ BASE_WATER)
 /* harmony export */ });
-/* unused harmony exports RESCUE_PAY, BASE_WATER */
+/* unused harmony export RESCUE_PAY */
 /* harmony import */ var _draw_firefighter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9290);
 
 class PawnModel {
