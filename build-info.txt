@@ -1,0 +1,3 @@
+Git SHA: c82bad5c
+Commit: Game sheds its junk drawer: DebugPanel, HelpPopup, EnvSwitch flow
+Built: 2026-08-06 19:08:37 UTC
